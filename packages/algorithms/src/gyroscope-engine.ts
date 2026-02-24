@@ -1,9 +1,9 @@
 import {
-  SENSITIVITY_MIN,
-  SENSITIVITY_MAX,
   GYRO_BASE_FACTOR,
   GYRO_PANEL_BONUS,
   GYRO_GAMING_BONUS,
+  SENSITIVITY_MIN,
+  SENSITIVITY_MAX,
 } from '@ares/config';
 
 import type { SensitivityOutput, GyroscopeOutput, DeviceSpecs } from './types';
@@ -12,48 +12,72 @@ import type { SensitivityOutput, GyroscopeOutput, DeviceSpecs } from './types';
 // ARES GYROSCOPE ENGINE v1.0
 // ═══════════════════════════════════════════════════════════
 //
-// El giroscopio es una feature PREMIUM que calcula valores
-// complementarios para jugadores que usan gyro en Free Fire.
-//
 // FÓRMULA:
-//   gyroBase = sensitivityValue × GYRO_BASE_FACTOR (50%)
-//   panelBonus = AMOLED/OLED ? GYRO_PANEL_BONUS (+5%) : 0
-//   gamingBonus = GAMING tier ? GYRO_GAMING_BONUS (+8%) : 0
-//   gyroFinal = clamp(round(gyroBase × (1 + panelBonus + gamingBonus)), 1, 100)
+//   gyroValue = sensitivityValue × GYRO_BASE_FACTOR (0.50)
+//             + panelBonus (AMOLED/OLED = +5%)
+//             + gamingBonus (GAMING tier = +8%)
+//             + fieldAdjustment (varies per scope type)
+//
+// FIELD ADJUSTMENTS:
+//   gyroGeneral:   +2  (necesita algo más de sensibilidad)
+//   gyroRedPoint:  +0  (neutral)
+//   gyroScope2x:   -1  (ligeramente más estable)
+//   gyroScope4x:   -3  (requiere más estabilidad)
+//   gyroSniper:    -5  (máxima estabilidad para sniper)
+//   gyroFreeView:  +3  (más libertad de movimiento)
+//
+// NOTA: Giroscopio es feature PREMIUM. Los valores se calculan
+// siempre pero solo se muestran a usuarios Premium/VIP.
 
-// Paneles que reciben bonus de giroscopio (mejor respuesta táctil)
-const GYRO_PANEL_TYPES = new Set(['AMOLED', 'OLED', 'LTPO']);
+const FIELD_ADJUSTMENTS: Record<keyof GyroscopeOutput, number> = {
+  gyroGeneral:   2,
+  gyroRedPoint:  0,
+  gyroScope2x:  -1,
+  gyroScope4x:  -3,
+  gyroSniper:   -5,
+  gyroFreeView:  3,
+};
 
-// Tiers que reciben bonus de giroscopio (mejor hardware)
-const GYRO_TIER_TYPES = new Set(['GAMING', 'ULTRA']);
+// Map gyro fields to their sensitivity counterparts
+const GYRO_TO_SENS: Record<keyof GyroscopeOutput, keyof SensitivityOutput> = {
+  gyroGeneral:   'general',
+  gyroRedPoint:  'redPoint',
+  gyroScope2x:   'scope2x',
+  gyroScope4x:   'scope4x',
+  gyroSniper:    'sniperScope',
+  gyroFreeView:  'freeView',
+};
 
 function clamp(value: number, min: number, max: number): number {
   return Math.round(Math.max(min, Math.min(max, value)));
-}
-
-function calculateGyroValue(
-  sensitivityValue: number,
-  panelBonus: number,
-  tierBonus: number,
-): number {
-  const gyroBase = sensitivityValue * GYRO_BASE_FACTOR;
-  const multiplier = 1 + panelBonus + tierBonus;
-  return clamp(gyroBase * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX);
 }
 
 export function generateGyroscope(
   sensitivity: SensitivityOutput,
   specs: DeviceSpecs,
 ): GyroscopeOutput {
-  const panelBonus = GYRO_PANEL_TYPES.has(specs.panelType) ? GYRO_PANEL_BONUS : 0;
-  const tierBonus = GYRO_TIER_TYPES.has(specs.tier) ? GYRO_GAMING_BONUS : 0;
+  // Calculate bonuses
+  const panelBonus = (specs.panelType === 'AMOLED' || specs.panelType === 'OLED')
+    ? GYRO_PANEL_BONUS
+    : 0;
 
-  return {
-    gyroGeneral:  calculateGyroValue(sensitivity.general, panelBonus, tierBonus),
-    gyroRedPoint: calculateGyroValue(sensitivity.redPoint, panelBonus, tierBonus),
-    gyroScope2x:  calculateGyroValue(sensitivity.scope2x, panelBonus, tierBonus),
-    gyroScope4x:  calculateGyroValue(sensitivity.scope4x, panelBonus, tierBonus),
-    gyroSniper:   calculateGyroValue(sensitivity.sniperScope, panelBonus, tierBonus),
-    gyroFreeView: calculateGyroValue(sensitivity.freeView, panelBonus, tierBonus),
-  };
+  const gamingBonus = specs.tier === 'GAMING' ? GYRO_GAMING_BONUS : 0;
+
+  const totalFactor = GYRO_BASE_FACTOR + panelBonus + gamingBonus;
+
+  const result: Partial<GyroscopeOutput> = {};
+
+  for (const [gyroField, sensField] of Object.entries(GYRO_TO_SENS)) {
+    const key = gyroField as keyof GyroscopeOutput;
+    const baseValue = sensitivity[sensField];
+    const adjustment = FIELD_ADJUSTMENTS[key];
+
+    result[key] = clamp(
+      baseValue * totalFactor + adjustment,
+      SENSITIVITY_MIN,
+      SENSITIVITY_MAX,
+    );
+  }
+
+  return result as GyroscopeOutput;
 }
