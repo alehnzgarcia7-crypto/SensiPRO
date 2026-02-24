@@ -51,6 +51,19 @@
       "file_delta": 19,
       "phase": 0,
       "timestamp": "2026-02-24T06:48:13Z"
+    },
+    {
+      "name": "ARES-005-infra-docker",
+      "status": "success",
+      "duration_seconds": 143,
+      "loc": 1502,
+      "files": 33,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 0,
+      "file_delta": 0,
+      "phase": 0,
+      "timestamp": "2026-02-24T06:51:02Z"
     }
   ],
   "phases": []
