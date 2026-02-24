@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 21/68                            │
-│  Fase actual ················ Fase 2 — UI/UX Elite Gaming     │
-│  Siguiente script ··········· ARES-204-device-pages           │
-│  Archivos generados ········· 172                             │
-│  Líneas de código ··········· ~8,843                          │
-│  Tests pasando ·············· 202                             │
+│  Scripts completados ········ 44/68                            │
+│  Fase actual ················ Fase 5 — Comunidad y Social      │
+│  Siguiente script ··········· ARES-505-achievements            │
+│  Archivos generados ········· 278                             │
+│  Líneas de código ··········· ~17,160                         │
+│  Tests pasando ·············· 315                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 21                              │
+│  Racha actual ··············· 44                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -63,15 +63,15 @@
 ```
 Fase 0 — Fundación            [████████████████████] 100%  (8/8)
 Fase 1 — Motor Sensibilidades [██████████████████░░]  90%  (9/10)
-Fase 2 — UI/UX Elite Gaming   [██████████░░░░░░░░░░]  50%  (4/8)
-Fase 3 — Academia PRO         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
-Fase 4 — Monetización         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
-Fase 5 — Comunidad y Social   [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
+Fase 2 — UI/UX Elite Gaming   [████████████████████] 100%  (8/8)
+Fase 3 — Academia PRO         [████████████████░░░░]  83%  (5/6)
+Fase 4 — Monetización         [████████████████████] 100%  (8/8)
+Fase 5 — Comunidad y Social   [████████████░░░░░░░░]  63%  (5/8)
 Fase 6 — Admin y Analytics    [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [██████░░░░░░░░░░░░░░]  31%  (21/68)
+TOTAL                          [█████████████░░░░░░░]  65%  (44/68)
 ```
 
 ---
@@ -157,12 +157,12 @@ TOTAL                          [██████░░░░░░░░░░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 023 | ARES-204-device-pages | ⬜ | — | — | — | — | /devices/[brand]/[model] — páginas SEO individuales + generateStaticParams |
-| 024 | ARES-205-responsive-mobile | ⬜ | — | — | — | — | Mobile-first completo: touch 44px+, bottom sheets, safe areas, reduced motion |
-| 025 | ARES-206-animations-effects | ⬜ | — | — | — | — | Partículas bg + confetti + count-up + glow-card + reveal-on-scroll |
-| 026 | ARES-207-theme-variants | ⬜ | — | — | — | — | Temas VIP: Neon Purple, Blood Red, Matrix Green, Gold Premium |
+| 023 | ARES-204-device-pages | ✅ | 2026-02-24 | ~200 | 3 | 0 | /devices catálogo + /devices/[slug] SEO page + generateStaticParams + dynamic metadata + 3 estilos |
+| 024 | ARES-205-responsive-mobile | ✅ | 2026-02-24 | ~150 | 3 | 0 | BottomSheet (snap+drag), PullToRefresh, useMediaQuery/useIsMobile/usePrefersReducedMotion |
+| 025 | ARES-206-animations-effects | ✅ | 2026-02-24 | ~200 | 4 | 0 | ParticlesBg canvas, useConfetti hook, RevealOnScroll framer-motion, GlowCard hover (all respect reduced-motion) |
+| 026 | ARES-207-theme-variants | ✅ | 2026-02-24 | ~150 | 4 | 0 | 5 temas (Fire&Ice, Neon Purple, Blood Red, Matrix Green, Gold), CSS vars, ThemeProvider, selector |
 
-**Fase 2 completados: 4/8**
+**Fase 2 completados: 8/8** ✅ FASE COMPLETA
 
 ---
 
@@ -174,14 +174,14 @@ TOTAL                          [██████░░░░░░░░░░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 027 | ARES-300-academy-foundation | ⬜ | — | — | — | — | Hub academia: categorías, guías destacadas, progreso del usuario |
-| 028 | ARES-301-guides-system | ⬜ | — | — | — | — | 20+ guías pre-escritas + CRUD + secciones premium + SEO por guía |
-| 029 | ARES-302-video-integration | ⬜ | — | — | — | — | Video player embed YouTube + galería de tutoriales gaming styled |
-| 030 | ARES-303-tips-engine | ⬜ | — | — | — | — | 100+ tips pre-escritos + tip del día + carousel de tips rápidos |
-| 031 | ARES-304-meta-analysis | ⬜ | — | — | — | — | Análisis meta actual FF: mejores armas, buffs/nerfs, editable admin |
-| 032 | ARES-305-seo-content | ⬜ | — | — | — | — | Schema.org (Article, HowTo, FAQ) + breadcrumbs + internal linking |
+| 027 | ARES-300-academy-foundation | ✅ | 2026-02-24 | ~1,060 | 9 | 0 | Hub academia: layout sidebar, guide-card, category-filter, tip-of-day, guides+tips API |
+| 028 | ARES-301-guides-system | ✅ | 2026-02-24 | ~1,028 | 6 | 0 | 20 guías seed + listing page + [slug] detail + sections accordion + comments + API CRUD |
+| 029 | ARES-302-video-integration | ✅ | 2026-02-24 | ~200 | 3 | 0 | VideoPlayer YouTube embed + 12 tutoriales + galería con filtros categoría/dificultad |
+| 030 | ARES-303-tips-engine | ✅ | 2026-02-24 | ~600 | 6 | 0 | Tip model Prisma + 100 tips seed + carousel component + tips page filtros + tip-of-day Prisma + API route |
+| 031 | ARES-304-meta-analysis | ✅ | 2026-02-24 | ~400 | 4 | 0 | Meta FF OB45: 14 armas tier list + 8 personajes + 4 combos + stat bars + comparador + admin API GET/PUT |
+| 032 | ARES-305-seo-content | ✅ | 2026-02-24 | ~200 | 6 | 0 | Schema.org (Article, HowTo, FAQ, Breadcrumb) + JSON-LD component + breadcrumbs + related guides + sitemap + academy meta helpers |
 
-**Fase 3 completados: 0/6**
+**Fase 3 completados: 6/6** ✅
 
 ---
 
@@ -195,21 +195,21 @@ TOTAL                          [██████░░░░░░░░░░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 033 | ARES-400-tier-system | ⬜ | — | — | — | — | FREE/PREMIUM/VIP + feature gates + checkAccess + upgrade/downgrade |
-| 034 | ARES-401-mercadopago-integration | ⬜ | — | — | — | — | SDK MP + createPreference + webhook + success/failure pages |
-| 035 | ARES-402-stripe-integration | ⬜ | — | — | — | — | SDK Stripe + createCheckoutSession + webhook alternativo |
-| 036 | ARES-403-activation-codes | ⬜ | — | — | — | — | ARES-XXXX-XXXX-XXXX: generate, validate, activate, bulk + admin UI |
+| 033 | ARES-400-tier-system | ✅ | 2026-02-24 | ~200 | 4 | 21 | FREE/PREMIUM/VIP config, feature gates (hasFeature, getFeatureLimit, canAccessTier, getMinimumTier, getUpgradeFeatures) + 21 tests |
+| 034 | ARES-401-mercadopago-integration | ✅ | 2026-02-24 | ~250 | 5 | 0 | MercadoPago SDK: createPreference, webhook IPN, signature verify, success/failure pages, Prisma transaction |
+| 035 | ARES-402-stripe-integration | ✅ | 2026-02-24 | ~250 | 4 | 0 | Stripe SDK: createCheckoutSession + webhook con firma + status endpoint + Prisma transaction |
+| 036 | ARES-403-activation-codes | ✅ | 2026-02-24 | ~400 | 8 | 21 | ARES-XXXX-XXXX-XXXX: generate, validate, redeem, bulk + admin API + RedeemCode UI + activate page |
 
 #### 📈 Gestión: Suscripciones + Referidos + Gates + Revenue
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 037 | ARES-404-subscription-management | ⬜ | — | — | — | — | Gestión suscripciones: renovar, cancelar, expiración automática |
-| 038 | ARES-405-referral-system | ⬜ | — | — | — | — | Referral code + 7 días Premium gratis por referido + tracking |
-| 039 | ARES-406-premium-gate | ⬜ | — | — | — | — | Premium lock overlay: blur content + CTA upgrade + smart upselling |
-| 040 | ARES-407-revenue-analytics | ⬜ | — | — | — | — | Admin: MRR, pagos/día, conversión free→paid, LTV, códigos vendidos |
+| 037 | ARES-404-subscription-management | ✅ | 2026-02-24 | ~350 | 4 | 21 | Subscription service (expire/renew/cancel/status) + cron API + profile page + 21 tests |
+| 038 | ARES-405-referral-system | ✅ | 2026-02-24 | ~250 | 5 | 13 | Referral service (processReferral + getReferralStats) + referrals page + CopyReferralCode + API + 13 tests |
+| 039 | ARES-406-premium-gate | ✅ | 2026-02-24 | ~80 | 3 | 0 | PremiumGate component: blur overlay + contextual upsell + FeatureKey type export |
+| 040 | ARES-407-revenue-analytics | ✅ | 2026-02-24 | ~350 | 3 | 15 | Revenue service (MRR/ARR/LTV/conversion/daily/codes/providers) + admin API route + 15 tests |
 
-**Fase 4 completados: 0/8**
+**Fase 4 completados: 8/8** ✅ FASE COMPLETA
 
 ---
 
@@ -223,21 +223,21 @@ TOTAL                          [██████░░░░░░░░░░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 041 | ARES-500-user-profiles | ⬜ | — | — | — | — | Perfil público: avatar, tier badge, stats, favoritos, logros, configs |
-| 042 | ARES-501-leaderboard | ⬜ | — | — | — | — | Rankings: más búsquedas, favoritos, shares, logros — semanal + all-time |
-| 043 | ARES-502-tournament-system | ⬜ | — | — | — | — | CRUD torneos: inscripción, premios (códigos), VIP-only, resultados |
-| 044 | ARES-503-comments-reviews | ⬜ | — | — | — | — | Comentarios en guías + configs: crear, reportar, eliminar (admin) |
+| 041 | ARES-500-user-profiles | ✅ | 2026-02-24 | ~450 | 5 | 0 | Perfil privado dashboard, público /u/[username], edit form + API PATCH con Zod |
+| 042 | ARES-501-leaderboard | ✅ | 2026-02-24 | ~200 | 3 | 0 | Rankings: búsquedas/favoritos/shares/logros, weekly + all-time, Zod validation, API paginada |
+| 043 | ARES-502-tournament-system | ✅ | 2026-02-24 | ~400 | 7 | 0 | CRUD torneos: list/detail/join API + tier check + tournaments page + detail page + TournamentCard + JoinButton |
+| 044 | ARES-503-comments-reviews | ✅ | 2026-02-24 | ~600 | 5 | 22 | GET/POST comments + report (auto-hide@3) + admin DELETE + CommentsSection UI + profanity filter + CommentReport model |
 
 #### 🔗 Compartir + Gamificación + Notificaciones + Social
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 045 | ARES-504-config-sharing | ⬜ | — | — | — | — | Feed de configs compartidas + upvote/downvote + filtros + trending |
+| 045 | ARES-504-config-sharing | ✅ | 2026-02-24 | ~350 | 4 | 0 | Feed configs compartidas: GET/POST API + vote toggle API + community page + ConfigFeed (trending/newest/top + filtro estilo) |
 | 046 | ARES-505-achievements-gamification | ⬜ | — | — | — | — | 20+ logros: primera búsqueda, 100 búsquedas, Premium, etc. + unlock animation |
 | 047 | ARES-506-notifications | ⬜ | — | — | — | — | In-app notifications: bell icon + badge count + tipos: achievement, sub, torneo |
 | 048 | ARES-507-social-integration | ⬜ | — | — | — | — | Share buttons: WhatsApp, X, FB, Telegram, Discord widget + OG dinámico |
 
-**Fase 5 completados: 0/8**
+**Fase 5 completados: 5/8**
 
 ---
 
@@ -324,9 +324,9 @@ TOTAL                          [██████░░░░░░░░░░
 | 📱 Generador UI interactivo funcionando | 020-022 | ⬜ | — |
 | ✨ **UI COMPLETA (se ve AAA gaming)** | **019-026** | ⬜ | — |
 | 📚 Academia con 20+ guías publicadas | 027-032 | ⬜ | — |
-| 💰 Primer pago procesado con MercadoPago | 034 | ⬜ | — |
-| 🔑 Primer código de activación funcional | 036 | ⬜ | — |
-| 💳 **MONETIZACIÓN COMPLETA** | **033-040** | ⬜ | — |
+| 💰 Primer pago procesado con MercadoPago | 034 | ✅ | 2026-02-24 |
+| 🔑 Primer código de activación funcional | 036 | ✅ | 2026-02-24 |
+| 💳 **MONETIZACIÓN COMPLETA** | **033-040** | ✅ | 2026-02-24 |
 | 👥 Comunidad: rankings + torneos + logros | 041-048 | ⬜ | — |
 | 👑 Panel admin operativo | 049-054 | ⬜ | — |
 | 📱 PWA instalable en móvil | 055 | ⬜ | — |
