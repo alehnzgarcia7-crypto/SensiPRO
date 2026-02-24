@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 48/68                            │
+│  Scripts completados ········ 49/68                            │
 │  Fase actual ················ Fase 6 — Admin y Analytics        │
-│  Siguiente script ··········· ARES-601-user-management         │
-│  Archivos generados ········· 296                             │
-│  Líneas de código ··········· ~18,230                         │
+│  Siguiente script ··········· ARES-602-content-management      │
+│  Archivos generados ········· 301                             │
+│  Líneas de código ··········· ~18,530                         │
 │  Tests pasando ·············· 352                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 48                              │
+│  Racha actual ··············· 49                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -67,11 +67,11 @@ Fase 2 — UI/UX Elite Gaming   [███████████████�
 Fase 3 — Academia PRO         [████████████████░░░░]  83%  (5/6)
 Fase 4 — Monetización         [████████████████████] 100%  (8/8)
 Fase 5 — Comunidad y Social   [████████████████████] 100%  (8/8)
-Fase 6 — Admin y Analytics    [███░░░░░░░░░░░░░░░░░]  17%  (1/6)
+Fase 6 — Admin y Analytics    [██████░░░░░░░░░░░░░░]  33%  (2/6)
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [██████████████░░░░░░]  71%  (48/68)
+TOTAL                          [██████████████░░░░░░]  72%  (49/68)
 ```
 
 ---
@@ -250,13 +250,13 @@ TOTAL                          [██████████████░░
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
 | 049 | ARES-600-admin-dashboard | ✅ | 2026-02-24 | ~120 | 4 | 0 | Dashboard: KPIs, sidebar nav, quick actions, role-protected layout |
-| 050 | ARES-601-user-management | ⬜ | — | — | — | — | Tabla usuarios: filtros, búsqueda, cambiar tier/role, desactivar, CSV |
+| 050 | ARES-601-user-management | ✅ | 2026-02-24 | ~300 | 5 | 0 | Tabla usuarios: busqueda, filtros tier/role, cambiar tier/role, desactivar, CSV export, admin log |
 | 051 | ARES-602-content-management | ⬜ | — | — | — | — | CMS: CRUD guías/tips/meta + editor markdown + gestión dispositivos |
 | 052 | ARES-603-analytics-dashboard | ⬜ | — | — | — | — | Recharts: búsquedas/día, devices top, estilos, conversión, retención |
 | 053 | ARES-604-support-system | ⬜ | — | — | — | — | Tickets soporte + formulario contacto + FAQ con búsqueda |
 | 054 | ARES-605-ab-testing | ⬜ | — | — | — | — | Framework A/B: pricing, CTAs, landing variants + track conversión |
 
-**Fase 6 completados: 1/6**
+**Fase 6 completados: 2/6**
 
 ---
 
