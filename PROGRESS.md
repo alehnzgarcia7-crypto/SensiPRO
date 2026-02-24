@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 56/68                            │
+│  Scripts completados ········ 57/68                            │
 │  Fase actual ················ Fase 7 — Mobile y PWA            │
-│  Siguiente script ··········· ARES-703-capacitor-apk           │
-│  Archivos generados ········· 354                             │
-│  Líneas de código ··········· ~20,530                         │
+│  Siguiente script ··········· ARES-704-performance-optimization│
+│  Archivos generados ········· 357                             │
+│  Líneas de código ··········· ~20,600                         │
 │  Tests pasando ·············· 360                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 56                              │
+│  Racha actual ··············· 57                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -68,10 +68,10 @@ Fase 3 — Academia PRO         [███████████████�
 Fase 4 — Monetización         [████████████████████] 100%  (8/8)
 Fase 5 — Comunidad y Social   [████████████████████] 100%  (8/8)
 Fase 6 — Admin y Analytics    [████████████████████] 100%  (6/6)
-Fase 7 — Mobile y PWA         [████████████░░░░░░░░]  60%  (3/5)
+Fase 7 — Mobile y PWA         [████████████████░░░░]  80%  (4/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [████████████████░░░░]  82%  (56/68)
+TOTAL                          [████████████████░░░░]  84%  (57/68)
 ```
 
 ---
@@ -271,10 +271,10 @@ TOTAL                          [████████████████
 | 055 | ARES-700-pwa-setup | ✅ | 2026-02-24 | ~200 | 18 | 0 | next-pwa + manifest.json + service worker + install prompt gaming + meta tags PWA + icon generator |
 | 056 | ARES-701-push-notifications | ✅ | 2026-02-24 | ~300 | 7 | 0 | VAPID config, subscribe/unsubscribe API, admin broadcast, PushPermission UI, SW push handler, PushSubscription model |
 | 057 | ARES-702-offline-mode | ✅ | 2026-02-24 | ~100 | 4 | 0 | IndexedDB cache, offline page, online status hook, offline indicator |
-| 058 | ARES-703-capacitor-apk | ⬜ | — | — | — | — | Capacitor config + build script → APK para Play Store / distribución |
+| 058 | ARES-703-capacitor-apk | ✅ | 2026-02-24 | ~70 | 3 | 0 | Capacitor config + build script + init script → APK para distribución |
 | 059 | ARES-704-performance-optimization | ⬜ | — | — | — | — | Lighthouse 90+ + code splitting + bundle analysis + Redis cache |
 
-**Fase 7 completados: 3/5**
+**Fase 7 completados: 4/5**
 
 ---
 
@@ -330,7 +330,7 @@ TOTAL                          [████████████████
 | 👥 Comunidad: rankings + torneos + logros | 041-048 | ⬜ | — |
 | 👑 Panel admin operativo | 049-054 | ⬜ | — |
 | 📱 PWA instalable en móvil | 055 | ✅ | 2026-02-24 |
-| 📦 APK para Android generado | 058 | ⬜ | — |
+| 📦 APK para Android generado | 058 | ✅ | 2026-02-24 |
 | 🧪 50+ tests unitarios pasando | 064 | ⬜ | — |
 | 🎯 E2E: user journey completo pasa | 066 | ⬜ | — |
 | 🌐 Staging live y funcional | 067 | ⬜ | — |
