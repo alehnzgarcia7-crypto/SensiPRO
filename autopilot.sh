@@ -634,7 +634,7 @@ execute_script() {
     # Execute with Claude Code
     cd "$PROJECT_DIR"
     local output
-    output=$(timeout 600 claude --print --dangerously-skip-permissions "$prompt" 2>&1 | tee "$log_file")
+    output=$(claude --print --dangerously-skip-permissions "$prompt" 2>&1 | tee "$log_file")
     local exit_code=$?
 
     local end_time=$(date +%s)
