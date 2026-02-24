@@ -37,7 +37,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0].message, statusCode: 400 } },
+        { success: false, error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0]?.message ?? 'Error de validación', statusCode: 400 } },
         { status: 400 },
       );
     }
@@ -100,7 +100,7 @@ export async function DELETE(req: Request): Promise<NextResponse> {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0].message, statusCode: 400 } },
+        { success: false, error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0]?.message ?? 'Error de validación', statusCode: 400 } },
         { status: 400 },
       );
     }

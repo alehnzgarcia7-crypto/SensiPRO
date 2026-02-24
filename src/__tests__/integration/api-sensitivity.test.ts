@@ -49,7 +49,8 @@ interface SensitivityData {
 async function getFirstDeviceId(): Promise<string | null> {
   const res = await fetch(`${BASE}/api/devices?limit=1`);
   const json: { data: DeviceItem[] } = await res.json();
-  return json.data.length > 0 ? json.data[0].id : null;
+  const first = json.data[0];
+  return json.data.length > 0 && first ? first.id : null;
 }
 
 describe('POST /api/generate', () => {

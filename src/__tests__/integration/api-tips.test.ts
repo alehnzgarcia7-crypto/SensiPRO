@@ -47,11 +47,13 @@ describe('GET /api/v1/academy/tips', () => {
     expect(res.status).toBe(200);
     if (json.data.length > 0) {
       const tip = json.data[0];
-      expect(tip).toHaveProperty('id');
-      expect(tip).toHaveProperty('title');
-      expect(tip).toHaveProperty('content');
-      expect(typeof tip.title).toBe('string');
-      expect(typeof tip.content).toBe('string');
+      if (tip) {
+        expect(tip).toHaveProperty('id');
+        expect(tip).toHaveProperty('title');
+        expect(tip).toHaveProperty('content');
+        expect(typeof tip.title).toBe('string');
+        expect(typeof tip.content).toBe('string');
+      }
     }
   });
 
@@ -108,8 +110,10 @@ describe('GET /api/v1/academy/tips', () => {
     const page2: PaginatedResponse = await page2Res.json();
 
     expect(page1.data.length).toBeLessThanOrEqual(3);
-    if (page2.data.length > 0 && page1.data.length > 0) {
-      expect(page1.data[0].id).not.toBe(page2.data[0].id);
+    const firstPage1 = page1.data[0];
+    const firstPage2 = page2.data[0];
+    if (page2.data.length > 0 && page1.data.length > 0 && firstPage1 && firstPage2) {
+      expect(firstPage1.id).not.toBe(firstPage2.id);
     }
   });
 

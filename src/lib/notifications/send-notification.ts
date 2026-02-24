@@ -71,7 +71,7 @@ export async function sendTournamentNotification(
     userId,
     type: 'TOURNAMENT',
     title: '🏆 Torneo',
-    message: messages[action],
+    message: messages[action] ?? `Actualización del torneo "${tournamentTitle}"`,
     link: '/tournaments',
   });
 }

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: parsed.error.issues[0].message,
+            message: parsed.error.issues[0]?.message ?? 'Error de validación',
             statusCode: 400,
           },
         },

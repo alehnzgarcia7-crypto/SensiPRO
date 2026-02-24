@@ -27,7 +27,8 @@ describe('GET /api/devices', () => {
 
     expect(json.success).toBe(true);
     if (json.data.length > 0) {
-      expect(json.data[0].brand).toBe('Samsung');
+      const first = json.data[0];
+      if (first) expect(first.brand).toBe('Samsung');
     }
   });
 
@@ -59,8 +60,10 @@ describe('GET /api/devices', () => {
     const page2: { data: Array<{ id: string }> } = await page2Res.json();
 
     expect(page1.data.length).toBeLessThanOrEqual(5);
-    if (page2.data.length > 0) {
-      expect(page1.data[0].id).not.toBe(page2.data[0].id);
+    const firstPage1 = page1.data[0];
+    const firstPage2 = page2.data[0];
+    if (page2.data.length > 0 && firstPage1 && firstPage2) {
+      expect(firstPage1.id).not.toBe(firstPage2.id);
     }
   });
 
@@ -116,7 +119,9 @@ describe('GET /api/devices/[slug]', () => {
     const list: { data: Array<{ slug: string }> } = await listRes.json();
     if (list.data.length === 0) return;
 
-    const slug = list.data[0].slug;
+    const firstDevice = list.data[0];
+    if (!firstDevice) return;
+    const slug = firstDevice.slug;
     const res = await fetch(`${BASE}/api/devices/${slug}`);
     const json: { success: boolean; data: { slug: string; brand: string; model: string } } = await res.json();
 
@@ -146,10 +151,13 @@ describe('GET /api/devices/brands', () => {
     expect(json.success).toBe(true);
     expect(Array.isArray(json.data)).toBe(true);
     if (json.data.length > 0) {
-      expect(json.data[0]).toHaveProperty('name');
-      expect(json.data[0]).toHaveProperty('slug');
-      expect(json.data[0]).toHaveProperty('count');
-      expect(typeof json.data[0].count).toBe('number');
+      const first = json.data[0];
+      if (first) {
+        expect(first).toHaveProperty('name');
+        expect(first).toHaveProperty('slug');
+        expect(first).toHaveProperty('count');
+        expect(typeof first.count).toBe('number');
+      }
     }
   });
 });

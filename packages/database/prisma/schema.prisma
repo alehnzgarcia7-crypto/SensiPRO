@@ -95,6 +95,12 @@ enum TournamentStatus {
   CANCELLED
 }
 
+enum TipDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 enum TicketStatus {
   OPEN
   IN_PROGRESS
@@ -410,6 +416,25 @@ model GuideSection {
 
   @@map("guide_sections")
   @@index([guideId, orderIndex])
+}
+
+// ──────────────────────────────────
+// 10b. TIP — Tips y trucos de Free Fire
+// ──────────────────────────────────
+model Tip {
+  id              String          @id @default(cuid())
+  title           String          @db.VarChar(200)
+  content         String          @db.Text
+  category        GuideCategory
+  difficulty      TipDifficulty   @default(BEGINNER)
+  isPublished     Boolean         @default(true) @map("is_published")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  @@map("tips")
+  @@index([category])
+  @@index([difficulty])
+  @@index([isPublished])
 }
 
 // ──────────────────────────────────

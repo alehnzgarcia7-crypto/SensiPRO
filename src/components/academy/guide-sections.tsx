@@ -20,7 +20,7 @@ interface GuideSectionsProps {
 
 export function GuideSections({ sections, userTier }: GuideSectionsProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    new Set(sections.length > 0 ? [sections[0].id] : []),
+    new Set(sections.length > 0 && sections[0] ? [sections[0].id] : []),
   );
 
   function toggleSection(id: string) {
