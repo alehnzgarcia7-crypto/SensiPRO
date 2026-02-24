@@ -155,6 +155,19 @@
       "file_delta": 0,
       "phase": 1,
       "timestamp": "2026-02-24T15:54:42Z"
+    },
+    {
+      "name": "ARES-200-landing-page",
+      "status": "success",
+      "duration_seconds": 398,
+      "loc": 4662,
+      "files": 67,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 821,
+      "file_delta": 11,
+      "phase": 2,
+      "timestamp": "2026-02-24T16:15:14Z"
     }
   ],
   "phases": []
