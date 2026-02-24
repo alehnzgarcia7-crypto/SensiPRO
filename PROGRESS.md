@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 16/68                            │
+│  Scripts completados ········ 17/68                            │
 │  Fase actual ················ Fase 1 — Motor Sensibilidades   │
-│  Siguiente script ··········· ARES-108-favorites-system       │
-│  Archivos generados ········· 141                             │
-│  Líneas de código ··········· ~6,917                          │
+│  Siguiente script ··········· ARES-109-search-history         │
+│  Archivos generados ········· 146                             │
+│  Líneas de código ··········· ~7,247                          │
 │  Tests pasando ·············· 202                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 16                              │
+│  Racha actual ··············· 17                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -62,7 +62,7 @@
 
 ```
 Fase 0 — Fundación            [████████████████████] 100%  (8/8)
-Fase 1 — Motor Sensibilidades [████████████████░░░░]  80%  (8/10)
+Fase 1 — Motor Sensibilidades [██████████████████░░]  90%  (9/10)
 Fase 2 — UI/UX Elite Gaming   [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
 Fase 3 — Academia PRO         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
 Fase 4 — Monetización         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
@@ -71,7 +71,7 @@ Fase 6 — Admin y Analytics    [░░░░░░░░░░░░░░░�
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [████░░░░░░░░░░░░░░░░]  24%  (16/68)
+TOTAL                          [█████░░░░░░░░░░░░░░░]  25%  (17/68)
 ```
 
 ---
@@ -131,7 +131,7 @@ TOTAL                          [████░░░░░░░░░░░░
 | 014 | ARES-105-device-comparison | ✅ | 2026-02-24 | ~230 | 4 | 11 | Comparator engine + API /api/compare + 11 tests (specs/sens/gyro diff + verdict) |
 | 015 | ARES-106-config-export | ✅ | 2026-02-24 | ~300 | 4 | 22 | Export texto copiable + HTML templates 1080×1080/1080×1920 + ExportCard component + API /api/export |
 | 016 | ARES-107-share-system | ✅ | 2026-02-24 | ~250 | 4 | 33 | Share links: WhatsApp, Twitter/X, FB, Telegram + OG image dinámica + ShareButtons component |
-| 017 | ARES-108-favorites-system | ⬜ | — | — | — | — | CRUD favoritos + toggle button animado + límite FREE=3, Premium=∞ |
+| 017 | ARES-108-favorites-system | ✅ | 2026-02-24 | ~330 | 5 | 0 | CRUD favoritos API (GET/POST/PATCH/DELETE) + useFavorites hook + FavoriteButton component + favorites page |
 | 018 | ARES-109-search-history | ⬜ | — | — | — | — | Timeline visual de búsquedas + filtros + límite FREE=10, Premium=∞ |
 
 **Fase 1 completados: 8/10**
