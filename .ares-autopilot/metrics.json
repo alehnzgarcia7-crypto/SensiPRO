@@ -64,6 +64,19 @@
       "file_delta": 0,
       "phase": 0,
       "timestamp": "2026-02-24T06:51:02Z"
+    },
+    {
+      "name": "ARES-007-security-base",
+      "status": "failed",
+      "duration_seconds": 0,
+      "loc": 0,
+      "files": 0,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 0,
+      "file_delta": 0,
+      "phase": 0,
+      "timestamp": "2026-02-24T07:09:45Z"
     }
   ],
   "phases": []
