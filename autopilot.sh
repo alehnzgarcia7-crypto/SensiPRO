@@ -170,7 +170,7 @@ progress_bar() {
     local label=${3:-""}
     current=$(echo "$current" | tr -dc '0-9'); current=${current:-0}
     total=$(echo "$total" | tr -dc '0-9'); total=${total:-$TOTAL_SCRIPTS}
-    [ "$total" -eq 0 ] 2>/dev/null && total=$TOTAL_SCRIPTS
+    [ "${total:-1}" -eq 0 ] 2>/dev/null && total=$TOTAL_SCRIPTS
     local percentage=$((current * 100 / total))
     local filled=$((current * width / total))
     local empty=$((width - filled))
@@ -194,8 +194,8 @@ progress_bar() {
 
 phase_progress_bar() {
     local phase=$1; local completed=$2; local total=$3; local width=20
-    [ "$total" -eq 0 ] 2>/dev/null && return
-    local filled=$((completed * width / total))
+    [ "${total:-1}" -eq 0 ] 2>/dev/null && return
+    local filled=$(( (completed > 0 && total > 0) ? completed * width / total : 0 ))
     local empty=$((width - filled))
     local bar=""
     for ((i=0; i<filled; i++)); do bar+="█"; done
@@ -434,7 +434,7 @@ is_phase_complete() {
     local phase=$1
     local completed=$(get_phase_completed_count "$phase")
     local total=$(get_phase_total_count "$phase")
-    [ "$completed" -ge "$total" ] 2>/dev/null && [ "$total" -gt 0 ] 2>/dev/null
+    [ "${completed:-0}" -ge "${total:-1}" ] 2>/dev/null && [ "${total:-1}" -gt 0 ] 2>/dev/null
 }
 
 check_phase_completion() {
@@ -897,7 +897,7 @@ show_status() {
         elif [ "$pc" -eq 0 ] 2>/dev/null; then
             icon="⬜"; status_color=$D
         fi
-        printf "  ${icon} ${status_color}Fase %d${NC} %-18s ${bar} ${D}%d/%d${NC}\n" "$p" "${PHASE_NAMES[$p]}" "$pc" "$pt"
+        printf "  ${icon} ${status_color}Fase %s${NC} %-18s ${bar} ${D}%d/%d${NC}\n" "$p" "${PHASE_NAMES[$p]}" "$pc" "$pt"
     done
     echo ""
 }
