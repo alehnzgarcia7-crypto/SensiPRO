@@ -428,6 +428,19 @@
       "file_delta": 4,
       "phase": 8,
       "timestamp": "2026-02-24T20:56:33Z"
+    },
+    {
+      "name": "ARES-804-unit-tests",
+      "status": "success",
+      "duration_seconds": 681,
+      "loc": 24504,
+      "files": 243,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 83,
+      "file_delta": 0,
+      "phase": 8,
+      "timestamp": "2026-02-24T21:08:13Z"
     }
   ],
   "phases": []
