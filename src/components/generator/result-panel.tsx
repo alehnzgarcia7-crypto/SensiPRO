@@ -185,7 +185,11 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
       )}
 
       {/* HUD Recommendation */}
-      <HudRecommendationPanel data={allCalibrations.hudRecommendation} />
+      <HudRecommendationPanel
+        data={allCalibrations.hudRecommendation}
+        deviceId={selectedDevice.id}
+        screenSize={selectedDevice.screenSize}
+      />
 
       {/* Acciones */}
       <div className="flex flex-wrap gap-3">
