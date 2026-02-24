@@ -311,6 +311,19 @@
       "file_delta": 8,
       "phase": 6,
       "timestamp": "2026-02-24T20:24:18Z"
+    },
+    {
+      "name": "ARES-700-pwa-setup",
+      "status": "success",
+      "duration_seconds": 317,
+      "loc": 22878,
+      "files": 219,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 125,
+      "file_delta": 1,
+      "phase": 7,
+      "timestamp": "2026-02-24T20:29:53Z"
     }
   ],
   "phases": []
