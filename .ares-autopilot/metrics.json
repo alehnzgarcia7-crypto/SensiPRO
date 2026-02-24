@@ -246,6 +246,19 @@
       "file_delta": 4,
       "phase": 6,
       "timestamp": "2026-02-24T19:53:03Z"
+    },
+    {
+      "name": "ARES-601-user-management",
+      "status": "success",
+      "duration_seconds": 315,
+      "loc": 19976,
+      "files": 197,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 617,
+      "file_delta": 5,
+      "phase": 6,
+      "timestamp": "2026-02-24T19:58:36Z"
     }
   ],
   "phases": []
