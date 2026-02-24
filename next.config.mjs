@@ -1,5 +1,4 @@
 import withPWAInit from '@ducanh2912/next-pwa';
-import type { NextConfig } from 'next';
 
 const withPWA = withPWAInit({
   dest: 'public',
@@ -50,8 +49,17 @@ const withPWA = withPWAInit({
   },
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: [
+    '@ares/database',
+    '@ares/algorithms',
+    '@ares/types',
+    '@ares/errors',
+    '@ares/logger',
+    '@ares/utils',
+    '@ares/config',
+  ],
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
