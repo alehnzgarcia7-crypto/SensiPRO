@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 45/68                            │
+│  Scripts completados ········ 46/68                            │
 │  Fase actual ················ Fase 5 — Comunidad y Social      │
-│  Siguiente script ··········· ARES-506-notifications           │
-│  Archivos generados ········· 282                             │
-│  Líneas de código ··········· ~17,460                         │
-│  Tests pasando ·············· 315                             │
+│  Siguiente script ··········· ARES-507-social-integration      │
+│  Archivos generados ········· 286                             │
+│  Líneas de código ··········· ~17,760                         │
+│  Tests pasando ·············· 327                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 45                              │
+│  Racha actual ··············· 46                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -66,12 +66,12 @@ Fase 1 — Motor Sensibilidades [███████████████�
 Fase 2 — UI/UX Elite Gaming   [████████████████████] 100%  (8/8)
 Fase 3 — Academia PRO         [████████████████░░░░]  83%  (5/6)
 Fase 4 — Monetización         [████████████████████] 100%  (8/8)
-Fase 5 — Comunidad y Social   [██████████████░░░░░░]  75%  (6/8)
+Fase 5 — Comunidad y Social   [███████████████░░░░░]  88%  (7/8)
 Fase 6 — Admin y Analytics    [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [█████████████░░░░░░░]  66%  (45/68)
+TOTAL                          [█████████████░░░░░░░]  68%  (46/68)
 ```
 
 ---
@@ -234,10 +234,10 @@ TOTAL                          [█████████████░░░
 |---|--------|--------|-------|-----|----------|-------|-------|
 | 045 | ARES-504-config-sharing | ✅ | 2026-02-24 | ~350 | 4 | 0 | Feed configs compartidas: GET/POST API + vote toggle API + community page + ConfigFeed (trending/newest/top + filtro estilo) |
 | 046 | ARES-505-achievements-gamification | ✅ | 2026-02-24 | ~300 | 4 | 0 | 21 logros (4 categorías, 4 tiers), auto-checker, achievements page, API GET/POST |
-| 047 | ARES-506-notifications | ⬜ | — | — | — | — | In-app notifications: bell icon + badge count + tipos: achievement, sub, torneo |
+| 047 | ARES-506-notifications | ✅ | 2026-02-24 | ~300 | 4 | 12 | In-app notifications: bell icon + badge count + mark read + send helpers (achievement/sub/tournament/referral/system) |
 | 048 | ARES-507-social-integration | ⬜ | — | — | — | — | Share buttons: WhatsApp, X, FB, Telegram, Discord widget + OG dinámico |
 
-**Fase 5 completados: 6/8**
+**Fase 5 completados: 7/8**
 
 ---
 
