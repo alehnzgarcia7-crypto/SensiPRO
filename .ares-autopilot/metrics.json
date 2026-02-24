@@ -1,1 +1,18 @@
-{"scripts":[],"phases":[]}
+{
+  "scripts": [
+    {
+      "name": "ARES-000-genesis",
+      "status": "success",
+      "duration_seconds": 600,
+      "loc": 0,
+      "files": 0,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 0,
+      "file_delta": 0,
+      "phase": 0,
+      "timestamp": "2026-02-24T04:52:09Z"
+    }
+  ],
+  "phases": []
+}
