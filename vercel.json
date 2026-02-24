@@ -1,0 +1,30 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npx prisma generate && npm run build",
+  "installCommand": "npm ci",
+  "regions": ["iad1"],
+  "crons": [
+    {
+      "path": "/api/cron/expire-subscriptions",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/email-automation",
+      "schedule": "0 10 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(?:js|css|woff2?|png|jpg|svg|ico)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}
