@@ -298,6 +298,19 @@
       "file_delta": 5,
       "phase": 6,
       "timestamp": "2026-02-24T20:16:43Z"
+    },
+    {
+      "name": "ARES-605-ab-testing",
+      "status": "success",
+      "duration_seconds": 436,
+      "loc": 22753,
+      "files": 218,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 952,
+      "file_delta": 8,
+      "phase": 6,
+      "timestamp": "2026-02-24T20:24:18Z"
     }
   ],
   "phases": []

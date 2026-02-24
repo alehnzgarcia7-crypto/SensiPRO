@@ -3,13 +3,22 @@ import type { Metadata, Viewport } from 'next';
 import { SessionProvider } from './session-provider';
 import './globals.css';
 
+export const viewport: Viewport = {
+  themeColor: '#ff6a00',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  colorScheme: 'dark',
+};
+
 export const metadata: Metadata = {
   title: {
-    default: 'Sensibilidades PRO — Generador #1 para Free Fire',
-    template: '%s | Sensibilidades PRO',
+    default: 'Sensibilidades PRO — Free Fire | Generador de Sensibilidad',
+    template: '%s | SensiPRO',
   },
   description:
-    'Genera las mejores sensibilidades para Free Fire basadas en las especificaciones reales de tu dispositivo. 500+ dispositivos, 3 estilos de juego, giroscopio y mas.',
+    'Genera la sensibilidad perfecta para Free Fire basada en tu dispositivo. Algoritmo PRO con 500+ dispositivos. Gratis.',
   keywords: [
     'sensibilidades free fire',
     'sensibilidad free fire',
@@ -19,37 +28,64 @@ export const metadata: Metadata = {
     'sensibilidades pro',
   ],
   authors: [{ name: 'ARES SensiPRO' }],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sensibilidadespro.com'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sensibilidadespro.com',
+  ),
+  manifest: '/manifest.json',
+  applicationName: 'SensiPRO',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'SensiPRO',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   openGraph: {
     type: 'website',
     locale: 'es_MX',
+    url: 'https://sensibilidadespro.com',
     siteName: 'Sensibilidades PRO',
-    title: 'Sensibilidades PRO — Generador #1 para Free Fire',
-    description: 'Genera sensibilidades basadas en hardware real. 500+ dispositivos.',
+    title: 'Sensibilidades PRO — Generador de Sensibilidad Free Fire',
+    description:
+      'Genera la sensibilidad perfecta para Free Fire basada en tu dispositivo.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sensibilidades PRO — Generador #1 para Free Fire',
-    description: 'Genera sensibilidades basadas en hardware real. 500+ dispositivos.',
+    title: 'Sensibilidades PRO — Free Fire',
+    description:
+      'Genera la sensibilidad perfecta basada en tu dispositivo.',
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
   },
 };
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: '#050810',
-  colorScheme: 'dark',
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="es" className="dark">
-      <body className="min-h-screen">
+      <body className="min-h-screen bg-[#050810] text-slate-200 antialiased">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

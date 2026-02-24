@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 53/68                            │
-│  Fase actual ················ Fase 6 — Admin y Analytics ✅     │
-│  Siguiente script ··········· ARES-700-pwa-setup               │
-│  Archivos generados ········· 325                             │
-│  Líneas de código ··········· ~19,930                         │
+│  Scripts completados ········ 54/68                            │
+│  Fase actual ················ Fase 7 — Mobile y PWA            │
+│  Siguiente script ··········· ARES-701-push-notifications      │
+│  Archivos generados ········· 343                             │
+│  Líneas de código ··········· ~20,130                         │
 │  Tests pasando ·············· 360                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 53                              │
+│  Racha actual ··············· 54                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -68,10 +68,10 @@ Fase 3 — Academia PRO         [███████████████�
 Fase 4 — Monetización         [████████████████████] 100%  (8/8)
 Fase 5 — Comunidad y Social   [████████████████████] 100%  (8/8)
 Fase 6 — Admin y Analytics    [████████████████████] 100%  (6/6)
-Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
+Fase 7 — Mobile y PWA         [████░░░░░░░░░░░░░░░░]  20%  (1/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [███████████████░░░░░]  78%  (53/68)
+TOTAL                          [████████████████░░░░]  79%  (54/68)
 ```
 
 ---
@@ -268,13 +268,13 @@ TOTAL                          [███████████████░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 055 | ARES-700-pwa-setup | ⬜ | — | — | — | — | next-pwa + manifest.json + service worker + install prompt custom |
+| 055 | ARES-700-pwa-setup | ✅ | 2026-02-24 | ~200 | 18 | 0 | next-pwa + manifest.json + service worker + install prompt gaming + meta tags PWA + icon generator |
 | 056 | ARES-701-push-notifications | ⬜ | — | — | — | — | Web Push API: nuevas guías, torneos, expiración suscripción |
 | 057 | ARES-702-offline-mode | ⬜ | — | — | — | — | Cache últimas sensibilidades + offline page + background sync |
 | 058 | ARES-703-capacitor-apk | ⬜ | — | — | — | — | Capacitor config + build script → APK para Play Store / distribución |
 | 059 | ARES-704-performance-optimization | ⬜ | — | — | — | — | Lighthouse 90+ + code splitting + bundle analysis + Redis cache |
 
-**Fase 7 completados: 0/5**
+**Fase 7 completados: 1/5**
 
 ---
 
@@ -329,7 +329,7 @@ TOTAL                          [███████████████░
 | 💳 **MONETIZACIÓN COMPLETA** | **033-040** | ✅ | 2026-02-24 |
 | 👥 Comunidad: rankings + torneos + logros | 041-048 | ⬜ | — |
 | 👑 Panel admin operativo | 049-054 | ⬜ | — |
-| 📱 PWA instalable en móvil | 055 | ⬜ | — |
+| 📱 PWA instalable en móvil | 055 | ✅ | 2026-02-24 |
 | 📦 APK para Android generado | 058 | ⬜ | — |
 | 🧪 50+ tests unitarios pasando | 064 | ⬜ | — |
 | 🎯 E2E: user journey completo pasa | 066 | ⬜ | — |
