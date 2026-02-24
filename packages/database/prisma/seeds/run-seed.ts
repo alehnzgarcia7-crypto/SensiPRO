@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
+import { seedDevices } from './seed-devices';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -56,6 +58,9 @@ async function main() {
     });
   }
   console.log(`  ✅ ${achievements.length} achievements created`);
+
+  // 3. Seed devices
+  await seedDevices();
 
   console.log('🎯 Seed complete!');
 }
