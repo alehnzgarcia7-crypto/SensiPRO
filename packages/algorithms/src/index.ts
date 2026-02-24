@@ -1,7 +1,8 @@
 export { generateSensitivity } from './sensitivity-engine';
 export { generateGyroscope } from './gyroscope-engine';
 export { getStyleMultipliers, getAllStyles } from './style-system';
-export { analyzeDeviceSpecs, calculatePerformanceScore } from './device-analyzer';
+export { analyzeDeviceSpecs, calculatePerformanceScore, autoDetectTier } from './device-analyzer';
+export type { DeviceAnalysis } from './device-analyzer';
 export {
   STYLE_PROFILES,
   getRecommendedStyle,

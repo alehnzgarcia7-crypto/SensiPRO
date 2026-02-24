@@ -1,122 +1,150 @@
 import type { DeviceSpecs } from './types';
+import type { DeviceTier, PanelType } from '@prisma/client';
 
 // ═══════════════════════════════════════════════════════════
-// ARES DEVICE ANALYZER v1.0
+// ARES DEVICE SPECS ANALYZER v2.0
 // ═══════════════════════════════════════════════════════════
 //
-// Analiza las specs de un dispositivo y genera un score
-// de performance compuesto (0-100).
+// Performance Score (0-100):
+//   hzScore     = (Hz - 30) / 120 * 30 pts     (max 30)
+//   ramScore    = (RAM - 1) / 15 * 25 pts       (max 25)
+//   panelScore  = LTPO=25, AMOLED=20, OLED=20, IPS=10, LCD=5
+//   tierScore   = GAMING=20, ULTRA=18, HIGH=15, MID=10, LOW=5
 //
-// Score ponderado:
-//   Hz       → 30% del score total
-//   RAM      → 25% del score total
-//   Panel    → 20% del score total
-//   Tier     → 15% del score total
-//   Screen   → 10% del score total
+//   Total = hzScore + ramScore + panelScore + tierScore (max 100)
+//   Bonus: GAMING + AMOLED/OLED combo = +5
 
-// Normalización: (valor - min) / (max - min) → rango 0-1
-const HZ_MIN = 30;
-const HZ_MAX = 165;
-
-const RAM_MIN = 1;
-const RAM_MAX = 16;
-
-const SCREEN_MIN = 4.0;
-const SCREEN_MAX = 7.6;
-
-// Panel type score (0-1)
-const PANEL_SCORES: Record<string, number> = {
-  LCD:    0.20,
-  IPS:    0.40,
-  AMOLED: 0.80,
-  OLED:   0.85,
-  LTPO:   1.00,
+const PANEL_SCORES: Record<PanelType, number> = {
+  LTPO: 25,
+  AMOLED: 20,
+  OLED: 20,
+  IPS: 10,
+  LCD: 5,
 };
 
-// Tier score (0-1)
-const TIER_SCORES: Record<string, number> = {
-  LOW:    0.15,
-  MID:    0.40,
-  HIGH:   0.65,
-  ULTRA:  0.85,
-  GAMING: 1.00,
+const TIER_SCORES: Record<DeviceTier, number> = {
+  GAMING: 20,
+  ULTRA: 18,
+  HIGH: 15,
+  MID: 10,
+  LOW: 5,
 };
-
-// Pesos de cada componente en el score final
-const WEIGHTS = {
-  hz:     0.30,
-  ram:    0.25,
-  panel:  0.20,
-  tier:   0.15,
-  screen: 0.10,
-} as const;
-
-function normalize(value: number, min: number, max: number): number {
-  return Math.max(0, Math.min(1, (value - min) / (max - min)));
-}
 
 export function calculatePerformanceScore(specs: DeviceSpecs): number {
-  const hzNorm = normalize(specs.screenHz, HZ_MIN, HZ_MAX);
-  const ramNorm = normalize(specs.ramGb, RAM_MIN, RAM_MAX);
-  const screenNorm = normalize(specs.screenSize, SCREEN_MIN, SCREEN_MAX);
-  const panelNorm = PANEL_SCORES[specs.panelType] ?? 0.20;
-  const tierNorm = TIER_SCORES[specs.tier] ?? 0.40;
+  const hzScore = Math.min(30, Math.max(0, ((specs.screenHz - 30) / 120) * 30));
+  const ramScore = Math.min(25, Math.max(0, ((specs.ramGb - 1) / 15) * 25));
+  const panelScore = PANEL_SCORES[specs.panelType] ?? 5;
+  const tierScore = TIER_SCORES[specs.tier] ?? 5;
 
-  const weightedScore =
-    hzNorm * WEIGHTS.hz +
-    ramNorm * WEIGHTS.ram +
-    panelNorm * WEIGHTS.panel +
-    tierNorm * WEIGHTS.tier +
-    screenNorm * WEIGHTS.screen;
+  // Bonus para combo GAMING + AMOLED/OLED
+  const comboBonus =
+    specs.tier === 'GAMING' && (specs.panelType === 'AMOLED' || specs.panelType === 'OLED')
+      ? 5
+      : 0;
 
-  // Escala a 0-100 y redondea
-  return Math.round(weightedScore * 100);
+  return Math.min(100, Math.round(hzScore + ramScore + panelScore + tierScore + comboBonus));
 }
 
-export function analyzeDeviceSpecs(specs: DeviceSpecs): {
+/**
+ * Auto-detecta tier basado en specs cuando no se proporciona.
+ */
+export function autoDetectTier(specs: Omit<DeviceSpecs, 'tier'>): DeviceTier {
+  const { screenHz, ramGb, panelType } = specs;
+  const isPremiumPanel = panelType === 'AMOLED' || panelType === 'OLED' || panelType === 'LTPO';
+
+  if (screenHz >= 120 && ramGb >= 8 && isPremiumPanel) {
+    return 'GAMING';
+  }
+  if (screenHz >= 120 && ramGb >= 8) {
+    return 'ULTRA';
+  }
+  if (screenHz >= 90 && ramGb >= 6 && isPremiumPanel) {
+    return 'HIGH';
+  }
+  if (screenHz >= 60 && ramGb >= 4) {
+    return 'MID';
+  }
+  return 'LOW';
+}
+
+export interface DeviceAnalysis {
   performanceScore: number;
-  category: string;
+  tier: DeviceTier;
+  rating: 'Excelente' | 'Muy Bueno' | 'Bueno' | 'Básico';
+  summary: string;
   strengths: string[];
-  weaknesses: string[];
-} {
+  limitations: string[];
+  gamingVerdict: string;
+}
+
+export function analyzeDeviceSpecs(specs: DeviceSpecs): DeviceAnalysis {
   const score = calculatePerformanceScore(specs);
 
-  const category =
-    score >= 80 ? 'Elite Gaming' :
-    score >= 60 ? 'Alto Rendimiento' :
-    score >= 40 ? 'Gama Media' :
-    'Gama Baja';
+  let rating: DeviceAnalysis['rating'];
+  let gamingVerdict: string;
+
+  if (score >= 80) {
+    rating = 'Excelente';
+    gamingVerdict =
+      'Dispositivo GAMING de élite. Puedes usar cualquier sensibilidad sin problemas. Ideal para ranked competitivo.';
+  } else if (score >= 60) {
+    rating = 'Muy Bueno';
+    gamingVerdict =
+      'Excelente para Free Fire. Soporta sensibilidades altas y giroscopio sin lag.';
+  } else if (score >= 40) {
+    rating = 'Bueno';
+    gamingVerdict =
+      'Funciona bien para Free Fire. Usa sensibilidades medias para mejor experiencia.';
+  } else {
+    rating = 'Básico';
+    gamingVerdict =
+      'Puede correr Free Fire pero con limitaciones. Usa sensibilidades bajas (estilo Sniper) para mayor estabilidad.';
+  }
 
   const strengths: string[] = [];
-  const weaknesses: string[] = [];
+  const limitations: string[] = [];
 
-  // Analizar Hz
+  // Hz
   if (specs.screenHz >= 120) {
-    strengths.push('Pantalla de alta frecuencia ideal para gaming');
-  } else if (specs.screenHz <= 60) {
-    weaknesses.push('Frecuencia de pantalla baja puede limitar fluidez');
+    strengths.push(`Pantalla ${specs.screenHz}Hz — ultra fluida`);
+  } else if (specs.screenHz >= 90) {
+    strengths.push(`Pantalla ${specs.screenHz}Hz — buena fluidez`);
+  } else {
+    limitations.push(`Pantalla ${specs.screenHz}Hz — limitada`);
   }
 
-  // Analizar RAM
+  // RAM
   if (specs.ramGb >= 8) {
-    strengths.push('RAM abundante para multitarea y gaming fluido');
-  } else if (specs.ramGb <= 3) {
-    weaknesses.push('RAM limitada puede causar cierres de app');
+    strengths.push(`${specs.ramGb}GB RAM — sin problemas de memoria`);
+  } else if (specs.ramGb >= 4) {
+    strengths.push(`${specs.ramGb}GB RAM — suficiente para Free Fire`);
+  } else {
+    limitations.push(`${specs.ramGb}GB RAM — puede tener lag en partidas largas`);
   }
 
-  // Analizar panel
+  // Panel
   if (specs.panelType === 'AMOLED' || specs.panelType === 'OLED' || specs.panelType === 'LTPO') {
-    strengths.push('Panel premium con colores vibrantes y respuesta rápida');
-  } else if (specs.panelType === 'LCD') {
-    weaknesses.push('Panel LCD básico sin colores profundos');
+    strengths.push(`Panel ${specs.panelType} — colores vibrantes, mejor respuesta táctil`);
+  } else {
+    limitations.push(`Panel ${specs.panelType} — respuesta táctil estándar`);
   }
 
-  // Analizar pantalla
+  // Screen
   if (specs.screenSize >= 6.5) {
-    strengths.push('Pantalla grande para mejor visibilidad de enemigos');
+    strengths.push(`Pantalla ${specs.screenSize}" — excelente visibilidad de enemigos`);
   } else if (specs.screenSize < 5.5) {
-    weaknesses.push('Pantalla pequeña limita campo visual');
+    limitations.push(`Pantalla ${specs.screenSize}" — campo visual reducido`);
   }
 
-  return { performanceScore: score, category, strengths, weaknesses };
+  const summary = `${rating} para gaming (${score}/100). ${specs.screenHz}Hz, ${specs.ramGb}GB RAM, ${specs.panelType}.`;
+
+  return {
+    performanceScore: score,
+    tier: specs.tier,
+    rating,
+    summary,
+    strengths,
+    limitations,
+    gamingVerdict,
+  };
 }
