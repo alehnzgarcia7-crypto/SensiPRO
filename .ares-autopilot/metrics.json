@@ -402,6 +402,19 @@
       "file_delta": 2,
       "phase": 8,
       "timestamp": "2026-02-24T20:47:39Z"
+    },
+    {
+      "name": "ARES-802-social-meta",
+      "status": "success",
+      "duration_seconds": 189,
+      "loc": 24163,
+      "files": 239,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 290,
+      "file_delta": 3,
+      "phase": 8,
+      "timestamp": "2026-02-24T20:51:05Z"
     }
   ],
   "phases": []

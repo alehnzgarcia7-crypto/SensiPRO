@@ -162,6 +162,7 @@ model User {
   supportTickets  SupportTicket[]
   abAssignments   ABAssignment[]
   pushSubscriptions PushSubscription[]
+  utmTrackings    UTMTracking[]
 
   @@map("users")
   @@index([email])
@@ -749,4 +750,27 @@ model PushSubscription {
   @@unique([userId, endpoint])
   @@index([userId])
   @@index([isActive])
+}
+
+// ──────────────────────────────────
+// 27. UTM TRACKING — Rastreo de parámetros UTM
+// ──────────────────────────────────
+model UTMTracking {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  source          String    @db.VarChar(100)
+  medium          String?   @db.VarChar(100)
+  campaign        String?   @db.VarChar(200)
+  content         String?   @db.VarChar(200)
+  term            String?   @db.VarChar(200)
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("utm_trackings")
+  @@index([userId])
+  @@index([source])
+  @@index([campaign])
+  @@index([createdAt(sort: Desc)])
 }
