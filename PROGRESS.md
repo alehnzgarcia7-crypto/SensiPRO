@@ -316,7 +316,7 @@ TOTAL                          [████████████████
 
 | Hito | Scripts | Estado | Fecha |
 |------|---------|--------|-------|
-| 🏗️ Fundación lista (monorepo + DB + auth funcional) | 001-008 | ⬜ | — |
+| 🏗️ Fundación lista (monorepo + DB + auth funcional) | 001-008 | ✅ | 2026-02-24 |
 | 🧠 Motor de sensibilidades funcional | 009-013 | ⬜ | — |
 | 🎯 Primera sensibilidad generada correctamente | 010 | ✅ | 2026-02-24 |
 | 🎮 **MVP GENERADOR COMPLETO** | **009-018** | ⬜ | — |
