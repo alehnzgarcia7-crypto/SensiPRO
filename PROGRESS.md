@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 13/68                            │
+│  Scripts completados ········ 14/68                            │
 │  Fase actual ················ Fase 1 — Motor Sensibilidades   │
-│  Siguiente script ··········· ARES-105-device-comparison      │
-│  Archivos generados ········· 129                             │
-│  Líneas de código ··········· ~6,137                          │
-│  Tests pasando ·············· 136                             │
+│  Siguiente script ··········· ARES-106-config-export          │
+│  Archivos generados ········· 133                             │
+│  Líneas de código ··········· ~6,367                          │
+│  Tests pasando ·············· 147                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 13                              │
+│  Racha actual ··············· 14                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -62,7 +62,7 @@
 
 ```
 Fase 0 — Fundación            [████████████████████] 100%  (8/8)
-Fase 1 — Motor Sensibilidades [██████████░░░░░░░░░░]  50%  (5/10)
+Fase 1 — Motor Sensibilidades [████████████░░░░░░░░]  60%  (6/10)
 Fase 2 — UI/UX Elite Gaming   [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
 Fase 3 — Academia PRO         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
 Fase 4 — Monetización         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
@@ -71,7 +71,7 @@ Fase 6 — Admin y Analytics    [░░░░░░░░░░░░░░░�
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [████░░░░░░░░░░░░░░░░]  19%  (13/68)
+TOTAL                          [████░░░░░░░░░░░░░░░░]  21%  (14/68)
 ```
 
 ---
@@ -128,13 +128,13 @@ TOTAL                          [████░░░░░░░░░░░░
 
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
-| 014 | ARES-105-device-comparison | ⬜ | — | — | — | — | Comparar 2 devices: specs diff, sensitivity diff, winner por cat |
+| 014 | ARES-105-device-comparison | ✅ | 2026-02-24 | ~230 | 4 | 11 | Comparator engine + API /api/compare + 11 tests (specs/sens/gyro diff + verdict) |
 | 015 | ARES-106-config-export | ⬜ | — | — | — | — | Exportar como imagen 1080×1080 (IG) + 1080×1920 (stories) + PDF |
 | 016 | ARES-107-share-system | ⬜ | — | — | — | — | Share links: WhatsApp, Twitter, FB, Telegram + OG metadata dinámica |
 | 017 | ARES-108-favorites-system | ⬜ | — | — | — | — | CRUD favoritos + toggle button animado + límite FREE=3, Premium=∞ |
 | 018 | ARES-109-search-history | ⬜ | — | — | — | — | Timeline visual de búsquedas + filtros + límite FREE=10, Premium=∞ |
 
-**Fase 1 completados: 5/10**
+**Fase 1 completados: 6/10**
 
 ---
 

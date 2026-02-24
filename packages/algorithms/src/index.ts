@@ -3,6 +3,8 @@ export { generateGyroscope } from './gyroscope-engine';
 export { getStyleMultipliers, getAllStyles } from './style-system';
 export { analyzeDeviceSpecs, calculatePerformanceScore, autoDetectTier } from './device-analyzer';
 export type { DeviceAnalysis } from './device-analyzer';
+export { compareDevices } from './comparator';
+export type { DeviceForComparison, ComparisonField, ComparisonResult } from './comparator';
 export {
   STYLE_PROFILES,
   getRecommendedStyle,
