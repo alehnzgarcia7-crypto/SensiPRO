@@ -77,6 +77,19 @@
       "file_delta": 0,
       "phase": 0,
       "timestamp": "2026-02-24T07:09:45Z"
+    },
+    {
+      "name": "ARES-101-sensitivity-algorithm",
+      "status": "success",
+      "duration_seconds": 94,
+      "loc": 2179,
+      "files": 44,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 0,
+      "file_delta": 0,
+      "phase": 1,
+      "timestamp": "2026-02-24T07:51:13Z"
     }
   ],
   "phases": []
