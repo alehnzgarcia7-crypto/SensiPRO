@@ -72,6 +72,11 @@ export const CALIBRATION_MULTIPLIERS = {
   ALTA: 1.28,
 } as const;
 
+// DPI reduction: when DPI is active, touch input is amplified → sensitivity must be lower
+export const DPI_REDUCTION_FACTOR = 0.82;
+// DPI precision bonus (CON DPI = more precise, higher precisionScore)
+export const DPI_PRECISION_BONUS = 8;
+
 // DPI calculation constants
 export const DPI_FORMULA_FACTOR = 4.2;
 export const DPI_FORMULA_BASE = 180;

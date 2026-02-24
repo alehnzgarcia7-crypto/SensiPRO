@@ -166,7 +166,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           <div className="space-y-4">
             {gyroscopeEntries.map(([key, value], i) => (
               <motion.div
-                key={`${key}-${calibration}`}
+                key={`${key}-${calibration}-${dpiMode}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.08 }}

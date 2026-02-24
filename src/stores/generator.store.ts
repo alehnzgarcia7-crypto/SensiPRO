@@ -139,8 +139,43 @@ export const useGeneratorStore = create<GeneratorStore>((set, get) => ({
     },
   }),
 
-  setCalibration: (calibration) => set({ calibration }),
-  setDpiMode: (dpiMode) => set({ dpiMode }),
+  setCalibration: (calibration) => set((state) => {
+    const combo = state.allCalibrations?.combinations.find(
+      (c) => c.calibration === calibration && c.dpiMode === state.dpiMode,
+    );
+    return {
+      calibration,
+      result: combo && state.allCalibrations ? {
+        sensitivity: combo.sensitivity,
+        gyroscope: combo.gyroscope,
+        meta: {
+          performanceScore: combo.performanceScore,
+          styleApplied: state.allCalibrations.meta.styleApplied,
+          deviceTier: state.allCalibrations.meta.deviceTier,
+          algorithm: state.allCalibrations.meta.algorithm,
+        },
+      } : state.result,
+    };
+  }),
+
+  setDpiMode: (dpiMode) => set((state) => {
+    const combo = state.allCalibrations?.combinations.find(
+      (c) => c.calibration === state.calibration && c.dpiMode === dpiMode,
+    );
+    return {
+      dpiMode,
+      result: combo && state.allCalibrations ? {
+        sensitivity: combo.sensitivity,
+        gyroscope: combo.gyroscope,
+        meta: {
+          performanceScore: combo.performanceScore,
+          styleApplied: state.allCalibrations.meta.styleApplied,
+          deviceTier: state.allCalibrations.meta.deviceTier,
+          algorithm: state.allCalibrations.meta.algorithm,
+        },
+      } : state.result,
+    };
+  }),
 
   setLoading: (loading) => set({ isLoading: loading, error: null }),
   setError: (error) => set({ error, isLoading: false }),

@@ -6,6 +6,8 @@ import {
   DPI_FORMULA_BASE,
   DPI_MIN,
   DPI_MAX,
+  DPI_REDUCTION_FACTOR,
+  DPI_PRECISION_BONUS,
   BUTTON_SIZE_MAP,
   HUD_THRESHOLD_SMALL,
   HUD_THRESHOLD_LARGE,
@@ -57,6 +59,18 @@ function applyCalibratedSensitivity(
   };
 }
 
+/** Reduce sensibilidad cuando DPI está activo (el DPI amplifica el input del touch) */
+function applyDpiReduction(sensitivity: SensitivityOutput): SensitivityOutput {
+  return {
+    general: clamp(sensitivity.general * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    redPoint: clamp(sensitivity.redPoint * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope2x: clamp(sensitivity.scope2x * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope4x: clamp(sensitivity.scope4x * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    sniperScope: clamp(sensitivity.sniperScope * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    freeView: clamp(sensitivity.freeView * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+  };
+}
+
 /** Calcula DPI óptimo basado en PPI y screenSize del dispositivo */
 export function calculateDpi(specs: DeviceSpecs): number {
   const ppi = specs.ppi ?? 400; // Fallback razonable si no hay PPI
@@ -70,9 +84,11 @@ export function calculateButtonSize(screenSize: number): number {
   return entry?.sizeMm ?? 54;
 }
 
-/** Calcula precision score (inverso de velocidad: más sensi = menos precisión) */
-export function calculatePrecisionScore(sensitivity: SensitivityOutput): number {
-  return clamp(100 - sensitivity.general * 0.8, 0, 100);
+/** Calcula precision score (inverso de velocidad: más sensi = menos precisión, DPI da bonus) */
+export function calculatePrecisionScore(sensitivity: SensitivityOutput, dpiMode = false): number {
+  const base = 100 - sensitivity.general * 0.8;
+  const bonus = dpiMode ? DPI_PRECISION_BONUS : 0;
+  return clamp(base + bonus, 0, 100);
 }
 
 /** Genera recomendación de Custom HUD basado en screenSize */
@@ -126,20 +142,26 @@ export function generateCalibration(input: CalibrationInput): CalibrationResult 
     calibration,
   );
 
-  // Recalcular giroscopio sobre valores calibrados si aplica
-  const calibratedGyro = baseResult.gyroscope
-    ? generateGyroscope(calibratedSensitivity, specs)
+  // Aplicar reducción DPI si está activo (DPI amplifica input → sensibilidad más baja)
+  const finalSensitivity = dpiMode
+    ? applyDpiReduction(calibratedSensitivity)
+    : calibratedSensitivity;
+
+  // Recalcular giroscopio sobre valores finales si aplica
+  const finalGyro = baseResult.gyroscope
+    ? generateGyroscope(finalSensitivity, specs)
     : null;
 
   const dpiValue = dpiMode ? calculateDpi(specs) : null;
   const buttonSize = calculateButtonSize(specs.screenSize);
-  const precisionScore = calculatePrecisionScore(calibratedSensitivity);
+  // CON DPI = más precisión (score más alto) porque valores más bajos = más control
+  const precisionScore = calculatePrecisionScore(finalSensitivity, dpiMode);
 
   return {
     calibration,
     dpiMode,
-    sensitivity: calibratedSensitivity,
-    gyroscope: calibratedGyro,
+    sensitivity: finalSensitivity,
+    gyroscope: finalGyro,
     performanceScore: baseResult.meta.performanceScore,
     precisionScore,
     dpiValue,
