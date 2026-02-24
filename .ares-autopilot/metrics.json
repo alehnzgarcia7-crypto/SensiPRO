@@ -350,6 +350,19 @@
       "file_delta": 4,
       "phase": 7,
       "timestamp": "2026-02-24T20:37:57Z"
+    },
+    {
+      "name": "ARES-703-capacitor-apk",
+      "status": "success",
+      "duration_seconds": 113,
+      "loc": 23390,
+      "files": 227,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 0,
+      "file_delta": 0,
+      "phase": 7,
+      "timestamp": "2026-02-24T20:40:06Z"
     }
   ],
   "phases": []
