@@ -95,6 +95,21 @@ enum TournamentStatus {
   CANCELLED
 }
 
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketCategory {
+  BUG
+  PAYMENT
+  ACCOUNT
+  FEATURE
+  OTHER
+}
+
 // ═══════════════════════════════════
 // MODELOS
 // ═══════════════════════════════════
@@ -144,6 +159,7 @@ model User {
   codesCreated    ActivationCode[] @relation("CodeCreator")
   guidesAuthored  Guide[]
   adminLogs       AdminLog[]
+  supportTickets  SupportTicket[]
 
   @@map("users")
   @@index([email])
@@ -587,7 +603,33 @@ model Notification {
 }
 
 // ──────────────────────────────────
-// 19. ADMIN LOG — Registro de acciones admin
+// 20. SUPPORT TICKET — Tickets de soporte
+// ──────────────────────────────────
+model SupportTicket {
+  id              String          @id @default(cuid())
+  userId          String?         @map("user_id")
+  email           String          @db.VarChar(255)
+  subject         String          @db.VarChar(200)
+  message         String          @db.Text
+  category        TicketCategory  @default(OTHER)
+  status          TicketStatus    @default(OPEN)
+  adminResponse   String?         @map("admin_response") @db.Text
+  respondedAt     DateTime?       @map("responded_at")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  user            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("support_tickets")
+  @@index([status])
+  @@index([category])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId])
+}
+
+// ──────────────────────────────────
+// 21. ADMIN LOG — Registro de acciones admin
 // ──────────────────────────────────
 model AdminLog {
   id              String    @id @default(cuid())
