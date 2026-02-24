@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Prisma Schema
 // Base de datos: PostgreSQL 16
-// 19 modelos | 12 enums | ~45 índices
+// 25 modelos | 12 enums | ~50 índices
 // ═══════════════════════════════════════════════════════════════
 
 generator client {
@@ -160,6 +160,7 @@ model User {
   guidesAuthored  Guide[]
   adminLogs       AdminLog[]
   supportTickets  SupportTicket[]
+  abAssignments   ABAssignment[]
 
   @@map("users")
   @@index([email])
@@ -647,4 +648,82 @@ model AdminLog {
   @@index([adminId])
   @@index([action])
   @@index([createdAt(sort: Desc)])
+}
+
+// ──────────────────────────────────
+// 22. AB EXPERIMENT — Experimentos A/B
+// ──────────────────────────────────
+model ABExperiment {
+  id              String        @id @default(cuid())
+  key             String        @unique @db.VarChar(50)
+  name            String        @db.VarChar(200)
+  description     String?       @db.VarChar(500)
+  isActive        Boolean       @default(true) @map("is_active")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  variants        ABVariant[]
+  assignments     ABAssignment[]
+
+  @@map("ab_experiments")
+  @@index([key])
+  @@index([isActive])
+}
+
+// ──────────────────────────────────
+// 23. AB VARIANT — Variantes de un experimento
+// ──────────────────────────────────
+model ABVariant {
+  id              String        @id @default(cuid())
+  experimentId    String        @map("experiment_id")
+  key             String        @db.VarChar(50)
+  label           String        @db.VarChar(100)
+  weight          Int           @default(50)
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  experiment      ABExperiment  @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  @@map("ab_variants")
+  @@unique([experimentId, key])
+  @@index([experimentId])
+}
+
+// ──────────────────────────────────
+// 24. AB ASSIGNMENT — Asignación usuario→variante
+// ──────────────────────────────────
+model ABAssignment {
+  id              String        @id @default(cuid())
+  userId          String        @map("user_id")
+  experimentId    String        @map("experiment_id")
+  variantKey      String        @map("variant_key") @db.VarChar(50)
+
+  assignedAt      DateTime      @default(now()) @map("assigned_at")
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experiment      ABExperiment  @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  conversions     ABConversion[]
+
+  @@map("ab_assignments")
+  @@unique([userId, experimentId])
+  @@index([experimentId, variantKey])
+  @@index([userId])
+}
+
+// ──────────────────────────────────
+// 25. AB CONVERSION — Eventos de conversión
+// ──────────────────────────────────
+model ABConversion {
+  id              String        @id @default(cuid())
+  assignmentId    String        @map("assignment_id")
+  eventName       String        @map("event_name") @db.VarChar(100)
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  assignment      ABAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@map("ab_conversions")
+  @@index([assignmentId])
+  @@index([eventName])
 }
