@@ -337,6 +337,19 @@
       "file_delta": 4,
       "phase": 7,
       "timestamp": "2026-02-24T20:35:49Z"
+    },
+    {
+      "name": "ARES-702-offline-mode",
+      "status": "success",
+      "duration_seconds": 110,
+      "loc": 23390,
+      "files": 227,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 143,
+      "file_delta": 4,
+      "phase": 7,
+      "timestamp": "2026-02-24T20:37:57Z"
     }
   ],
   "phases": []
