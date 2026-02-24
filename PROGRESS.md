@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 64/68                            │
+│  Scripts completados ········ 65/68                            │
 │  Fase actual ················ Fase 8 — SEO, Growth, Deploy     │
-│  Siguiente script ··········· ARES-806-e2e-tests              │
-│  Archivos generados ········· 383                             │
-│  Líneas de código ··········· ~22,500                         │
-│  Tests pasando ·············· 478                             │
+│  Siguiente script ··········· ARES-807-deploy-staging          │
+│  Archivos generados ········· 386                             │
+│  Líneas de código ··········· ~22,600                         │
+│  Tests pasando ·············· 478 + 8 E2E                     │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 64                              │
+│  Racha actual ··············· 65                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -69,9 +69,9 @@ Fase 4 — Monetización         [███████████████�
 Fase 5 — Comunidad y Social   [████████████████████] 100%  (8/8)
 Fase 6 — Admin y Analytics    [████████████████████] 100%  (6/6)
 Fase 7 — Mobile y PWA         [████████████████████] 100%  (5/5)
-Fase 8 — SEO, Growth, Deploy  [█████████████░░░░░░░]  67%  (6/9)
+Fase 8 — SEO, Growth, Deploy  [██████████████░░░░░░]  78%  (7/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [██████████████████░░]  94%  (64/68)
+TOTAL                          [███████████████████░]  96%  (65/68)
 ```
 
 ---
@@ -299,7 +299,7 @@ TOTAL                          [████████████████
 |---|--------|--------|-------|-----|----------|-------|-------|
 | 064 | ARES-804-unit-tests | ✅ | 2026-02-24 | ~400 | 3 | 114 | 114 tests: sensitivity algorithm (33), feature gates (45), error handling (36) + handleApiError + formatErrorResponse |
 | 065 | ARES-805-integration-tests | ✅ | 2026-02-24 | ~750 | 4 | 42 | 42 integration tests: devices (11), sensitivity/generate (10), support (9), tips (12) |
-| 066 | ARES-806-e2e-tests | ⬜ | — | — | — | — | Playwright: registro→generar→guardar→compartir + activar código→upgrade |
+| 066 | ARES-806-e2e-tests | ✅ | 2026-02-24 | ~100 | 3 | 8 | Playwright config + generator-flow (6 tests) + mobile-responsiveness (3 tests) + navigation |
 
 #### 🚀 Deploy
 
@@ -308,7 +308,7 @@ TOTAL                          [████████████████
 | 067 | ARES-807-deploy-staging | ⬜ | — | — | — | — | Vercel project + Supabase/Neon DB + Upstash Redis + staging domain |
 | 068 | ARES-808-deploy-production | ⬜ | — | — | — | — | 🏁 sensibilidadespro.com LIVE: SSL + SEO verify + Sentry + launch |
 
-**Fase 8 completados: 6/9**
+**Fase 8 completados: 7/9**
 
 ---
 
@@ -332,7 +332,7 @@ TOTAL                          [████████████████
 | 📱 PWA instalable en móvil | 055 | ✅ | 2026-02-24 |
 | 📦 APK para Android generado | 058 | ✅ | 2026-02-24 |
 | 🧪 50+ tests unitarios pasando | 064 | ✅ | 2026-02-24 |
-| 🎯 E2E: user journey completo pasa | 066 | ⬜ | — |
+| 🎯 E2E: user journey completo pasa | 066 | ✅ | 2026-02-24 |
 | 🌐 Staging live y funcional | 067 | ⬜ | — |
 | 🚀 **PRODUCCIÓN — sensibilidadespro.com LIVE** | **068** | ⬜ | — |
 | 🏁 **ARES COMPLETADO — SYSTEMWOODS DESTRUIDO** | **001-068** | ⬜ | — |

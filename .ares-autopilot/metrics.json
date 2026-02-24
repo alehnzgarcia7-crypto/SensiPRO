@@ -441,6 +441,19 @@
       "file_delta": 0,
       "phase": 8,
       "timestamp": "2026-02-24T21:08:13Z"
+    },
+    {
+      "name": "ARES-805-integration-tests",
+      "status": "success",
+      "duration_seconds": 415,
+      "loc": 25254,
+      "files": 247,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 750,
+      "file_delta": 4,
+      "phase": 8,
+      "timestamp": "2026-02-24T21:15:28Z"
     }
   ],
   "phases": []
