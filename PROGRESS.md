@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 59/68                            │
+│  Scripts completados ········ 60/68                            │
 │  Fase actual ················ Fase 8 — SEO, Growth, Deploy     │
-│  Siguiente script ··········· ARES-801-sitemap-schema         │
-│  Archivos generados ········· 365                             │
-│  Líneas de código ··········· ~20,900                         │
+│  Siguiente script ··········· ARES-802-social-meta            │
+│  Archivos generados ········· 368                             │
+│  Líneas de código ··········· ~21,000                         │
 │  Tests pasando ·············· 360                             │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 59                              │
+│  Racha actual ··············· 60                              │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -69,9 +69,9 @@ Fase 4 — Monetización         [███████████████�
 Fase 5 — Comunidad y Social   [████████████████████] 100%  (8/8)
 Fase 6 — Admin y Analytics    [████████████████████] 100%  (6/6)
 Fase 7 — Mobile y PWA         [████████████████████] 100%  (5/5)
-Fase 8 — SEO, Growth, Deploy  [██░░░░░░░░░░░░░░░░░░]  11%  (1/9)
+Fase 8 — SEO, Growth, Deploy  [████░░░░░░░░░░░░░░░░]  22%  (2/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [█████████████████░░░]  87%  (59/68)
+TOTAL                          [██████████████████░░]  88%  (60/68)
 ```
 
 ---
@@ -289,7 +289,7 @@ TOTAL                          [████████████████
 | # | Script | Estado | Fecha | LOC | Archivos | Tests | Notas |
 |---|--------|--------|-------|-----|----------|-------|-------|
 | 060 | ARES-800-seo-engine | ✅ | 2026-02-24 | ~150 | 3 | 0 | Metadata dinámica + JSON-LD (WebApp, HowTo, FAQ, Article, Breadcrumb) + canonicals + hreflang + StructuredData component |
-| 061 | ARES-801-sitemap-schema | ⬜ | — | — | — | — | next-sitemap: dinámico con todos los devices, guías, marcas + auto-submit GSC |
+| 061 | ARES-801-sitemap-schema | ✅ | 2026-02-24 | ~100 | 3 | 0 | Sitemap dinámico (devices+guides+brands), robots.txt, submit-sitemap.sh ping Google/Bing |
 | 062 | ARES-802-social-meta | ⬜ | — | — | — | — | Open Graph dinámico + Twitter Cards + WhatsApp preview optimized |
 | 063 | ARES-803-growth-automation | ⬜ | — | — | — | — | Referral tracking + UTM handling + conversion funnel + Resend email automation |
 
@@ -308,7 +308,7 @@ TOTAL                          [████████████████
 | 067 | ARES-807-deploy-staging | ⬜ | — | — | — | — | Vercel project + Supabase/Neon DB + Upstash Redis + staging domain |
 | 068 | ARES-808-deploy-production | ⬜ | — | — | — | — | 🏁 sensibilidadespro.com LIVE: SSL + SEO verify + Sentry + launch |
 
-**Fase 8 completados: 1/9**
+**Fase 8 completados: 2/9**
 
 ---
 
