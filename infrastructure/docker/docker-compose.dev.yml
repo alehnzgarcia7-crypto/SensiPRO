@@ -12,11 +12,11 @@ services:
       POSTGRES_PASSWORD: ares
       POSTGRES_DB: ares_dev
     volumes:
-      - ares_pgdata:/var/lib/postgresql/data
+      - ares-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ares']
+      test: ['CMD-SHELL', 'pg_isready -U ares -d ares_dev']
       interval: 5s
-      timeout: 5s
+      timeout: 3s
       retries: 5
 
   redis:
@@ -25,14 +25,15 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
+    command: redis-server --appendonly yes
     volumes:
-      - ares_redis:/data
+      - ares-redis-data:/data
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
-      timeout: 5s
+      timeout: 3s
       retries: 5
 
 volumes:
-  ares_pgdata:
-  ares_redis:
+  ares-postgres-data:
+  ares-redis-data:

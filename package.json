@@ -28,6 +28,8 @@
     "db:reset": "cd packages/database && npx prisma migrate reset --force",
     "docker:up": "docker compose -f infrastructure/docker/docker-compose.dev.yml up -d",
     "docker:down": "docker compose -f infrastructure/docker/docker-compose.dev.yml down",
+    "setup": "bash scripts/setup.sh",
+    "db:reset:safe": "bash scripts/db-reset.sh",
     "clean": "rm -rf .next node_modules packages/*/node_modules packages/*/dist"
   },
   "dependencies": {
