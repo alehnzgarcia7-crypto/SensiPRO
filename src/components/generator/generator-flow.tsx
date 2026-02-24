@@ -12,9 +12,9 @@ import { StyleStep } from './steps/style-step';
 import { ResultPanel } from './result-panel';
 
 export function GeneratorFlow() {
-  const { step, result, goBack, reset } = useGeneratorStore();
+  const { step, result, allCalibrations, goBack, reset } = useGeneratorStore();
 
-  if (result) {
+  if (allCalibrations || result) {
     return <ResultPanel onReset={reset} />;
   }
 

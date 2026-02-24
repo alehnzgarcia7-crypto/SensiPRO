@@ -1,0 +1,178 @@
+import type { CalibrationLevel } from '@prisma/client';
+
+import {
+  CALIBRATION_MULTIPLIERS,
+  DPI_FORMULA_FACTOR,
+  DPI_FORMULA_BASE,
+  DPI_MIN,
+  DPI_MAX,
+  BUTTON_SIZE_MAP,
+  HUD_THRESHOLD_SMALL,
+  HUD_THRESHOLD_LARGE,
+  SENSITIVITY_MIN,
+  SENSITIVITY_MAX,
+} from '@ares/config';
+
+import type {
+  DeviceSpecs,
+  SensitivityOutput,
+  CalibrationResult,
+  HudRecommendation,
+  HudOption,
+  GenerateAllOutput,
+  CalibrationInput,
+} from './types';
+import { generateSensitivity } from './sensitivity-engine';
+import { generateGyroscope } from './gyroscope-engine';
+import { calculatePerformanceScore } from './device-analyzer';
+
+// ═══════════════════════════════════════════════════════════════
+// ARES CALIBRATION ENGINE v1.0
+// ═══════════════════════════════════════════════════════════════
+//
+// Genera 6 combinaciones: BAJA×sinDPI, BAJA×conDPI,
+//                         MEDIA×sinDPI, MEDIA×conDPI,
+//                         ALTA×sinDPI, ALTA×conDPI
+
+const CALIBRATION_LEVELS: CalibrationLevel[] = ['BAJA', 'MEDIA', 'ALTA'];
+const DPI_MODES = [false, true] as const;
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.round(Math.max(min, Math.min(max, value)));
+}
+
+/** Aplica el multiplicador de calibración a todos los campos de sensibilidad */
+function applyCalibratedSensitivity(
+  baseSensitivity: SensitivityOutput,
+  calibration: CalibrationLevel,
+): SensitivityOutput {
+  const multiplier = CALIBRATION_MULTIPLIERS[calibration];
+  return {
+    general: clamp(baseSensitivity.general * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    redPoint: clamp(baseSensitivity.redPoint * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope2x: clamp(baseSensitivity.scope2x * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope4x: clamp(baseSensitivity.scope4x * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    sniperScope: clamp(baseSensitivity.sniperScope * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    freeView: clamp(baseSensitivity.freeView * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+  };
+}
+
+/** Calcula DPI óptimo basado en PPI y screenSize del dispositivo */
+export function calculateDpi(specs: DeviceSpecs): number {
+  const ppi = specs.ppi ?? 400; // Fallback razonable si no hay PPI
+  const rawDpi = Math.round((ppi / specs.screenSize) * DPI_FORMULA_FACTOR + DPI_FORMULA_BASE);
+  return clamp(rawDpi, DPI_MIN, DPI_MAX);
+}
+
+/** Calcula tamaño de botón recomendado basado en screenSize */
+export function calculateButtonSize(screenSize: number): number {
+  const entry = BUTTON_SIZE_MAP.find((e) => screenSize < e.maxScreen);
+  return entry?.sizeMm ?? 54;
+}
+
+/** Calcula precision score (inverso de velocidad: más sensi = menos precisión) */
+export function calculatePrecisionScore(sensitivity: SensitivityOutput): number {
+  return clamp(100 - sensitivity.general * 0.8, 0, 100);
+}
+
+/** Genera recomendación de Custom HUD basado en screenSize */
+export function generateHudRecommendation(screenSize: number): HudRecommendation {
+  let recommended: 2 | 3 | 4;
+  if (screenSize < HUD_THRESHOLD_SMALL) {
+    recommended = 2;
+  } else if (screenSize <= HUD_THRESHOLD_LARGE) {
+    recommended = 3;
+  } else {
+    recommended = 4;
+  }
+
+  const options: HudOption[] = [
+    {
+      fingers: 2,
+      description: 'Control clásico con dos pulgares. Simple y familiar.',
+      pros: ['Fácil de aprender', 'Cómodo en pantallas chicas', 'Menos fatiga en sesiones largas'],
+      cons: ['No puedes moverte y disparar al mismo tiempo', 'Reacción más lenta en CQB'],
+      isRecommended: recommended === 2,
+    },
+    {
+      fingers: 3,
+      description: 'Pulgar izquierdo + pulgar derecho + índice derecho. Versátil.',
+      pros: ['Movimiento + disparo simultáneo', 'Buena transición desde 2 dedos', 'Ideal para pantallas medianas'],
+      cons: ['Curva de aprendizaje moderada', 'Puede ser incómodo sin soporte'],
+      isRecommended: recommended === 3,
+    },
+    {
+      fingers: 4,
+      description: 'Estilo garra: 2 pulgares + 2 índices. Máximo control.',
+      pros: ['Control total simultáneo', 'Ventaja competitiva real', 'Peek + disparo + movimiento a la vez'],
+      cons: ['Curva de aprendizaje alta', 'Requiere pantalla grande (>6.4")', 'Puede causar fatiga en las manos'],
+      isRecommended: recommended === 4,
+    },
+  ];
+
+  return { recommended, options };
+}
+
+/** Genera una sola combinación de calibración */
+export function generateCalibration(input: CalibrationInput): CalibrationResult {
+  const { specs, style, calibration, dpiMode, includeGyro } = input;
+
+  // Generar sensibilidad base con el motor existente
+  const baseResult = generateSensitivity({ specs, style, includeGyro });
+
+  // Aplicar multiplicador de calibración
+  const calibratedSensitivity = applyCalibratedSensitivity(
+    baseResult.sensitivity,
+    calibration,
+  );
+
+  // Recalcular giroscopio sobre valores calibrados si aplica
+  const calibratedGyro = baseResult.gyroscope
+    ? generateGyroscope(calibratedSensitivity, specs)
+    : null;
+
+  const dpiValue = dpiMode ? calculateDpi(specs) : null;
+  const buttonSize = calculateButtonSize(specs.screenSize);
+  const precisionScore = calculatePrecisionScore(calibratedSensitivity);
+
+  return {
+    calibration,
+    dpiMode,
+    sensitivity: calibratedSensitivity,
+    gyroscope: calibratedGyro,
+    performanceScore: baseResult.meta.performanceScore,
+    precisionScore,
+    dpiValue,
+    buttonSize,
+  };
+}
+
+/** Genera las 6 combinaciones para un dispositivo + estilo */
+export function generateAllCalibrations(
+  specs: DeviceSpecs,
+  style: CalibrationInput['style'],
+  includeGyro: boolean,
+): GenerateAllOutput {
+  const combinations: CalibrationResult[] = [];
+
+  for (const calibration of CALIBRATION_LEVELS) {
+    for (const dpiMode of DPI_MODES) {
+      combinations.push(
+        generateCalibration({ specs, style, calibration, dpiMode, includeGyro }),
+      );
+    }
+  }
+
+  const hudRecommendation = generateHudRecommendation(specs.screenSize);
+  const performanceScore = calculatePerformanceScore(specs);
+
+  return {
+    combinations,
+    hudRecommendation,
+    meta: {
+      styleApplied: style,
+      deviceTier: specs.tier,
+      algorithm: 'ARES-v1.1-calibration',
+    },
+  };
+}

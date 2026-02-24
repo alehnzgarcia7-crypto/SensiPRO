@@ -1,9 +1,17 @@
 import { create } from 'zustand';
-import type { SensitivityStyle, DeviceTier } from '@prisma/client';
+import type { SensitivityStyle, DeviceTier, CalibrationLevel, PanelType } from '@prisma/client';
+
+import type {
+  CalibrationResult,
+  HudRecommendation,
+  SensitivityOutput,
+  GyroscopeOutput,
+} from '@ares/algorithms';
 
 // ═══════════════════════════════════════════════════════════════
 // Zustand store para el flujo del generador de sensibilidades
 // 3 pasos: marca → modelo → estilo → resultado
+// Soporta 6 combinaciones: BAJA/MEDIA/ALTA × sinDPI/conDPI
 // ═══════════════════════════════════════════════════════════════
 
 interface SelectedDevice {
@@ -14,27 +22,25 @@ interface SelectedDevice {
   tier: DeviceTier;
   screenHz: number;
   ramGb: number;
+  screenSize?: number;
+  panelType?: PanelType;
 }
 
 interface GeneratorResult {
-  sensitivity: {
-    general: number;
-    redPoint: number;
-    scope2x: number;
-    scope4x: number;
-    sniperScope: number;
-    freeView: number;
-  };
-  gyroscope: {
-    gyroGeneral: number;
-    gyroRedPoint: number;
-    gyroScope2x: number;
-    gyroScope4x: number;
-    gyroSniper: number;
-    gyroFreeView: number;
-  } | null;
+  sensitivity: SensitivityOutput;
+  gyroscope: GyroscopeOutput | null;
   meta: {
     performanceScore: number;
+    styleApplied: SensitivityStyle;
+    deviceTier: DeviceTier;
+    algorithm: string;
+  };
+}
+
+interface AllCalibrationsResult {
+  combinations: CalibrationResult[];
+  hudRecommendation: HudRecommendation;
+  meta: {
     styleApplied: SensitivityStyle;
     deviceTier: DeviceTier;
     algorithm: string;
@@ -47,47 +53,121 @@ interface GeneratorStore {
   selectedDevice: SelectedDevice | null;
   selectedStyle: SensitivityStyle;
   includeGyro: boolean;
+
+  // Resultado legacy (single)
   result: GeneratorResult | null;
+
+  // Resultado nuevo (6 combinaciones)
+  allCalibrations: AllCalibrationsResult | null;
+  calibration: CalibrationLevel;
+  dpiMode: boolean;
+
   isLoading: boolean;
   error: string | null;
 
+  // Acciones
   selectBrand: (brand: string) => void;
   selectDevice: (device: SelectedDevice) => void;
   selectStyle: (style: SensitivityStyle) => void;
   setIncludeGyro: (value: boolean) => void;
   setResult: (result: GeneratorResult) => void;
+  setAllCalibrations: (data: AllCalibrationsResult) => void;
+  setCalibration: (calibration: CalibrationLevel) => void;
+  setDpiMode: (dpiMode: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   reset: () => void;
   goBack: () => void;
+
+  // Computed: combinación activa filtrada de allCalibrations
+  getCurrentCombination: () => CalibrationResult | null;
 }
 
 const initialState = {
   step: 1 as const,
-  selectedBrand: null,
-  selectedDevice: null,
+  selectedBrand: null as string | null,
+  selectedDevice: null as SelectedDevice | null,
   selectedStyle: 'BALANCED' as SensitivityStyle,
   includeGyro: false,
-  result: null,
+  result: null as GeneratorResult | null,
+  allCalibrations: null as AllCalibrationsResult | null,
+  calibration: 'MEDIA' as CalibrationLevel,
+  dpiMode: false,
   isLoading: false,
-  error: null,
+  error: null as string | null,
 };
 
-export const useGeneratorStore = create<GeneratorStore>((set) => ({
+export const useGeneratorStore = create<GeneratorStore>((set, get) => ({
   ...initialState,
 
-  selectBrand: (brand) => set({ selectedBrand: brand, step: 2, selectedDevice: null, result: null }),
-  selectDevice: (device) => set({ selectedDevice: device, step: 3, result: null }),
+  selectBrand: (brand) => set({
+    selectedBrand: brand,
+    step: 2,
+    selectedDevice: null,
+    result: null,
+    allCalibrations: null,
+  }),
+
+  selectDevice: (device) => set({
+    selectedDevice: device,
+    step: 3,
+    result: null,
+    allCalibrations: null,
+  }),
+
   selectStyle: (style) => set({ selectedStyle: style }),
   setIncludeGyro: (value) => set({ includeGyro: value }),
   setResult: (result) => set({ result, isLoading: false }),
+
+  setAllCalibrations: (data) => set({
+    allCalibrations: data,
+    isLoading: false,
+    // También setear result legacy para compatibilidad con componentes existentes
+    result: {
+      sensitivity: data.combinations.find(
+        (c) => c.calibration === get().calibration && c.dpiMode === get().dpiMode,
+      )?.sensitivity ?? data.combinations[0]!.sensitivity,
+      gyroscope: data.combinations.find(
+        (c) => c.calibration === get().calibration && c.dpiMode === get().dpiMode,
+      )?.gyroscope ?? null,
+      meta: {
+        performanceScore: data.combinations[0]!.performanceScore,
+        styleApplied: data.meta.styleApplied,
+        deviceTier: data.meta.deviceTier,
+        algorithm: data.meta.algorithm,
+      },
+    },
+  }),
+
+  setCalibration: (calibration) => set({ calibration }),
+  setDpiMode: (dpiMode) => set({ dpiMode }),
+
   setLoading: (loading) => set({ isLoading: loading, error: null }),
   setError: (error) => set({ error, isLoading: false }),
   reset: () => set(initialState),
+
   goBack: () =>
     set((state) => {
-      if (state.step === 3) return { step: 2, result: null };
-      if (state.step === 2) return { step: 1, selectedBrand: null, selectedDevice: null, result: null };
+      if (state.step === 3) return {
+        step: 2 as const,
+        result: null,
+        allCalibrations: null,
+      };
+      if (state.step === 2) return {
+        step: 1 as const,
+        selectedBrand: null,
+        selectedDevice: null,
+        result: null,
+        allCalibrations: null,
+      };
       return state;
     }),
+
+  getCurrentCombination: () => {
+    const state = get();
+    if (!state.allCalibrations) return null;
+    return state.allCalibrations.combinations.find(
+      (c) => c.calibration === state.calibration && c.dpiMode === state.dpiMode,
+    ) ?? null;
+  },
 }));

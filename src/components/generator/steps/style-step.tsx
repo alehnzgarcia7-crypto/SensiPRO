@@ -3,6 +3,9 @@
 import { Sword, Target, Crosshair } from 'lucide-react';
 import type { SensitivityStyle } from '@prisma/client';
 
+import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
+import type { DeviceTier } from '@prisma/client';
+
 import { useGeneratorStore } from '@/stores/generator.store';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -44,6 +47,31 @@ const STYLES: StyleOption[] = [
   },
 ];
 
+interface AllCalibrationsApiResponse {
+  success: boolean;
+  data?: {
+    device: {
+      id: string;
+      brand: string;
+      model: string;
+      slug: string;
+      tier: DeviceTier;
+      screenSize: number;
+      screenHz: number;
+      ramGb: number;
+      panelType: string;
+    };
+    combinations: CalibrationResult[];
+    hudRecommendation: HudRecommendation;
+    meta: {
+      styleApplied: SensitivityStyle;
+      deviceTier: DeviceTier;
+      algorithm: string;
+    };
+  };
+  error?: { message: string };
+}
+
 export function StyleStep() {
   const {
     selectedDevice,
@@ -54,7 +82,7 @@ export function StyleStep() {
     isLoading,
     error,
     setLoading,
-    setResult,
+    setAllCalibrations,
     setError,
   } = useGeneratorStore();
 
@@ -63,7 +91,7 @@ export function StyleStep() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/generate', {
+      const res = await fetch('/api/generate/all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -73,10 +101,14 @@ export function StyleStep() {
         }),
       });
 
-      const data: { success: boolean; data?: Parameters<typeof setResult>[0]; error?: { message: string } } = await res.json();
+      const data = await res.json() as AllCalibrationsApiResponse;
 
       if (data.success && data.data) {
-        setResult(data.data);
+        setAllCalibrations({
+          combinations: data.data.combinations,
+          hudRecommendation: data.data.hudRecommendation,
+          meta: data.data.meta,
+        });
       } else {
         setError(data.error?.message ?? 'Error al generar');
       }

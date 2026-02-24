@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { RotateCcw, Heart, Share2, Download } from 'lucide-react';
+import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge } from 'lucide-react';
 
 import { useGeneratorStore } from '@/stores/generator.store';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { CountUp } from '@/components/effects/count-up';
+import { CalibrationSelector } from './calibration-selector';
+import { DpiToggle } from './dpi-toggle';
+import { HudRecommendationPanel } from './hud-recommendation';
 
 interface ResultPanelProps {
   onReset: () => void;
@@ -33,15 +36,25 @@ const GYRO_LABELS: Record<string, string> = {
 };
 
 export function ResultPanel({ onReset }: ResultPanelProps) {
-  const { selectedDevice, selectedStyle, result } = useGeneratorStore();
+  const {
+    selectedDevice,
+    selectedStyle,
+    allCalibrations,
+    calibration,
+    dpiMode,
+    setCalibration,
+    setDpiMode,
+    getCurrentCombination,
+  } = useGeneratorStore();
 
-  if (!result || !selectedDevice) return null;
+  const currentCombo = getCurrentCombination();
+
+  if (!allCalibrations || !selectedDevice || !currentCombo) return null;
 
   const styleVariant = selectedStyle.toLowerCase() as 'aggressive' | 'balanced' | 'sniper';
-
-  const sensitivityEntries = Object.entries(result.sensitivity) as [string, number][];
-  const gyroscopeEntries = result.gyroscope
-    ? (Object.entries(result.gyroscope) as [string, number][])
+  const sensitivityEntries = Object.entries(currentCombo.sensitivity) as [string, number][];
+  const gyroscopeEntries = currentCombo.gyroscope
+    ? (Object.entries(currentCombo.gyroscope) as [string, number][])
     : null;
 
   return (
@@ -61,11 +74,21 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         <div className="text-right">
           <p className="text-sm text-slate-500">Performance</p>
           <p className="text-3xl font-display font-black text-gradient-fire-ice">
-            <CountUp end={result.meta.performanceScore} />
+            <CountUp end={currentCombo.performanceScore} />
             <span className="text-lg text-slate-500">/100</span>
           </p>
         </div>
       </div>
+
+      {/* Controles de calibración y DPI — reactivos, sin reload */}
+      <Card variant="default" className="p-4 space-y-4">
+        <CalibrationSelector value={calibration} onChange={setCalibration} />
+        <DpiToggle
+          enabled={dpiMode}
+          onChange={setDpiMode}
+          dpiValue={currentCombo.dpiValue}
+        />
+      </Card>
 
       {/* Valores de sensibilidad */}
       <Card variant="glow" className="p-6">
@@ -73,7 +96,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         <div className="space-y-4">
           {sensitivityEntries.map(([key, value], i) => (
             <motion.div
-              key={key}
+              key={`${key}-${calibration}-${dpiMode}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: i * 0.08 }}
@@ -81,12 +104,58 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm text-slate-400">{FIELD_LABELS[key] ?? key}</span>
                 <span className="text-lg font-display font-bold text-white">
-                  <CountUp end={value} duration={800} />
+                  <CountUp end={value} duration={600} />
                 </span>
               </div>
               <Progress value={value} max={100} size="sm" color="gradient" />
             </motion.div>
           ))}
+        </div>
+
+        {/* Filas adicionales: Precision Score, Button Size, DPI */}
+        <div className="mt-6 pt-4 border-t border-white/5 space-y-3">
+          {/* Precision Score */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target size={14} className="text-ice-400" />
+              <span className="text-sm text-slate-400">Precisión</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-display font-bold text-ice-300">
+                <CountUp end={currentCombo.precisionScore} duration={600} />
+                <span className="text-xs text-slate-500">/100</span>
+              </span>
+            </div>
+          </div>
+          <Progress value={currentCombo.precisionScore} max={100} size="sm" color="ice" />
+
+          {/* Button Size */}
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center gap-2">
+              <Ruler size={14} className="text-fire-400" />
+              <span className="text-sm text-slate-400">Tamaño del Botón</span>
+            </div>
+            <span className="text-sm font-display font-bold text-white">
+              {currentCombo.buttonSize}mm
+            </span>
+          </div>
+
+          {/* DPI Value (solo si dpiMode) */}
+          {currentCombo.dpiValue !== null && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="flex items-center justify-between mt-3"
+            >
+              <div className="flex items-center gap-2">
+                <Gauge size={14} className="text-ice-400" />
+                <span className="text-sm text-slate-400">DPI Óptimo</span>
+              </div>
+              <span className="text-sm font-display font-bold text-ice-300">
+                <CountUp end={currentCombo.dpiValue} duration={600} />
+              </span>
+            </motion.div>
+          )}
         </div>
       </Card>
 
@@ -97,7 +166,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           <div className="space-y-4">
             {gyroscopeEntries.map(([key, value], i) => (
               <motion.div
-                key={key}
+                key={`${key}-${calibration}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.08 }}
@@ -105,7 +174,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-slate-400">{GYRO_LABELS[key] ?? key}</span>
                   <span className="text-lg font-display font-bold text-white">
-                    <CountUp end={value} duration={800} />
+                    <CountUp end={value} duration={600} />
                   </span>
                 </div>
                 <Progress value={value} max={100} size="sm" color="ice" />
@@ -114,6 +183,9 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           </div>
         </Card>
       )}
+
+      {/* HUD Recommendation */}
+      <HudRecommendationPanel data={allCalibrations.hudRecommendation} />
 
       {/* Acciones */}
       <div className="flex flex-wrap gap-3">

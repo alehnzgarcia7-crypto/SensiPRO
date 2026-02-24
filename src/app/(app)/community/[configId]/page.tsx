@@ -67,8 +67,8 @@ export default async function SharedConfigPage({ params }: PageProps) {
     notFound();
   }
 
-  const sensitivity = await prisma.sensitivity.findUnique({
-    where: { deviceId_style: { deviceId: config.deviceId, style: config.style } },
+  const sensitivity = await prisma.sensitivity.findFirst({
+    where: { deviceId: config.deviceId, style: config.style, calibration: 'MEDIA', dpiMode: false },
   });
 
   const styleColors: Record<string, string> = {

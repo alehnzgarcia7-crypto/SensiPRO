@@ -64,3 +64,28 @@ export const BASE_SENSITIVITY = {
 export const GYRO_BASE_FACTOR = 0.50;
 export const GYRO_PANEL_BONUS = 0.05;     // AMOLED/OLED
 export const GYRO_GAMING_BONUS = 0.08;    // GAMING tier
+
+// Calibration multipliers (BAJA=precisión, MEDIA=base, ALTA=velocidad)
+export const CALIBRATION_MULTIPLIERS = {
+  BAJA: 0.72,
+  MEDIA: 1.0,
+  ALTA: 1.28,
+} as const;
+
+// DPI calculation constants
+export const DPI_FORMULA_FACTOR = 4.2;
+export const DPI_FORMULA_BASE = 180;
+export const DPI_MIN = 200;
+export const DPI_MAX = 800;
+
+// Button size thresholds (screenSize en pulgadas → mm)
+export const BUTTON_SIZE_MAP: readonly { maxScreen: number; sizeMm: number }[] = [
+  { maxScreen: 5.5, sizeMm: 42 },
+  { maxScreen: 6.2, sizeMm: 46 },
+  { maxScreen: 6.7, sizeMm: 50 },
+  { maxScreen: Infinity, sizeMm: 54 },
+] as const;
+
+// HUD recommendation thresholds
+export const HUD_THRESHOLD_SMALL = 5.8;
+export const HUD_THRESHOLD_LARGE = 6.4;

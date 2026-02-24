@@ -12,9 +12,22 @@ export {
   getAllStyleProfiles,
 } from './style-profiles';
 export type { StyleProfile } from './style-profiles';
+export {
+  generateCalibration,
+  generateAllCalibrations,
+  calculateDpi,
+  calculateButtonSize,
+  calculatePrecisionScore,
+  generateHudRecommendation,
+} from './calibration-engine';
 export type {
   AlgorithmInput,
   AlgorithmOutput,
+  CalibrationInput,
+  CalibrationResult,
+  HudOption,
+  HudRecommendation,
+  GenerateAllOutput,
   SensitivityOutput,
   GyroscopeOutput,
   StyleMultipliers,

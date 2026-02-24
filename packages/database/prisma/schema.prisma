@@ -95,6 +95,12 @@ enum TournamentStatus {
   CANCELLED
 }
 
+enum CalibrationLevel {
+  BAJA
+  MEDIA
+  ALTA
+}
+
 enum TipDifficulty {
   BEGINNER
   INTERMEDIATE
@@ -239,14 +245,20 @@ model Sensitivity {
   gyroSniper      Int?              @map("gyro_sniper") @db.SmallInt
   gyroFreeView    Int?              @map("gyro_free_view") @db.SmallInt
 
+  calibration     CalibrationLevel  @default(MEDIA)
+  dpiMode         Boolean           @default(false) @map("dpi_mode")
+  dpiValue        Int?              @map("dpi_value") @db.SmallInt
+  buttonSize      Float?            @map("button_size")
+
   createdAt       DateTime          @default(now()) @map("created_at")
 
   device          Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@map("sensitivities")
-  @@unique([deviceId, style])
+  @@unique([deviceId, style, calibration, dpiMode])
   @@index([deviceId])
   @@index([style])
+  @@index([calibration])
 }
 
 // ──────────────────────────────────

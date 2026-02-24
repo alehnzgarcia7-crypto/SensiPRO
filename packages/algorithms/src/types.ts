@@ -1,4 +1,4 @@
-import type { SensitivityStyle, PanelType, DeviceTier } from '@prisma/client';
+import type { SensitivityStyle, PanelType, DeviceTier, CalibrationLevel } from '@prisma/client';
 
 export interface DeviceSpecs {
   screenHz: number;
@@ -6,11 +6,20 @@ export interface DeviceSpecs {
   ramGb: number;
   panelType: PanelType;
   tier: DeviceTier;
+  ppi?: number;
 }
 
 export interface AlgorithmInput {
   specs: DeviceSpecs;
   style: SensitivityStyle;
+  includeGyro?: boolean;
+}
+
+export interface CalibrationInput {
+  specs: DeviceSpecs;
+  style: SensitivityStyle;
+  calibration: CalibrationLevel;
+  dpiMode: boolean;
   includeGyro?: boolean;
 }
 
@@ -37,6 +46,40 @@ export interface AlgorithmOutput {
   gyroscope: GyroscopeOutput | null;
   meta: {
     performanceScore: number;
+    styleApplied: SensitivityStyle;
+    deviceTier: DeviceTier;
+    algorithm: string;
+  };
+}
+
+export interface CalibrationResult {
+  calibration: CalibrationLevel;
+  dpiMode: boolean;
+  sensitivity: SensitivityOutput;
+  gyroscope: GyroscopeOutput | null;
+  performanceScore: number;
+  precisionScore: number;
+  dpiValue: number | null;
+  buttonSize: number;
+}
+
+export interface HudOption {
+  fingers: 2 | 3 | 4;
+  description: string;
+  pros: string[];
+  cons: string[];
+  isRecommended: boolean;
+}
+
+export interface HudRecommendation {
+  recommended: 2 | 3 | 4;
+  options: HudOption[];
+}
+
+export interface GenerateAllOutput {
+  combinations: CalibrationResult[];
+  hudRecommendation: HudRecommendation;
+  meta: {
     styleApplied: SensitivityStyle;
     deviceTier: DeviceTier;
     algorithm: string;
