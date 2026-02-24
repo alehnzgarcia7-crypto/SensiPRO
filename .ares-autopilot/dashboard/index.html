@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="15">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎮 ARES AUTOPILOT v2.0</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050810;color:#e0e0e0;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;padding:15px}
+.hdr{text-align:center;padding:25px;border-bottom:1px solid #1a2a4e;margin-bottom:20px}
+.hdr h1{font-size:1.8em;background:linear-gradient(90deg,#ff6a00,#00c8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr p{color:#555;font-size:.8em;margin-top:5px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.cd{background:#0a0f1e;border:1px solid #1a2a4e;border-radius:12px;padding:18px;text-align:center}
+.cd .n{font-size:2.2em;font-weight:bold;margin:8px 0}
+.cd .l{color:#666;font-size:.75em;text-transform:uppercase;letter-spacing:1px}
+.c1 .n{color:#00ff88}.c2 .n{color:#ff4444}.c3 .n{color:#00c8ff}.c4 .n{color:#ff6a00}
+.c5 .n{color:#a855f7}.c6 .n{color:#eab308}
+.sec{background:#0a0f1e;border:1px solid #1a2a4e;border-radius:12px;padding:20px;margin-bottom:15px}
+.sec h3{color:#ff6a00;margin-bottom:12px;font-size:1em}
+.bar{height:28px;background:#0d1424;border-radius:14px;overflow:hidden;margin:10px 0}
+.fill{height:100%;border-radius:14px;background:linear-gradient(90deg,#ff6a00,#00c8ff);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:.85em;transition:width .8s ease}
+.phase{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #0d1424}
+.phase:last-child{border:none}
+.phase .pn{width:30px;text-align:center;font-weight:bold}
+.phase .pl{flex:1;font-size:.85em}
+.phase .pb{flex:2;height:14px;background:#0d1424;border-radius:7px;overflow:hidden}
+.phase .pf{height:100%;border-radius:7px;transition:width .5s}
+.phase .ps{width:50px;text-align:right;font-size:.8em;color:#888}
+.log{max-height:350px;overflow-y:auto}
+.le{padding:6px 8px;border-bottom:1px solid #080d1a;font-size:.8em;display:flex;align-items:center;gap:8px}
+.le.s{border-left:3px solid #00ff88}.le.f{border-left:3px solid #ff4444}
+.le .t{color:#444;font-size:.75em;margin-left:auto}
+.ft{text-align:center;padding:15px;color:#333;font-size:.75em}
+@media(max-width:768px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.cd .n{font-size:1.6em}}
+</style></head><body>
+<div class="hdr"><h1>🎮 ARES AUTOPILOT v2.0</h1><p>Autonomous Gaming Platform Builder — Auto-refresh 15s</p></div>
+<div class="g4">
+<div class="cd c1"><div class="l">Completados</div><div class="n" id="c">0</div></div>
+<div class="cd c2"><div class="l">Fallidos</div><div class="n" id="f">0</div></div>
+<div class="cd c3"><div class="l">Archivos</div><div class="n" id="fi">0</div></div>
+<div class="cd c4"><div class="l">LOC</div><div class="n" id="l">0</div></div>
+</div>
+<div class="g3">
+<div class="cd c5"><div class="l">Racha</div><div class="n" id="sk">0</div></div>
+<div class="cd c6"><div class="l">Sesiones</div><div class="n" id="se">0</div></div>
+<div class="cd c1"><div class="l">Tiempo</div><div class="n" id="tm" style="font-size:1.4em">0h 0m</div></div>
+</div>
+<div class="sec"><h3>📊 Progreso Global — 68 Scripts</h3>
+<div class="bar"><div class="fill" id="p" style="width:0%">0%</div></div>
+<p style="color:#666;text-align:center;font-size:.85em" id="pt">0/68</p></div>
+<div class="sec"><h3>🎯 Progreso por Fase</h3><div id="phases"></div></div>
+<div class="sec"><h3>📋 Log de Ejecución</h3><div class="log" id="le"><div class="le" style="color:#444">Esperando datos...</div></div></div>
+<div class="ft">ARES SensiPRO 🇲🇽 Cancún | <span id="u"></span></div>
+<script>
+const PN=['Foundation','Motor','UI/UX','Academia','Monetización','Comunidad','Admin','Mobile','SEO/Deploy'];
+const PT=[8,10,8,6,8,8,6,5,9];
+const PP=['ARES-00','ARES-10','ARES-20','ARES-30','ARES-40','ARES-50','ARES-60','ARES-70','ARES-80'];
+async function u(){try{
+const s=await(await fetch('state.json')).json();
+const m=await(await fetch('metrics.json')).json();
+document.getElementById('c').textContent=s.total_scripts_completed||0;
+document.getElementById('f').textContent=s.total_scripts_failed||0;
+document.getElementById('fi').textContent=s.total_files_generated||0;
+document.getElementById('l').textContent=(s.total_loc_generated||0).toLocaleString();
+document.getElementById('sk').textContent=s.streak||0;
+document.getElementById('se').textContent=s.session_count||0;
+const tt=s.total_time_seconds||0;
+document.getElementById('tm').textContent=Math.floor(tt/3600)+'h '+Math.floor((tt%3600)/60)+'m';
+const p=Math.round(((s.total_scripts_completed||0)/68)*100);
+document.getElementById('p').style.width=p+'%';
+document.getElementById('p').textContent=p+'%';
+document.getElementById('pt').textContent=(s.total_scripts_completed||0)+'/68';
+// Phases
+const pd=document.getElementById('phases');pd.innerHTML='';
+const sc=m.scripts||[];
+for(let i=0;i<9;i++){const pc=sc.filter(x=>x.phase===i&&x.status==='success').length;
+const pct=Math.round((pc/PT[i])*100);const done=pc>=PT[i];
+pd.innerHTML+=`<div class="phase"><div class="pn" style="color:${done?'#00ff88':'#ff6a00'}">${done?'✅':i}</div><div class="pl">${PN[i]}</div><div class="pb"><div class="pf" style="width:${pct}%;background:${done?'#00ff88':'linear-gradient(90deg,#ff6a00,#00c8ff)'}"></div></div><div class="ps">${pc}/${PT[i]}</div></div>`;}
+// Log
+const d=document.getElementById('le');d.innerHTML='';
+sc.slice(-30).reverse().forEach(s=>{const e=document.createElement('div');
+e.className='le '+(s.status==='success'?'s':'f');
+e.innerHTML=`${s.status==='success'?'✅':'❌'} <b>${s.name}</b> — ${s.duration_seconds}s <span class="t">${new Date(s.timestamp).toLocaleString()}</span>`;
+d.appendChild(e);});
+}catch(e){}document.getElementById('u').textContent=new Date().toLocaleString();}
+u();setInterval(u,5000);
+</script></body></html>
