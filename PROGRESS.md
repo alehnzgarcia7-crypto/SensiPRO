@@ -40,14 +40,14 @@
 │                       ARES — ESTADO                            │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
-│  Scripts completados ········ 4/68                             │
+│  Scripts completados ········ 5/68                             │
 │  Fase actual ················ Fase 0 — Fundación              │
-│  Siguiente script ··········· ARES-004-design-system          │
-│  Archivos generados ········· 69                              │
-│  Líneas de código ··········· ~2,720                          │
+│  Siguiente script ··········· ARES-005-infra-docker           │
+│  Archivos generados ········· 88                              │
+│  Líneas de código ··········· ~3,522                          │
 │  Tests pasando ·············· 0                               │
 │  Última actualización ······· 2026-02-24                      │
-│  Racha actual ··············· 4                               │
+│  Racha actual ··············· 5                               │
 │                                                               │
 │  Estimado total: ~60,000 LOC | ~450 archivos                 │
 │                                                               │
@@ -61,7 +61,7 @@
 ## 🗺️ PROGRESO POR FASE
 
 ```
-Fase 0 — Fundación            [██████████░░░░░░░░░░]  50%  (4/8)
+Fase 0 — Fundación            [████████████░░░░░░░░]  63%  (5/8)
 Fase 1 — Motor Sensibilidades [░░░░░░░░░░░░░░░░░░░░]   0%  (0/10)
 Fase 2 — UI/UX Elite Gaming   [░░░░░░░░░░░░░░░░░░░░]   0%  (0/8)
 Fase 3 — Academia PRO         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/6)
@@ -71,7 +71,7 @@ Fase 6 — Admin y Analytics    [░░░░░░░░░░░░░░░�
 Fase 7 — Mobile y PWA         [░░░░░░░░░░░░░░░░░░░░]   0%  (0/5)
 Fase 8 — SEO, Growth, Deploy  [░░░░░░░░░░░░░░░░░░░░]   0%  (0/9)
 ─────────────────────────────────────────────────────────────────
-TOTAL                          [█░░░░░░░░░░░░░░░░░░░]   6%  (4/68)
+TOTAL                          [█░░░░░░░░░░░░░░░░░░░]   7%  (5/68)
 ```
 
 ---
@@ -99,12 +99,12 @@ TOTAL                          [█░░░░░░░░░░░░░░░
 | 002 | ARES-001-database-foundation | ✅ | 2026-02-24 | ~742 | 6 | 0 | Prisma schema 19 modelos + 12 enums + PrismaClient singleton + seed admin + 20 achievements |
 | 003 | ARES-002-shared-libraries | ✅ | 2026-02-24 | ~846 | 34 | 0 | @ares/types, @ares/utils, @ares/errors, @ares/logger, @ares/config |
 | 004 | ARES-003-auth-system | ✅ | 2026-02-24 | ~671 | 11 | 0 | NextAuth v5 + login/registro + JWT + middleware protección rutas + SessionProvider |
-| 005 | ARES-004-design-system | ⬜ | — | — | — | — | 15+ componentes UI gaming + navbar + footer + providers + tema dark |
+| 005 | ARES-004-design-system | ✅ | 2026-02-24 | ~802 | 19 | 0 | 12 UI components + navbar + footer + mobile-nav + count-up + providers + cn utility |
 | 006 | ARES-005-infra-docker | ⬜ | — | — | — | — | Docker Compose: PostgreSQL 16 + Redis 7 + script db-setup.sh |
 | 007 | ARES-006-testing-framework | ⬜ | — | — | — | — | Vitest config + Playwright config + test factories + setup global |
 | 008 | ARES-007-security-base | ⬜ | — | — | — | — | Rate limiting Redis por tier + sanitize XSS + headers CSP + CSRF |
 
-**Fase 0 completados: 4/8**
+**Fase 0 completados: 5/8**
 
 ---
 
@@ -396,8 +396,8 @@ DESPUÉS: | 🏗️ Fundación lista | 001-008 | ✅ | 2026-02-18 |
 
 ### 5. Actualizar barras de PROGRESO POR FASE:
 ```
-ANTES: Fase 0 — Fundación            [██████████░░░░░░░░░░]  50%  (4/8)
-DESPUÉS: Fase 0 — Fundación            [██████████░░░░░░░░░░]  50%  (4/8)
+ANTES: Fase 0 — Fundación            [████████████░░░░░░░░]  63%  (5/8)
+DESPUÉS: Fase 0 — Fundación            [████████████░░░░░░░░]  63%  (5/8)
 
 Caracteres: █ = completado, ░ = pendiente (20 chars total)
 Fórmula: filled = round(completados / total × 20)
