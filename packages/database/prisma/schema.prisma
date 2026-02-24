@@ -1,0 +1,586 @@
+// ═══════════════════════════════════════════════════════════════
+// ARES — Prisma Schema
+// Base de datos: PostgreSQL 16
+// 19 modelos | 12 enums | ~45 índices
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════
+
+enum UserTier {
+  FREE
+  PREMIUM
+  VIP
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum SensitivityStyle {
+  AGGRESSIVE
+  BALANCED
+  SNIPER
+}
+
+enum PanelType {
+  LCD
+  IPS
+  AMOLED
+  OLED
+  LTPO
+}
+
+enum DeviceTier {
+  LOW
+  MID
+  HIGH
+  ULTRA
+  GAMING
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  MERCADOPAGO
+  STRIPE
+  CODE
+}
+
+enum CodeStatus {
+  AVAILABLE
+  USED
+  EXPIRED
+}
+
+enum CodeType {
+  PREMIUM_30
+  PREMIUM_90
+  PREMIUM_365
+  VIP_30
+  VIP_90
+  VIP_365
+}
+
+enum GuideCategory {
+  SENSITIVITY
+  MOVEMENT
+  AIM
+  STRATEGY
+  DEVICE
+  META
+}
+
+enum TournamentStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// ═══════════════════════════════════
+// MODELOS
+// ═══════════════════════════════════
+
+// ──────────────────────────────────
+// 1. USER — Usuarios de la plataforma
+// ──────────────────────────────────
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique @db.VarChar(255)
+  username        String    @unique @db.VarChar(30)
+  password        String    @db.VarChar(255)
+  displayName     String?   @map("display_name") @db.VarChar(50)
+  avatarUrl       String?   @map("avatar_url") @db.VarChar(500)
+  bio             String?   @db.VarChar(200)
+
+  role            UserRole  @default(USER)
+  tier            UserTier  @default(FREE)
+  tierExpiresAt   DateTime? @map("tier_expires_at")
+
+  totalSearches   Int       @default(0) @map("total_searches")
+  totalFavorites  Int       @default(0) @map("total_favorites")
+  totalShares     Int       @default(0) @map("total_shares")
+
+  referralCode    String?   @unique @map("referral_code") @db.VarChar(12)
+  referredBy      String?   @map("referred_by") @db.VarChar(12)
+  referralCount   Int       @default(0) @map("referral_count")
+
+  lastLoginAt     DateTime? @map("last_login_at")
+  lastLoginIp     String?   @map("last_login_ip") @db.VarChar(45)
+  isActive        Boolean   @default(true) @map("is_active")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  favorites       Favorite[]
+  searchHistory   SearchHistory[]
+  payments        Payment[]
+  subscriptions   Subscription[]
+  achievements    UserAchievement[]
+  sharedConfigs   SharedConfig[]
+  votes           Vote[]
+  comments        Comment[]
+  tournamentEntries TournamentEntry[]
+  notifications   Notification[]
+  codesUsed       ActivationCode[] @relation("CodeUser")
+  codesCreated    ActivationCode[] @relation("CodeCreator")
+  guidesAuthored  Guide[]
+  adminLogs       AdminLog[]
+
+  @@map("users")
+  @@index([email])
+  @@index([username])
+  @@index([tier])
+  @@index([referralCode])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 2. DEVICE — Dispositivos con specs técnicos
+// ──────────────────────────────────
+model Device {
+  id              String      @id @default(cuid())
+  brand           String      @db.VarChar(50)
+  model           String      @db.VarChar(100)
+  slug            String      @unique @db.VarChar(150)
+
+  screenHz        Int         @map("screen_hz") @db.SmallInt
+  screenSize      Float       @map("screen_size")
+  ramGb           Int         @map("ram_gb") @db.SmallInt
+  panelType       PanelType   @default(LCD) @map("panel_type")
+  tier            DeviceTier  @default(MID)
+  chipset         String?     @db.VarChar(100)
+  releaseYear     Int?        @map("release_year") @db.SmallInt
+
+  imageUrl        String?     @map("image_url") @db.VarChar(500)
+
+  isPopular       Boolean     @default(false) @map("is_popular")
+  isActive        Boolean     @default(true) @map("is_active")
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  sensitivities   Sensitivity[]
+  favorites       Favorite[]
+  searchHistory   SearchHistory[]
+  sharedConfigs   SharedConfig[]
+
+  @@map("devices")
+  @@unique([brand, model])
+  @@index([brand])
+  @@index([slug])
+  @@index([tier])
+  @@index([isPopular])
+  @@index([screenHz])
+}
+
+// ──────────────────────────────────
+// 3. SENSITIVITY — Sensibilidades calculadas
+// ──────────────────────────────────
+model Sensitivity {
+  id              String            @id @default(cuid())
+  deviceId        String            @map("device_id")
+  style           SensitivityStyle
+
+  general         Int               @db.SmallInt
+  redPoint        Int               @map("red_point") @db.SmallInt
+  scope2x         Int               @map("scope_2x") @db.SmallInt
+  scope4x         Int               @map("scope_4x") @db.SmallInt
+  sniperScope     Int               @map("sniper_scope") @db.SmallInt
+  freeView        Int               @map("free_view") @db.SmallInt
+
+  gyroGeneral     Int?              @map("gyro_general") @db.SmallInt
+  gyroRedPoint    Int?              @map("gyro_red_point") @db.SmallInt
+  gyroScope2x     Int?              @map("gyro_scope_2x") @db.SmallInt
+  gyroScope4x     Int?              @map("gyro_scope_4x") @db.SmallInt
+  gyroSniper      Int?              @map("gyro_sniper") @db.SmallInt
+  gyroFreeView    Int?              @map("gyro_free_view") @db.SmallInt
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  device          Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@map("sensitivities")
+  @@unique([deviceId, style])
+  @@index([deviceId])
+  @@index([style])
+}
+
+// ──────────────────────────────────
+// 4. FAVORITE — Configs guardadas por usuario
+// ──────────────────────────────────
+model Favorite {
+  id              String            @id @default(cuid())
+  userId          String            @map("user_id")
+  deviceId        String            @map("device_id")
+  style           SensitivityStyle
+  nickname        String?           @db.VarChar(50)
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device          Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@map("favorites")
+  @@unique([userId, deviceId, style])
+  @@index([userId])
+}
+
+// ──────────────────────────────────
+// 5. SEARCH HISTORY
+// ──────────────────────────────────
+model SearchHistory {
+  id              String            @id @default(cuid())
+  userId          String            @map("user_id")
+  deviceId        String            @map("device_id")
+  style           SensitivityStyle
+  searchedAt      DateTime          @default(now()) @map("searched_at")
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device          Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@map("search_history")
+  @@index([userId, searchedAt(sort: Desc)])
+  @@index([deviceId])
+}
+
+// ──────────────────────────────────
+// 6. ACTIVATION CODE
+// ──────────────────────────────────
+model ActivationCode {
+  id              String      @id @default(cuid())
+  code            String      @unique @db.VarChar(20)
+  type            CodeType
+  status          CodeStatus  @default(AVAILABLE)
+
+  createdById     String      @map("created_by_id")
+  usedById        String?     @map("used_by_id")
+  usedAt          DateTime?   @map("used_at")
+  expiresAt       DateTime?   @map("expires_at")
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  createdBy       User        @relation("CodeCreator", fields: [createdById], references: [id])
+  usedBy          User?       @relation("CodeUser", fields: [usedById], references: [id])
+  subscription    Subscription?
+
+  @@map("activation_codes")
+  @@index([code])
+  @@index([status])
+  @@index([type])
+}
+
+// ──────────────────────────────────
+// 7. PAYMENT
+// ──────────────────────────────────
+model Payment {
+  id              String          @id @default(cuid())
+  userId          String          @map("user_id")
+  externalId      String?         @map("external_id") @db.VarChar(255)
+  provider        PaymentProvider
+  amount          Int
+  currency        String          @default("MXN") @db.VarChar(3)
+  status          PaymentStatus   @default(PENDING)
+  codeType        CodeType?       @map("code_type")
+  metadata        Json?
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  user            User            @relation(fields: [userId], references: [id])
+  subscription    Subscription?
+
+  @@map("payments")
+  @@index([userId])
+  @@index([externalId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 8. SUBSCRIPTION
+// ──────────────────────────────────
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  tier            UserTier
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime  @map("end_date")
+  isActive        Boolean   @default(true) @map("is_active")
+
+  paymentId       String?   @unique @map("payment_id")
+  codeId          String?   @unique @map("code_id")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user            User      @relation(fields: [userId], references: [id])
+  payment         Payment?  @relation(fields: [paymentId], references: [id])
+  code            ActivationCode? @relation(fields: [codeId], references: [id])
+
+  @@map("subscriptions")
+  @@index([userId])
+  @@index([endDate])
+  @@index([isActive])
+}
+
+// ──────────────────────────────────
+// 9. GUIDE — Contenido de academia
+// ──────────────────────────────────
+model Guide {
+  id              String        @id @default(cuid())
+  title           String        @db.VarChar(200)
+  slug            String        @unique @db.VarChar(200)
+  description     String        @db.VarChar(500)
+  category        GuideCategory
+  content         String        @db.Text
+  imageUrl        String?       @map("image_url") @db.VarChar(500)
+  readTimeMin     Int           @default(5) @map("read_time_min") @db.SmallInt
+
+  isPremium       Boolean       @default(false) @map("is_premium")
+  isPublished     Boolean       @default(false) @map("is_published")
+  viewCount       Int           @default(0) @map("view_count")
+
+  authorId        String        @map("author_id")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  author          User          @relation(fields: [authorId], references: [id])
+  sections        GuideSection[]
+  comments        Comment[]
+
+  @@map("guides")
+  @@index([slug])
+  @@index([category])
+  @@index([isPublished])
+  @@index([viewCount(sort: Desc)])
+}
+
+// ──────────────────────────────────
+// 10. GUIDE SECTION
+// ──────────────────────────────────
+model GuideSection {
+  id              String    @id @default(cuid())
+  guideId         String    @map("guide_id")
+  title           String    @db.VarChar(200)
+  content         String    @db.Text
+  orderIndex      Int       @map("order_index") @db.SmallInt
+  isPremium       Boolean   @default(false) @map("is_premium")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  guide           Guide     @relation(fields: [guideId], references: [id], onDelete: Cascade)
+
+  @@map("guide_sections")
+  @@index([guideId, orderIndex])
+}
+
+// ──────────────────────────────────
+// 11. ACHIEVEMENT — Logros/badges
+// ──────────────────────────────────
+model Achievement {
+  id              String    @id @default(cuid())
+  key             String    @unique @db.VarChar(50)
+  name            String    @db.VarChar(100)
+  description     String    @db.VarChar(300)
+  iconUrl         String?   @map("icon_url") @db.VarChar(500)
+  category        String    @db.VarChar(50)
+  points          Int       @default(10)
+  requirement     Json
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  users           UserAchievement[]
+
+  @@map("achievements")
+}
+
+// ──────────────────────────────────
+// 12. USER ACHIEVEMENT — Relación usuario-logro
+// ──────────────────────────────────
+model UserAchievement {
+  id              String      @id @default(cuid())
+  userId          String      @map("user_id")
+  achievementId   String      @map("achievement_id")
+  unlockedAt      DateTime    @default(now()) @map("unlocked_at")
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement     Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@map("user_achievements")
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+// ──────────────────────────────────
+// 13. TOURNAMENT
+// ──────────────────────────────────
+model Tournament {
+  id                String            @id @default(cuid())
+  title             String            @db.VarChar(200)
+  description       String?           @db.Text
+  status            TournamentStatus  @default(UPCOMING)
+  startDate         DateTime          @map("start_date")
+  endDate           DateTime          @map("end_date")
+  prizeDescription  String?           @map("prize_description") @db.VarChar(500)
+  maxParticipants   Int?              @map("max_participants")
+  entryTier         UserTier          @default(FREE) @map("entry_tier")
+
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  entries           TournamentEntry[]
+
+  @@map("tournaments")
+  @@index([status])
+  @@index([startDate])
+}
+
+// ──────────────────────────────────
+// 14. TOURNAMENT ENTRY
+// ──────────────────────────────────
+model TournamentEntry {
+  id              String      @id @default(cuid())
+  tournamentId    String      @map("tournament_id")
+  userId          String      @map("user_id")
+  score           Int?        @default(0)
+  rank            Int?        @db.SmallInt
+  joinedAt        DateTime    @default(now()) @map("joined_at")
+
+  tournament      Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tournament_entries")
+  @@unique([tournamentId, userId])
+  @@index([tournamentId, score(sort: Desc)])
+}
+
+// ──────────────────────────────────
+// 15. SHARED CONFIG — Configs compartidas en comunidad
+// ──────────────────────────────────
+model SharedConfig {
+  id              String            @id @default(cuid())
+  userId          String            @map("user_id")
+  deviceId        String            @map("device_id")
+  style           SensitivityStyle
+  title           String            @db.VarChar(100)
+  description     String?           @db.VarChar(500)
+  votes           Int               @default(0)
+  isApproved      Boolean           @default(true) @map("is_approved")
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device          Device            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  userVotes       Vote[]
+  comments        Comment[]
+
+  @@map("shared_configs")
+  @@index([votes(sort: Desc)])
+  @@index([deviceId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ──────────────────────────────────
+// 16. VOTE
+// ──────────────────────────────────
+model Vote {
+  id              String      @id @default(cuid())
+  userId          String      @map("user_id")
+  sharedConfigId  String      @map("shared_config_id")
+  value           Int         @db.SmallInt
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedConfig    SharedConfig @relation(fields: [sharedConfigId], references: [id], onDelete: Cascade)
+
+  @@map("votes")
+  @@unique([userId, sharedConfigId])
+}
+
+// ──────────────────────────────────
+// 17. COMMENT — En guías y configs
+// ──────────────────────────────────
+model Comment {
+  id              String      @id @default(cuid())
+  userId          String      @map("user_id")
+  content         String      @db.VarChar(1000)
+
+  guideId         String?     @map("guide_id")
+  sharedConfigId  String?     @map("shared_config_id")
+
+  parentId        String?     @map("parent_id")
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guide           Guide?      @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  sharedConfig    SharedConfig? @relation(fields: [sharedConfigId], references: [id], onDelete: Cascade)
+  parent          Comment?    @relation("CommentReplies", fields: [parentId], references: [id])
+  replies         Comment[]   @relation("CommentReplies")
+
+  @@map("comments")
+  @@index([guideId, createdAt(sort: Desc)])
+  @@index([sharedConfigId, createdAt(sort: Desc)])
+  @@index([userId])
+}
+
+// ──────────────────────────────────
+// 18. NOTIFICATION
+// ──────────────────────────────────
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  type            String    @db.VarChar(50)
+  title           String    @db.VarChar(200)
+  message         String    @db.VarChar(500)
+  link            String?   @db.VarChar(500)
+  isRead          Boolean   @default(false) @map("is_read")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId, isRead, createdAt(sort: Desc)])
+}
+
+// ──────────────────────────────────
+// 19. ADMIN LOG — Registro de acciones admin
+// ──────────────────────────────────
+model AdminLog {
+  id              String    @id @default(cuid())
+  adminId         String    @map("admin_id")
+  action          String    @db.VarChar(100)
+  target          String?   @db.VarChar(200)
+  details         Json?
+  ipAddress       String?   @map("ip_address") @db.VarChar(45)
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  admin           User      @relation(fields: [adminId], references: [id])
+
+  @@map("admin_logs")
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+}

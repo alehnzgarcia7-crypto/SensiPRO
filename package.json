@@ -1,0 +1,73 @@
+{
+  "name": "ares-sensipro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ARES — Generador de Sensibilidades #1 para Free Fire",
+  "author": "Alex García",
+  "license": "PROPRIETARY",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "next dev --turbo",
+    "dev:db": "docker compose -f infrastructure/docker/docker-compose.dev.yml up -d",
+    "build": "turbo run build",
+    "start": "next start",
+    "lint": "next lint && eslint packages/ --ext .ts,.tsx",
+    "lint:fix": "next lint --fix && eslint packages/ --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,css}\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "db:migrate": "cd packages/database && npx prisma migrate dev",
+    "db:generate": "cd packages/database && npx prisma generate",
+    "db:seed": "cd packages/database && npx tsx prisma/seeds/run-seed.ts",
+    "db:studio": "cd packages/database && npx prisma studio",
+    "db:reset": "cd packages/database && npx prisma migrate reset --force",
+    "docker:up": "docker compose -f infrastructure/docker/docker-compose.dev.yml up -d",
+    "docker:down": "docker compose -f infrastructure/docker/docker-compose.dev.yml down",
+    "clean": "rm -rf .next node_modules packages/*/node_modules packages/*/dist"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "next-auth": "^5.0.0-beta.18",
+    "zustand": "^4.5.0",
+    "framer-motion": "^11.0.0",
+    "zod": "^3.23.0",
+    "bcryptjs": "^2.4.3",
+    "lucide-react": "^0.378.0",
+    "recharts": "^2.12.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "postcss": "^8.4.38",
+    "prettier": "^3.2.0",
+    "tailwindcss": "^3.4.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "playwright": "^1.44.0",
+    "@playwright/test": "^1.44.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

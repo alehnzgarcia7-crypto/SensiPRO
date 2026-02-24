@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   ARES SensiPRO — Gaming Design System
+   Dark mode only | Fire & Ice theme | Mobile first
+   ═══════════════════════════════════════════════════════════ */
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Exo+2:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  * {
+    @apply border-white/10;
+  }
+
+  html {
+    @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-slate-200 font-body antialiased;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(255, 106, 0, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 50%, rgba(0, 200, 255, 0.03) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #050810; }
+  ::-webkit-scrollbar-thumb { background: #1a2a4e; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #ff6a00; }
+
+  ::selection { background: rgba(255, 106, 0, 0.3); color: white; }
+}
+
+@layer components {
+  .glass {
+    @apply bg-background-card/80 backdrop-blur-xl border border-white/5 rounded-gaming;
+  }
+
+  .glass-hover {
+    @apply glass transition-all duration-300 hover:border-fire-500/30 hover:shadow-glow-fire;
+  }
+
+  .border-glow-fire {
+    @apply border-fire-500/30 shadow-glow-fire;
+  }
+
+  .border-glow-ice {
+    @apply border-ice-500/30 shadow-glow-ice;
+  }
+
+  .text-gradient-fire-ice {
+    @apply bg-gradient-fire-ice bg-clip-text text-transparent;
+  }
+
+  .text-gradient-fire {
+    @apply bg-gradient-fire bg-clip-text text-transparent;
+  }
+
+  .btn-gaming {
+    @apply inline-flex items-center justify-center gap-2 rounded-gaming px-6 py-3
+           font-ui font-semibold text-sm tracking-wider uppercase
+           transition-all duration-200 active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed
+           min-h-[44px] min-w-[44px];
+  }
+
+  .badge-free { @apply bg-tier-free/10 text-tier-free border border-tier-free/20; }
+  .badge-premium { @apply bg-tier-premium/10 text-tier-premium border border-tier-premium/20; }
+  .badge-vip { @apply bg-tier-vip/10 text-tier-vip border border-tier-vip/20; }
+
+  .badge-aggressive { @apply bg-style-aggressive/10 text-style-aggressive border border-style-aggressive/20; }
+  .badge-balanced { @apply bg-style-balanced/10 text-style-balanced border border-style-balanced/20; }
+  .badge-sniper { @apply bg-style-sniper/10 text-style-sniper border border-style-sniper/20; }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .touch-target { @apply min-h-[44px] min-w-[44px]; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
+  .safe-top { padding-top: env(safe-area-inset-top, 0); }
+}

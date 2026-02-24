@@ -1,0 +1,36 @@
+export { prisma } from './client';
+export type {
+  User,
+  Device,
+  Sensitivity,
+  Favorite,
+  SearchHistory,
+  ActivationCode,
+  Payment,
+  Subscription,
+  Guide,
+  GuideSection,
+  Achievement,
+  UserAchievement,
+  Tournament,
+  TournamentEntry,
+  SharedConfig,
+  Vote,
+  Comment,
+  Notification,
+  AdminLog,
+} from '@prisma/client';
+
+export {
+  UserTier,
+  UserRole,
+  SensitivityStyle,
+  PanelType,
+  DeviceTier,
+  PaymentStatus,
+  PaymentProvider,
+  CodeStatus,
+  CodeType,
+  GuideCategory,
+  TournamentStatus,
+} from '@prisma/client';
