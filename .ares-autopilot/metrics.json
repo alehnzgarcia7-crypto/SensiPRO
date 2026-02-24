@@ -389,6 +389,19 @@
       "file_delta": 3,
       "phase": 8,
       "timestamp": "2026-02-24T20:45:48Z"
+    },
+    {
+      "name": "ARES-801-sitemap-schema",
+      "status": "success",
+      "duration_seconds": 92,
+      "loc": 23873,
+      "files": 236,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 88,
+      "file_delta": 2,
+      "phase": 8,
+      "timestamp": "2026-02-24T20:47:39Z"
     }
   ],
   "phases": []
