@@ -116,6 +116,19 @@
       "file_delta": 0,
       "phase": 1,
       "timestamp": "2026-02-24T08:13:05Z"
+    },
+    {
+      "name": "ARES-105-device-comparison",
+      "status": "success",
+      "duration_seconds": 261,
+      "loc": 2289,
+      "files": 45,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 110,
+      "file_delta": 1,
+      "phase": 1,
+      "timestamp": "2026-02-24T08:17:46Z"
     }
   ],
   "phases": []
