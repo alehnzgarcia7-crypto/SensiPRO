@@ -207,6 +207,19 @@
       "file_delta": 4,
       "phase": 5,
       "timestamp": "2026-02-24T19:39:01Z"
+    },
+    {
+      "name": "ARES-506-notifications",
+      "status": "success",
+      "duration_seconds": 195,
+      "loc": 18605,
+      "files": 183,
+      "any_count": 0,
+      "tests_passed": 0,
+      "loc_delta": 275,
+      "file_delta": 3,
+      "phase": 5,
+      "timestamp": "2026-02-24T19:42:34Z"
     }
   ],
   "phases": []
