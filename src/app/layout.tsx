@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
+import { SessionProvider } from './session-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     template: '%s | Sensibilidades PRO',
   },
   description:
-    'Genera las mejores sensibilidades para Free Fire basadas en las especificaciones reales de tu dispositivo. 500+ dispositivos, 3 estilos de juego, giroscopio y más.',
+    'Genera las mejores sensibilidades para Free Fire basadas en las especificaciones reales de tu dispositivo. 500+ dispositivos, 3 estilos de juego, giroscopio y mas.',
   keywords: [
     'sensibilidades free fire',
     'sensibilidad free fire',
@@ -49,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className="dark">
       <body className="min-h-screen">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
