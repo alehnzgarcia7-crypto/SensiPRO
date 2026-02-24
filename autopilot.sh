@@ -792,7 +792,7 @@ ensure_git_push() {
     git add -A 2>/dev/null
     git diff --cached --quiet 2>/dev/null || \
         git commit -m "chore: autopilot checkpoint — $(date +%Y-%m-%d_%H:%M)" 2>/dev/null
-    git push origin main 2>/dev/null && echo -e "  ${G}  ✓ Push OK${NC}" || \
+    # #git push disabled 2>/dev/null && echo -e "  ${G}  ✓ Push OK${NC}" || \
         echo -e "  ${Y}  ⚠ Push falló (no remote o sin internet)${NC}"
 }
 
