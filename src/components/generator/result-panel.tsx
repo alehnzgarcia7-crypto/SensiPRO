@@ -1,7 +1,11 @@
 'use client';
 
+import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge } from 'lucide-react';
+
+import type { SensitivityStyle, DeviceTier } from '@prisma/client';
+import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 
 import { useGeneratorStore } from '@/stores/generator.store';
 import { Button } from '@/components/ui/button';
@@ -13,6 +17,31 @@ import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
 import { RamSelector } from './ram-selector';
 import { HudRecommendationPanel } from './hud-recommendation';
+
+interface AllCalibrationsApiResponse {
+  success: boolean;
+  data?: {
+    device: {
+      id: string;
+      brand: string;
+      model: string;
+      slug: string;
+      tier: DeviceTier;
+      screenSize: number;
+      screenHz: number;
+      ramGb: number;
+      panelType: string;
+    };
+    combinations: CalibrationResult[];
+    hudRecommendation: HudRecommendation;
+    meta: {
+      styleApplied: SensitivityStyle;
+      deviceTier: DeviceTier;
+      algorithm: string;
+    };
+  };
+  error?: { message: string };
+}
 
 interface ResultPanelProps {
   onReset: () => void;
@@ -40,15 +69,68 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
   const {
     selectedDevice,
     selectedStyle,
+    includeGyro,
     allCalibrations,
     calibration,
     dpiMode,
     userRam,
+    isLoading,
     setCalibration,
     setDpiMode,
     setUserRam,
+    setLoading,
+    setAllCalibrations,
+    setError,
     getCurrentCombination,
   } = useGeneratorStore();
+
+  // Ref para trackear si es el primer render (evitar fetch duplicado al montar)
+  const isInitialMount = useRef(true);
+
+  // Re-generar sensibilidades cuando cambia userRam
+  const regenerate = useCallback(async (ramOverride: number) => {
+    if (!selectedDevice) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/generate/all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deviceId: selectedDevice.id,
+          style: selectedStyle,
+          includeGyro,
+          ...(ramOverride !== selectedDevice.ramGb ? { userRam: ramOverride } : {}),
+        }),
+      });
+
+      const data = await res.json() as AllCalibrationsApiResponse;
+
+      if (data.success && data.data) {
+        setAllCalibrations({
+          combinations: data.data.combinations,
+          hudRecommendation: data.data.hudRecommendation,
+          meta: data.data.meta,
+        });
+      } else {
+        setError(data.error?.message ?? 'Error al regenerar');
+      }
+    } catch {
+      setError('Error de conexion al regenerar.');
+    }
+  }, [selectedDevice, selectedStyle, includeGyro, setLoading, setAllCalibrations, setError]);
+
+  useEffect(() => {
+    // Saltar el primer render — los datos iniciales ya vienen del style-step
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (userRam !== null) {
+      void regenerate(userRam);
+    }
+  }, [userRam, regenerate]);
 
   const currentCombo = getCurrentCombination();
 
@@ -103,8 +185,10 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
       </Card>
 
       {/* Valores de sensibilidad */}
-      <Card variant="glow" className="p-6">
-        <h3 className="font-display font-bold text-white mb-4">Sensibilidades</h3>
+      <Card variant="glow" className={`p-6 transition-opacity duration-200 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+        <h3 className="font-display font-bold text-white mb-4">
+          {isLoading ? 'Recalculando...' : 'Sensibilidades'}
+        </h3>
         <div className="space-y-4">
           {sensitivityEntries.map(([key, value], i) => (
             <motion.div

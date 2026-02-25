@@ -79,6 +79,7 @@ export function StyleStep() {
     selectStyle,
     includeGyro,
     setIncludeGyro,
+    userRam,
     isLoading,
     error,
     setLoading,
@@ -98,6 +99,7 @@ export function StyleStep() {
           deviceId: selectedDevice.id,
           style: selectedStyle,
           includeGyro,
+          ...(userRam !== null && userRam !== selectedDevice.ramGb ? { userRam } : {}),
         }),
       });
 
