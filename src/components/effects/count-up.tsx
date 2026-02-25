@@ -1,5 +1,10 @@
 'use client';
 
+// ═══════════════════════════════════════════════════════════════
+// ARES — CountUp — Animación numérica con re-trigger al cambiar
+// Soporta CountUp y CountDown suave con easeOutCubic
+// ═══════════════════════════════════════════════════════════════
+
 import { useEffect, useState, useRef } from 'react';
 
 interface CountUpProps {
@@ -9,38 +14,36 @@ interface CountUpProps {
   suffix?: string;
 }
 
-export function CountUp({ end, duration = 1000, className, suffix }: CountUpProps) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
+export function CountUp({ end, duration = 600, className, suffix }: CountUpProps) {
+  const [count, setCount] = useState(end);
+  const prevEnd = useRef(end);
+  const animFrame = useRef<number>(0);
 
   useEffect(() => {
-    if (started.current) return;
+    const from = prevEnd.current;
+    prevEnd.current = end;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting && !started.current) {
-          started.current = true;
-          const startTime = Date.now();
-          const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-            setCount(Math.round(end * eased));
-            if (progress < 1) requestAnimationFrame(animate);
-          };
-          requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0.3 },
-    );
+    if (from === end) return;
 
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(from + (end - from) * eased));
+      if (progress < 1) {
+        animFrame.current = requestAnimationFrame(animate);
+      }
+    };
+    animFrame.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animFrame.current) cancelAnimationFrame(animFrame.current);
+    };
   }, [end, duration]);
 
   return (
-    <span ref={ref} className={className}>
+    <span className={className}>
       {count.toLocaleString()}{suffix}
     </span>
   );

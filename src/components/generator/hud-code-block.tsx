@@ -25,7 +25,6 @@ export function HudCodeBlock({ code, label, playerName }: HudCodeBlockProps) {
     try {
       await navigator.clipboard.writeText(code);
     } catch {
-      // Fallback para navegadores sin Clipboard API
       const textarea = document.createElement('textarea');
       textarea.value = code;
       textarea.style.position = 'fixed';
@@ -42,19 +41,19 @@ export function HudCodeBlock({ code, label, playerName }: HudCodeBlockProps) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-slate-500 font-ui uppercase tracking-wider">
-          Código HUD • Free Fire
+        <p className="text-[10px] text-slate-500 font-heading uppercase tracking-[0.12em]">
+          Codigo HUD
         </p>
         {playerName && (
           <span className="flex items-center gap-1 text-[10px] text-amber-400 font-ui font-semibold">
             <Star size={10} className="fill-amber-400" />
-            Pro Player: {playerName}
+            Pro: {playerName}
           </span>
         )}
       </div>
       <div
         className={cn(
-          'relative flex items-center justify-between gap-2 rounded-lg border px-3 py-3',
+          'group/hud relative flex items-center justify-between gap-2 rounded-xl border px-3 py-3',
           'bg-[#020804] border-emerald-900/30 overflow-hidden',
         )}
       >
@@ -64,6 +63,15 @@ export function HudCodeBlock({ code, label, playerName }: HudCodeBlockProps) {
           style={{
             backgroundImage:
               'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.015) 2px, rgba(0,255,65,0.015) 4px)',
+          }}
+        />
+
+        {/* Scanline sweep on hover */}
+        <div
+          className="pointer-events-none absolute left-0 right-0 h-[2px] opacity-0 group-hover/hud:opacity-100"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(0,255,65,0.15), transparent)',
+            animation: 'scanline 2s linear infinite',
           }}
         />
 
@@ -83,34 +91,35 @@ export function HudCodeBlock({ code, label, playerName }: HudCodeBlockProps) {
           {code}
         </code>
 
-        {/* Botón copiar */}
+        {/* Boton copiar — con morph icon y flash */}
         <motion.button
           onClick={handleCopy}
           whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
           className={cn(
             'relative z-10 shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center gap-1.5',
-            'rounded-md border font-ui text-xs font-semibold tracking-wider uppercase transition-all duration-200',
+            'rounded-lg border font-ui text-xs font-bold tracking-wider uppercase transition-all duration-200',
             copied
-              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-              : 'bg-white/[0.03] border-ice-500/20 text-ice-400 hover:border-ice-400/40 hover:bg-ice-500/10 hover:shadow-[0_0_12px_rgba(6,182,212,0.15)]',
+              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 shadow-[0_0_12px_rgba(0,255,65,0.2)]'
+              : 'bg-white/[0.03] border-emerald-900/40 text-emerald-400/70 hover:border-emerald-500/40 hover:bg-emerald-500/10',
           )}
-          aria-label="Copiar código"
+          aria-label="Copiar codigo"
         >
-          {copied ? (
-            <>
-              <Check size={14} />
-              <span className="hidden sm:inline">Copiado</span>
-            </>
-          ) : (
-            <>
-              <Clipboard size={14} />
-              <span className="hidden sm:inline">Copiar</span>
-            </>
-          )}
+          <motion.div
+            key={copied ? 'check' : 'copy'}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+          >
+            {copied ? <Check size={14} /> : <Clipboard size={14} />}
+          </motion.div>
+          <span className="hidden sm:inline">
+            {copied ? 'Copiado' : 'Copiar'}
+          </span>
         </motion.button>
       </div>
       <p className="text-[9px] text-slate-600 leading-relaxed">
-        📲 Ajustes → En Partida → Usar código compartido → Pegar → Aplicar
+        Ajustes &rarr; En Partida &rarr; Usar codigo compartido &rarr; Pegar &rarr; Aplicar
       </p>
     </div>
   );

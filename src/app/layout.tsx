@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 
 import { SessionProvider } from './session-provider';
+import { BackgroundAtmosphere } from '@/components/effects/background-atmosphere';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -85,7 +86,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark">
-      <body className="min-h-screen bg-[#050810] text-slate-200 antialiased">
+      <body className="min-h-screen bg-[#050810] text-slate-200 antialiased font-body">
+        <BackgroundAtmosphere />
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

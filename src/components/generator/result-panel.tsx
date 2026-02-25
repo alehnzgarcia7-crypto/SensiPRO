@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge } from 'lucide-react';
+// ═══════════════════════════════════════════════════════════════
+// ARES — ResultPanel — Panel de resultados PREMIUM con UI épica
+// Glow progress bars, holographic numbers, animated borders,
+// staggered animations, 3D cards, glass morphism 2.0
+// ═══════════════════════════════════════════════════════════════
+
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge, Crosshair, Eye, Scan } from 'lucide-react';
 
 import type { SensitivityStyle, DeviceTier } from '@prisma/client';
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
@@ -10,9 +16,9 @@ import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 import { useGeneratorStore } from '@/stores/generator.store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Card } from '@/components/ui/card';
 import { CountUp } from '@/components/effects/count-up';
+import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
+import { AnimatedBorder } from '@/components/effects/animated-border';
 import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
 import { RamSelector } from './ram-selector';
@@ -47,22 +53,45 @@ interface ResultPanelProps {
   onReset: () => void;
 }
 
-const FIELD_LABELS: Record<string, string> = {
-  general: 'General',
-  redPoint: 'Punto Rojo',
-  scope2x: 'Mira 2x',
-  scope4x: 'Mira 4x',
-  sniperScope: 'Mira Sniper',
-  freeView: 'Vista Libre',
+const FIELD_META: Record<string, { label: string; icon: typeof Crosshair }> = {
+  general: { label: 'General', icon: Crosshair },
+  redPoint: { label: 'Punto Rojo', icon: Target },
+  scope2x: { label: 'Mira 2x', icon: Scan },
+  scope4x: { label: 'Mira 4x', icon: Scan },
+  sniperScope: { label: 'Mira Sniper', icon: Crosshair },
+  freeView: { label: 'Vista Libre', icon: Eye },
 };
 
-const GYRO_LABELS: Record<string, string> = {
-  gyroGeneral: 'Gyro General',
-  gyroRedPoint: 'Gyro Punto Rojo',
-  gyroScope2x: 'Gyro 2x',
-  gyroScope4x: 'Gyro 4x',
-  gyroSniper: 'Gyro Sniper',
-  gyroFreeView: 'Gyro Vista Libre',
+const GYRO_META: Record<string, { label: string; icon: typeof Crosshair }> = {
+  gyroGeneral: { label: 'Gyro General', icon: Crosshair },
+  gyroRedPoint: { label: 'Gyro Punto Rojo', icon: Target },
+  gyroScope2x: { label: 'Gyro 2x', icon: Scan },
+  gyroScope4x: { label: 'Gyro 4x', icon: Scan },
+  gyroSniper: { label: 'Gyro Sniper', icon: Crosshair },
+  gyroFreeView: { label: 'Gyro Vista Libre', icon: Eye },
+};
+
+// Gradiente de color dinámico para números holográficos
+function getNumberColorClass(value: number, max: number): string {
+  const ratio = value / max;
+  if (ratio >= 0.9) return 'holo-number-max';
+  if (ratio >= 0.7) return 'holo-number-high';
+  if (ratio >= 0.5) return 'holo-number-mid';
+  return 'holo-number-low';
+}
+
+// Stagger orchestration
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 };
 
 export function ResultPanel({ onReset }: ResultPanelProps) {
@@ -84,10 +113,10 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     getCurrentCombination,
   } = useGeneratorStore();
 
-  // Ref para trackear si es el primer render (evitar fetch duplicado al montar)
   const isInitialMount = useRef(true);
+  const [showFlash, setShowFlash] = useState(false);
+  const prevComboKey = useRef('');
 
-  // Re-generar sensibilidades cuando cambia userRam
   const regenerate = useCallback(async (ramOverride: number) => {
     if (!selectedDevice) return;
     setLoading(true);
@@ -121,7 +150,6 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
   }, [selectedDevice, selectedStyle, includeGyro, setLoading, setAllCalibrations, setError]);
 
   useEffect(() => {
-    // Saltar el primer render — los datos iniciales ya vienen del style-step
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
@@ -134,6 +162,19 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
 
   const currentCombo = getCurrentCombination();
 
+  // Flash effect al cambiar calibración/DPI/RAM
+  const comboKey = `${calibration}-${dpiMode}-${userRam}`;
+  useEffect(() => {
+    if (prevComboKey.current && prevComboKey.current !== comboKey) {
+      setShowFlash(true);
+      const timer = setTimeout(() => setShowFlash(false), 300);
+      prevComboKey.current = comboKey;
+      return () => clearTimeout(timer);
+    }
+    prevComboKey.current = comboKey;
+    return undefined;
+  }, [comboKey]);
+
   if (!allCalibrations || !selectedDevice || !currentCombo) return null;
 
   const styleVariant = selectedStyle.toLowerCase() as 'aggressive' | 'balanced' | 'sniper';
@@ -143,159 +184,208 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     : null;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-slate-500 font-ui">{selectedDevice.brand}</p>
-          <h2 className="text-2xl font-display font-bold text-white">{selectedDevice.model}</h2>
-          <div className="flex items-center gap-2 mt-1">
-            <Badge variant={styleVariant} size="sm">{selectedStyle}</Badge>
-            <Badge variant={selectedDevice.tier === 'GAMING' || selectedDevice.tier === 'ULTRA' ? 'vip' : 'premium'} size="sm">
-              {selectedDevice.tier}
-            </Badge>
+    <motion.div
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* ═══ HEADER ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-heading uppercase tracking-[0.2em] text-fire-400/70">{selectedDevice.brand}</p>
+            <h2 className="text-xl md:text-2xl font-heading font-black text-white tracking-wide mt-0.5">{selectedDevice.model}</h2>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant={styleVariant} size="sm">{selectedStyle}</Badge>
+              <Badge variant={selectedDevice.tier === 'GAMING' || selectedDevice.tier === 'ULTRA' ? 'vip' : 'premium'} size="sm">
+                {selectedDevice.tier}
+              </Badge>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] font-heading uppercase tracking-[0.15em] text-slate-500">Performance</p>
+            <p className="text-3xl md:text-4xl font-mono font-black text-gradient-fire-ice mt-0.5" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              <CountUp end={currentCombo.performanceScore} />
+              <span className="text-base text-slate-600">/100</span>
+            </p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500">Performance</p>
-          <p className="text-3xl font-display font-black text-gradient-fire-ice">
-            <CountUp end={currentCombo.performanceScore} />
-            <span className="text-lg text-slate-500">/100</span>
-          </p>
-        </div>
-      </div>
+      </motion.div>
 
-      {/* Selector de RAM */}
-      <Card variant="default" className="p-4">
+      {/* ═══ RAM SELECTOR ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-5">
         <RamSelector
           value={userRam}
           onChange={setUserRam}
           suggestedRam={selectedDevice.ramGb}
         />
-      </Card>
+      </motion.div>
 
-      {/* Controles de calibración y DPI — reactivos, sin reload */}
-      <Card variant="default" className="p-4 space-y-4">
+      {/* ═══ CALIBRACION + DPI ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-5 space-y-5">
         <CalibrationSelector value={calibration} onChange={setCalibration} />
         <DpiToggle
           enabled={dpiMode}
           onChange={setDpiMode}
           dpiValue={currentCombo.dpiValue}
         />
-      </Card>
+      </motion.div>
 
-      {/* Valores de sensibilidad */}
-      <Card variant="glow" className={`p-6 transition-opacity duration-200 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-        <h3 className="font-display font-bold text-white mb-4">
-          {isLoading ? 'Recalculando...' : 'Sensibilidades'}
-        </h3>
-        <div className="space-y-4">
-          {sensitivityEntries.map(([key, value], i) => (
-            <motion.div
-              key={`${key}-${calibration}-${dpiMode}-${userRam}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.08 }}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-slate-400">{FIELD_LABELS[key] ?? key}</span>
-                <span className="text-lg font-display font-bold text-white">
-                  <CountUp end={value} duration={600} />
+      {/* ═══ SENSIBILIDADES — PANEL ÉPICO ═══ */}
+      <motion.div variants={itemVariants}>
+        <AnimatedBorder active={!isLoading}>
+          <div className={`p-6 transition-opacity duration-200 relative ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+            {/* Flash overlay al cambiar valores */}
+            <AnimatePresence>
+              {showFlash && (
+                <motion.div
+                  className="absolute inset-0 bg-white/[0.03] rounded-[15px] pointer-events-none z-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+            </AnimatePresence>
+
+            <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-5">
+              {isLoading ? 'Recalculando...' : 'Sensibilidades'}
+            </h3>
+            <div className="space-y-4">
+              {sensitivityEntries.map(([key, value], i) => {
+                const meta = FIELD_META[key];
+                const Icon = meta?.icon ?? Crosshair;
+                const colorClass = getNumberColorClass(value, 200);
+                return (
+                  <motion.div
+                    key={`${key}-${userRam}`}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.08 }}
+                    className="group"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <Icon size={14} className="text-slate-600 group-hover:text-fire-400 transition-colors" />
+                        <span className="text-sm font-ui font-medium text-slate-400">{meta?.label ?? key}</span>
+                      </div>
+                      <span className={`text-2xl font-mono font-black ${colorClass}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        <CountUp end={value} duration={600} />
+                      </span>
+                    </div>
+                    <GlowProgressBar value={value} max={200} delay={i * 0.06} />
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Separador gradiente */}
+            <div className="divider-gradient my-6" />
+
+            {/* Stats adicionales */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Target size={14} className="text-ice-400" />
+                  <span className="text-sm font-ui text-slate-400">Precision</span>
+                </div>
+                <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <CountUp end={currentCombo.precisionScore} duration={600} />
+                  <span className="text-xs text-slate-600">/100</span>
                 </span>
               </div>
-              <Progress value={value} max={200} size="sm" color="gradient" />
-            </motion.div>
-          ))}
-        </div>
+              <GlowProgressBar value={currentCombo.precisionScore} max={100} />
 
-        {/* Filas adicionales: Precision Score, Button Size, DPI */}
-        <div className="mt-6 pt-4 border-t border-white/5 space-y-3">
-          {/* Precision Score */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Target size={14} className="text-ice-400" />
-              <span className="text-sm text-slate-400">Precisión</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span key={`precision-${calibration}-${dpiMode}-${userRam}`} className="text-sm font-display font-bold text-ice-300">
-                <CountUp end={currentCombo.precisionScore} duration={600} />
-                <span className="text-xs text-slate-500">/100</span>
-              </span>
-            </div>
-          </div>
-          <Progress value={currentCombo.precisionScore} max={100} size="sm" color="ice" />
-
-          {/* Button Size */}
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center gap-2">
-              <Ruler size={14} className="text-fire-400" />
-              <span className="text-sm text-slate-400">Tamaño del Botón</span>
-            </div>
-            <span key={`button-${calibration}-${dpiMode}-${userRam}`} className="text-sm font-display font-bold text-white">
-              {currentCombo.buttonSize}mm
-            </span>
-          </div>
-
-          {/* DPI Value (solo si dpiMode) */}
-          {currentCombo.dpiValue !== null && (
-            <motion.div
-              key={`dpi-${calibration}-${dpiMode}-${userRam}`}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="flex items-center justify-between mt-3"
-            >
-              <div className="flex items-center gap-2">
-                <Gauge size={14} className="text-ice-400" />
-                <span className="text-sm text-slate-400">DPI Óptimo</span>
-              </div>
-              <span className="text-sm font-display font-bold text-ice-300">
-                <CountUp end={currentCombo.dpiValue} duration={600} />
-              </span>
-            </motion.div>
-          )}
-        </div>
-      </Card>
-
-      {/* Giroscopio */}
-      {gyroscopeEntries && (
-        <Card variant="glow" className="p-6">
-          <h3 className="font-display font-bold text-white mb-4">Giroscopio</h3>
-          <div className="space-y-4">
-            {gyroscopeEntries.map(([key, value], i) => (
-              <motion.div
-                key={`${key}-${calibration}-${dpiMode}-${userRam}`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.08 }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-slate-400">{GYRO_LABELS[key] ?? key}</span>
-                  <span className="text-lg font-display font-bold text-white">
-                    <CountUp end={value} duration={600} />
-                  </span>
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center gap-2">
+                  <Ruler size={14} className="text-fire-400" />
+                  <span className="text-sm font-ui text-slate-400">Boton</span>
                 </div>
-                <Progress value={value} max={100} size="sm" color="ice" />
-              </motion.div>
-            ))}
+                <span className="text-sm font-mono font-bold text-white" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {currentCombo.buttonSize}mm
+                </span>
+              </div>
+
+              <AnimatePresence>
+                {currentCombo.dpiValue !== null && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex items-center justify-between mt-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Gauge size={14} className="text-ice-400" />
+                      <span className="text-sm font-ui text-slate-400">DPI Optimo</span>
+                    </div>
+                    <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      <CountUp end={currentCombo.dpiValue} duration={600} />
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
-        </Card>
+        </AnimatedBorder>
+      </motion.div>
+
+      {/* ═══ GIROSCOPIO ═══ */}
+      {gyroscopeEntries && (
+        <motion.div variants={itemVariants}>
+          <AnimatedBorder active speed="slow">
+            <div className="p-6">
+              <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-5">
+                Giroscopio
+              </h3>
+              <div className="space-y-4">
+                {gyroscopeEntries.map(([key, value], i) => {
+                  const meta = GYRO_META[key];
+                  const Icon = meta?.icon ?? Crosshair;
+                  return (
+                    <motion.div
+                      key={`${key}-${userRam}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: i * 0.08 }}
+                      className="group"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <Icon size={14} className="text-slate-600 group-hover:text-ice-400 transition-colors" />
+                          <span className="text-sm font-ui font-medium text-slate-400">{meta?.label ?? key}</span>
+                        </div>
+                        <span className="text-2xl font-mono font-black text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          <CountUp end={value} duration={600} />
+                        </span>
+                      </div>
+                      <GlowProgressBar value={value} max={100} delay={i * 0.06} />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </AnimatedBorder>
+        </motion.div>
       )}
 
-      {/* HUD Recommendation */}
-      <HudRecommendationPanel
-        data={allCalibrations.hudRecommendation}
-        screenSize={selectedDevice.screenSize}
-      />
+      {/* ═══ HUD RECOMMENDATION ═══ */}
+      <motion.div variants={itemVariants}>
+        <HudRecommendationPanel
+          data={allCalibrations.hudRecommendation}
+          screenSize={selectedDevice.screenSize}
+        />
+      </motion.div>
 
-      {/* Acciones */}
-      <div className="flex flex-wrap gap-3">
+      {/* ═══ ACCIONES ═══ */}
+      <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" leftIcon={<Heart size={16} />}>Guardar</Button>
         <Button variant="ghost" size="sm" leftIcon={<Share2 size={16} />}>Compartir</Button>
         <Button variant="ghost" size="sm" leftIcon={<Download size={16} />}>Exportar</Button>
         <Button variant="secondary" size="sm" leftIcon={<RotateCcw size={16} />} onClick={onReset}>
           Nueva busqueda
         </Button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
