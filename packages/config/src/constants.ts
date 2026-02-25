@@ -31,13 +31,13 @@ export const CALIBRATION_OFFSETS = {
 // RAM options disponibles y sus offsets para el algoritmo
 export const RAM_OPTIONS = [2, 3, 4, 6, 8, 12, 16] as const;
 export const RAM_FACTORS: Record<number, number> = {
-  2: -15,
-  3: -10,
-  4: -5,
+  2: -35,
+  3: -25,
+  4: -15,
   6: 0,
-  8: 5,
-  12: 8,
-  16: 10,
+  8: 15,
+  12: 25,
+  16: 30,
 };
 
 // Tier limits
