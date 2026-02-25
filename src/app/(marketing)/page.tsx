@@ -7,6 +7,7 @@ import { BrandsSection } from '@/components/landing/brands-section';
 import { FeaturesSection } from '@/components/landing/features-section';
 import { ShowcaseDemo } from '@/components/landing/showcase-demo';
 import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
+import { AresCoachShowcase } from '@/components/landing/ares-coach-showcase';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
 import { DeviceShowcase } from '@/components/landing/device-showcase';
 import { PricingSection } from '@/components/landing/pricing-section';
@@ -43,17 +44,19 @@ export default function LandingPage() {
       <ShowcaseDemo />
       {/* 7. Headshot Mode Showcase — feature estrella */}
       <HeadshotShowcase />
-      {/* 8. Testimonios — 8 reviews + rating promedio */}
+      {/* 8. ARES AI Coach Showcase — demo interactivo */}
+      <AresCoachShowcase />
+      {/* 9. Testimonios — 8 reviews + rating promedio */}
       <TestimonialsSection />
-      {/* 9. Dispositivos populares — 10 cards */}
+      {/* 10. Dispositivos populares — 10 cards */}
       <DeviceShowcase />
-      {/* 10. Pricing — 2 planes */}
+      {/* 11. Pricing — 2 planes */}
       <PricingSection />
-      {/* 11. FAQ — 8 preguntas */}
+      {/* 12. FAQ — 8 preguntas */}
       <FaqSection />
-      {/* 12. CTA Final — último empujón */}
+      {/* 13. CTA Final — último empujón */}
       <CtaSection />
-      {/* 13. Footer */}
+      {/* 14. Footer */}
       <LandingFooter />
     </>
   );

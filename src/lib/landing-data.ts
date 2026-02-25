@@ -240,13 +240,13 @@ export const FEATURES: LandingFeature[] = [
     highlight: 'Control avanzado',
   },
   {
-    icon: 'Trophy',
-    title: 'Comunidad y Rankings',
+    icon: 'Bot',
+    title: 'ARES AI Coach',
     description:
-      'Comparte tu config con la comunidad, descubre las configuraciones más populares, y compite en rankings de los mejores setups.',
+      'Tu coach personal con IA que conoce tu dispositivo, armas, y estrategias. Pregúntale lo que quieras sobre Free Fire.',
     color: '#8b5cf6',
-    isNew: false,
-    highlight: 'Configs compartidas',
+    isNew: true,
+    highlight: 'Próximamente',
   },
 ];
 
@@ -343,6 +343,7 @@ export const SOCIAL_PROOF_ITEMS: string[] = [
   '💎 NahomiFF_ llegó a Platino con Galaxy A14',
   '🔥 CamiRush22 recomienda SensiPRO a toda su squad',
   '🎯 AndresGOAT mejoró en clasificatoria con Infinix Hot 40',
+  '🤖 ARES respondió 3,847 preguntas esta semana',
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -380,6 +381,7 @@ export const FEATURE_ICONS: Record<string, string> = {
   'Headshot Mode': '🎯',
   'HUD Codes': '🎮',
   'Academia': '📚',
+  'ARES AI Coach': '🤖',
   'Comparador': '🔄',
   'Todo': '🏆',
 } as const;

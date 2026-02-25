@@ -11,7 +11,7 @@ import {
   ArrowLeftRight,
   Share2,
   Shield,
-  Trophy,
+  Bot,
 } from 'lucide-react';
 
 import { FEATURES, type LandingFeature } from '@/lib/landing-data';
@@ -26,7 +26,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   ArrowLeftRight,
   Share2,
   Shield,
-  Trophy,
+  Bot,
 };
 
 function FeatureCard({ feature, index }: { feature: LandingFeature; index: number }) {

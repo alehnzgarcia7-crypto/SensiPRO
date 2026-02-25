@@ -426,6 +426,41 @@
   width: 100%;
 }
 
+/* ═══ ARES AI Coach ═══ */
+.ares-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
+.ares-text-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+.typing-dot { animation: typingDot 1.4s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes chatBubbleIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.chat-bubble-enter { animation: chatBubbleIn 0.3s ease-out; }
+
+@keyframes aresBadgePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(139, 92, 246, 0.4); }
+  50% { opacity: 0.9; box-shadow: 0 0 16px rgba(139, 92, 246, 0.6); }
+}
+.ares-badge-pulse { animation: aresBadgePulse 2s ease-in-out infinite; }
+
+@keyframes onlinePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.online-pulse { animation: onlinePulse 2s ease-in-out infinite; }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee {
@@ -443,7 +478,13 @@
   .drag-path-animate,
   .drag-endpoint-pulse,
   .cta-pulse-glow,
-  .headshot-badge-pulse {
+  .headshot-badge-pulse,
+  .ares-badge-pulse,
+  .online-pulse,
+  .typing-dot {
+    animation: none !important;
+  }
+  .chat-bubble-enter {
     animation: none !important;
   }
   .academy-stagger {
