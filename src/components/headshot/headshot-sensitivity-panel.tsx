@@ -21,7 +21,7 @@ const SENS_FIELDS: { key: keyof SensitivityOutput; label: string; icon: typeof C
   { key: 'redPoint', label: 'Punto Rojo', icon: Target },
   { key: 'scope2x', label: 'Mira 2x', icon: Scan },
   { key: 'scope4x', label: 'Mira 4x', icon: Scan },
-  { key: 'sniperScope', label: 'Mira Sniper', icon: Crosshair },
+  { key: 'sniperScope', label: 'AWM', icon: Crosshair },
   { key: 'freeView', label: 'Vista Libre', icon: Eye },
 ];
 
@@ -30,7 +30,7 @@ const GYRO_FIELDS: { key: keyof GyroscopeOutput; sensKey: keyof GyroscopeOutput;
   { key: 'gyroRedPoint', sensKey: 'gyroRedPoint', label: 'Gyro Punto Rojo', icon: Target },
   { key: 'gyroScope2x', sensKey: 'gyroScope2x', label: 'Gyro 2x', icon: Scan },
   { key: 'gyroScope4x', sensKey: 'gyroScope4x', label: 'Gyro 4x', icon: Scan },
-  { key: 'gyroSniper', sensKey: 'gyroSniper', label: 'Gyro Sniper', icon: Crosshair },
+  { key: 'gyroSniper', sensKey: 'gyroSniper', label: 'Gyro AWM', icon: Crosshair },
   { key: 'gyroFreeView', sensKey: 'gyroFreeView', label: 'Gyro Vista Libre', icon: Eye },
 ];
 

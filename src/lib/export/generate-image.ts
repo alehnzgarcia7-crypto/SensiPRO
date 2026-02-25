@@ -104,7 +104,7 @@ export function generateExportHtml(data: ExportData, options: ExportOptions): st
     { label: 'Punto Rojo', value: data.sensitivity.redPoint },
     { label: 'Mira 2x', value: data.sensitivity.scope2x },
     { label: 'Mira 4x', value: data.sensitivity.scope4x },
-    { label: 'Mira Sniper', value: data.sensitivity.sniperScope },
+    { label: 'AWM', value: data.sensitivity.sniperScope },
     { label: 'Vista Libre', value: data.sensitivity.freeView },
   ];
 
@@ -113,7 +113,7 @@ export function generateExportHtml(data: ExportData, options: ExportOptions): st
     { label: 'Gyro Punto Rojo', value: data.gyroscope.gyroRedPoint },
     { label: 'Gyro 2x', value: data.gyroscope.gyroScope2x },
     { label: 'Gyro 4x', value: data.gyroscope.gyroScope4x },
-    { label: 'Gyro Sniper', value: data.gyroscope.gyroSniper },
+    { label: 'Gyro AWM', value: data.gyroscope.gyroSniper },
     { label: 'Gyro Vista Libre', value: data.gyroscope.gyroFreeView },
   ] : [];
 
@@ -170,7 +170,7 @@ export function generateExportText(data: ExportData): string {
     `  Punto Rojo: ${data.sensitivity.redPoint}`,
     `  Mira 2x: ${data.sensitivity.scope2x}`,
     `  Mira 4x: ${data.sensitivity.scope4x}`,
-    `  Mira Sniper: ${data.sensitivity.sniperScope}`,
+    `  AWM: ${data.sensitivity.sniperScope}`,
     `  Vista Libre: ${data.sensitivity.freeView}`,
   ];
 
@@ -182,7 +182,7 @@ export function generateExportText(data: ExportData): string {
       `  Punto Rojo: ${data.gyroscope.gyroRedPoint}`,
       `  2x: ${data.gyroscope.gyroScope2x}`,
       `  4x: ${data.gyroscope.gyroScope4x}`,
-      `  Sniper: ${data.gyroscope.gyroSniper}`,
+      `  AWM: ${data.gyroscope.gyroSniper}`,
       `  Vista Libre: ${data.gyroscope.gyroFreeView}`,
     );
   }

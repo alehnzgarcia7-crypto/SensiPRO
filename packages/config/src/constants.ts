@@ -112,12 +112,35 @@ export const MAX_PAGE_SIZE = 100;
 // Rate limiting
 export const RATE_LIMIT_WINDOW_SECONDS = 86400; // 24 hours
 
+// ════════════════ DICCIONARIO DE TÉRMINOS FF ════════════════
+// Nombres EXACTOS como aparecen en Free Fire (español LATAM)
+// Los keys internos (redPoint, sniperScope, etc.) NO cambian,
+// solo los labels que ve el usuario en la UI.
+
+export const SENSITIVITY_LABELS: Record<string, string> = {
+  general: 'General',
+  redPoint: 'Punto Rojo',
+  scope2x: 'Mira 2x',
+  scope4x: 'Mira 4x',
+  sniperScope: 'AWM',
+  freeView: 'Vista Libre',
+};
+
+export const GYRO_LABELS: Record<string, string> = {
+  gyroGeneral: 'Gyro General',
+  gyroRedPoint: 'Gyro Punto Rojo',
+  gyroScope2x: 'Gyro 2x',
+  gyroScope4x: 'Gyro 4x',
+  gyroSniper: 'Gyro AWM',
+  gyroFreeView: 'Gyro Vista Libre',
+};
+
 // ════════════════ HEADSHOT MODE ════════════════
 
 // Modificadores multiplicativos sobre sensibilidad base (escala 0-200)
-// Red Dot sube MUCHO (el drag headshot depende del red dot)
+// Punto Rojo sube MUCHO (el drag headshot depende del punto rojo)
 // General sube (giros rápidos para adquirir target)
-// Scopes bajan (headshots a distancia = más estabilidad)
+// Miras con zoom bajan (headshots a distancia = más estabilidad)
 export const HEADSHOT_SENSITIVITY_MODIFIERS = {
   general: 1.07,
   redPoint: 1.18,
@@ -481,8 +504,8 @@ export const CROSSHAIR_TIPS = [
   'SIEMPRE mantén el crosshair a nivel de CABEZA. Nunca al pecho, nunca al suelo.',
   'Pre-apunta a nivel de cabeza ANTES de ver al enemigo. Cuando aparezca, solo dispara.',
   'El aim assist de Free Fire favorece BODY SHOTS. El drag manual es ESENCIAL para headshots.',
-  'Activa "Precise on Scope" en Ajustes → En Partida para headshots más limpios.',
-  'Activa "Quick Weapon Switch" para combos: disparo → switch → disparo headshot.',
+  'Activa "Precisión en Mira" en Ajustes → En Partida para headshots más limpios.',
+  'Activa "Cambio rápido de arma" para combos: disparo → switch → disparo headshot.',
   'Gráficos en Smooth + High FPS = mejor respuesta táctil = mejores headshots.',
   'DPI del sistema entre 480-600 es óptimo para drag headshots.',
   'El tamaño del botón de disparo importa: 50-70% es el sweet spot para drag.',

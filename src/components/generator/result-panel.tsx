@@ -59,7 +59,7 @@ const FIELD_META: Record<string, { label: string; icon: typeof Crosshair }> = {
   redPoint: { label: 'Punto Rojo', icon: Target },
   scope2x: { label: 'Mira 2x', icon: Scan },
   scope4x: { label: 'Mira 4x', icon: Scan },
-  sniperScope: { label: 'Mira Sniper', icon: Crosshair },
+  sniperScope: { label: 'AWM', icon: Crosshair },
   freeView: { label: 'Vista Libre', icon: Eye },
 };
 
@@ -68,7 +68,7 @@ const GYRO_META: Record<string, { label: string; icon: typeof Crosshair }> = {
   gyroRedPoint: { label: 'Gyro Punto Rojo', icon: Target },
   gyroScope2x: { label: 'Gyro 2x', icon: Scan },
   gyroScope4x: { label: 'Gyro 4x', icon: Scan },
-  gyroSniper: { label: 'Gyro Sniper', icon: Crosshair },
+  gyroSniper: { label: 'Gyro AWM', icon: Crosshair },
   gyroFreeView: { label: 'Gyro Vista Libre', icon: Eye },
 };
 

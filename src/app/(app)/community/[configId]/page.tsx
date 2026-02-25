@@ -142,11 +142,11 @@ export default async function SharedConfigPage({ params }: PageProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {([
               { label: 'General', value: sensitivity.general },
-              { label: 'Red Point', value: sensitivity.redPoint },
-              { label: 'Scope 2x', value: sensitivity.scope2x },
-              { label: 'Scope 4x', value: sensitivity.scope4x },
-              { label: 'Sniper', value: sensitivity.sniperScope },
-              { label: 'Free View', value: sensitivity.freeView },
+              { label: 'Punto Rojo', value: sensitivity.redPoint },
+              { label: 'Mira 2x', value: sensitivity.scope2x },
+              { label: 'Mira 4x', value: sensitivity.scope4x },
+              { label: 'AWM', value: sensitivity.sniperScope },
+              { label: 'Vista Libre', value: sensitivity.freeView },
             ] as const).map((item) => (
               <div key={item.label} className="rounded-lg bg-white/5 border border-white/5 p-3 text-center">
                 <p className="text-xs text-slate-500">{item.label}</p>

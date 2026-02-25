@@ -50,7 +50,7 @@ describe('generateExportText', () => {
     expect(text).toContain('Punto Rojo: 68');
     expect(text).toContain('Mira 2x: 55');
     expect(text).toContain('Mira 4x: 48');
-    expect(text).toContain('Mira Sniper: 42');
+    expect(text).toContain('AWM: 42');
     expect(text).toContain('Vista Libre: 75');
   });
 

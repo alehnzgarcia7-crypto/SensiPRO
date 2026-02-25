@@ -103,7 +103,7 @@ export function compareDevices(
     makeField('Punto Rojo', resultA.sensitivity.redPoint, resultB.sensitivity.redPoint),
     makeField('Mira 2x', resultA.sensitivity.scope2x, resultB.sensitivity.scope2x),
     makeField('Mira 4x', resultA.sensitivity.scope4x, resultB.sensitivity.scope4x),
-    makeField('Mira Sniper', resultA.sensitivity.sniperScope, resultB.sensitivity.sniperScope),
+    makeField('AWM', resultA.sensitivity.sniperScope, resultB.sensitivity.sniperScope),
     makeField('Vista Libre', resultA.sensitivity.freeView, resultB.sensitivity.freeView),
   ];
 
@@ -115,7 +115,7 @@ export function compareDevices(
       makeField('Gyro Punto Rojo', resultA.gyroscope.gyroRedPoint, resultB.gyroscope.gyroRedPoint),
       makeField('Gyro 2x', resultA.gyroscope.gyroScope2x, resultB.gyroscope.gyroScope2x),
       makeField('Gyro 4x', resultA.gyroscope.gyroScope4x, resultB.gyroscope.gyroScope4x),
-      makeField('Gyro Sniper', resultA.gyroscope.gyroSniper, resultB.gyroscope.gyroSniper),
+      makeField('Gyro AWM', resultA.gyroscope.gyroSniper, resultB.gyroscope.gyroSniper),
       makeField('Gyro Vista Libre', resultA.gyroscope.gyroFreeView, resultB.gyroscope.gyroFreeView),
     ];
   }

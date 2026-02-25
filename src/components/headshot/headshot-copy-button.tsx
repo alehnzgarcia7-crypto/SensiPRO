@@ -20,7 +20,7 @@ export function HeadshotCopyButton({ sensitivity, gyroscope, label = 'COPIAR SEN
       `Punto Rojo: ${sensitivity.redPoint}`,
       `Mira 2x: ${sensitivity.scope2x}`,
       `Mira 4x: ${sensitivity.scope4x}`,
-      `Sniper: ${sensitivity.sniperScope}`,
+      `AWM: ${sensitivity.sniperScope}`,
       `Vista Libre: ${sensitivity.freeView}`,
     ];
 
@@ -32,7 +32,7 @@ export function HeadshotCopyButton({ sensitivity, gyroscope, label = 'COPIAR SEN
         `Punto Rojo: ${gyroscope.gyroRedPoint}`,
         `Mira 2x: ${gyroscope.gyroScope2x}`,
         `Mira 4x: ${gyroscope.gyroScope4x}`,
-        `Sniper: ${gyroscope.gyroSniper}`,
+        `AWM: ${gyroscope.gyroSniper}`,
         `Vista Libre: ${gyroscope.gyroFreeView}`,
       );
     }

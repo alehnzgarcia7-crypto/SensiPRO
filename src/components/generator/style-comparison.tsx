@@ -32,7 +32,7 @@ const FIELD_LABELS: Record<string, string> = {
   redPoint: 'Punto Rojo',
   scope2x: '2x',
   scope4x: '4x',
-  sniperScope: 'Sniper',
+  sniperScope: 'AWM',
   freeView: 'Vista Libre',
 };
 

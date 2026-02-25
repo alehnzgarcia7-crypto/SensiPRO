@@ -60,7 +60,7 @@ const FIELD_LABELS: Record<keyof SensitivityOutput, string> = {
   redPoint: 'Punto Rojo',
   scope2x: 'Mira 2x',
   scope4x: 'Mira 4x',
-  sniperScope: 'Sniper',
+  sniperScope: 'AWM',
   freeView: 'Vista Libre',
 };
 
