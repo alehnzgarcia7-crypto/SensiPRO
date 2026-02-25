@@ -64,9 +64,11 @@ export default async function VideosPage({ searchParams }: VideosPageProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
           <Video className="w-6 h-6 text-fire-400" />
-          Video Tutoriales
+          <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Video Tutoriales
+          </span>
         </h1>
         <p className="text-slate-400 text-sm">
           {videos.length} video{videos.length !== 1 ? 's' : ''} disponible

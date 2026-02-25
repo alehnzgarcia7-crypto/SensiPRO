@@ -36,7 +36,12 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white mb-2">Guías de Free Fire</h1>
+        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
+          <BookOpen className="w-6 h-6 text-fire-400" />
+          <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Guías de Free Fire
+          </span>
+        </h1>
         <p className="text-slate-400 text-sm">
           {total} {total === 1 ? 'guía disponible' : 'guías disponibles'}
         </p>
@@ -51,7 +56,7 @@ export default async function GuidesPage({ searchParams }: GuidesPageProps) {
             name="search"
             defaultValue={search}
             placeholder="Buscar guías..."
-            className="w-full rounded-xl bg-background-card border border-white/10 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:border-fire-500/50 focus:outline-none focus:ring-1 focus:ring-fire-500/30 transition-colors min-h-[44px]"
+            className="w-full rounded-xl bg-[#0a0f1e]/40 backdrop-blur-sm border border-white/[0.06] pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:border-fire-500/50 focus:outline-none focus:ring-1 focus:ring-fire-500/30 transition-colors min-h-[44px]"
             aria-label="Buscar guías"
           />
           {category && <input type="hidden" name="category" value={category} />}

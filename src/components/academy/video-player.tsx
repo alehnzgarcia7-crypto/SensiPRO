@@ -45,6 +45,43 @@ export function VideoPlayer({ video, canAccess }: VideoPlayerProps) {
     );
   }
 
+  const isPlaceholder = video.youtubeId === '_placeholder_';
+
+  // ── Estado: Placeholder (sin video real todavía) ────
+  if (isPlaceholder) {
+    return (
+      <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+            <Play className="w-7 h-7 text-slate-500 ml-1" />
+          </div>
+          <h3 className="text-white font-bold text-sm mb-1 px-4 text-center line-clamp-1">{video.title}</h3>
+          <span className="text-xs text-slate-500 px-3 py-1 rounded-full bg-white/5 border border-white/10 mt-2">
+            Próximamente
+          </span>
+        </div>
+        {/* Barra de info inferior */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="flex items-center gap-3 text-sm">
+            <span className="flex items-center gap-1 text-slate-400">
+              <Clock className="w-3.5 h-3.5" />
+              {video.duration}
+            </span>
+            <span
+              className={cn(
+                'flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium',
+                difficulty.color,
+              )}
+            >
+              <BarChart3 className="w-3 h-3" />
+              {difficulty.label}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Estado: Thumbnail (antes de play) ──────────────
   if (!isPlaying) {
     return (

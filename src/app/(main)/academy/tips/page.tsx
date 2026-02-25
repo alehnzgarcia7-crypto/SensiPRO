@@ -65,9 +65,11 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
           <Lightbulb className="w-6 h-6 text-yellow-400" />
-          Tips y Trucos
+          <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Tips y Trucos
+          </span>
         </h1>
         <p className="text-slate-400 text-sm">{tips.length} tips disponibles</p>
       </div>
@@ -134,7 +136,7 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
 
         return (
           <section key={cat}>
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
               <Icon className="w-5 h-5" style={{ color: config.color }} />
               {config.nameEs}
               <span className="text-xs text-slate-500 font-normal">({catTips.length})</span>
@@ -144,7 +146,7 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
               {catTips.map((tip) => (
                 <div
                   key={tip.id}
-                  className="rounded-xl border border-white/10 bg-background-card/30 p-4 hover:border-white/20 transition-colors"
+                  className="rounded-xl border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm p-4 hover:border-white/[0.12] transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <Lightbulb className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />

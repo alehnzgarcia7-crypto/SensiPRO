@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  Crown,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
@@ -32,7 +33,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     href: '/academy/guides',
     label: 'Guías',
     icon: BookOpen,
-    description: '20+ guías por categoría',
+    description: '22+ guías por categoría',
   },
   {
     href: '/academy/tips',
@@ -44,7 +45,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     href: '/academy/meta',
     label: 'Meta Actual',
     icon: Swords,
-    description: 'Análisis del meta de FF',
+    description: 'Parche OB51 — Tier List',
   },
   {
     href: '/academy/videos',
@@ -60,18 +61,21 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
-      {/* Sidebar Desktop */}
+      {/* Sidebar Desktop — Glass effect */}
       <aside
         className={cn(
-          'hidden lg:flex flex-col border-r border-white/10 bg-background-card/50 transition-all duration-300',
+          'hidden lg:flex flex-col border-r border-white/[0.06] transition-all duration-300',
+          'bg-[#0a0f1e]/80 backdrop-blur-xl',
           collapsed ? 'w-16' : 'w-64',
         )}
       >
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
           {!collapsed && (
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
               <GraduationCap className="w-5 h-5 text-fire-500" />
-              Academia
+              <span className="bg-gradient-to-r from-fire-400 to-orange-300 bg-clip-text text-transparent">
+                Academia
+              </span>
             </h2>
           )}
           <button
@@ -101,7 +105,7 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
                   isActive
-                    ? 'bg-fire-500/20 text-fire-400 border border-fire-500/30'
+                    ? 'bg-fire-500/15 text-fire-400 border border-fire-500/20 shadow-[0_0_12px_rgba(255,106,0,0.08)]'
                     : 'text-slate-400 hover:text-white hover:bg-white/5',
                   collapsed && 'justify-center px-2',
                 )}
@@ -111,7 +115,7 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
                 {!collapsed && (
                   <div className="flex flex-col">
                     <span className="font-medium">{item.label}</span>
-                    <span className="text-xs text-slate-500">{item.description}</span>
+                    <span className="text-[10px] text-slate-500 leading-tight">{item.description}</span>
                   </div>
                 )}
               </Link>
@@ -120,14 +124,18 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
         </nav>
 
         {!collapsed && (
-          <div className="p-4 border-t border-white/10">
-            <div className="rounded-lg bg-gradient-to-br from-fire-500/20 to-ice-500/20 p-3 border border-white/10">
-              <p className="text-xs text-slate-300 mb-2">
-                Desbloquea todas las guías y contenido exclusivo
+          <div className="p-4 border-t border-white/[0.06]">
+            <div className="rounded-xl bg-gradient-to-br from-fire-500/10 via-transparent to-ice-500/10 p-4 border border-white/[0.06] backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs font-bold text-white">Premium</span>
+              </div>
+              <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">
+                Desbloquea todas las guías, tips avanzados y contenido exclusivo
               </p>
               <Link
                 href="/pricing"
-                className="block text-center text-xs font-bold py-1.5 px-3 rounded-md bg-fire-500 text-white hover:bg-fire-600 transition-colors"
+                className="block text-center text-xs font-bold py-2 px-3 rounded-lg bg-gradient-to-r from-fire-500 to-fire-600 text-white hover:from-fire-600 hover:to-fire-700 transition-all shadow-lg shadow-fire-500/20"
               >
                 Upgrade a Premium
               </Link>
@@ -136,8 +144,8 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
         )}
       </aside>
 
-      {/* Mobile Nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background-card/95 backdrop-blur-xl border-t border-white/10">
+      {/* Mobile Nav — Glass bottom bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0f1e]/90 backdrop-blur-xl border-t border-white/[0.06]">
         <nav className="flex items-center justify-around py-2 px-1">
           {SIDEBAR_ITEMS.map((item) => {
             const isActive =

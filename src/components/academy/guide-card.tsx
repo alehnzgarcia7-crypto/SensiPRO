@@ -17,7 +17,7 @@ export function GuideCard({ guide, showCategory = true }: GuideCardProps) {
   return (
     <Link
       href={`/academy/guides/${guide.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-background-card/50 hover:border-white/20 transition-all duration-300"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm hover:border-white/[0.12] hover:bg-[#0a0f1e]/60 transition-all duration-300 hover:shadow-[0_0_24px_rgba(255,255,255,0.02)]"
     >
       {/* Image */}
       <div className="relative aspect-video bg-background-card overflow-hidden">

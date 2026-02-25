@@ -3,6 +3,8 @@ import { hash } from 'bcryptjs';
 
 import { seedDevices } from './seed-devices';
 import { seedHudCodes } from './hud-codes.seed';
+import { seedGuides } from './guides.seed';
+import { seedTips } from './tips.seed';
 
 const prisma = new PrismaClient();
 
@@ -65,6 +67,14 @@ async function main() {
 
   // 4. Seed HUD codes
   await seedHudCodes();
+
+  // 5. Seed guides
+  const guidesCount = await seedGuides(prisma, admin.id);
+  console.log(`  ✅ ${guidesCount} guides seeded`);
+
+  // 6. Seed tips
+  const tipsCount = await seedTips(prisma);
+  console.log(`  ✅ ${tipsCount} tips seeded`);
 
   console.log('🎯 Seed complete!');
 }

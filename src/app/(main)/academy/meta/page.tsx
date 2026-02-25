@@ -41,9 +41,12 @@ export default function MetaPage() {
     <div className="space-y-10">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
           <Swords className="w-6 h-6 text-fire-400" />
-          Meta Actual — Parche {version}
+          <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Meta Actual
+          </span>
+          <span className="text-fire-400">— Parche {version}</span>
         </h1>
         <p className="text-slate-400 text-sm mb-3">
           Última actualización:{' '}
@@ -68,7 +71,7 @@ export default function MetaPage() {
             return (
               <div
                 key={type}
-                className="rounded-lg border border-white/10 bg-background-card/50 p-3 text-center"
+                className="rounded-lg border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm p-3 text-center"
               >
                 <span className="text-lg font-black text-white">{count}</span>
                 <p className="text-[10px] text-slate-500 mt-0.5">{label}</p>
@@ -80,7 +83,7 @@ export default function MetaPage() {
 
       {/* Weapon Tier List */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
           <Target className="w-5 h-5 text-fire-400" />
           Tier List de Armas
         </h2>
@@ -119,7 +122,7 @@ export default function MetaPage() {
 
       {/* Weapon Comparison */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
           <TrendingUp className="w-5 h-5 text-ice-400" />
           Comparaciones Clave
         </h2>
@@ -136,7 +139,7 @@ export default function MetaPage() {
 
       {/* Characters */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
           <Shield className="w-5 h-5 text-purple-400" />
           Tier List de Personajes
         </h2>
@@ -148,7 +151,7 @@ export default function MetaPage() {
             return (
               <div
                 key={char.name}
-                className={cn('rounded-xl border p-4', style.border, 'bg-background-card/50')}
+                className={cn('rounded-xl border p-4', style.border, 'bg-[#0a0f1e]/40 backdrop-blur-sm')}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -198,7 +201,7 @@ export default function MetaPage() {
 
       {/* Top Combos */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
           <Crown className="w-5 h-5 text-yellow-400" />
           Combos Recomendados
         </h2>
@@ -207,7 +210,7 @@ export default function MetaPage() {
           {topCombos.map((combo) => (
             <div
               key={combo.name}
-              className="rounded-xl border border-white/10 bg-background-card/50 p-4"
+              className="rounded-xl border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm p-4"
             >
               <h3 className="font-bold text-white text-sm mb-1">{combo.name}</h3>
               <p className="text-xs text-slate-400 mb-3">{combo.description}</p>
