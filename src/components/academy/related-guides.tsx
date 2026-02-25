@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// ARES-305 — Related Guides Component
+// ARES-305 — Related Guides Component — Premium Glass Design
 // Sidebar de guías relacionadas con internal linking para SEO
 // ═══════════════════════════════════════════════════════════════
 
@@ -26,8 +26,8 @@ export function RelatedGuides({ guides, currentSlug }: RelatedGuidesProps) {
   if (filtered.length === 0) return null;
 
   return (
-    <section className="rounded-xl border border-white/10 bg-background-card/50 p-5">
-      <h3 className="font-bold text-white text-sm mb-4 flex items-center gap-2">
+    <section className="glass-card p-5">
+      <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-4 flex items-center gap-2">
         <BookOpen className="w-4 h-4 text-fire-400" />
         Guías Relacionadas
       </h3>
@@ -41,16 +41,19 @@ export function RelatedGuides({ guides, currentSlug }: RelatedGuidesProps) {
             <Link
               key={guide.slug}
               href={`/academy/guides/${guide.slug}`}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors group"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/[0.04] transition-all duration-200 group"
             >
-              <div className={`flex-shrink-0 p-1.5 rounded-md bg-gradient-to-br ${config.gradient}`}>
+              <div
+                className="flex-shrink-0 p-1.5 rounded-md"
+                style={{ background: config.headerGradient }}
+              >
                 <Icon className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white font-medium truncate group-hover:text-fire-400 transition-colors">
+                <p className="text-sm text-white font-[family-name:var(--font-rajdhani)] font-medium truncate group-hover:text-fire-400 transition-colors">
                   {guide.title}
                 </p>
-                <p className="text-xs text-slate-500">{guide.readTimeMin} min</p>
+                <p className="font-numbers text-xs text-slate-500">{guide.readTimeMin} min</p>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-fire-400 transition-colors" />
             </Link>

@@ -26,14 +26,15 @@ export function CategoryFilter({ selected, counts }: CategoryFilterProps) {
   }
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory md:snap-none">
+      {/* Todas */}
       <button
         onClick={() => handleSelect(null)}
         className={cn(
-          'flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]',
+          'flex-shrink-0 snap-start px-4 py-2 rounded-xl text-sm font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide transition-all duration-200 min-h-[44px] border',
           !selected
-            ? 'bg-fire-500/20 text-fire-400 border border-fire-500/30'
-            : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent',
+            ? 'bg-fire-500/15 text-fire-400 border-fire-500/30 shadow-[0_0_12px_rgba(255,106,0,0.15)]'
+            : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent hover:border-white/10',
         )}
       >
         Todas
@@ -50,16 +51,26 @@ export function CategoryFilter({ selected, counts }: CategoryFilterProps) {
             key={key}
             onClick={() => handleSelect(key)}
             className={cn(
-              'flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]',
+              'flex-shrink-0 snap-start flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-[family-name:var(--font-rajdhani)] font-semibold transition-all duration-200 min-h-[44px] border',
               isSelected
-                ? 'bg-fire-500/20 text-fire-400 border border-fire-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent',
+                ? 'text-white'
+                : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent hover:border-white/10',
             )}
+            style={{
+              ...(isSelected
+                ? {
+                    backgroundColor: `${config.color}20`,
+                    borderColor: `${config.color}40`,
+                    color: config.color,
+                    boxShadow: `0 0 12px ${config.color}25`,
+                  }
+                : {}),
+            }}
           >
             <Icon className="w-4 h-4" />
             {config.nameEs}
             {count !== undefined && (
-              <span className="text-xs text-slate-500">({count})</span>
+              <span className="font-numbers text-xs opacity-60">({count})</span>
             )}
           </button>
         );

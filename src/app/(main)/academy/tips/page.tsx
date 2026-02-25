@@ -22,17 +22,20 @@ const DIFFICULTY_OPTIONS = [
   {
     key: 'BEGINNER',
     label: 'Principiante',
-    color: 'text-green-400 bg-green-500/20 border-green-500/30',
+    color: '#22c55e',
+    bgActive: 'bg-green-500/15 text-green-400 border-green-500/30',
   },
   {
     key: 'INTERMEDIATE',
     label: 'Intermedio',
-    color: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30',
+    color: '#f97316',
+    bgActive: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
   },
   {
     key: 'ADVANCED',
     label: 'Avanzado',
-    color: 'text-red-400 bg-red-500/20 border-red-500/30',
+    color: '#ef4444',
+    bgActive: 'bg-red-500/15 text-red-400 border-red-500/30',
   },
 ] as const;
 
@@ -64,44 +67,60 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black text-white mb-2 flex items-center gap-2 font-[family-name:var(--font-orbitron)]">
+      <div className="academy-stagger">
+        <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2 font-[family-name:var(--font-orbitron)] uppercase tracking-wide">
           <Lightbulb className="w-6 h-6 text-yellow-400" />
           <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
             Tips y Trucos
           </span>
         </h1>
-        <p className="text-slate-400 text-sm">{tips.length} tips disponibles</p>
+        <div className="section-heading-separator mb-3" />
+        <p className="text-slate-400 text-sm font-numbers">{tips.length} tips disponibles</p>
       </div>
 
-      {/* Carousel */}
-      {carouselTips.length > 0 && <TipCarousel tips={carouselTips} />}
+      {/* Carousel — wrapped in AnimatedBorder */}
+      {carouselTips.length > 0 && (
+        <div className="academy-stagger" style={{ animationDelay: '50ms' }}>
+          <TipCarousel tips={carouselTips} />
+        </div>
+      )}
 
       {/* Filtros */}
-      <div className="space-y-3">
+      <div className="space-y-3 academy-stagger" style={{ animationDelay: '100ms' }}>
         {/* Categoría */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory md:snap-none">
           <a
             href="/academy/tips"
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex-shrink-0 snap-start px-4 py-2 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide transition-all duration-200 min-h-[44px] flex items-center border ${
               !category
-                ? 'bg-fire-500/20 text-fire-400 border border-fire-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-fire-500/15 text-fire-400 border-fire-500/30 shadow-[0_0_12px_rgba(255,106,0,0.15)]'
+                : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
             }`}
           >
             Todas
           </a>
           {CATEGORIES_ORDER.map((key) => {
             const config = CATEGORY_CONFIGS[key];
+            const isActive = category === key;
             return (
               <a
                 key={key}
                 href={`/academy/tips?category=${key}${validDifficulty ? `&difficulty=${validDifficulty}` : ''}`}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  category === key
-                    ? 'bg-fire-500/20 text-fire-400 border border-fire-500/30'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                className={`flex-shrink-0 snap-start px-3 py-2 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold transition-all duration-200 min-h-[44px] flex items-center border ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
                 }`}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: `${config.color}20`,
+                        borderColor: `${config.color}40`,
+                        color: config.color,
+                        boxShadow: `0 0 12px ${config.color}25`,
+                      }
+                    : undefined
+                }
               >
                 {config.nameEs}
               </a>
@@ -115,11 +134,16 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
             <a
               key={opt.key}
               href={`/academy/tips?difficulty=${opt.key}${validCategory ? `&category=${validCategory}` : ''}`}
-              className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold transition-all duration-200 min-h-[44px] border ${
                 difficulty === opt.key
-                  ? opt.color + ' border'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? opt.bgActive
+                  : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
               }`}
+              style={
+                difficulty === opt.key
+                  ? { boxShadow: `0 0 10px ${opt.color}25` }
+                  : undefined
+              }
             >
               <BarChart3 className="w-3 h-3" />
               {opt.label}
@@ -136,22 +160,36 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
 
         return (
           <section key={cat}>
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2 font-[family-name:var(--font-rajdhani)]">
-              <Icon className="w-5 h-5" style={{ color: config.color }} />
-              {config.nameEs}
-              <span className="text-xs text-slate-500 font-normal">({catTips.length})</span>
-            </h2>
+            <div className="mb-2">
+              <h2 className="font-[family-name:var(--font-orbitron)] text-base font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                <Icon className="w-5 h-5" style={{ color: config.color }} />
+                {config.nameEs}
+                <span className="font-numbers text-xs text-slate-500 font-normal normal-case tracking-normal">({catTips.length})</span>
+              </h2>
+            </div>
+            <div className="section-heading-separator mb-4" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {catTips.map((tip) => (
+              {catTips.map((tip, index) => (
                 <div
                   key={tip.id}
-                  className="rounded-xl border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm p-4 hover:border-white/[0.12] transition-colors"
+                  className="relative glass-card p-4 pl-6 academy-stagger group"
+                  style={{ animationDelay: `${index * 40}ms` }}
                 >
+                  {/* Category accent bar — left side */}
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl transition-all duration-200 group-hover:w-[5px]"
+                    style={{
+                      background: config.color,
+                      boxShadow: `0 0 8px ${config.color}40`,
+                    }}
+                  />
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Lightbulb className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5 glow-pulse" />
                     <div>
-                      <h3 className="font-bold text-white text-sm mb-1">{tip.title}</h3>
+                      <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1">
+                        {tip.title}
+                      </h3>
                       <p className="text-xs text-slate-400 leading-relaxed">{tip.content}</p>
                     </div>
                   </div>
@@ -165,7 +203,7 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
       {tips.length === 0 && (
         <div className="text-center py-16 text-slate-500">
           <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p className="text-lg font-medium">No se encontraron tips</p>
+          <p className="text-lg font-[family-name:var(--font-rajdhani)] font-medium">No se encontraron tips</p>
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ export interface CategoryConfig {
   icon: LucideIcon;
   color: string;
   gradient: string;
+  headerGradient: string;
   slug: string;
 }
 
@@ -22,6 +23,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Crosshair,
     color: '#f97316',
     gradient: 'from-fire-500 to-fire-600',
+    headerGradient: 'radial-gradient(ellipse at center, #f97316, #c2410c)',
     slug: 'sensibilidad',
   },
   MOVEMENT: {
@@ -32,6 +34,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Move,
     color: '#06b6d4',
     gradient: 'from-ice-500 to-ice-600',
+    headerGradient: 'radial-gradient(ellipse at center, #06b6d4, #0284c7)',
     slug: 'movimiento',
   },
   AIM: {
@@ -42,6 +45,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Crosshair,
     color: '#ef4444',
     gradient: 'from-red-500 to-red-600',
+    headerGradient: 'radial-gradient(ellipse at center, #ef4444, #991b1b)',
     slug: 'punteria',
   },
   STRATEGY: {
@@ -52,6 +56,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Brain,
     color: '#a855f7',
     gradient: 'from-purple-500 to-purple-600',
+    headerGradient: 'radial-gradient(ellipse at center, #a855f7, #7c3aed)',
     slug: 'estrategia',
   },
   DEVICE: {
@@ -62,6 +67,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Smartphone,
     color: '#22c55e',
     gradient: 'from-green-500 to-green-600',
+    headerGradient: 'radial-gradient(ellipse at center, #22c55e, #059669)',
     slug: 'dispositivo',
   },
   META: {
@@ -72,6 +78,7 @@ export const CATEGORY_CONFIGS: Record<GuideCategory, CategoryConfig> = {
     icon: Swords,
     color: '#eab308',
     gradient: 'from-yellow-500 to-yellow-600',
+    headerGradient: 'radial-gradient(ellipse at center, #eab308, #d97706)',
     slug: 'meta',
   },
 };

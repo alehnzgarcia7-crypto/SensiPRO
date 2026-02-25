@@ -27,14 +27,14 @@ export default async function AcademyHubPage() {
   return (
     <div className="space-y-10">
       {/* Hero — Glass card con gradientes premium */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#0a0f1e]/60 backdrop-blur-xl border border-white/[0.06] p-8 lg:p-12">
+      <section className="relative overflow-hidden glass-card p-8 lg:p-12 academy-stagger">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 rounded-xl bg-fire-500/15 border border-fire-500/20 shadow-[0_0_20px_rgba(255,106,0,0.1)]">
               <GraduationCap className="w-8 h-8 text-fire-400" />
             </div>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-black text-white font-[family-name:var(--font-orbitron)]">
+              <h1 className="text-3xl lg:text-4xl font-black text-white font-[family-name:var(--font-orbitron)] uppercase tracking-wide">
                 <span className="bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent">
                   Academia PRO
                 </span>
@@ -51,17 +51,17 @@ export default async function AcademyHubPage() {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/[0.03] rounded-lg px-3 py-1.5 border border-white/[0.06]">
+            <div className="flex items-center gap-2 text-sm text-slate-300 glass-card !rounded-lg px-3 py-1.5">
               <BookOpen className="w-4 h-4 text-fire-400" />
-              <span className="font-medium">{totalGuides} guías</span>
+              <span className="font-numbers font-medium">{totalGuides} guías</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/[0.03] rounded-lg px-3 py-1.5 border border-white/[0.06]">
+            <div className="flex items-center gap-2 text-sm text-slate-300 glass-card !rounded-lg px-3 py-1.5">
               <Lightbulb className="w-4 h-4 text-yellow-400" />
-              <span className="font-medium">100+ tips</span>
+              <span className="font-numbers font-medium">100+ tips</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/[0.03] rounded-lg px-3 py-1.5 border border-white/[0.06]">
+            <div className="flex items-center gap-2 text-sm text-slate-300 glass-card !rounded-lg px-3 py-1.5">
               <Eye className="w-4 h-4 text-ice-400" />
-              <span className="font-medium">6 categorías</span>
+              <span className="font-numbers font-medium">6 categorías</span>
             </div>
           </div>
         </div>
@@ -77,8 +77,10 @@ export default async function AcademyHubPage() {
 
       {/* Categorías */}
       <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white font-[family-name:var(--font-rajdhani)]">Explorar por Categoría</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide">
+            Explorar por Categoría
+          </h2>
           <Link
             href="/academy/guides"
             className="text-sm text-fire-400 hover:text-fire-300 flex items-center gap-1 transition-colors"
@@ -86,9 +88,10 @@ export default async function AcademyHubPage() {
             Ver todas <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+        <div className="section-heading-separator mb-6" />
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {CATEGORIES_ORDER.map((key) => {
+          {CATEGORIES_ORDER.map((key, index) => {
             const config = CATEGORY_CONFIGS[key];
             const count = categoryCounts[key] || 0;
 
@@ -96,18 +99,24 @@ export default async function AcademyHubPage() {
               <Link
                 key={key}
                 href={`/academy/guides?category=${key}`}
-                className="group relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#0a0f1e]/40 backdrop-blur-sm p-4 hover:border-white/[0.12] hover:bg-[#0a0f1e]/60 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.02)]"
+                className="group glass-card p-4 academy-stagger"
+                style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div
-                  className={`inline-flex p-2.5 rounded-lg bg-gradient-to-br ${config.gradient} mb-3 shadow-lg`}
+                  className="inline-flex p-2.5 rounded-lg mb-3 shadow-lg"
+                  style={{
+                    background: config.headerGradient,
+                    boxShadow: `0 4px 12px ${config.color}33`,
+                  }}
                 >
                   <config.icon className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-bold text-white text-sm mb-1 font-[family-name:var(--font-rajdhani)]">{config.nameEs}</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1">
+                  {config.nameEs}
+                </h3>
+                <p className="font-numbers text-xs text-slate-500">
                   {count} {count === 1 ? 'guía' : 'guías'}
                 </p>
-                <div className="absolute inset-0 bg-gradient-to-t from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             );
           })}
@@ -116,8 +125,10 @@ export default async function AcademyHubPage() {
 
       {/* Guías destacadas */}
       <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white font-[family-name:var(--font-rajdhani)]">Guías Destacadas</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide">
+            Guías Destacadas
+          </h2>
           <Link
             href="/academy/guides"
             className="text-sm text-fire-400 hover:text-fire-300 flex items-center gap-1 transition-colors"
@@ -125,10 +136,11 @@ export default async function AcademyHubPage() {
             Ver todas <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+        <div className="section-heading-separator mb-6" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {featured.map((guide) => (
-            <GuideCard key={guide.id} guide={guide} />
+          {featured.map((guide, index) => (
+            <GuideCard key={guide.id} guide={guide} index={index} />
           ))}
         </div>
 

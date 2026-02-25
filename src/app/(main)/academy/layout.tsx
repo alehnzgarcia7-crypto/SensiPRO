@@ -61,11 +61,11 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
-      {/* Sidebar Desktop — Glass effect */}
+      {/* Sidebar Desktop — Glass premium */}
       <aside
         className={cn(
           'hidden lg:flex flex-col border-r border-white/[0.06] transition-all duration-300',
-          'bg-[#0a0f1e]/80 backdrop-blur-xl',
+          'bg-[rgba(15,23,42,0.6)] backdrop-blur-xl',
           collapsed ? 'w-16' : 'w-64',
         )}
       >
@@ -80,7 +80,7 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200"
             aria-label={collapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
           >
             {collapsed ? (
@@ -103,18 +103,28 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
+                  'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200',
                   isActive
-                    ? 'bg-fire-500/15 text-fire-400 border border-fire-500/20 shadow-[0_0_12px_rgba(255,106,0,0.08)]'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5',
+                    ? 'bg-white/[0.04] text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.03]',
                   collapsed && 'justify-center px-2',
                 )}
                 title={collapsed ? item.label : undefined}
               >
-                <item.icon className={cn('w-5 h-5 flex-shrink-0', isActive && 'text-fire-400')} />
+                {/* Active indicator — left cyan bar */}
+                {isActive && (
+                  <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
+                    style={{
+                      background: '#06b6d4',
+                      boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)',
+                    }}
+                  />
+                )}
+                <item.icon className={cn('w-5 h-5 flex-shrink-0', isActive && 'text-ice-400')} />
                 {!collapsed && (
                   <div className="flex flex-col">
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-[family-name:var(--font-rajdhani)] font-medium">{item.label}</span>
                     <span className="text-[10px] text-slate-500 leading-tight">{item.description}</span>
                   </div>
                 )}
@@ -125,17 +135,23 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
 
         {!collapsed && (
           <div className="p-4 border-t border-white/[0.06]">
-            <div className="rounded-xl bg-gradient-to-br from-fire-500/10 via-transparent to-ice-500/10 p-4 border border-white/[0.06] backdrop-blur-sm">
+            <div className="glass-card p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-4 h-4 text-yellow-400" />
-                <span className="text-xs font-bold text-white">Premium</span>
+                <span className="font-[family-name:var(--font-rajdhani)] text-xs font-bold text-white uppercase tracking-wide">
+                  Premium
+                </span>
               </div>
               <p className="text-[10px] text-slate-400 mb-3 leading-relaxed">
                 Desbloquea todas las guías, tips avanzados y contenido exclusivo
               </p>
               <Link
                 href="/pricing"
-                className="block text-center text-xs font-bold py-2 px-3 rounded-lg bg-gradient-to-r from-fire-500 to-fire-600 text-white hover:from-fire-600 hover:to-fire-700 transition-all shadow-lg shadow-fire-500/20"
+                className="block text-center text-xs font-bold py-2.5 px-3 rounded-lg text-white transition-all duration-200 shadow-lg min-h-[44px] flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #ff6a00, #06b6d4)',
+                  boxShadow: '0 4px 16px rgba(255, 106, 0, 0.2)',
+                }}
               >
                 Upgrade a Premium
               </Link>
@@ -145,7 +161,7 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Mobile Nav — Glass bottom bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0f1e]/90 backdrop-blur-xl border-t border-white/[0.06]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[rgba(15,23,42,0.9)] backdrop-blur-xl border-t border-white/[0.06] safe-bottom">
         <nav className="flex items-center justify-around py-2 px-1">
           {SIDEBAR_ITEMS.map((item) => {
             const isActive =
@@ -158,12 +174,22 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-xs transition-colors',
-                  isActive ? 'text-fire-400' : 'text-slate-500 hover:text-slate-300',
+                  'relative flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-xs transition-all duration-200 min-h-[44px] justify-center',
+                  isActive ? 'text-ice-400' : 'text-slate-500 hover:text-slate-300',
                 )}
               >
+                {/* Active indicator — top cyan bar */}
+                {isActive && (
+                  <div
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full"
+                    style={{
+                      background: '#06b6d4',
+                      boxShadow: '0 0 6px rgba(6, 182, 212, 0.5)',
+                    }}
+                  />
+                )}
                 <item.icon className="w-5 h-5" />
-                <span className="truncate max-w-[60px]">{item.label}</span>
+                <span className="truncate max-w-[60px] font-[family-name:var(--font-rajdhani)]">{item.label}</span>
               </Link>
             );
           })}

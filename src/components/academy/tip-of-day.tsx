@@ -33,27 +33,38 @@ export async function TipOfDay() {
   const tip = await fetchTipOfDay();
 
   return (
-    <section className="relative overflow-hidden rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5">
+    <section className="relative overflow-hidden glass-card p-5">
+      {/* Glow accent — top border */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[2px]"
+        style={{
+          background: 'linear-gradient(90deg, #eab308, #f97316, #eab308)',
+          boxShadow: '0 0 12px rgba(234, 179, 8, 0.3)',
+        }}
+      />
+
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 p-2.5 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
-          <Lightbulb className="w-5 h-5 text-yellow-400" />
+        <div className="flex-shrink-0 p-2.5 rounded-lg bg-yellow-500/15 border border-yellow-500/20 shadow-[0_0_12px_rgba(234,179,8,0.1)]">
+          <Lightbulb className="w-5 h-5 text-yellow-400 glow-pulse" />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-yellow-400 uppercase tracking-wider">
+            <span className="font-[family-name:var(--font-rajdhani)] text-xs font-bold text-yellow-400 uppercase tracking-wider">
               Tip del día
             </span>
-            <span className="text-xs text-slate-500">#{tip.id.slice(-4)}</span>
+            <span className="font-numbers text-xs text-slate-500">#{tip.id.slice(-4)}</span>
           </div>
 
-          <h3 className="font-bold text-white text-sm mb-1.5">{tip.title}</h3>
+          <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1.5">
+            {tip.title}
+          </h3>
           <p className="text-sm text-slate-300 leading-relaxed">{tip.content}</p>
         </div>
 
         <Link
           href="/academy/tips"
-          className="flex-shrink-0 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="flex-shrink-0 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
           title="Ver todos los tips"
         >
           <ChevronRight className="w-5 h-5" />
