@@ -192,7 +192,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         <div className="space-y-4">
           {sensitivityEntries.map(([key, value], i) => (
             <motion.div
-              key={`${key}-${calibration}-${dpiMode}`}
+              key={`${key}-${calibration}-${dpiMode}-${userRam}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: i * 0.08 }}
@@ -217,7 +217,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               <span className="text-sm text-slate-400">Precisión</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-display font-bold text-ice-300">
+              <span key={`precision-${calibration}-${dpiMode}-${userRam}`} className="text-sm font-display font-bold text-ice-300">
                 <CountUp end={currentCombo.precisionScore} duration={600} />
                 <span className="text-xs text-slate-500">/100</span>
               </span>
@@ -231,7 +231,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               <Ruler size={14} className="text-fire-400" />
               <span className="text-sm text-slate-400">Tamaño del Botón</span>
             </div>
-            <span className="text-sm font-display font-bold text-white">
+            <span key={`button-${calibration}-${dpiMode}-${userRam}`} className="text-sm font-display font-bold text-white">
               {currentCombo.buttonSize}mm
             </span>
           </div>
@@ -239,6 +239,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           {/* DPI Value (solo si dpiMode) */}
           {currentCombo.dpiValue !== null && (
             <motion.div
+              key={`dpi-${calibration}-${dpiMode}-${userRam}`}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               className="flex items-center justify-between mt-3"
@@ -262,7 +263,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           <div className="space-y-4">
             {gyroscopeEntries.map(([key, value], i) => (
               <motion.div
-                key={`${key}-${calibration}-${dpiMode}`}
+                key={`${key}-${calibration}-${dpiMode}-${userRam}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.08 }}
