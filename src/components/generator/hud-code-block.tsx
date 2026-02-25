@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Clipboard, Check } from 'lucide-react';
 
 import { cn } from '@/lib/cn';
-import { useToast } from '@/components/ui/toast';
 
 interface HudCodeBlockProps {
   fingers: 2 | 3 | 4;
@@ -54,16 +53,12 @@ function generateHudCode(deviceId: string, fingers: 2 | 3 | 4): string {
 
 export function HudCodeBlock({ fingers, deviceId }: HudCodeBlockProps) {
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   const code = generateHudCode(deviceId, fingers);
 
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(code);
-      setCopied(true);
-      toast('success', '¡Código copiado al portapapeles!');
-      setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback para navegadores sin Clipboard API
       const textarea = document.createElement('textarea');
@@ -74,11 +69,10 @@ export function HudCodeBlock({ fingers, deviceId }: HudCodeBlockProps) {
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      setCopied(true);
-      toast('success', '¡Código copiado!');
-      setTimeout(() => setCopied(false), 2000);
     }
-  }, [code, toast]);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [code]);
 
   return (
     <div className="space-y-2">
@@ -107,6 +101,11 @@ export function HudCodeBlock({ fingers, deviceId }: HudCodeBlockProps) {
         >
           {copied ? <Check size={16} /> : <Clipboard size={16} />}
         </motion.button>
+        {copied && (
+          <span className="text-xs font-medium text-emerald-400 shrink-0 animate-pulse">
+            ¡Copiado!
+          </span>
+        )}
       </div>
     </div>
   );
