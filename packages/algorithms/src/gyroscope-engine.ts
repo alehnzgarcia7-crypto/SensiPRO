@@ -1,85 +1,51 @@
 import {
-  GYRO_BASE_FACTOR,
-  GYRO_PANEL_BONUS,
-  GYRO_GAMING_BONUS,
-  SENSITIVITY_MIN,
+  GYRO_MIN,
   GYRO_MAX,
 } from '@ares/config';
 
-import type { SensitivityOutput, GyroscopeOutput, DeviceSpecs } from './types';
+import type { SensitivityOutput, GyroscopeOutput } from './types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES GYROSCOPE ENGINE v2.0
+// ARES GYROSCOPE ENGINE v3.0
 // ═══════════════════════════════════════════════════════════
 //
-// RANGO: 60-140 (giroscopio es más conservador que sensibilidad)
+// RANGO: 0-100 (giroscopio en Free Fire, pros usan 20-40)
 //
 // FÓRMULA:
-//   gyroValue = sensitivityValue × GYRO_BASE_FACTOR (0.35)
-//             + panelBonus (AMOLED/OLED = +5%)
-//             + gamingBonus (GAMING tier = +8%)
-//             + fieldAdjustment
+//   gyroValue = sensitivityValue × GYRO_FACTOR[field]
+//   clamped a [0, 100]
 //
-// FIELD ADJUSTMENTS (escalados para rango 60-190 → gyro 60-140):
-//   gyroGeneral:   +4
-//   gyroRedPoint:  +0
-//   gyroScope2x:   -3
-//   gyroScope4x:   -6
-//   gyroSniper:    -10
-//   gyroFreeView:  +6
+// FACTORES por campo:
+//   Los factores convierten escala 0-200 → rango gyro ~20-40
+//   Miras con más zoom (scope) reciben factor MÁS ALTO porque
+//   el gyro es más útil para estabilizar miras de largo alcance.
+//   FreeView recibe factor BAJO porque gyro general es menos crítico.
 //
 // NOTA: Giroscopio es feature PREMIUM. Los valores se calculan
 // siempre pero solo se muestran a usuarios Premium/VIP.
 
-const FIELD_ADJUSTMENTS: Record<keyof GyroscopeOutput, number> = {
-  gyroGeneral:   4,
-  gyroRedPoint:  0,
-  gyroScope2x:  -3,
-  gyroScope4x:  -6,
-  gyroSniper:  -10,
-  gyroFreeView:  6,
-};
-
-// Map gyro fields to their sensitivity counterparts
-const GYRO_TO_SENS: Record<keyof GyroscopeOutput, keyof SensitivityOutput> = {
-  gyroGeneral:   'general',
-  gyroRedPoint:  'redPoint',
-  gyroScope2x:   'scope2x',
-  gyroScope4x:   'scope4x',
-  gyroSniper:    'sniperScope',
-  gyroFreeView:  'freeView',
+// Factores de conversión sensitivity → gyroscope por campo
+const GYRO_FACTOR: Record<keyof GyroscopeOutput, { sensField: keyof SensitivityOutput; factor: number }> = {
+  gyroGeneral:     { sensField: 'general',     factor: 0.18 },
+  gyroRedPoint:    { sensField: 'redPoint',    factor: 0.20 },
+  gyroScope2x:     { sensField: 'scope2x',     factor: 0.22 },
+  gyroScope4x:     { sensField: 'scope4x',     factor: 0.25 },
+  gyroSniper:      { sensField: 'sniperScope',  factor: 0.35 },
+  gyroFreeView:    { sensField: 'freeView',    factor: 0.15 },
 };
 
 function clamp(value: number, min: number, max: number): number {
   return Math.round(Math.max(min, Math.min(max, value)));
 }
 
-export function generateGyroscope(
-  sensitivity: SensitivityOutput,
-  specs: DeviceSpecs,
-): GyroscopeOutput {
-  // Calculate bonuses
-  const panelBonus = (specs.panelType === 'AMOLED' || specs.panelType === 'OLED')
-    ? GYRO_PANEL_BONUS
-    : 0;
+export function generateGyroscope(sensitivity: SensitivityOutput): GyroscopeOutput {
+  const result = {} as GyroscopeOutput;
 
-  const gamingBonus = specs.tier === 'GAMING' ? GYRO_GAMING_BONUS : 0;
-
-  const totalFactor = GYRO_BASE_FACTOR + panelBonus + gamingBonus;
-
-  const result: Partial<GyroscopeOutput> = {};
-
-  for (const [gyroField, sensField] of Object.entries(GYRO_TO_SENS)) {
+  for (const [gyroField, config] of Object.entries(GYRO_FACTOR)) {
     const key = gyroField as keyof GyroscopeOutput;
-    const baseValue = sensitivity[sensField];
-    const adjustment = FIELD_ADJUSTMENTS[key];
-
-    result[key] = clamp(
-      baseValue * totalFactor + adjustment,
-      SENSITIVITY_MIN,
-      GYRO_MAX,
-    );
+    const sensValue = sensitivity[config.sensField];
+    result[key] = clamp(sensValue * config.factor, GYRO_MIN, GYRO_MAX);
   }
 
-  return result as GyroscopeOutput;
+  return result;
 }

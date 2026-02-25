@@ -35,7 +35,7 @@ export function SensitivityCard({ label, value, icon, delay = 0, color = 'gradie
           {value}
         </motion.span>
       </div>
-      <Progress value={value} max={100} size="sm" color={color} />
+      <Progress value={value} max={200} size="sm" color={color} />
       <div className="flex justify-between mt-1">
         <span className="text-[10px] text-slate-600">Bajo</span>
         <span className="text-[10px] text-slate-600">Alto</span>

@@ -203,7 +203,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                   <CountUp end={value} duration={600} />
                 </span>
               </div>
-              <Progress value={value} max={190} size="sm" color="gradient" />
+              <Progress value={value} max={200} size="sm" color="gradient" />
             </motion.div>
           ))}
         </div>
@@ -274,7 +274,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     <CountUp end={value} duration={600} />
                   </span>
                 </div>
-                <Progress value={value} max={140} size="sm" color="ice" />
+                <Progress value={value} max={100} size="sm" color="ice" />
               </motion.div>
             ))}
           </div>
