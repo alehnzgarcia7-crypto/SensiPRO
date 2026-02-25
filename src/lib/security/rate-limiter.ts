@@ -125,6 +125,11 @@ export async function enforceRateLimit(
   userId: string,
   tier: UserTier,
 ): Promise<RateLimitResult> {
+  // Bypass rate limit en desarrollo para no bloquear testing local
+  if (process.env.NODE_ENV === 'development') {
+    return { allowed: true, remaining: 9999, resetAt: new Date(Date.now() + 86400000), limit: 9999 };
+  }
+
   const result = await checkRateLimit(userId, tier);
 
   if (!result.allowed) {
