@@ -1,5 +1,10 @@
 'use client';
 
+// ═══════════════════════════════════════════════════════════════
+// ARES — HUD Code Block — Estilo terminal/consola con scanlines,
+// código monospace verde Matrix, y botón copiar con feedback.
+// ═══════════════════════════════════════════════════════════════
+
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Clipboard, Check } from 'lucide-react';
@@ -75,37 +80,66 @@ export function HudCodeBlock({ fingers, deviceId }: HudCodeBlockProps) {
   }, [code]);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <p className="text-[10px] text-slate-500 font-ui uppercase tracking-wider">
         Código de importación
       </p>
       <div
         className={cn(
-          'flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5',
-          'bg-[#0a0e1a] border-white/10',
+          'relative flex items-center justify-between gap-2 rounded-lg border px-3 py-3',
+          'bg-[#020804] border-emerald-900/30 overflow-hidden',
         )}
       >
-        <code className="font-mono text-sm md:text-base font-bold tracking-widest text-ice-300 select-all">
+        {/* Scanlines overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.015) 2px, rgba(0,255,65,0.015) 4px)',
+          }}
+        />
+
+        {/* Prompt indicator */}
+        <span
+          className="shrink-0 font-mono text-xs select-none"
+          style={{ color: '#00ff41', opacity: 0.4 }}
+        >
+          &gt;
+        </span>
+
+        {/* Código */}
+        <code
+          className="flex-1 font-mono text-sm md:text-base font-bold tracking-[0.2em] select-all"
+          style={{ color: '#00ff41', textShadow: '0 0 8px rgba(0, 255, 65, 0.3)' }}
+        >
           {code}
         </code>
+
+        {/* Botón copiar */}
         <motion.button
           onClick={handleCopy}
           whileTap={{ scale: 0.9 }}
           className={cn(
-            'shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-md transition-colors',
+            'relative z-10 shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center gap-1.5',
+            'rounded-md border font-ui text-xs font-semibold tracking-wider uppercase transition-all duration-200',
             copied
-              ? 'bg-success/20 text-success'
-              : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10',
+              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+              : 'bg-white/[0.03] border-ice-500/20 text-ice-400 hover:border-ice-400/40 hover:bg-ice-500/10 hover:shadow-[0_0_12px_rgba(6,182,212,0.15)]',
           )}
           aria-label="Copiar código"
         >
-          {copied ? <Check size={16} /> : <Clipboard size={16} />}
+          {copied ? (
+            <>
+              <Check size={14} />
+              <span className="hidden sm:inline">Copiado</span>
+            </>
+          ) : (
+            <>
+              <Clipboard size={14} />
+              <span className="hidden sm:inline">Copiar</span>
+            </>
+          )}
         </motion.button>
-        {copied && (
-          <span className="text-xs font-medium text-emerald-400 shrink-0 animate-pulse">
-            ¡Copiado!
-          </span>
-        )}
       </div>
     </div>
   );

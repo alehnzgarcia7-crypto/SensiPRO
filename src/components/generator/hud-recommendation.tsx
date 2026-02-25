@@ -1,19 +1,20 @@
 'use client';
 
+// ═══════════════════════════════════════════════════════════════
+// ARES — HUD Recommendation Panel — Versión PREMIUM ESPORTS
+// Layout vertical completo con SVG mockup de pantalla Free Fire,
+// barras de stats con gradiente, código de importación y
+// pros/contras colapsables. Diseño nivel competitivo.
+// ═══════════════════════════════════════════════════════════════
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Gamepad2, Info } from 'lucide-react';
+import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target } from 'lucide-react';
 
 import type { HudRecommendation } from '@ares/algorithms';
 import { cn } from '@/lib/cn';
-import { Card } from '@/components/ui/card';
 import { FingerLayoutSvg } from './finger-layout-svg';
 import { HudCodeBlock } from './hud-code-block';
-
-// ═══════════════════════════════════════════════════════════════
-// HUD Recommendation Panel — Versión completa con códigos,
-// visual de dedos, stats por layout y diseño gaming AAA
-// ═══════════════════════════════════════════════════════════════
 
 interface HudRecommendationPanelProps {
   data: HudRecommendation;
@@ -21,21 +22,24 @@ interface HudRecommendationPanelProps {
   screenSize?: number;
 }
 
-const FINGER_NAMES: Record<2 | 3 | 4, { emoji: string; title: string; subtitle: string }> = {
+const FINGER_META: Record<2 | 3 | 4, { emoji: string; title: string; subtitle: string; icon: typeof Gamepad2 }> = {
   2: {
     emoji: '✌️',
-    title: '2 DEDOS | CLÁSICO',
+    title: '2 DEDOS — CLÁSICO',
     subtitle: 'Ideal para principiantes y juego casual',
+    icon: Gamepad2,
   },
   3: {
     emoji: '🤟',
-    title: '3 DEDOS | VERSÁTIL',
+    title: '3 DEDOS — VERSÁTIL',
     subtitle: 'Balance perfecto entre control y velocidad',
+    icon: Zap,
   },
   4: {
     emoji: '🖐️',
-    title: '4 DEDOS | COMPETITIVO',
-    subtitle: 'Máximo rendimiento para jugadores pro',
+    title: '4 DEDOS — GARRA',
+    subtitle: 'Máximo rendimiento para jugadores competitivos',
+    icon: Trophy,
   },
 };
 
@@ -51,30 +55,39 @@ const LAYOUT_STATS: Record<2 | 3 | 4, LayoutStats> = {
   4: { precision: 95, speed: 90, playability: 45 },
 };
 
-const STAT_LABELS: { key: keyof LayoutStats; label: string }[] = [
-  { key: 'precision', label: 'Precisión' },
-  { key: 'speed', label: 'Velocidad' },
-  { key: 'playability', label: 'Jugabilidad' },
+const STAT_CONFIG: { key: keyof LayoutStats; label: string; icon: typeof Target }[] = [
+  { key: 'precision', label: 'Precisión', icon: Target },
+  { key: 'speed', label: 'Velocidad', icon: Zap },
+  { key: 'playability', label: 'Jugabilidad', icon: Gamepad2 },
 ];
 
 function StatBar({ value, delay }: { value: number; delay: number }) {
   return (
-    <div className="relative h-2 w-full rounded-full bg-white/5 overflow-hidden">
+    <div className="relative h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
       <motion.div
         className="absolute inset-y-0 left-0 rounded-full"
         style={{
-          background: 'linear-gradient(90deg, #f97316, #06b6d4)',
+          background: `linear-gradient(90deg, #f97316 0%, #06b6d4 ${Math.max(value, 30)}%)`,
         }}
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
-        transition={{ duration: 0.6, delay, ease: 'easeOut' }}
+        transition={{ duration: 0.8, delay, ease: 'easeOut' }}
+      />
+      {/* Glow en la punta */}
+      <motion.div
+        className="absolute top-0 bottom-0 w-2 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(6,182,212,0.6) 0%, transparent 70%)',
+        }}
+        initial={{ left: '0%' }}
+        animate={{ left: `${Math.max(value - 1, 0)}%` }}
+        transition={{ duration: 0.8, delay, ease: 'easeOut' }}
       />
     </div>
   );
 }
 
 export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecommendationPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [expandedPros, setExpandedPros] = useState<Record<number, boolean>>({});
 
   const togglePros = (fingers: number) => {
@@ -82,186 +95,209 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
   };
 
   return (
-    <Card variant="default" className="overflow-hidden">
-      {/* Header colapsable */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 min-h-[44px] hover:bg-white/[0.02] transition-colors"
-      >
+    <div className="space-y-4">
+      {/* ═══ HEADER ═══ */}
+      <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <Gamepad2 size={18} className="text-fire-400" />
-          <div className="text-left">
-            <p className="text-sm font-ui font-semibold text-white">
-              CUSTOM HUD — Configuración de Controles
-            </p>
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-fire-500/10 border border-fire-500/20">
+            <Gamepad2 size={18} className="text-fire-400" />
+          </div>
+          <div>
+            <h3 className="text-base font-display font-bold text-white tracking-wide">
+              CUSTOM HUD
+            </h3>
             <p className="text-xs text-slate-500">
-              Recomendado:{' '}
-              <span className="text-ice-400 font-semibold">{data.recommended} dedos</span>
-              {' · '}
-              <span className="text-slate-600">Toca para expandir</span>
+              Configuración óptima para tu dispositivo
             </p>
           </div>
         </div>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown size={18} className="text-slate-500" />
-        </motion.div>
-      </button>
 
-      {/* Contenido expandible */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4 space-y-3">
-              {/* Instrucciones de importación */}
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-ice-500/5 border border-ice-500/10">
-                <Info size={14} className="text-ice-400 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  <span className="text-ice-300 font-semibold">Cómo importar:</span>{' '}
-                  Copia el código → Free Fire → Ajustes → Controles → Personalizar →
-                  Importar diseño → Pegar código
-                </p>
-              </div>
+        {/* Instrucción de importación */}
+        <div className="flex items-start gap-2.5 p-3 rounded-lg bg-ice-500/[0.04] border border-ice-500/10">
+          <Import size={14} className="text-ice-400 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            <span className="text-ice-300 font-semibold">Copia el código</span>{' '}
+            → Free Fire → Ajustes → Controles → Importar HUD
+          </p>
+        </div>
+      </div>
 
-              {/* Tarjetas de cada layout */}
-              {data.options.map((option, cardIdx) => {
-                const meta = FINGER_NAMES[option.fingers];
-                const stats = LAYOUT_STATS[option.fingers];
-                const prosOpen = expandedPros[option.fingers] ?? false;
+      {/* ═══ CARDS DE CADA LAYOUT ═══ */}
+      <div className="space-y-4">
+        {data.options.map((option, cardIdx) => {
+          const meta = FINGER_META[option.fingers];
+          const stats = LAYOUT_STATS[option.fingers];
+          const prosOpen = expandedPros[option.fingers] ?? false;
+          const isRec = option.isRecommended;
 
-                return (
+          return (
+            <motion.div
+              key={option.fingers}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: cardIdx * 0.12 }}
+              className={cn(
+                'relative rounded-xl border overflow-hidden transition-all',
+                'backdrop-blur-sm',
+                isRec
+                  ? 'bg-white/[0.03] border-transparent'
+                  : 'bg-white/[0.015] border-white/5 opacity-[0.85]',
+              )}
+              style={
+                isRec
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(135deg, rgba(6,182,212,0.04), rgba(249,115,22,0.04))',
+                      boxShadow:
+                        '0 0 0 1px rgba(6,182,212,0.15), 0 0 30px rgba(6,182,212,0.06), 0 0 60px rgba(249,115,22,0.03)',
+                    }
+                  : undefined
+              }
+            >
+              {/* Badge recomendado con glow animado */}
+              {isRec && (
+                <div className="relative flex items-center justify-center gap-1.5 py-2 overflow-hidden">
+                  {/* Glow animado de fondo */}
                   <motion.div
-                    key={option.fingers}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: cardIdx * 0.1 }}
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, transparent, rgba(6,182,212,0.08), rgba(249,115,22,0.06), transparent)',
+                      backgroundSize: '200% 100%',
+                    }}
+                    animate={{ backgroundPosition: ['100% 0%', '-100% 0%'] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <Check size={12} className="relative text-ice-400" />
+                  <span className="relative text-[10px] font-ui font-bold text-ice-300 uppercase tracking-[0.15em]">
+                    Recomendado para tu dispositivo
+                  </span>
+                </div>
+              )}
+
+              <div className="p-4 space-y-4">
+                {/* Header del card */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm md:text-base font-display font-bold text-white">
+                      {meta.emoji} {meta.title}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{meta.subtitle}</p>
+                  </div>
+                  {isRec && (
+                    <div className="shrink-0 px-2 py-1 rounded-md bg-ice-500/10 border border-ice-500/20">
+                      <span className="text-[9px] font-ui font-bold text-ice-400 uppercase tracking-wider">
+                        Best
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* ═══ SVG MOCKUP — PIEZA CENTRAL ═══ */}
+                <div
+                  className={cn(
+                    'rounded-lg overflow-hidden border',
+                    isRec ? 'border-white/10' : 'border-white/5',
+                  )}
+                >
+                  <FingerLayoutSvg fingers={option.fingers} screenSize={screenSize} />
+                </div>
+
+                {/* ═══ STATS BARS — Fila horizontal ═══ */}
+                <div className="grid grid-cols-3 gap-3">
+                  {STAT_CONFIG.map((stat, statIdx) => {
+                    const StatIcon = stat.icon;
+                    return (
+                      <div key={stat.key} className="space-y-1.5">
+                        <div className="flex items-center gap-1">
+                          <StatIcon size={10} className="text-slate-500" />
+                          <span className="text-[10px] text-slate-500 font-ui truncate">
+                            {stat.label}
+                          </span>
+                        </div>
+                        <StatBar
+                          value={stats[stat.key]}
+                          delay={cardIdx * 0.15 + statIdx * 0.08}
+                        />
+                        <span className="text-[11px] font-mono font-bold text-white">
+                          {stats[stat.key]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* ═══ CÓDIGO HUD ═══ */}
+                <HudCodeBlock fingers={option.fingers} deviceId={deviceId} />
+
+                {/* ═══ PROS Y CONTRAS — Colapsable ═══ */}
+                <div>
+                  <button
+                    onClick={() => togglePros(option.fingers)}
                     className={cn(
-                      'rounded-xl border overflow-hidden transition-all',
-                      option.isRecommended
-                        ? 'border-ice-500/30 shadow-[0_0_20px_rgba(6,182,212,0.08)]'
-                        : 'border-white/5',
+                      'flex items-center gap-1.5 py-1.5 text-[11px] font-ui transition-colors min-h-[32px]',
+                      prosOpen ? 'text-slate-300' : 'text-slate-600 hover:text-slate-400',
                     )}
                   >
-                    {/* Badge recomendado */}
-                    {option.isRecommended && (
+                    <motion.div
+                      animate={{ rotate: prosOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown size={12} />
+                    </motion.div>
+                    {prosOpen ? 'Ocultar' : 'Ver'} pros y contras
+                  </button>
+
+                  <AnimatePresence>
+                    {prosOpen && (
                       <motion.div
-                        className="flex items-center justify-center gap-1.5 py-1.5 bg-gradient-to-r from-ice-500/20 via-ice-400/10 to-ice-500/20"
-                        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-                        transition={{ duration: 3, repeat: Infinity }}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
                       >
-                        <Check size={12} className="text-ice-400" />
-                        <span className="text-[10px] font-ui font-bold text-ice-300 uppercase tracking-widest">
-                          Recomendado para tu dispositivo
-                        </span>
+                        <div className="grid grid-cols-2 gap-3 pt-2 pb-1">
+                          {/* Pros */}
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-ui font-bold text-emerald-500 uppercase tracking-wider mb-1">
+                              Ventajas
+                            </p>
+                            {option.pros.map((pro) => (
+                              <p
+                                key={pro}
+                                className="text-[10px] text-emerald-400/80 flex items-start gap-1.5 leading-relaxed"
+                              >
+                                <span className="shrink-0 text-emerald-500 mt-px">+</span>
+                                <span>{pro}</span>
+                              </p>
+                            ))}
+                          </div>
+                          {/* Contras */}
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-ui font-bold text-red-500 uppercase tracking-wider mb-1">
+                              Desventajas
+                            </p>
+                            {option.cons.map((con) => (
+                              <p
+                                key={con}
+                                className="text-[10px] text-red-400/80 flex items-start gap-1.5 leading-relaxed"
+                              >
+                                <span className="shrink-0 text-red-500 mt-px">&minus;</span>
+                                <span>{con}</span>
+                              </p>
+                            ))}
+                          </div>
+                        </div>
                       </motion.div>
                     )}
-
-                    <div className={cn(
-                      'p-4 space-y-4',
-                      option.isRecommended ? 'bg-ice-500/[0.03]' : 'bg-white/[0.01]',
-                    )}>
-                      {/* Título */}
-                      <div>
-                        <h4 className="text-base font-display font-bold text-white">
-                          {meta.emoji} {meta.title}
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-0.5">{meta.subtitle}</p>
-                      </div>
-
-                      {/* Visual de dedos SVG */}
-                      <div className="py-2">
-                        <FingerLayoutSvg fingers={option.fingers} screenSize={screenSize} />
-                      </div>
-
-                      {/* Stats con barras */}
-                      <div className="space-y-2.5">
-                        {STAT_LABELS.map((stat, statIdx) => (
-                          <div key={stat.key} className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[11px] text-slate-400 font-ui">
-                                {stat.label}
-                              </span>
-                              <span className="text-xs font-mono font-bold text-white">
-                                {stats[stat.key]}
-                              </span>
-                            </div>
-                            <StatBar
-                              value={stats[stat.key]}
-                              delay={cardIdx * 0.1 + statIdx * 0.08}
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Código HUD copiable */}
-                      <HudCodeBlock fingers={option.fingers} deviceId={deviceId} />
-
-                      {/* Pros y contras — expandible */}
-                      <button
-                        onClick={() => togglePros(option.fingers)}
-                        className="flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-300 transition-colors min-h-[32px]"
-                      >
-                        <motion.div
-                          animate={{ rotate: prosOpen ? 180 : 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          <ChevronDown size={12} />
-                        </motion.div>
-                        {prosOpen ? 'Ocultar' : 'Ver'} pros y contras
-                      </button>
-
-                      <AnimatePresence>
-                        {prosOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="grid grid-cols-2 gap-2 pt-1">
-                              <div className="space-y-1">
-                                {option.pros.map((pro) => (
-                                  <p
-                                    key={pro}
-                                    className="text-[10px] text-emerald-400 flex items-start gap-1"
-                                  >
-                                    <span className="shrink-0 mt-0.5">+</span>
-                                    <span>{pro}</span>
-                                  </p>
-                                ))}
-                              </div>
-                              <div className="space-y-1">
-                                {option.cons.map((con) => (
-                                  <p
-                                    key={con}
-                                    className="text-[10px] text-red-400 flex items-start gap-1"
-                                  >
-                                    <span className="shrink-0 mt-0.5">−</span>
-                                    <span>{con}</span>
-                                  </p>
-                                ))}
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Card>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
