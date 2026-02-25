@@ -2,6 +2,7 @@ import {
   BASE_SENSITIVITY,
   SENSITIVITY_MIN,
   SENSITIVITY_MAX,
+  RAM_FACTORS,
 } from '@ares/config';
 
 import type { AlgorithmInput, AlgorithmOutput, SensitivityOutput } from './types';
@@ -10,77 +11,80 @@ import { calculatePerformanceScore } from './device-analyzer';
 import { generateGyroscope } from './gyroscope-engine';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES SENSITIVITY ENGINE v1.0
+// ARES SENSITIVITY ENGINE v2.0
 // ═══════════════════════════════════════════════════════════════
 //
-// FÓRMULA CORE:
-//   Para cada campo (general, redPoint, scope2x, etc.):
-//     rawValue = BASE + (hzFactor × W_hz) + (screenFactor × W_screen)
-//                + (ramFactor × W_ram) + (panelBonus) + (tierBonus)
-//     styledValue = rawValue × styleMultiplier[field]
-//     finalValue = clamp(round(styledValue), 1, 100)
+// RANGO: 60-190 (valores reales de Free Fire)
+//
+// FÓRMULA CORE (por campo):
+//   rawValue = BASE[field]
+//     + (hzFactor × weights[0])
+//     + (screenFactor × weights[1])
+//     + ramOffset
+//     + panelBonus
+//     + tierBonus
+//
+//   styledValue = rawValue × styleMultiplier[field]
+//   finalValue = clamp(round(styledValue), 60, 190)
 //
 // FACTORES:
-//   hzFactor:     (deviceHz - 60) / 120 → normalizado 0-1 (60Hz=0, 180Hz=1)
-//   screenFactor: (6.7 - deviceSize) / 2.0 → pantalla más chica = más sensible
-//   ramFactor:    (deviceRam - 3) / 13 → normalizado 0-1 (3GB=0, 16GB=1)
-//   panelBonus:   AMOLED/OLED=+3, LTPO=+4, IPS=+1, LCD=0
-//   tierBonus:    GAMING=+8, ULTRA=+6, HIGH=+4, MID=+1, LOW=-2
-//
-// PESOS por campo:
-//   general:     hz=15, screen=10, ram=8
-//   redPoint:    hz=12, screen=12, ram=6
-//   scope2x:     hz=10, screen=14, ram=5
-//   scope4x:     hz=8,  screen=16, ram=4
-//   sniperScope: hz=6,  screen=18, ram=3
-//   freeView:    hz=18, screen=6,  ram=10
+//   hzFactor:     (deviceHz - 60) / 120 → normalizado 0-1
+//   screenFactor: (6.5 - deviceSize) / 2.0 → pantalla más chica = más sensible
+//   ramOffset:    RAM_FACTORS[ramGb] directamente (-15 a +10)
+//   panelBonus:   LTPO=+6, AMOLED=+5, OLED=+5, IPS=+2, LCD=0
+//   tierBonus:    GAMING=+12, ULTRA=+9, HIGH=+6, MID=+2, LOW=-4
 
-// Pesos por campo de sensibilidad: [hz, screen, ram]
-const FIELD_WEIGHTS: Record<keyof SensitivityOutput, [number, number, number]> = {
-  general:     [15, 10, 8],
-  redPoint:    [12, 12, 6],
-  scope2x:     [10, 14, 5],
-  scope4x:     [8,  16, 4],
-  sniperScope: [6,  18, 3],
-  freeView:    [18, 6,  10],
+// Pesos por campo de sensibilidad: [hz, screen]
+const FIELD_WEIGHTS: Record<keyof SensitivityOutput, [number, number]> = {
+  general:     [20, 12],
+  redPoint:    [16, 15],
+  scope2x:     [14, 18],
+  scope4x:     [10, 20],
+  sniperScope: [8,  22],
+  freeView:    [24, 8],
 };
 
 // Bonus por tipo de panel
 const PANEL_BONUS: Record<string, number> = {
-  LTPO:   4,
-  AMOLED: 3,
-  OLED:   3,
-  IPS:    1,
+  LTPO:   6,
+  AMOLED: 5,
+  OLED:   5,
+  IPS:    2,
   LCD:    0,
 };
 
 // Bonus por tier del dispositivo
 const TIER_BONUS: Record<string, number> = {
-  GAMING: 8,
-  ULTRA:  6,
-  HIGH:   4,
-  MID:    1,
-  LOW:   -2,
+  GAMING: 12,
+  ULTRA:  9,
+  HIGH:   6,
+  MID:    2,
+  LOW:   -4,
 };
 
 function clamp(value: number, min: number, max: number): number {
   return Math.round(Math.max(min, Math.min(max, value)));
 }
 
+/** Obtiene el offset de RAM, fallback a 0 si la RAM no está en el mapa */
+function getRamOffset(ramGb: number): number {
+  return RAM_FACTORS[ramGb] ?? 0;
+}
+
 function calculateField(
   base: number,
   hzFactor: number,
   screenFactor: number,
-  ramFactor: number,
+  ramOffset: number,
   panelBonus: number,
   tierBonus: number,
-  weights: [number, number, number],
+  weights: [number, number],
   styleMultiplier: number,
 ): number {
   const raw = base
     + (hzFactor * weights[0])
     + (screenFactor * weights[1])
-    + (ramFactor * weights[2])
+    + ramOffset
     + panelBonus
     + tierBonus;
 
@@ -88,13 +92,15 @@ function calculateField(
 }
 
 export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
-  const { specs, style, includeGyro } = input;
+  const { specs, style, includeGyro, userRam } = input;
 
-  // Calcular factores normalizados (rango 0 a 1)
+  // Usar userRam si viene, sino el RAM del device
+  const effectiveRam = userRam ?? specs.ramGb;
+
+  // Calcular factores
   const hzFactor = Math.max(0, Math.min(1, (specs.screenHz - 60) / 120));
-  const screenFactor = Math.max(-0.5, Math.min(1, (6.7 - specs.screenSize) / 2.0));
-  const ramFactor = Math.max(0, Math.min(1, (specs.ramGb - 3) / 13));
-
+  const screenFactor = Math.max(-0.5, Math.min(1, (6.5 - specs.screenSize) / 2.0));
+  const ramOffset = getRamOffset(effectiveRam);
   const panelBonus = PANEL_BONUS[specs.panelType] ?? 0;
   const tierBonus = TIER_BONUS[specs.tier] ?? 0;
 
@@ -104,27 +110,27 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
   // Calcular cada campo de sensibilidad
   const sensitivity: SensitivityOutput = {
     general: calculateField(
-      BASE_SENSITIVITY.general, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.general, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.general, multipliers.general,
     ),
     redPoint: calculateField(
-      BASE_SENSITIVITY.redPoint, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.redPoint, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.redPoint, multipliers.redPoint,
     ),
     scope2x: calculateField(
-      BASE_SENSITIVITY.scope2x, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.scope2x, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.scope2x, multipliers.scope2x,
     ),
     scope4x: calculateField(
-      BASE_SENSITIVITY.scope4x, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.scope4x, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.scope4x, multipliers.scope4x,
     ),
     sniperScope: calculateField(
-      BASE_SENSITIVITY.sniperScope, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.sniperScope, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.sniperScope, multipliers.sniperScope,
     ),
     freeView: calculateField(
-      BASE_SENSITIVITY.freeView, hzFactor, screenFactor, ramFactor,
+      BASE_SENSITIVITY.freeView, hzFactor, screenFactor, ramOffset,
       panelBonus, tierBonus, FIELD_WEIGHTS.freeView, multipliers.freeView,
     ),
   };
@@ -139,7 +145,7 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
       performanceScore: calculatePerformanceScore(specs),
       styleApplied: style,
       deviceTier: specs.tier,
-      algorithm: 'ARES-v1.0',
+      algorithm: 'ARES-v2.0',
     },
   };
 }

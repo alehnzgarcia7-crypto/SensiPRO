@@ -3,39 +3,41 @@ import {
   GYRO_PANEL_BONUS,
   GYRO_GAMING_BONUS,
   SENSITIVITY_MIN,
-  SENSITIVITY_MAX,
+  GYRO_MAX,
 } from '@ares/config';
 
 import type { SensitivityOutput, GyroscopeOutput, DeviceSpecs } from './types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES GYROSCOPE ENGINE v1.0
+// ARES GYROSCOPE ENGINE v2.0
 // ═══════════════════════════════════════════════════════════
 //
+// RANGO: 60-140 (giroscopio es más conservador que sensibilidad)
+//
 // FÓRMULA:
-//   gyroValue = sensitivityValue × GYRO_BASE_FACTOR (0.50)
+//   gyroValue = sensitivityValue × GYRO_BASE_FACTOR (0.35)
 //             + panelBonus (AMOLED/OLED = +5%)
 //             + gamingBonus (GAMING tier = +8%)
-//             + fieldAdjustment (varies per scope type)
+//             + fieldAdjustment
 //
-// FIELD ADJUSTMENTS:
-//   gyroGeneral:   +2  (necesita algo más de sensibilidad)
-//   gyroRedPoint:  +0  (neutral)
-//   gyroScope2x:   -1  (ligeramente más estable)
-//   gyroScope4x:   -3  (requiere más estabilidad)
-//   gyroSniper:    -5  (máxima estabilidad para sniper)
-//   gyroFreeView:  +3  (más libertad de movimiento)
+// FIELD ADJUSTMENTS (escalados para rango 60-190 → gyro 60-140):
+//   gyroGeneral:   +4
+//   gyroRedPoint:  +0
+//   gyroScope2x:   -3
+//   gyroScope4x:   -6
+//   gyroSniper:    -10
+//   gyroFreeView:  +6
 //
 // NOTA: Giroscopio es feature PREMIUM. Los valores se calculan
 // siempre pero solo se muestran a usuarios Premium/VIP.
 
 const FIELD_ADJUSTMENTS: Record<keyof GyroscopeOutput, number> = {
-  gyroGeneral:   2,
+  gyroGeneral:   4,
   gyroRedPoint:  0,
-  gyroScope2x:  -1,
-  gyroScope4x:  -3,
-  gyroSniper:   -5,
-  gyroFreeView:  3,
+  gyroScope2x:  -3,
+  gyroScope4x:  -6,
+  gyroSniper:  -10,
+  gyroFreeView:  6,
 };
 
 // Map gyro fields to their sensitivity counterparts
@@ -75,7 +77,7 @@ export function generateGyroscope(
     result[key] = clamp(
       baseValue * totalFactor + adjustment,
       SENSITIVITY_MIN,
-      SENSITIVITY_MAX,
+      GYRO_MAX,
     );
   }
 

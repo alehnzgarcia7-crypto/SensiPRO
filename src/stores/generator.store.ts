@@ -62,6 +62,9 @@ interface GeneratorStore {
   calibration: CalibrationLevel;
   dpiMode: boolean;
 
+  // RAM seleccionada por el usuario (override del valor del device)
+  userRam: number | null;
+
   isLoading: boolean;
   error: string | null;
 
@@ -70,6 +73,7 @@ interface GeneratorStore {
   selectDevice: (device: SelectedDevice) => void;
   selectStyle: (style: SensitivityStyle) => void;
   setIncludeGyro: (value: boolean) => void;
+  setUserRam: (ram: number) => void;
   setResult: (result: GeneratorResult) => void;
   setAllCalibrations: (data: AllCalibrationsResult) => void;
   setCalibration: (calibration: CalibrationLevel) => void;
@@ -93,6 +97,7 @@ const initialState = {
   allCalibrations: null as AllCalibrationsResult | null,
   calibration: 'MEDIA' as CalibrationLevel,
   dpiMode: false,
+  userRam: null as number | null,
   isLoading: false,
   error: null as string | null,
 };
@@ -113,10 +118,12 @@ export const useGeneratorStore = create<GeneratorStore>((set, get) => ({
     step: 3,
     result: null,
     allCalibrations: null,
+    userRam: device.ramGb,
   }),
 
   selectStyle: (style) => set({ selectedStyle: style }),
   setIncludeGyro: (value) => set({ includeGyro: value }),
+  setUserRam: (ram) => set({ userRam: ram }),
   setResult: (result) => set({ result, isLoading: false }),
 
   setAllCalibrations: (data) => set({

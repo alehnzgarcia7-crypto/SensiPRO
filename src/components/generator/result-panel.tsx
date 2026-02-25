@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/card';
 import { CountUp } from '@/components/effects/count-up';
 import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
+import { RamSelector } from './ram-selector';
 import { HudRecommendationPanel } from './hud-recommendation';
 
 interface ResultPanelProps {
@@ -42,8 +43,10 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     allCalibrations,
     calibration,
     dpiMode,
+    userRam,
     setCalibration,
     setDpiMode,
+    setUserRam,
     getCurrentCombination,
   } = useGeneratorStore();
 
@@ -80,6 +83,15 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         </div>
       </div>
 
+      {/* Selector de RAM */}
+      <Card variant="default" className="p-4">
+        <RamSelector
+          value={userRam}
+          onChange={setUserRam}
+          suggestedRam={selectedDevice.ramGb}
+        />
+      </Card>
+
       {/* Controles de calibración y DPI — reactivos, sin reload */}
       <Card variant="default" className="p-4 space-y-4">
         <CalibrationSelector value={calibration} onChange={setCalibration} />
@@ -107,7 +119,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                   <CountUp end={value} duration={600} />
                 </span>
               </div>
-              <Progress value={value} max={100} size="sm" color="gradient" />
+              <Progress value={value} max={190} size="sm" color="gradient" />
             </motion.div>
           ))}
         </div>
@@ -177,7 +189,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     <CountUp end={value} duration={600} />
                   </span>
                 </div>
-                <Progress value={value} max={100} size="sm" color="ice" />
+                <Progress value={value} max={140} size="sm" color="ice" />
               </motion.div>
             ))}
           </div>

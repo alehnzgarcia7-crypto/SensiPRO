@@ -1,18 +1,18 @@
 import type { CalibrationLevel } from '@prisma/client';
 
 import {
-  CALIBRATION_MULTIPLIERS,
+  CALIBRATION_OFFSETS,
+  CALIBRATION_RANGES,
+  DPI_OFFSET,
   DPI_FORMULA_FACTOR,
   DPI_FORMULA_BASE,
   DPI_MIN,
   DPI_MAX,
-  DPI_REDUCTION_FACTOR,
   DPI_PRECISION_BONUS,
   BUTTON_SIZE_MAP,
   HUD_THRESHOLD_SMALL,
   HUD_THRESHOLD_LARGE,
   SENSITIVITY_MIN,
-  SENSITIVITY_MAX,
 } from '@ares/config';
 
 import type {
@@ -29,12 +29,16 @@ import { generateGyroscope } from './gyroscope-engine';
 import { calculatePerformanceScore } from './device-analyzer';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES CALIBRATION ENGINE v1.0
+// ARES CALIBRATION ENGINE v2.0
 // ═══════════════════════════════════════════════════════════════
 //
 // Genera 6 combinaciones: BAJA×sinDPI, BAJA×conDPI,
 //                         MEDIA×sinDPI, MEDIA×conDPI,
 //                         ALTA×sinDPI, ALTA×conDPI
+//
+// BAJA:  offset -50, clamp 60-140
+// MEDIA: offset  0,  clamp 141-165
+// ALTA:  offset +30, clamp 166-190
 
 const CALIBRATION_LEVELS: CalibrationLevel[] = ['BAJA', 'MEDIA', 'ALTA'];
 const DPI_MODES = [false, true] as const;
@@ -43,37 +47,44 @@ function clamp(value: number, min: number, max: number): number {
   return Math.round(Math.max(min, Math.min(max, value)));
 }
 
-/** Aplica el multiplicador de calibración a todos los campos de sensibilidad */
+/** Aplica offset de calibración + clamp al rango correspondiente */
 function applyCalibratedSensitivity(
   baseSensitivity: SensitivityOutput,
   calibration: CalibrationLevel,
 ): SensitivityOutput {
-  const multiplier = CALIBRATION_MULTIPLIERS[calibration];
+  const offset = CALIBRATION_OFFSETS[calibration];
+  const range = CALIBRATION_RANGES[calibration];
+
   return {
-    general: clamp(baseSensitivity.general * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    redPoint: clamp(baseSensitivity.redPoint * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope2x: clamp(baseSensitivity.scope2x * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope4x: clamp(baseSensitivity.scope4x * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    sniperScope: clamp(baseSensitivity.sniperScope * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    freeView: clamp(baseSensitivity.freeView * multiplier, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    general: clamp(baseSensitivity.general + offset, range.min, range.max),
+    redPoint: clamp(baseSensitivity.redPoint + offset, range.min, range.max),
+    scope2x: clamp(baseSensitivity.scope2x + offset, range.min, range.max),
+    scope4x: clamp(baseSensitivity.scope4x + offset, range.min, range.max),
+    sniperScope: clamp(baseSensitivity.sniperScope + offset, range.min, range.max),
+    freeView: clamp(baseSensitivity.freeView + offset, range.min, range.max),
   };
 }
 
-/** Reduce sensibilidad cuando DPI está activo (el DPI amplifica el input del touch) */
-function applyDpiReduction(sensitivity: SensitivityOutput): SensitivityOutput {
+/** Reduce sensibilidad cuando DPI está activo (offset fijo, clamped al rango de calibración) */
+function applyDpiReduction(
+  sensitivity: SensitivityOutput,
+  calibration: CalibrationLevel,
+): SensitivityOutput {
+  const range = CALIBRATION_RANGES[calibration];
+
   return {
-    general: clamp(sensitivity.general * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    redPoint: clamp(sensitivity.redPoint * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope2x: clamp(sensitivity.scope2x * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope4x: clamp(sensitivity.scope4x * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    sniperScope: clamp(sensitivity.sniperScope * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    freeView: clamp(sensitivity.freeView * DPI_REDUCTION_FACTOR, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    general: clamp(sensitivity.general + DPI_OFFSET, range.min, range.max),
+    redPoint: clamp(sensitivity.redPoint + DPI_OFFSET, range.min, range.max),
+    scope2x: clamp(sensitivity.scope2x + DPI_OFFSET, range.min, range.max),
+    scope4x: clamp(sensitivity.scope4x + DPI_OFFSET, range.min, range.max),
+    sniperScope: clamp(sensitivity.sniperScope + DPI_OFFSET, range.min, range.max),
+    freeView: clamp(sensitivity.freeView + DPI_OFFSET, range.min, range.max),
   };
 }
 
 /** Calcula DPI óptimo basado en PPI y screenSize del dispositivo */
 export function calculateDpi(specs: DeviceSpecs): number {
-  const ppi = specs.ppi ?? 400; // Fallback razonable si no hay PPI
+  const ppi = specs.ppi ?? 400;
   const rawDpi = Math.round((ppi / specs.screenSize) * DPI_FORMULA_FACTOR + DPI_FORMULA_BASE);
   return clamp(rawDpi, DPI_MIN, DPI_MAX);
 }
@@ -84,9 +95,11 @@ export function calculateButtonSize(screenSize: number): number {
   return entry?.sizeMm ?? 54;
 }
 
-/** Calcula precision score (inverso de velocidad: más sensi = menos precisión, DPI da bonus) */
+/** Calcula precision score para rango 60-190 (inverso: más sensi = menos precisión) */
 export function calculatePrecisionScore(sensitivity: SensitivityOutput, dpiMode = false): number {
-  const base = 100 - sensitivity.general * 0.8;
+  // Normalizar general de rango 60-190 a 0-100, luego invertir
+  const normalized = (sensitivity.general - SENSITIVITY_MIN) / 130;
+  const base = 100 - normalized * 80;
   const bonus = dpiMode ? DPI_PRECISION_BONUS : 0;
   return clamp(base + bonus, 0, 100);
 }
@@ -129,7 +142,6 @@ export function generateHudRecommendation(screenSize: number): HudRecommendation
       description: 'Nivel élite: 2 pulgares + 2 índices + 1 medio. Control absoluto.',
       pros: ['Máximo multitasking posible', 'Dominio total del HUD', 'Ventaja en torneos competitivos'],
       cons: ['Curva de aprendizaje extrema', 'Requiere tablet o pantalla >6.5"', 'Fatiga rápida sin práctica constante'],
-      // 5 dedos nunca es auto-recomendado (solo para expertos)
       isRecommended: false,
     },
   ];
@@ -139,20 +151,20 @@ export function generateHudRecommendation(screenSize: number): HudRecommendation
 
 /** Genera una sola combinación de calibración */
 export function generateCalibration(input: CalibrationInput): CalibrationResult {
-  const { specs, style, calibration, dpiMode, includeGyro } = input;
+  const { specs, style, calibration, dpiMode, includeGyro, userRam } = input;
 
-  // Generar sensibilidad base con el motor existente
-  const baseResult = generateSensitivity({ specs, style, includeGyro });
+  // Generar sensibilidad base con el motor v2.0 (rango 60-190)
+  const baseResult = generateSensitivity({ specs, style, includeGyro, userRam });
 
-  // Aplicar multiplicador de calibración
+  // Aplicar offset de calibración + clamp al rango
   const calibratedSensitivity = applyCalibratedSensitivity(
     baseResult.sensitivity,
     calibration,
   );
 
-  // Aplicar reducción DPI si está activo (DPI amplifica input → sensibilidad más baja)
+  // Aplicar reducción DPI si está activo (offset fijo, clamped al rango de calibración)
   const finalSensitivity = dpiMode
-    ? applyDpiReduction(calibratedSensitivity)
+    ? applyDpiReduction(calibratedSensitivity, calibration)
     : calibratedSensitivity;
 
   // Recalcular giroscopio sobre valores finales si aplica
@@ -162,7 +174,6 @@ export function generateCalibration(input: CalibrationInput): CalibrationResult 
 
   const dpiValue = dpiMode ? calculateDpi(specs) : null;
   const buttonSize = calculateButtonSize(specs.screenSize);
-  // CON DPI = más precisión (score más alto) porque valores más bajos = más control
   const precisionScore = calculatePrecisionScore(finalSensitivity, dpiMode);
 
   return {
@@ -182,13 +193,14 @@ export function generateAllCalibrations(
   specs: DeviceSpecs,
   style: CalibrationInput['style'],
   includeGyro: boolean,
+  userRam?: number,
 ): GenerateAllOutput {
   const combinations: CalibrationResult[] = [];
 
   for (const calibration of CALIBRATION_LEVELS) {
     for (const dpiMode of DPI_MODES) {
       combinations.push(
-        generateCalibration({ specs, style, calibration, dpiMode, includeGyro }),
+        generateCalibration({ specs, style, calibration, dpiMode, includeGyro, userRam }),
       );
     }
   }
@@ -202,7 +214,7 @@ export function generateAllCalibrations(
     meta: {
       styleApplied: style,
       deviceTier: specs.tier,
-      algorithm: 'ARES-v1.1-calibration',
+      algorithm: 'ARES-v2.0-calibration',
     },
   };
 }

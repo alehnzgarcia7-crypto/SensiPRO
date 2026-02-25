@@ -5,8 +5,8 @@ import { getStyleMultipliers, getAllStyles } from '../style-system';
 import type { AlgorithmInput, SensitivityOutput } from '../types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES-804 — Tests de Sensibilidad Comprensivos
-// Cubre: edge cases, hardware factors, style interactions
+// ARES v2.0 — Tests de Sensibilidad Comprensivos
+// Rango: 60-190 (valores reales de Free Fire)
 // ═══════════════════════════════════════════════════════════
 
 const baseDevice: AlgorithmInput = {
@@ -24,7 +24,7 @@ const extremeLowEnd: AlgorithmInput = {
   style: 'BALANCED',
 };
 
-describe('generateSensitivity — campos y rangos', () => {
+describe('generateSensitivity — campos y rangos (60-190)', () => {
   it('retorna todas las keys de sensibilidad requeridas', () => {
     const result = generateSensitivity(baseDevice);
     expect(result.sensitivity).toHaveProperty('general');
@@ -35,27 +35,27 @@ describe('generateSensitivity — campos y rangos', () => {
     expect(result.sensitivity).toHaveProperty('freeView');
   });
 
-  it('todos los valores están entre 1-100 para device base', () => {
+  it('todos los valores están entre 60-190 para device base', () => {
     const result = generateSensitivity(baseDevice);
     Object.values(result.sensitivity).forEach((val) => {
-      expect(val).toBeGreaterThanOrEqual(1);
-      expect(val).toBeLessThanOrEqual(100);
+      expect(val).toBeGreaterThanOrEqual(60);
+      expect(val).toBeLessThanOrEqual(190);
     });
   });
 
   it('todos los valores clampeados para device ultra high-end AGGRESSIVE', () => {
     const result = generateSensitivity(ultraHighEnd);
     Object.values(result.sensitivity).forEach((val) => {
-      expect(val).toBeGreaterThanOrEqual(1);
-      expect(val).toBeLessThanOrEqual(100);
+      expect(val).toBeGreaterThanOrEqual(60);
+      expect(val).toBeLessThanOrEqual(190);
     });
   });
 
   it('todos los valores clampeados para extreme low-end', () => {
     const result = generateSensitivity(extremeLowEnd);
     Object.values(result.sensitivity).forEach((val) => {
-      expect(val).toBeGreaterThanOrEqual(1);
-      expect(val).toBeLessThanOrEqual(100);
+      expect(val).toBeGreaterThanOrEqual(60);
+      expect(val).toBeLessThanOrEqual(190);
     });
   });
 
@@ -104,8 +104,8 @@ describe('generateSensitivity — estilos de juego', () => {
     expect(styles).toHaveLength(3);
     styles.forEach((style) => {
       const result = generateSensitivity({ ...baseDevice, style });
-      expect(result.sensitivity.general).toBeGreaterThanOrEqual(1);
-      expect(result.sensitivity.general).toBeLessThanOrEqual(100);
+      expect(result.sensitivity.general).toBeGreaterThanOrEqual(60);
+      expect(result.sensitivity.general).toBeLessThanOrEqual(190);
     });
   });
 });
@@ -123,7 +123,6 @@ describe('generateSensitivity — factores de hardware', () => {
   it('144Hz produce valores mayores o iguales que 60Hz', () => {
     const hz60 = generateSensitivity({ specs: { ...baseDevice.specs, screenHz: 60 }, style: 'BALANCED' });
     const hz144 = generateSensitivity({ specs: { ...baseDevice.specs, screenHz: 144 }, style: 'BALANCED' });
-    // freeView tiene peso de Hz=18, debe ser claramente mayor
     expect(hz144.sensitivity.freeView).toBeGreaterThanOrEqual(hz60.sensitivity.freeView);
   });
 
@@ -164,7 +163,7 @@ describe('generateSensitivity — factores de hardware', () => {
   });
 });
 
-describe('generateSensitivity — giroscopio', () => {
+describe('generateSensitivity — giroscopio (60-140)', () => {
   it('retorna null para giroscopio cuando no se solicita', () => {
     const result = generateSensitivity(baseDevice);
     expect(result.gyroscope).toBeNull();
@@ -183,7 +182,7 @@ describe('generateSensitivity — giroscopio', () => {
     }
   });
 
-  it('valores de giroscopio son menores que sensibilidad normal (~50%)', () => {
+  it('valores de giroscopio son menores que sensibilidad normal', () => {
     const result = generateSensitivity({ ...baseDevice, includeGyro: true });
     if (result.gyroscope) {
       expect(result.gyroscope.gyroGeneral).toBeLessThan(result.sensitivity.general);
@@ -191,12 +190,12 @@ describe('generateSensitivity — giroscopio', () => {
     }
   });
 
-  it('giroscopio valores entre 1 y 100', () => {
+  it('giroscopio valores entre 60 y 140', () => {
     const result = generateSensitivity({ ...ultraHighEnd, includeGyro: true });
     if (result.gyroscope) {
       Object.values(result.gyroscope).forEach((val) => {
-        expect(val).toBeGreaterThanOrEqual(1);
-        expect(val).toBeLessThanOrEqual(100);
+        expect(val).toBeGreaterThanOrEqual(60);
+        expect(val).toBeLessThanOrEqual(140);
       });
     }
   });
@@ -205,7 +204,7 @@ describe('generateSensitivity — giroscopio', () => {
 describe('generateSensitivity — meta y determinismo', () => {
   it('meta incluye todos los campos requeridos', () => {
     const result = generateSensitivity(baseDevice);
-    expect(result.meta.algorithm).toBe('ARES-v1.0');
+    expect(result.meta.algorithm).toBe('ARES-v2.0');
     expect(result.meta.styleApplied).toBe('BALANCED');
     expect(result.meta.deviceTier).toBe('MID');
     expect(typeof result.meta.performanceScore).toBe('number');

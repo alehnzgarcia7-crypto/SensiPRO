@@ -7,9 +7,38 @@ export const APP_NAME = 'Sensibilidades PRO';
 export const APP_CODENAME = 'ARES';
 export const APP_DOMAIN = 'sensibilidadespro.com';
 
-// Sensitivity ranges
-export const SENSITIVITY_MIN = 1;
-export const SENSITIVITY_MAX = 100;
+// Sensitivity ranges (Free Fire usa 60-190)
+export const SENSITIVITY_MIN = 60;
+export const SENSITIVITY_MAX = 190;
+
+// Gyroscope max (giroscopio no debería superar 140)
+export const GYRO_MAX = 140;
+
+// Calibration ranges por nivel
+export const CALIBRATION_RANGES = {
+  BAJA: { min: 60, max: 140 },
+  MEDIA: { min: 141, max: 165 },
+  ALTA: { min: 166, max: 190 },
+} as const;
+
+// Calibration offsets (reemplazan los multiplicadores viejos)
+export const CALIBRATION_OFFSETS = {
+  BAJA: -50,
+  MEDIA: 0,
+  ALTA: 30,
+} as const;
+
+// RAM options disponibles y sus offsets para el algoritmo
+export const RAM_OPTIONS = [2, 3, 4, 6, 8, 12, 16] as const;
+export const RAM_FACTORS: Record<number, number> = {
+  2: -15,
+  3: -10,
+  4: -5,
+  6: 0,
+  8: 5,
+  12: 8,
+  16: 10,
+};
 
 // Tier limits
 export const FREE_SEARCH_LIMIT = 5;
@@ -50,30 +79,23 @@ export const MAX_PAGE_SIZE = 100;
 // Rate limiting
 export const RATE_LIMIT_WINDOW_SECONDS = 86400; // 24 hours
 
-// Sensitivity algorithm base values
+// Sensitivity algorithm base values (rango 60-190, MEDIA cae ~141-165)
 export const BASE_SENSITIVITY = {
-  general: 50,
-  redPoint: 45,
-  scope2x: 40,
-  scope4x: 35,
-  sniperScope: 30,
-  freeView: 55,
+  general: 150,
+  redPoint: 140,
+  scope2x: 125,
+  scope4x: 110,
+  sniperScope: 95,
+  freeView: 160,
 } as const;
 
-// Gyroscope base factor
-export const GYRO_BASE_FACTOR = 0.50;
+// Gyroscope base factor (proporción de sensibilidad → gyro, valores 60-140)
+export const GYRO_BASE_FACTOR = 0.35;
 export const GYRO_PANEL_BONUS = 0.05;     // AMOLED/OLED
 export const GYRO_GAMING_BONUS = 0.08;    // GAMING tier
 
-// Calibration multipliers (BAJA=precisión, MEDIA=base, ALTA=velocidad)
-export const CALIBRATION_MULTIPLIERS = {
-  BAJA: 0.72,
-  MEDIA: 1.0,
-  ALTA: 1.28,
-} as const;
-
-// DPI reduction: when DPI is active, touch input is amplified → sensitivity must be lower
-export const DPI_REDUCTION_FACTOR = 0.82;
+// DPI reduction: offset fijo cuando DPI activo (resta 12 a cada valor)
+export const DPI_OFFSET = -12;
 // DPI precision bonus (CON DPI = more precise, higher precisionScore)
 export const DPI_PRECISION_BONUS = 8;
 

@@ -13,6 +13,7 @@ export interface AlgorithmInput {
   specs: DeviceSpecs;
   style: SensitivityStyle;
   includeGyro?: boolean;
+  userRam?: number;
 }
 
 export interface CalibrationInput {
@@ -21,6 +22,7 @@ export interface CalibrationInput {
   calibration: CalibrationLevel;
   dpiMode: boolean;
   includeGyro?: boolean;
+  userRam?: number;
 }
 
 export interface SensitivityOutput {

@@ -23,7 +23,7 @@ const ultraDevice: AlgorithmInput = {
   style: 'BALANCED',
 };
 
-describe('generateSensitivity', () => {
+describe('generateSensitivity v2.0', () => {
   it('retorna los 6 campos de sensibilidad', () => {
     const result = generateSensitivity(midDevice);
     expect(result.sensitivity).toHaveProperty('general');
@@ -34,12 +34,12 @@ describe('generateSensitivity', () => {
     expect(result.sensitivity).toHaveProperty('freeView');
   });
 
-  it('todos los valores están entre 1 y 100', () => {
+  it('todos los valores están entre 60 y 190', () => {
     const result = generateSensitivity(gamingDevice);
     const values = Object.values(result.sensitivity);
     values.forEach((v) => {
-      expect(v).toBeGreaterThanOrEqual(1);
-      expect(v).toBeLessThanOrEqual(100);
+      expect(v).toBeGreaterThanOrEqual(60);
+      expect(v).toBeLessThanOrEqual(190);
     });
   });
 
@@ -47,8 +47,8 @@ describe('generateSensitivity', () => {
     const result = generateSensitivity({ ...ultraDevice, style: 'AGGRESSIVE' });
     const values = Object.values(result.sensitivity);
     values.forEach((v) => {
-      expect(v).toBeGreaterThanOrEqual(1);
-      expect(v).toBeLessThanOrEqual(100);
+      expect(v).toBeGreaterThanOrEqual(60);
+      expect(v).toBeLessThanOrEqual(190);
     });
   });
 
@@ -73,16 +73,15 @@ describe('generateSensitivity', () => {
 
   it('estilo balanceado no modifica valores (multiplier 1.0)', () => {
     const balanced = generateSensitivity(midDevice);
-    // Los valores balanceados deben estar entre agresivo y sniper
     const aggressive = generateSensitivity({ ...midDevice, style: 'AGGRESSIVE' });
     const sniper = generateSensitivity({ ...midDevice, style: 'SNIPER' });
     expect(balanced.sensitivity.general).toBeLessThanOrEqual(aggressive.sensitivity.general);
     expect(balanced.sensitivity.general).toBeGreaterThanOrEqual(sniper.sensitivity.general);
   });
 
-  it('incluye meta información correcta', () => {
+  it('incluye meta información correcta (v2.0)', () => {
     const result = generateSensitivity(gamingDevice);
-    expect(result.meta.algorithm).toBe('ARES-v1.0');
+    expect(result.meta.algorithm).toBe('ARES-v2.0');
     expect(result.meta.styleApplied).toBe('BALANCED');
     expect(result.meta.deviceTier).toBe('GAMING');
     expect(result.meta.performanceScore).toBeGreaterThan(0);
@@ -113,13 +112,13 @@ describe('generateSensitivity', () => {
     }
   });
 
-  it('valores de giroscopio están entre 1 y 100', () => {
+  it('valores de giroscopio están entre 60 y 140', () => {
     const result = generateSensitivity({ ...gamingDevice, includeGyro: true });
     if (result.gyroscope) {
       const values = Object.values(result.gyroscope);
       values.forEach((v) => {
-        expect(v).toBeGreaterThanOrEqual(1);
-        expect(v).toBeLessThanOrEqual(100);
+        expect(v).toBeGreaterThanOrEqual(60);
+        expect(v).toBeLessThanOrEqual(140);
       });
     }
   });
@@ -137,14 +136,12 @@ describe('generateSensitivity', () => {
     expect(gaming.meta.performanceScore).toBeGreaterThan(low.meta.performanceScore);
   });
 
-  it('freeView tiene peso de Hz alto (18), general (15), scope decrece', () => {
-    // Dispositivo con Hz alto pero RAM baja — freeView debe ser relativamente alto
+  it('freeView tiene peso de Hz alto, general medio, scope decrece', () => {
     const highHz: AlgorithmInput = {
       specs: { screenHz: 144, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'MID' },
       style: 'BALANCED',
     };
     const result = generateSensitivity(highHz);
-    // freeView tiene peso hz=18, ram=10, así que la frecuencia alta debería compensar
     expect(result.sensitivity.freeView).toBeGreaterThan(result.sensitivity.sniperScope);
   });
 
@@ -160,5 +157,18 @@ describe('generateSensitivity', () => {
     const resultAmoled = generateSensitivity(amoled);
     const resultLcd = generateSensitivity(lcd);
     expect(resultAmoled.sensitivity.general).toBeGreaterThan(resultLcd.sensitivity.general);
+  });
+
+  it('userRam override cambia el resultado', () => {
+    const withDeviceRam = generateSensitivity(midDevice);
+    const withUserRam = generateSensitivity({ ...midDevice, userRam: 2 });
+    // 2GB RAM debería producir valores más bajos que 6GB
+    expect(withUserRam.sensitivity.general).toBeLessThan(withDeviceRam.sensitivity.general);
+  });
+
+  it('userRam 16GB produce valores más altos que userRam 2GB', () => {
+    const low = generateSensitivity({ ...midDevice, userRam: 2 });
+    const high = generateSensitivity({ ...midDevice, userRam: 16 });
+    expect(high.sensitivity.general).toBeGreaterThan(low.sensitivity.general);
   });
 });
