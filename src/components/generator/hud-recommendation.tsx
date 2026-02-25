@@ -2,23 +2,23 @@
 
 // ═══════════════════════════════════════════════════════════════
 // ARES — HUD Recommendation Panel — Versión PREMIUM ESPORTS
-// Layout vertical completo con SVG mockup de pantalla Free Fire,
-// barras de stats con gradiente, código de importación y
-// pros/contras colapsables. Diseño nivel competitivo.
+// Ahora con códigos HUD REALES de Free Fire desde la base de datos.
+// Mini-selector de códigos, badge de pro player, instrucciones
+// de importación reales para el juego.
 // ═══════════════════════════════════════════════════════════════
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target } from 'lucide-react';
+import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target, Loader2 } from 'lucide-react';
 
 import type { HudRecommendation } from '@ares/algorithms';
 import { cn } from '@/lib/cn';
+import { useHudCodes } from '@/hooks/use-hud-codes';
 import { FingerLayoutSvg } from './finger-layout-svg';
 import { HudCodeBlock } from './hud-code-block';
 
 interface HudRecommendationPanelProps {
   data: HudRecommendation;
-  deviceId: string;
   screenSize?: number;
 }
 
@@ -43,19 +43,7 @@ const FINGER_META: Record<2 | 3 | 4, { emoji: string; title: string; subtitle: s
   },
 };
 
-interface LayoutStats {
-  precision: number;
-  speed: number;
-  playability: number;
-}
-
-const LAYOUT_STATS: Record<2 | 3 | 4, LayoutStats> = {
-  2: { precision: 60, speed: 40, playability: 95 },
-  3: { precision: 75, speed: 70, playability: 70 },
-  4: { precision: 95, speed: 90, playability: 45 },
-};
-
-const STAT_CONFIG: { key: keyof LayoutStats; label: string; icon: typeof Target }[] = [
+const STAT_CONFIG: { key: 'precision' | 'speed' | 'playability'; label: string; icon: typeof Target }[] = [
   { key: 'precision', label: 'Precisión', icon: Target },
   { key: 'speed', label: 'Velocidad', icon: Zap },
   { key: 'playability', label: 'Jugabilidad', icon: Gamepad2 },
@@ -73,7 +61,6 @@ function StatBar({ value, delay }: { value: number; delay: number }) {
         animate={{ width: `${value}%` }}
         transition={{ duration: 0.8, delay, ease: 'easeOut' }}
       />
-      {/* Glow en la punta */}
       <motion.div
         className="absolute top-0 bottom-0 w-2 rounded-full"
         style={{
@@ -87,7 +74,74 @@ function StatBar({ value, delay }: { value: number; delay: number }) {
   );
 }
 
-export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecommendationPanelProps) {
+function HudCodeSection({ fingers, screenSize }: { fingers: 2 | 3 | 4; screenSize?: number }) {
+  const { codes, recommended, isLoading, error } = useHudCodes({ fingers, screenSize });
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+
+  // Determinar código activo: selección manual > recomendado > primer código
+  const activeCode = selectedIdx !== null ? codes[selectedIdx] : recommended ?? codes[0] ?? null;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 py-3">
+        <Loader2 size={14} className="animate-spin text-ice-400" />
+        <span className="text-[11px] text-slate-500">Cargando códigos HUD...</span>
+      </div>
+    );
+  }
+
+  if (error || !activeCode) {
+    return (
+      <div className="py-2">
+        <p className="text-[11px] text-red-400/70">No se pudieron cargar los códigos HUD</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2.5">
+      {/* Mini-selector si hay múltiples códigos */}
+      {codes.length > 1 && (
+        <div className="flex flex-wrap gap-1.5">
+          {codes.map((c, idx) => {
+            const isActive = activeCode.id === c.id;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setSelectedIdx(idx)}
+                className={cn(
+                  'px-2.5 py-1 rounded-md text-[10px] font-ui font-semibold transition-all min-h-[28px]',
+                  'border',
+                  isActive
+                    ? 'bg-ice-500/15 border-ice-500/40 text-ice-300 shadow-[0_0_8px_rgba(6,182,212,0.15)]'
+                    : 'bg-white/[0.02] border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-400',
+                )}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Descripción del código activo */}
+      {activeCode.description && (
+        <p className="text-[10px] text-slate-500 leading-relaxed">
+          {activeCode.description}
+        </p>
+      )}
+
+      {/* Bloque de código real */}
+      <HudCodeBlock
+        code={activeCode.code}
+        label={activeCode.label}
+        playerName={activeCode.playerName}
+      />
+    </div>
+  );
+}
+
+export function HudRecommendationPanel({ data, screenSize }: HudRecommendationPanelProps) {
   const [expandedPros, setExpandedPros] = useState<Record<number, boolean>>({});
 
   const togglePros = (fingers: number) => {
@@ -107,7 +161,7 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
               CUSTOM HUD
             </h3>
             <p className="text-xs text-slate-500">
-              Configuración óptima para tu dispositivo
+              Códigos HUD reales de Free Fire • Copia y pega directo en el juego
             </p>
           </div>
         </div>
@@ -117,7 +171,7 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
           <Import size={14} className="text-ice-400 shrink-0 mt-0.5" />
           <p className="text-[11px] text-slate-400 leading-relaxed">
             <span className="text-ice-300 font-semibold">Copia el código</span>{' '}
-            → Free Fire → Ajustes → Controles → Importar HUD
+            → Ajustes → En Partida → Usar código compartido → Pegar → Aplicar
           </p>
         </div>
       </div>
@@ -126,7 +180,6 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
       <div className="space-y-4">
         {data.options.map((option, cardIdx) => {
           const meta = FINGER_META[option.fingers];
-          const stats = LAYOUT_STATS[option.fingers];
           const prosOpen = expandedPros[option.fingers] ?? false;
           const isRec = option.isRecommended;
 
@@ -157,7 +210,6 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
               {/* Badge recomendado con glow animado */}
               {isRec && (
                 <div className="relative flex items-center justify-center gap-1.5 py-2 overflow-hidden">
-                  {/* Glow animado de fondo */}
                   <motion.div
                     className="absolute inset-0"
                     style={{
@@ -204,31 +256,10 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
                 </div>
 
                 {/* ═══ STATS BARS — Fila horizontal ═══ */}
-                <div className="grid grid-cols-3 gap-3">
-                  {STAT_CONFIG.map((stat, statIdx) => {
-                    const StatIcon = stat.icon;
-                    return (
-                      <div key={stat.key} className="space-y-1.5">
-                        <div className="flex items-center gap-1">
-                          <StatIcon size={10} className="text-slate-500" />
-                          <span className="text-[10px] text-slate-500 font-ui truncate">
-                            {stat.label}
-                          </span>
-                        </div>
-                        <StatBar
-                          value={stats[stat.key]}
-                          delay={cardIdx * 0.15 + statIdx * 0.08}
-                        />
-                        <span className="text-[11px] font-mono font-bold text-white">
-                          {stats[stat.key]}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                <HudStatsSection fingers={option.fingers} screenSize={screenSize} cardIdx={cardIdx} />
 
-                {/* ═══ CÓDIGO HUD ═══ */}
-                <HudCodeBlock fingers={option.fingers} deviceId={deviceId} />
+                {/* ═══ CÓDIGO HUD REAL ═══ */}
+                <HudCodeSection fingers={option.fingers} screenSize={screenSize} />
 
                 {/* ═══ PROS Y CONTRAS — Colapsable ═══ */}
                 <div>
@@ -258,7 +289,6 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
                         className="overflow-hidden"
                       >
                         <div className="grid grid-cols-2 gap-3 pt-2 pb-1">
-                          {/* Pros */}
                           <div className="space-y-1.5">
                             <p className="text-[9px] font-ui font-bold text-emerald-500 uppercase tracking-wider mb-1">
                               Ventajas
@@ -273,7 +303,6 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
                               </p>
                             ))}
                           </div>
-                          {/* Contras */}
                           <div className="space-y-1.5">
                             <p className="text-[9px] font-ui font-bold text-red-500 uppercase tracking-wider mb-1">
                               Desventajas
@@ -298,6 +327,50 @@ export function HudRecommendationPanel({ data, deviceId, screenSize }: HudRecomm
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Muestra las barras de stats usando datos del código activo de la DB,
+ * con fallback a los valores estáticos por defecto.
+ */
+function HudStatsSection({ fingers, screenSize, cardIdx }: { fingers: 2 | 3 | 4; screenSize?: number; cardIdx: number }) {
+  const { recommended } = useHudCodes({ fingers, screenSize });
+
+  // Usar stats del código recomendado si está disponible, fallback a valores estáticos
+  const FALLBACK_STATS: Record<2 | 3 | 4, { precision: number; speed: number; playability: number }> = {
+    2: { precision: 60, speed: 40, playability: 95 },
+    3: { precision: 75, speed: 70, playability: 70 },
+    4: { precision: 95, speed: 90, playability: 45 },
+  };
+
+  const stats = recommended
+    ? { precision: recommended.precision, speed: recommended.velocity, playability: recommended.playability }
+    : FALLBACK_STATS[fingers];
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {STAT_CONFIG.map((stat, statIdx) => {
+        const StatIcon = stat.icon;
+        return (
+          <div key={stat.key} className="space-y-1.5">
+            <div className="flex items-center gap-1">
+              <StatIcon size={10} className="text-slate-500" />
+              <span className="text-[10px] text-slate-500 font-ui truncate">
+                {stat.label}
+              </span>
+            </div>
+            <StatBar
+              value={stats[stat.key]}
+              delay={cardIdx * 0.15 + statIdx * 0.08}
+            />
+            <span className="text-[11px] font-mono font-bold text-white">
+              {stats[stat.key]}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -19,6 +19,7 @@ export type {
   Comment,
   Notification,
   AdminLog,
+  HudCode,
 } from '@prisma/client';
 
 export {

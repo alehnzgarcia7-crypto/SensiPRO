@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Prisma Schema
 // Base de datos: PostgreSQL 16
-// 25 modelos | 12 enums | ~50 índices
+// 26 modelos | 12 enums | ~53 índices
 // ═══════════════════════════════════════════════════════════════
 
 generator client {
@@ -790,7 +790,34 @@ model PushSubscription {
 }
 
 // ──────────────────────────────────
-// 27. UTM TRACKING — Rastreo de parámetros UTM
+// 27. HUD CODE — Códigos HUD reales de Free Fire
+// ──────────────────────────────────
+model HudCode {
+  id          String   @id @default(cuid())
+  fingers     Int      @db.SmallInt               // 2, 3, 4
+  code        String   @unique @db.VarChar(100)   // código REAL de FF: #FFHUDT6O3jjGFRltPo7eM
+  label       String   @db.VarChar(100)           // nombre descriptivo
+  description String?  @db.VarChar(500)
+  playerName  String?  @map("player_name") @db.VarChar(100) // nombre del pro player
+  screenMin   Float?   @map("screen_min")         // pantalla mínima recomendada (pulgadas)
+  screenMax   Float?   @map("screen_max")         // pantalla máxima recomendada
+  source      String   @default("community") @db.VarChar(50) // pro_player, community, esports
+  precision   Int      @default(70) @db.SmallInt   // 0-100
+  velocity    Int      @default(70) @db.SmallInt
+  playability Int      @default(70) @db.SmallInt
+  isDefault   Boolean  @default(false) @map("is_default")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("hud_codes")
+  @@index([fingers])
+  @@index([isDefault])
+  @@index([source])
+}
+
+// ──────────────────────────────────
+// 28. UTM TRACKING — Rastreo de parámetros UTM
 // ──────────────────────────────────
 model UTMTracking {
   id              String    @id @default(cuid())

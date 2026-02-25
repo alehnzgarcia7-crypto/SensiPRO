@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 import { seedDevices } from './seed-devices';
+import { seedHudCodes } from './hud-codes.seed';
 
 const prisma = new PrismaClient();
 
@@ -61,6 +62,9 @@ async function main() {
 
   // 3. Seed devices
   await seedDevices();
+
+  // 4. Seed HUD codes
+  await seedHudCodes();
 
   console.log('🎯 Seed complete!');
 }
