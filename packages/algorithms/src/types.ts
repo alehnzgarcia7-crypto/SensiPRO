@@ -104,3 +104,22 @@ export interface SpecWeights {
   panel: number;
   tier: number;
 }
+
+// ═══ HEADSHOT MODE ═══
+
+export interface FireButtonResult {
+  percentage: number;
+  fingers: 2 | 3 | 4;
+  positionTip: string;
+}
+
+export interface HeadshotResult {
+  sensitivity: SensitivityOutput;
+  gyroscope: GyroscopeOutput;
+  normalSensitivity: SensitivityOutput;
+  normalGyroscope: GyroscopeOutput;
+  fireButton: FireButtonResult;
+  headshotScore: number;
+  recommendedDrag: string;
+  crosshairTip: string;
+}

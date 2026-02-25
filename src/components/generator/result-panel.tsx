@@ -23,6 +23,7 @@ import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
 import { RamSelector } from './ram-selector';
 import { HudRecommendationPanel } from './hud-recommendation';
+import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
 
 interface AllCalibrationsApiResponse {
   success: boolean;
@@ -375,6 +376,11 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           data={allCalibrations.hudRecommendation}
           screenSize={selectedDevice.screenSize}
         />
+      </motion.div>
+
+      {/* ═══ HEADSHOT CTA ═══ */}
+      <motion.div variants={itemVariants}>
+        <HeadshotCtaBanner />
       </motion.div>
 
       {/* ═══ ACCIONES ═══ */}

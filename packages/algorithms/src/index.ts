@@ -20,6 +20,7 @@ export {
   calculatePrecisionScore,
   generateHudRecommendation,
 } from './calibration-engine';
+export { generateHeadshotSensitivity, getWeaponAdjustedSensitivity } from './headshot-engine';
 export type {
   AlgorithmInput,
   AlgorithmOutput,
@@ -33,4 +34,6 @@ export type {
   StyleMultipliers,
   DeviceSpecs,
   SpecWeights,
+  FireButtonResult,
+  HeadshotResult,
 } from './types';

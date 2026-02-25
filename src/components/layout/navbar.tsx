@@ -23,6 +23,12 @@ export async function Navbar() {
           <Link href="/generator" className="text-sm text-slate-400 hover:text-white transition-colors">
             Generador
           </Link>
+          <Link href="/generator/headshot" className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+            Headshot
+            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-red-500/20 text-red-400 uppercase leading-none" style={{ animation: 'headshotPulse 2s ease-in-out infinite' }}>
+              NEW
+            </span>
+          </Link>
           <Link href="/academy" className="text-sm text-slate-400 hover:text-white transition-colors">
             Academia
           </Link>

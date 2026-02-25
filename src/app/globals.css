@@ -302,6 +302,48 @@
   animation: playPulse 2s ease-in-out infinite;
 }
 
+/* ═══ Headshot Mode ═══ */
+.headshot-glow { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+.headshot-text-gradient {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.headshot-border-glow {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1), inset 0 0 15px rgba(239, 68, 68, 0.05);
+}
+
+.animated-border-headshot .animated-border-gradient {
+  background: conic-gradient(from 0deg, #ef4444, #f97316, #ef4444) !important;
+}
+
+@keyframes drawPath {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes headshotFlash {
+  0%, 70% { opacity: 0; transform: scale(0.8); }
+  80% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes fireButtonPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+@keyframes timerCountdown {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: 283; }
+}
+@keyframes confettiDrop {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
+}
+@keyframes headshotPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3), 0 0 10px rgba(239, 68, 68, 0.1); }
+  50% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), 0 0 24px rgba(239, 68, 68, 0.2); }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .atmosphere-particle,

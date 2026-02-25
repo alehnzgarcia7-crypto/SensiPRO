@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, BookOpen, Users, User } from 'lucide-react';
+import { Zap, BookOpen, Users, User, Crosshair } from 'lucide-react';
 
 import { cn } from '@/lib/cn';
 
 const navItems = [
   { href: '/generator', label: 'Generar', icon: Zap },
+  { href: '/generator/headshot', label: 'Headshot', icon: Crosshair },
   { href: '/academy', label: 'Academia', icon: BookOpen },
   { href: '/community', label: 'Comunidad', icon: Users },
   { href: '/profile', label: 'Perfil', icon: User },

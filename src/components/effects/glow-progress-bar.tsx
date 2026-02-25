@@ -3,18 +3,24 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — GlowProgressBar — Barra de sensibilidad épica con glow
 // 3D reflection, shimmer, gradiente dinámico, spring animation
+// Soporta color schemes: default (cyan/naranja), red, green
 // ═══════════════════════════════════════════════════════════════
 
 import { motion } from 'framer-motion';
+
+type ColorScheme = 'default' | 'red' | 'green';
 
 interface GlowProgressBarProps {
   value: number;
   max?: number;
   delay?: number;
   className?: string;
+  color?: ColorScheme;
 }
 
-function getBarGradient(value: number, max: number): string {
+function getBarGradient(value: number, max: number, scheme: ColorScheme): string {
+  if (scheme === 'red') return 'linear-gradient(90deg, #ef4444, #f97316)';
+  if (scheme === 'green') return 'linear-gradient(90deg, #22c55e, #86efac)';
   const ratio = value / max;
   if (ratio >= 0.9) return 'linear-gradient(90deg, #06b6d4, #e0f2fe)';   // cyan → blanco
   if (ratio >= 0.7) return 'linear-gradient(90deg, #06b6d4, #67e8f9)';   // cyan → cyan claro
@@ -22,7 +28,9 @@ function getBarGradient(value: number, max: number): string {
   return 'linear-gradient(90deg, #c2410c, #ff6a00)';                      // naranja oscuro → naranja
 }
 
-function getGlowColor(value: number, max: number): string {
+function getGlowColor(value: number, max: number, scheme: ColorScheme): string {
+  if (scheme === 'red') return 'rgba(239, 68, 68, 0.4)';
+  if (scheme === 'green') return 'rgba(34, 197, 94, 0.4)';
   const ratio = value / max;
   if (ratio >= 0.9) return 'rgba(6, 182, 212, 0.5)';
   if (ratio >= 0.7) return 'rgba(6, 182, 212, 0.4)';
@@ -30,10 +38,10 @@ function getGlowColor(value: number, max: number): string {
   return 'rgba(255, 106, 0, 0.3)';
 }
 
-export function GlowProgressBar({ value, max = 200, delay = 0, className }: GlowProgressBarProps) {
+export function GlowProgressBar({ value, max = 200, delay = 0, className, color = 'default' }: GlowProgressBarProps) {
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
-  const gradient = getBarGradient(value, max);
-  const glowColor = getGlowColor(value, max);
+  const gradient = getBarGradient(value, max, color);
+  const glowColor = getGlowColor(value, max, color);
 
   return (
     <div className={className}>
