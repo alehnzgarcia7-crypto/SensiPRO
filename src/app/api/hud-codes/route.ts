@@ -8,8 +8,8 @@ import { logger } from '@ares/logger';
 
 const QuerySchema = z.object({
   fingers: z.coerce.number().int().refine(
-    (v) => v === 2 || v === 3 || v === 4,
-    { message: 'fingers debe ser 2, 3 o 4' },
+    (v) => v === 2 || v === 3 || v === 4 || v === 5,
+    { message: 'fingers debe ser 2, 3, 4 o 5' },
   ),
   screenSize: z.coerce.number().min(3).max(15).optional(),
 });

@@ -29,7 +29,7 @@ export function useHudCodes({
   fingers,
   screenSize,
 }: {
-  fingers: 2 | 3 | 4;
+  fingers: 2 | 3 | 4 | 5;
   screenSize?: number;
 }): UseHudCodesResult {
   const [codes, setCodes] = useState<HudCodeData[]>([]);

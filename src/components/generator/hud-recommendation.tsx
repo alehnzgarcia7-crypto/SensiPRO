@@ -22,7 +22,7 @@ interface HudRecommendationPanelProps {
   screenSize?: number;
 }
 
-const FINGER_META: Record<2 | 3 | 4, { emoji: string; title: string; subtitle: string; icon: typeof Gamepad2 }> = {
+const FINGER_META: Record<2 | 3 | 4 | 5, { emoji: string; title: string; subtitle: string; icon: typeof Gamepad2 }> = {
   2: {
     emoji: '✌️',
     title: '2 DEDOS — CLÁSICO',
@@ -40,6 +40,12 @@ const FINGER_META: Record<2 | 3 | 4, { emoji: string; title: string; subtitle: s
     title: '4 DEDOS — GARRA',
     subtitle: 'Máximo rendimiento para jugadores competitivos',
     icon: Trophy,
+  },
+  5: {
+    emoji: '🖐️',
+    title: '5 DEDOS — ÉLITE',
+    subtitle: 'Control absoluto para los más pro',
+    icon: Target,
   },
 };
 
@@ -74,7 +80,7 @@ function StatBar({ value, delay }: { value: number; delay: number }) {
   );
 }
 
-function HudCodeSection({ fingers, screenSize }: { fingers: 2 | 3 | 4; screenSize?: number }) {
+function HudCodeSection({ fingers, screenSize }: { fingers: 2 | 3 | 4 | 5; screenSize?: number }) {
   const { codes, recommended, isLoading, error } = useHudCodes({ fingers, screenSize });
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
@@ -335,14 +341,15 @@ export function HudRecommendationPanel({ data, screenSize }: HudRecommendationPa
  * Muestra las barras de stats usando datos del código activo de la DB,
  * con fallback a los valores estáticos por defecto.
  */
-function HudStatsSection({ fingers, screenSize, cardIdx }: { fingers: 2 | 3 | 4; screenSize?: number; cardIdx: number }) {
+function HudStatsSection({ fingers, screenSize, cardIdx }: { fingers: 2 | 3 | 4 | 5; screenSize?: number; cardIdx: number }) {
   const { recommended } = useHudCodes({ fingers, screenSize });
 
   // Usar stats del código recomendado si está disponible, fallback a valores estáticos
-  const FALLBACK_STATS: Record<2 | 3 | 4, { precision: number; speed: number; playability: number }> = {
+  const FALLBACK_STATS: Record<2 | 3 | 4 | 5, { precision: number; speed: number; playability: number }> = {
     2: { precision: 60, speed: 40, playability: 95 },
     3: { precision: 75, speed: 70, playability: 70 },
     4: { precision: 95, speed: 90, playability: 45 },
+    5: { precision: 90, speed: 87, playability: 90 },
   };
 
   const stats = recommended

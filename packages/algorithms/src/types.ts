@@ -64,7 +64,7 @@ export interface CalibrationResult {
 }
 
 export interface HudOption {
-  fingers: 2 | 3 | 4;
+  fingers: 2 | 3 | 4 | 5;
   description: string;
   pros: string[];
   cons: string[];
@@ -72,7 +72,7 @@ export interface HudOption {
 }
 
 export interface HudRecommendation {
-  recommended: 2 | 3 | 4;
+  recommended: 2 | 3 | 4 | 5;
   options: HudOption[];
 }
 

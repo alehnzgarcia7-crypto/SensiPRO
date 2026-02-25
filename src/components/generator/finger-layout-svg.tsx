@@ -8,7 +8,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 interface FingerLayoutSvgProps {
-  fingers: 2 | 3 | 4;
+  fingers: 2 | 3 | 4 | 5;
   screenSize?: number;
 }
 
@@ -64,13 +64,21 @@ const HUD_BUTTONS: HudButton[] = [
 ];
 
 // Qué botones activa cada dedo en cada layout
+const PURPLE = {
+  main: '#a855f7',
+  bright: '#c084fc',
+  glow: 'rgba(168, 85, 247, 0.35)',
+  glowSoft: 'rgba(168, 85, 247, 0.12)',
+  text: '#e9d5ff',
+} as const;
+
 interface FingerAssignment {
   buttonId: string;
   fingerLabel: string;
-  color: 'cyan' | 'orange';
+  color: 'cyan' | 'orange' | 'purple';
 }
 
-const ASSIGNMENTS: Record<2 | 3 | 4, FingerAssignment[]> = {
+const ASSIGNMENTS: Record<2 | 3 | 4 | 5, FingerAssignment[]> = {
   2: [
     { buttonId: 'joystick', fingerLabel: 'Pulgar Izq.', color: 'cyan' },
     { buttonId: 'fire', fingerLabel: 'Pulgar Der.', color: 'cyan' },
@@ -86,13 +94,21 @@ const ASSIGNMENTS: Record<2 | 3 | 4, FingerAssignment[]> = {
     { buttonId: 'scope-l', fingerLabel: 'Índice Izq.', color: 'orange' },
     { buttonId: 'scope', fingerLabel: 'Índice Der.', color: 'orange' },
   ],
+  5: [
+    { buttonId: 'joystick', fingerLabel: 'Pulgar Izq.', color: 'cyan' },
+    { buttonId: 'fire', fingerLabel: 'Pulgar Der.', color: 'cyan' },
+    { buttonId: 'scope-l', fingerLabel: 'Índice Izq.', color: 'orange' },
+    { buttonId: 'scope', fingerLabel: 'Índice Der.', color: 'orange' },
+    { buttonId: 'jump', fingerLabel: 'Medio Der.', color: 'purple' },
+  ],
 };
 
-function isActive(buttonId: string, fingers: 2 | 3 | 4): FingerAssignment | undefined {
+function isActive(buttonId: string, fingers: 2 | 3 | 4 | 5): FingerAssignment | undefined {
   return ASSIGNMENTS[fingers].find((a) => a.buttonId === buttonId);
 }
 
-function getColors(color: 'cyan' | 'orange') {
+function getColors(color: 'cyan' | 'orange' | 'purple') {
+  if (color === 'purple') return PURPLE;
   return color === 'cyan' ? CYAN : ORANGE;
 }
 
@@ -147,6 +163,15 @@ export function FingerLayoutSvg({ fingers }: FingerLayoutSvgProps) {
           <filter id={`${uid}-glow-orange`} x="-60%" y="-60%" width="220%" height="220%">
             <feGaussianBlur stdDeviation="4" result="blur" />
             <feFlood floodColor={ORANGE.main} floodOpacity="0.6" result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="shadow" />
+            <feMerge>
+              <feMergeNode in="shadow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id={`${uid}-glow-purple`} x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor={PURPLE.main} floodOpacity="0.6" result="color" />
             <feComposite in="color" in2="blur" operator="in" result="shadow" />
             <feMerge>
               <feMergeNode in="shadow" />
@@ -504,7 +529,7 @@ export function FingerLayoutSvg({ fingers }: FingerLayoutSvgProps) {
           })}
 
           {/* ═══ LEYENDA ═══ */}
-          <g transform="translate(140, 188)">
+          <g transform="translate(120, 188)">
             <circle cx="0" cy="0" r="3" fill={CYAN.main} fillOpacity="0.5" stroke={CYAN.bright} strokeWidth="0.5" />
             <text x="6" y="1.5" fill="#94a3b8" fontSize="4.5" fontFamily="monospace">
               Pulgar
@@ -517,8 +542,16 @@ export function FingerLayoutSvg({ fingers }: FingerLayoutSvgProps) {
                 </text>
               </>
             )}
-            <rect x="100" y="-3" width="3" height="6" rx="1" fill={INACTIVE.fill} stroke={INACTIVE.stroke} strokeWidth="0.5" />
-            <text x="106" y="1.5" fill="#64748b" fontSize="4.5" fontFamily="monospace">
+            {fingers >= 5 && (
+              <>
+                <circle cx="100" cy="0" r="3" fill={PURPLE.main} fillOpacity="0.5" stroke={PURPLE.bright} strokeWidth="0.5" />
+                <text x="106" y="1.5" fill="#94a3b8" fontSize="4.5" fontFamily="monospace">
+                  Medio
+                </text>
+              </>
+            )}
+            <rect x={fingers >= 5 ? 140 : 100} y="-3" width="3" height="6" rx="1" fill={INACTIVE.fill} stroke={INACTIVE.stroke} strokeWidth="0.5" />
+            <text x={fingers >= 5 ? 146 : 106} y="1.5" fill="#64748b" fontSize="4.5" fontFamily="monospace">
               No asignado
             </text>
           </g>

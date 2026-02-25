@@ -93,7 +93,7 @@ export function calculatePrecisionScore(sensitivity: SensitivityOutput, dpiMode 
 
 /** Genera recomendación de Custom HUD basado en screenSize */
 export function generateHudRecommendation(screenSize: number): HudRecommendation {
-  let recommended: 2 | 3 | 4;
+  let recommended: 2 | 3 | 4 | 5;
   if (screenSize < HUD_THRESHOLD_SMALL) {
     recommended = 2;
   } else if (screenSize <= HUD_THRESHOLD_LARGE) {
@@ -123,6 +123,14 @@ export function generateHudRecommendation(screenSize: number): HudRecommendation
       pros: ['Control total simultáneo', 'Ventaja competitiva real', 'Peek + disparo + movimiento a la vez'],
       cons: ['Curva de aprendizaje alta', 'Requiere pantalla grande (>6.4")', 'Puede causar fatiga en las manos'],
       isRecommended: recommended === 4,
+    },
+    {
+      fingers: 5,
+      description: 'Nivel élite: 2 pulgares + 2 índices + 1 medio. Control absoluto.',
+      pros: ['Máximo multitasking posible', 'Dominio total del HUD', 'Ventaja en torneos competitivos'],
+      cons: ['Curva de aprendizaje extrema', 'Requiere tablet o pantalla >6.5"', 'Fatiga rápida sin práctica constante'],
+      // 5 dedos nunca es auto-recomendado (solo para expertos)
+      isRecommended: false,
     },
   ];
 
