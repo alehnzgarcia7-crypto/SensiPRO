@@ -21,32 +21,32 @@ import { generateGyroscope } from './gyroscope-engine';
 // El engine produce valores RAW sin calibración.
 // La calibración (ALTA/MEDIA/BAJA) y DPI se aplican en calibration-engine.
 //
-// HARDWARE ADJUST:
-//   hzBonus:     ((Hz - 60) / 60) × 10  → 60Hz=0, 90Hz=+5, 120Hz=+10, 144Hz=+14
-//   screenBonus: ((screenSize - 6.0) / 1.5) × 4  → pantalla más grande = más sensi
-//   panelBonus:  LTPO=+3, AMOLED=+2, OLED=+2, IPS=0, LCD=-2
-//   tierBonus:   GAMING=+5, ULTRA=+4, HIGH=+2, MID=0, LOW=-3
+// HARDWARE ADJUST (reducidos para rangos realistas de pro players):
+//   hzBonus:     ((Hz - 60) / 60) × 5   → 60Hz=0, 90Hz=+2.5, 120Hz=+5, 144Hz=+7
+//   screenBonus: ((screenSize - 6.0) / 1.5) × 2  → 6.0"=0, 6.5"=+0.67, 6.7"=+0.93
+//   panelBonus:  LTPO=+2, AMOLED=+1, OLED=+1, IPS=0, LCD=-1
+//   tierBonus:   GAMING=+3, ULTRA=+2, HIGH=+1, MID=0, LOW=-2
 //
-// RAM FACTOR (uniforme a todos los campos):
-//   2GB=+15, 3GB=+10, 4GB=+5, 6GB=0, 8GB=-5, 12GB=-8, 16GB=-10
+// RAM FACTOR (uniforme a todos los campos, reducido para rangos realistas):
+//   2GB=+8, 3GB=+5, 4GB=+3, 6GB=0, 8GB=-2, 12GB=-4, 16GB=-5
 //   Más RAM = menos sensi necesaria (hardware más responsivo)
 
-// Bonus por tipo de panel
+// Bonus por tipo de panel (reducido para rangos realistas)
 const PANEL_BONUS: Record<string, number> = {
-  LTPO:   3,
-  AMOLED: 2,
-  OLED:   2,
+  LTPO:   2,
+  AMOLED: 1,
+  OLED:   1,
   IPS:    0,
-  LCD:   -2,
+  LCD:   -1,
 };
 
-// Bonus por tier del dispositivo
+// Bonus por tier del dispositivo (reducido para rangos realistas)
 const TIER_BONUS: Record<string, number> = {
-  GAMING: 5,
-  ULTRA:  4,
-  HIGH:   2,
+  GAMING: 3,
+  ULTRA:  2,
+  HIGH:   1,
   MID:    0,
-  LOW:   -3,
+  LOW:   -2,
 };
 
 // Qué porcentaje del hardware bonus recibe cada campo
@@ -70,13 +70,13 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
   // Usar userRam si viene, sino el RAM del device
   const ram = userRam ?? specs.ramGb;
 
-  // 1. Hz bonus (respecto a 60Hz base)
-  // 60Hz=0, 90Hz=+5, 120Hz=+10, 144Hz=+14
-  const hzBonus = ((specs.screenHz - 60) / 60) * 10;
+  // 1. Hz bonus (respecto a 60Hz base, factor ×5 para rangos realistas)
+  // 60Hz=0, 90Hz=+2.5, 120Hz=+5, 144Hz=+7
+  const hzBonus = ((specs.screenHz - 60) / 60) * 5;
 
-  // 2. Screen bonus (pantallas más grandes = ligeramente más sensi por más área de toque)
-  // 5.0"=-2.7, 6.0"=0, 6.5"=+1.3, 6.7"=+1.9, 7.0"=+2.7
-  const screenBonus = ((specs.screenSize - 6.0) / 1.5) * 4;
+  // 2. Screen bonus (pantallas más grandes = ligeramente más sensi, factor ×2)
+  // 5.0"=-1.3, 6.0"=0, 6.5"=+0.67, 6.7"=+0.93, 7.0"=+1.3
+  const screenBonus = ((specs.screenSize - 6.0) / 1.5) * 2;
 
   // 3. Panel y Tier
   const panelBonus = PANEL_BONUS[specs.panelType] ?? 0;
