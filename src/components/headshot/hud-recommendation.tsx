@@ -11,6 +11,7 @@ import {
 } from '@ares/algorithms';
 import { HudVisualization } from './hud-visualization';
 import { FingerRoleCards } from './finger-role-cards';
+import { HeadshotHudCodes } from './headshot-hud-codes';
 
 interface HudRecommendationProps {
   fingers: FingerCount;
@@ -75,6 +76,11 @@ export function HudRecommendation({ fingers }: HudRecommendationProps) {
           Distribución de dedos
         </p>
         <FingerRoleCards fingers={fingers} />
+      </div>
+
+      {/* HUD Codes — Códigos reales para copiar y pegar */}
+      <div className="mb-4">
+        <HeadshotHudCodes fingers={fingers} />
       </div>
 
       {/* Pro Tips + Mistakes */}
