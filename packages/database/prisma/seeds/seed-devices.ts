@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
+import { estimateDpiFromDevice } from '@ares/algorithms';
+
 import { ALL_DEVICES } from './devices';
 
 const prisma = new PrismaClient();
@@ -27,6 +29,8 @@ export async function seedDevices(): Promise<void> {
       continue;
     }
 
+    const screenDpi = estimateDpiFromDevice(device.brand, device.model, device.tier);
+
     await prisma.device.create({
       data: {
         brand: device.brand,
@@ -34,6 +38,7 @@ export async function seedDevices(): Promise<void> {
         slug,
         screenHz: device.screenHz,
         screenSize: device.screenSize,
+        screenDpi,
         ramGb: device.ramGb,
         panelType: device.panelType,
         tier: device.tier,

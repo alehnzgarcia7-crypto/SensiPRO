@@ -195,6 +195,7 @@ model Device {
 
   screenHz        Int         @map("screen_hz") @db.SmallInt
   screenSize      Float       @map("screen_size")
+  screenDpi       Int?        @map("screen_dpi") @db.SmallInt
   ramGb           Int         @map("ram_gb") @db.SmallInt
   panelType       PanelType   @default(LCD) @map("panel_type")
   tier            DeviceTier  @default(MID)

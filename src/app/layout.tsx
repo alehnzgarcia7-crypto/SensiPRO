@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: '%s | SensiPRO',
   },
   description:
-    'Genera la sensibilidad perfecta para Free Fire basada en tu dispositivo. Algoritmo PRO con 500+ dispositivos. Gratis.',
+    'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos, ±2 puntos de precisión. Gratis.',
   keywords: [
     'sensibilidades free fire',
     'sensibilidad free fire',
@@ -49,14 +49,14 @@ export const metadata: Metadata = {
     siteName: 'Sensibilidades PRO',
     title: 'Sensibilidades PRO — Generador de Sensibilidad Free Fire',
     description:
-      'Genera la sensibilidad perfecta para Free Fire basada en tu dispositivo.',
+      'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos.',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sensibilidades PRO — Free Fire',
     description:
-      'Genera la sensibilidad perfecta basada en tu dispositivo.',
+      'Calibración forense DPI-first v4.0 para Free Fire. 500+ dispositivos.',
     images: ['/og-image.png'],
   },
   robots: {

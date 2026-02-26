@@ -78,7 +78,7 @@ export function StyleComparison({ deviceId, currentStyle }: StyleComparisonProps
                 <span className="text-xs text-slate-400">{FIELD_LABELS[field]}</span>
                 <span className="text-xs font-bold text-white tabular-nums">{current[field]}</span>
               </div>
-              <Progress value={current[field]} max={100} size="sm" color="gradient" />
+              <Progress value={current[field]} max={200} size="sm" color="gradient" />
             </div>
           ))}
         </div>

@@ -9,24 +9,26 @@ interface TipSeed {
 
 const TIPS: TipSeed[] = [
   // ─── SENSITIVITY (18 tips) ───
-  { title: 'Empieza siempre en 50', content: 'Pon todos los sliders de sensibilidad en 50 como punto de partida. Desde ahí ajusta hacia arriba o abajo según cómo se sienta.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
+  { title: 'Tu DPI manda tu sensibilidad', content: 'El DPI de tu pantalla es el factor #1 que determina tu sensibilidad. DPI bajo (~270) = General ~185-190. DPI alto (~460) = General ~163-170. Usa SensiPRO para calcularlo automáticamente.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'No copies la sensi de un streamer', content: 'Los streamers usan dispositivos diferentes al tuyo. Lo que funciona en un iPad Pro no funciona en un Redmi Note.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'Dale 3 días a cada cambio', content: 'Tu cerebro necesita mínimo 3 días para acostumbrarse a una nueva sensibilidad. No cambies cada partida.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'Prueba en sala de entrenamiento', content: 'SIEMPRE prueba cambios de sensibilidad en la sala de entrenamiento antes de ir a ranked.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'El giroscopio es tu amigo', content: 'Activar giroscopio incluso en nivel bajo te da una ventaja enorme en combates cercanos. No lo ignores.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'Sensibilidad alta no es igual a mejor', content: 'Más sensibilidad = más velocidad pero menos control. Encuentra el balance donde puedas girar rápido Y apuntar preciso.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
   { title: 'Cada mira necesita su valor', content: 'No pongas la misma sensibilidad para todas las miras. El scope 4x necesita menos sensibilidad que el punto rojo.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
-  { title: 'Free Look es clave', content: 'Ajusta tu Free Look (vista libre) por separado. Necesitas poder vigilar rápido mientras corres.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
-  { title: '120Hz necesita menos sensibilidad', content: 'Si tu celular tiene pantalla de 120Hz, baja tu sensibilidad 10-15% comparado con 60Hz.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
-  { title: 'Pantalla grande = más sensibilidad', content: 'En pantallas de 6.5"+ necesitas más sensibilidad porque tu dedo recorre más distancia física.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
+  { title: 'Free Look va separado (14-22)', content: 'El Free Look (vista libre) NO sigue el tapering -15. Tiene su propio cálculo independiente y debe estar entre 14-22 dependiendo de tu DPI. No lo subas más o perderás control.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
+  { title: '120Hz ajusta ±3 puntos', content: 'La tasa de refresco es un ajuste SECUNDARIO al DPI. 120Hz suma ~3 puntos vs 60Hz. No es el 10-15% que se creía antes — el DPI importa mucho más.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
+  { title: 'Pantalla grande = ±4 puntos', content: 'El tamaño de pantalla es un ajuste secundario. Una pantalla de 6.7" suma ~4 puntos vs una de 5.5". El factor principal sigue siendo el DPI.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
   { title: 'AWM scope necesita precisión', content: 'Para el AWM usa la sensibilidad más baja de todas tus miras. Cada pixel cuenta para el headshot.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
   { title: 'Calibra después de actualizar', content: 'Garena a veces cambia cómo funcionan los sliders en actualizaciones. Recalibra después de cada parche grande.', category: 'SENSITIVITY', difficulty: 'ADVANCED' },
-  { title: 'El DPI de tu pantalla importa', content: 'Pantallas con más PPI (pixels por pulgada) hacen que la misma sensibilidad se sienta más lenta.', category: 'SENSITIVITY', difficulty: 'ADVANCED' },
+  { title: 'El tapering profesional es -15', content: 'Los mejores calibradores usan tapering -15: si tu General es 175, tu Punto Rojo es 160, tu 2x es 145, tu 4x es 130 y tu AWM es 115. Este patrón escalonado te da control progresivo con cada zoom.', category: 'SENSITIVITY', difficulty: 'ADVANCED' },
   { title: 'Sensibilidad diferente por arma', content: 'Tu sensibilidad ideal para pelear con MP40 (cerca) es diferente a la de pelear con M4 (lejos).', category: 'SENSITIVITY', difficulty: 'ADVANCED' },
   { title: 'Giro de 180° en un swipe', content: 'Ajusta tu sensibilidad general para poder hacer un giro de 180° con un solo movimiento del dedo sin levantar.', category: 'SENSITIVITY', difficulty: 'ADVANCED' },
   { title: 'Giroscopio: empieza solo con scope', content: 'Si eres nuevo con giroscopio, actívalo solo "Scope On" primero. Cuando domines eso, pasa a "Always On".', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
   { title: 'No toques sensi antes de ranked', content: 'NUNCA cambies tu sensibilidad justo antes de una sesión de ranked. Hazlo en un día que practiques.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
-  { title: 'Usa ARES para tu modelo exacto', content: 'Nuestro generador calcula la sensibilidad óptima usando los specs reales de tu celular. Es más preciso que adivinar.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
+  { title: 'General va de 135 a 195', content: 'En v4.0, la sensibilidad General está entre 135 (DPI ultra alto ~600) y 195 (DPI bajo ~200). Si tu valor está fuera de este rango, probablemente no está calibrado correctamente para tu pantalla.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
+  { title: 'Cambiaste de celular? Recalibra', content: 'Si cambias de dispositivo, tu sensibilidad DEBE cambiar. Un Samsung A13 (DPI 270) usa General ~187 mientras que un iPhone 15 (DPI 460) usa General ~170. Nunca copies la misma config entre celulares.', category: 'SENSITIVITY', difficulty: 'BEGINNER' },
+  { title: 'La RAM ajusta ±5 puntos máximo', content: 'La RAM es un factor secundario. Un celular de 3GB baja ~5 puntos y uno de 12GB sube ~5. No es el factor principal — el DPI de tu pantalla importa 10 veces más.', category: 'SENSITIVITY', difficulty: 'INTERMEDIATE' },
 
   // ─── AIM (17 tips) ───
   { title: 'Apunta a nivel de cabeza', content: 'Mantén tu mira SIEMPRE a nivel de cabeza mientras caminas. Reduce la distancia para headshots.', category: 'AIM', difficulty: 'BEGINNER' },

@@ -11,6 +11,7 @@ export function createTestDevice(overrides?: Partial<Device>): Device {
     slug: `samsung-galaxy-a${counter + 10}`,
     screenHz: 90,
     screenSize: 6.5,
+    screenDpi: 395,
     ramGb: 4,
     panelType: 'AMOLED' as PanelType,
     tier: 'MID' as DeviceTier,
