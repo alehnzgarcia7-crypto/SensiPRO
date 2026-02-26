@@ -7,11 +7,12 @@ import { GuideCard } from '@/components/academy/guide-card';
 import { TipOfDay } from '@/components/academy/tip-of-day';
 
 export const metadata: Metadata = {
-  title: 'Academia PRO | ARES SensiPRO',
+  title: 'Academia PRO | SensiPRO — Guías y Tips de Free Fire',
   description:
-    'Aprende a dominar Free Fire con guías profesionales, tips avanzados y análisis del meta actual. Desde sensibilidades hasta estrategias de alto nivel.',
+    'Aprende a dominar Free Fire con guías profesionales, tips de pros, meta actual, y video tutoriales. Mejora tu headshot rate.',
+  keywords: ['guías free fire', 'tips free fire', 'academia free fire', 'tutoriales free fire'],
   openGraph: {
-    title: 'Academia PRO — ARES SensiPRO',
+    title: 'Academia PRO — SensiPRO',
     description: 'Guías, tips y análisis de meta para dominar Free Fire',
   },
 };

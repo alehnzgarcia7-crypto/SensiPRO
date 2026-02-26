@@ -7,10 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import type { TournamentStatus, UserTier } from '@prisma/client';
 
+import { TournamentsComingSoon } from './coming-soon';
+
 export const metadata: Metadata = {
-  title: 'Torneos | SensiPRO',
+  title: 'Torneos | SensiPRO — Compite con los Mejores',
   description:
-    'Participa en torneos con premios reales. Compite contra otros jugadores de Free Fire.',
+    'Participa en torneos de sensibilidad de Free Fire. Premios, rankings y la oportunidad de demostrar tu configuración.',
+  keywords: ['torneos free fire', 'competencia free fire', 'torneo sensibilidad'],
 };
 
 const STATUS_LABELS: Record<TournamentStatus, string> = {
@@ -54,6 +57,10 @@ export default async function TournamentsPage() {
     },
   });
 
+  if (tournaments.length === 0) {
+    return <TournamentsComingSoon />;
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6 flex items-center gap-3">
@@ -68,80 +75,68 @@ export default async function TournamentsPage() {
         </div>
       </div>
 
-      {tournaments.length === 0 ? (
-        <Card className="p-8 text-center">
-          <Trophy size={40} className="mx-auto mb-3 text-slate-600" />
-          <p className="text-slate-400">
-            No hay torneos disponibles en este momento
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Vuelve pronto para nuevos torneos
-          </p>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {tournaments.map((t) => {
-            const isActive =
-              t.status === 'ACTIVE' || t.status === 'UPCOMING';
+      <div className="space-y-4">
+        {tournaments.map((t) => {
+          const isActive =
+            t.status === 'ACTIVE' || t.status === 'UPCOMING';
 
-            return (
-              <Link key={t.id} href={`/tournaments/${t.id}`}>
-                <Card
-                  variant={isActive ? 'glow' : 'default'}
-                  className="p-5 transition-colors hover:border-fire-500/20"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="font-display font-bold text-white">
-                      {t.title}
-                    </h3>
-                    <Badge
-                      variant={STATUS_BADGE_VARIANT[t.status]}
-                      size="sm"
-                    >
-                      {STATUS_LABELS[t.status]}
-                    </Badge>
-                  </div>
+          return (
+            <Link key={t.id} href={`/tournaments/${t.id}`}>
+              <Card
+                variant={isActive ? 'glow' : 'default'}
+                className="p-5 transition-colors hover:border-fire-500/20"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="font-display font-bold text-white">
+                    {t.title}
+                  </h3>
+                  <Badge
+                    variant={STATUS_BADGE_VARIANT[t.status]}
+                    size="sm"
+                  >
+                    {STATUS_LABELS[t.status]}
+                  </Badge>
+                </div>
 
-                  {t.description && (
-                    <p className="mb-3 text-sm text-slate-400 line-clamp-2">
-                      {t.description}
-                    </p>
-                  )}
+                {t.description && (
+                  <p className="mb-3 text-sm text-slate-400 line-clamp-2">
+                    {t.description}
+                  </p>
+                )}
 
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Users size={12} />
-                      {t._count.entries}
-                      {t.maxParticipants ? `/${t.maxParticipants}` : ''}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar size={12} />
-                      {new Date(t.startDate).toLocaleDateString('es-MX')}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock size={12} />
-                      {new Date(t.endDate).toLocaleDateString('es-MX')}
-                    </span>
-                    <Badge
-                      variant={TIER_BADGE_VARIANT[t.entryTier]}
-                      size="sm"
-                    >
-                      {t.entryTier}
-                    </Badge>
-                  </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <Users size={12} />
+                    {t._count.entries}
+                    {t.maxParticipants ? `/${t.maxParticipants}` : ''}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar size={12} />
+                    {new Date(t.startDate).toLocaleDateString('es-MX')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock size={12} />
+                    {new Date(t.endDate).toLocaleDateString('es-MX')}
+                  </span>
+                  <Badge
+                    variant={TIER_BADGE_VARIANT[t.entryTier]}
+                    size="sm"
+                  >
+                    {t.entryTier}
+                  </Badge>
+                </div>
 
-                  {t.prizeDescription && (
-                    <p className="mt-2 text-xs text-tier-vip">
-                      <Trophy size={12} className="mr-1 inline" />
-                      {t.prizeDescription}
-                    </p>
-                  )}
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+                {t.prizeDescription && (
+                  <p className="mt-2 text-xs text-tier-vip">
+                    <Trophy size={12} className="mr-1 inline" />
+                    {t.prizeDescription}
+                  </p>
+                )}
+              </Card>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

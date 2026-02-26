@@ -3,9 +3,10 @@ import type { Metadata } from 'next';
 import { ConfigFeed } from '@/components/community/config-feed';
 
 export const metadata: Metadata = {
-  title: 'Comunidad | SensiPRO',
+  title: 'Comunidad | SensiPRO — Configs Compartidas',
   description:
-    'Configs compartidas por la comunidad de SensiPRO. Vota, comenta y descubre las mejores configuraciones de sensibilidad para Free Fire.',
+    'Explora configuraciones de sensibilidad compartidas por la comunidad. Encuentra la config perfecta para tu dispositivo.',
+  keywords: ['configs free fire', 'comunidad free fire', 'configuraciones compartidas'],
 };
 
 export default function CommunityPage() {

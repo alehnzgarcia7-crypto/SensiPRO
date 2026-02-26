@@ -3,9 +3,10 @@ import type { Metadata } from 'next';
 import { LeaderboardView } from '@/components/community/leaderboard-view';
 
 export const metadata: Metadata = {
-  title: 'Rankings | SensiPRO',
+  title: 'Rankings | SensiPRO — Los Mejores Jugadores',
   description:
-    'Los jugadores más activos de SensiPRO. Rankings de búsquedas, favoritos, shares y logros.',
+    'Mira los rankings de los mejores jugadores de SensiPRO. Compite, sube de nivel y demuestra que eres el mejor.',
+  keywords: ['ranking free fire', 'mejores jugadores', 'leaderboard free fire'],
 };
 
 export default function LeaderboardPage() {
