@@ -55,6 +55,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 /** Aplica offset de calibración + clamp al rango 0-200 */
+// Free Look es independiente del tapering y calibración (rango fijo 12-25)
 function applyCalibratedSensitivity(
   baseSensitivity: SensitivityOutput,
   calibration: CalibrationLevel,
@@ -67,11 +68,12 @@ function applyCalibratedSensitivity(
     scope2x: clamp(baseSensitivity.scope2x + offset, SENSITIVITY_MIN, SENSITIVITY_MAX),
     scope4x: clamp(baseSensitivity.scope4x + offset, SENSITIVITY_MIN, SENSITIVITY_MAX),
     sniperScope: clamp(baseSensitivity.sniperScope + offset, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    freeView: clamp(baseSensitivity.freeView + offset, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    freeView: baseSensitivity.freeView, // Free Look independiente, no se le aplica offset
   };
 }
 
 /** Reduce sensibilidad cuando DPI está activo (resta uniforme, clamp 0-200) */
+// Free Look no se reduce con DPI — es independiente (rango fijo 12-25)
 function applyDpiReduction(sensitivity: SensitivityOutput): SensitivityOutput {
   return {
     general: clamp(sensitivity.general - DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX),
@@ -79,7 +81,7 @@ function applyDpiReduction(sensitivity: SensitivityOutput): SensitivityOutput {
     scope2x: clamp(sensitivity.scope2x - DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX),
     scope4x: clamp(sensitivity.scope4x - DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX),
     sniperScope: clamp(sensitivity.sniperScope - DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    freeView: clamp(sensitivity.freeView - DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX),
+    freeView: sensitivity.freeView, // Free Look independiente, no se reduce con DPI
   };
 }
 

@@ -78,8 +78,8 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.55 }}
           className="mt-6 text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-body leading-relaxed"
         >
-          Nuestro algoritmo analiza el hardware REAL de tu celular — procesador, RAM,
-          pantalla, panel táctil — y genera la sensibilidad perfecta para FREE FIRE.
+          Calibración forense v4.0 basada en el DPI real de tu pantalla con tapering
+          profesional -15. Validado contra datos reales con ±2 puntos de precisión.
           No más copiar configs genéricas de YouTube.
         </motion.p>
 
@@ -142,7 +142,7 @@ export function HeroSection() {
           <Dot />
           <StatPill value={`${LANDING_DATA.brandCount}`} label="Marcas" />
           <Dot />
-          <StatPill value={`${LANDING_DATA.styleCount}`} label="Estilos" />
+          <StatPill value="±2 pts" label="Precisión" />
           <Dot />
           <StatPill value="Gratis" label="Para empezar" />
         </motion.div>

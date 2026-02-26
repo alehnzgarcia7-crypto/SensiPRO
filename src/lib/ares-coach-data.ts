@@ -40,14 +40,14 @@ export const ARES_CONVERSATIONS: AresConversation[] = [
     category: 'weapons',
     question: '¿Cuál es la mejor arma para headshot?',
     response:
-      'Depende del rango bro 🎯\n\n🔴 CLOSE RANGE: M1887 sin dudarlo. One-tap con J-drag y se acabó. 94 de daño base, x2.0 headshot = 188. Muerte instantánea.\n\n🟠 MID RANGE: M4A1. Es la más consistente del juego, retroceso bajo, drag vertical suave. Si no haces headshots con M4, el problema es tu técnica, no el arma.\n\n🔵 LONG RANGE: AWM. One-shot headshot garantizado con CUALQUIER casco incluido nivel 3. Scope in → micro-drag → dispara en <0.5s.\n\nPero ojo, cada arma necesita su propia sensi. En el Headshot Mode te las calculo todas 💪',
+      'Depende del rango bro 🎯\n\n🔴 CLOSE RANGE: M1887 sin dudarlo. One-tap con J-drag y se acabó. 94 de daño base, x2.0 headshot = 188. Muerte instantánea.\n\n🟠 MID RANGE: M4A1. Es la más consistente del juego, retroceso bajo, drag vertical suave. Si no haces headshots con M4, el problema es tu técnica, no el arma.\n\n🔵 LONG RANGE: AWM. One-shot headshot garantizado con CUALQUIER casco incluido nivel 3. El tapering -15 del v4.0 te deja el AWM en ~115-127 dependiendo de tu DPI, perfecto para quickscopes.\n\nPero ojo, cada arma necesita su propia sensi. En el Headshot Mode te las calculo todas 💪',
   },
   {
     id: 'my-phone',
     category: 'device',
     question: '¿Mi celular es bueno para Free Fire?',
     response:
-      'Dame tu modelo y te digo la neta 📱\n\nPero en general:\n• 120Hz+ = VENTAJA REAL en drag shots (Samsung A54, POCO X5 Pro)\n• AMOLED = mejor touch response que IPS\n• 4GB RAM = funciona pero puede lagear en BR con 50 jugadores\n• 6GB+ RAM = vas sobrado\n\nLo importante es que TU SENSI esté optimizada para TU hardware específico. Un Redmi 13C con sensi bien calibrada le gana a un iPhone mal configurado. Literal.\n\nGenera tu sensi en SensiPRO y te doy tu Headshot Score de 0-100 🔥',
+      'Dame tu modelo y te digo la neta 📱\n\nLo que más importa ahora es el DPI de tu pantalla. Un Samsung A13 con DPI 270 te da General 187, mientras que un iPhone 16 Pro con DPI 460 te da 163. La diferencia no es porque uno sea mejor — es porque el DPI más alto hace que tu dedo cubra más pixels por centímetro, así que necesitas menos sensi.\n\n• 120Hz+ = VENTAJA REAL en drag shots\n• AMOLED = mejor touch response que IPS\n• RAM es ajuste secundario (±5 puntos nada más)\n\nLo importante es que TU SENSI esté calibrada para el DPI de TU pantalla. Un Redmi 13C con sensi bien calibrada le gana a un iPhone mal configurado. Literal 🔥',
   },
   {
     id: 'drag-headshot',
@@ -61,7 +61,7 @@ export const ARES_CONVERSATIONS: AresConversation[] = [
     category: 'sensitivity',
     question: 'Mi sensi se siente muy rápida, ¿qué hago?',
     response:
-      'Eso pasa mucho y tiene solución:\n\n1️⃣ ¿Acabas de cambiarla? Dale mínimo 3 días antes de juzgar. Tu músculo memoria necesita adaptarse.\n\n2️⃣ Si después de 3 días sigue muy rápida: baja el PUNTO ROJO 5-10 puntos. Es el valor que más afecta al combate diario.\n\n3️⃣ Revisa tu DPI del sistema. Si está arriba de 600, bájalo a 480-550.\n\n4️⃣ ¿Juegas en gama baja? Los celulares con menos Hz necesitan sensi MÁS BAJA porque el touch sampling es menor.\n\n5️⃣ Tip pro: practica 10 min en Training Ground con la nueva sensi ANTES de ir a ranked. Nunca estrenes sensi en clasificatoria bro 💀',
+      'Eso pasa mucho y tiene solución:\n\n1️⃣ ¿Acabas de cambiarla? Dale mínimo 3 días antes de juzgar. Tu músculo memoria necesita adaptarse.\n\n2️⃣ Si después de 3 días sigue muy rápida: baja el PUNTO ROJO 5-10 puntos. El patrón profesional es -15 entre cada mira. Si tu general es 175, tu punto rojo es 160, tu 2x es 145, tu 4x es 130, y tu AWM es 115. Este patrón lo usan los mejores calibradores del mundo.\n\n3️⃣ El DPI de tu pantalla es lo que manda. Si tienes un cel con DPI alto (>400), tu sensi general debería estar entre 163-175. Si el DPI es bajo (<300), anda por 183-195.\n\n4️⃣ El Free Look va separado, no sigue el tapering. Para tu dispositivo está entre 17-19. Mantenlo bajo para que la cámara libre no te descontrole.\n\n5️⃣ Tip pro: practica 10 min en Training Ground con la nueva sensi ANTES de ir a ranked. Nunca estrenes sensi en clasificatoria bro 💀',
   },
   {
     id: 'rank-up',
@@ -89,6 +89,6 @@ export const ARES_CONVERSATIONS: AresConversation[] = [
     category: 'device',
     question: '¿Cómo optimizar FF en gama baja?',
     response:
-      'Bro te entiendo, yo empecé con un Redmi gama baja:\n\n⚙️ GRÁFICOS:\n• Smooth + High FPS (SIEMPRE)\n• Sombras: OFF\n• Efecto de disparo: OFF\n• Anti-aliasing: OFF\n\n📱 CELULAR:\n• Cierra TODAS las apps antes de jugar\n• Modo gaming si tu cel lo tiene\n• Datos > WiFi para menos lag (contraintuitivo pero funciona)\n• DPI del sistema: 480 (más bajo = menos procesamiento)\n\n🎯 SENSIBILIDAD:\n• En gama baja necesitas sensi MÁS BAJA que gama alta\n• Tu touch sampling es menor = movimientos menos precisos\n• SensiPRO ya calcula esto automáticamente según tu hardware\n\n💡 Lo más importante: la TÉCNICA gana al hardware. He visto jugadores en Redmi 13C llegar a Heroico 🏆',
+      'Bro te entiendo, yo empecé con un Redmi gama baja:\n\n⚙️ GRÁFICOS:\n• Smooth + High FPS (SIEMPRE)\n• Sombras: OFF\n• Efecto de disparo: OFF\n• Anti-aliasing: OFF\n\n📱 CELULAR:\n• Cierra TODAS las apps antes de jugar\n• Modo gaming si tu cel lo tiene\n• Datos > WiFi para menos lag (contraintuitivo pero funciona)\n\n🎯 SENSIBILIDAD:\n• Tu cel gama baja tiene DPI bajo (~270), por eso el v4.0 te da sensi más ALTA (~185-187 de general). Eso es correcto — los pixeles son más grandes y necesitas más movimiento.\n• El tapering -15 baja perfecto: 187 → 172 → 157 → 142 → 127 en AWM.\n• El Free Look déjalo en 19-21, no lo subas.\n• SensiPRO calcula todo esto automático basado en el DPI de tu pantalla.\n\n💡 Lo más importante: la TÉCNICA gana al hardware. He visto jugadores en Redmi 13C llegar a Heroico 🏆',
   },
 ];

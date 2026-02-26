@@ -174,7 +174,7 @@ function calculateForensicGyroscope(
     gyroScope2x: clamp(gyroBase - gyroTapering * 2, 0, 100),
     gyroScope4x: clamp(gyroBase - gyroTapering * 3, 0, 100),
     gyroSniper: clamp(gyroBase - gyroTapering * 4, 0, 100),
-    gyroFreeView: clamp(Math.round(gyroBase * 0.35), 5, 25),
+    gyroFreeView: clamp(Math.round(gyroBase * 0.35), 5, 15),
   };
 }
 

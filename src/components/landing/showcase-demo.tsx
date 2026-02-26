@@ -17,40 +17,43 @@ interface DemoDevice {
 
 const DEMO_DEVICES: DemoDevice[] = [
   {
-    name: 'Redmi Note 12',
+    // Samsung A13: DPI 270, 4GB, 60Hz, 6.6" → General 187, tapering -15
+    name: 'Samsung A13',
     values: [
-      { label: 'General', value: 185 },
-      { label: 'Punto Rojo', value: 177 },
-      { label: 'Mira 2x', value: 160 },
-      { label: 'Mira 4x', value: 137 },
-      { label: 'AWM', value: 83 },
-      { label: 'Vista Libre', value: 171 },
+      { label: 'General', value: 187 },
+      { label: 'Punto Rojo', value: 172 },
+      { label: 'Mira 2x', value: 157 },
+      { label: 'Mira 4x', value: 142 },
+      { label: 'AWM', value: 127 },
+      { label: 'Vista Libre', value: 20 },
     ],
-    score: 72,
+    score: 52,
   },
   {
+    // Samsung A54: DPI 401, 8GB, 120Hz, 6.4" → General ~173, tapering -15
     name: 'Samsung A54',
     values: [
-      { label: 'General', value: 198 },
-      { label: 'Punto Rojo', value: 191 },
-      { label: 'Mira 2x', value: 174 },
-      { label: 'Mira 4x', value: 149 },
-      { label: 'AWM', value: 92 },
-      { label: 'Vista Libre', value: 185 },
+      { label: 'General', value: 173 },
+      { label: 'Punto Rojo', value: 158 },
+      { label: 'Mira 2x', value: 143 },
+      { label: 'Mira 4x', value: 128 },
+      { label: 'AWM', value: 113 },
+      { label: 'Vista Libre', value: 18 },
     ],
-    score: 81,
+    score: 78,
   },
   {
+    // iPhone 15: DPI 460, 6GB, 60Hz, 6.1" → General ~170, tapering -15
     name: 'iPhone 15',
     values: [
-      { label: 'General', value: 210 },
-      { label: 'Punto Rojo', value: 203 },
-      { label: 'Mira 2x', value: 188 },
-      { label: 'Mira 4x', value: 162 },
-      { label: 'AWM', value: 98 },
-      { label: 'Vista Libre', value: 196 },
+      { label: 'General', value: 170 },
+      { label: 'Punto Rojo', value: 155 },
+      { label: 'Mira 2x', value: 140 },
+      { label: 'Mira 4x', value: 125 },
+      { label: 'AWM', value: 110 },
+      { label: 'Vista Libre', value: 17 },
     ],
-    score: 89,
+    score: 85,
   },
 ];
 
