@@ -21,6 +21,22 @@ export {
   generateHudRecommendation,
 } from './calibration-engine';
 export { generateHeadshotSensitivity, getWeaponAdjustedSensitivity } from './headshot-engine';
+export { calculateHeadshotFingerMode } from './headshot-finger-engine';
+export type {
+  GyroscopeFingerValues,
+  FireButtonRecommendation,
+  WeaponAdjustmentRow,
+  HeadshotFingerResult,
+} from './headshot-finger-engine';
+export { FINGER_PROFILES, getFingerProfile } from './finger-profiles';
+export type { FingerCount, FingerProfile } from './finger-profiles';
+export {
+  WEAPON_CATEGORIES,
+  getWeaponCategory,
+  getAllWeaponCategories,
+  getMetaWeapons,
+} from './weapon-categories';
+export type { WeaponCategory, WeaponCategoryData } from './weapon-categories';
 export type {
   AlgorithmInput,
   AlgorithmOutput,
