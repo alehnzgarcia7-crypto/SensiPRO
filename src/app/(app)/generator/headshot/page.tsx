@@ -3,16 +3,17 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import type { SensitivityOutput, GyroscopeOutput, FireButtonResult, HeadshotFingerResult } from '@ares/algorithms';
-import { calculateHeadshotFingerMode, type FingerCount } from '@ares/algorithms';
+import type { SensitivityOutput, GyroscopeOutput, FireButtonResult, HeadshotFingerResult, DeviceSpecs } from '@ares/algorithms';
+import { calculateHeadshotFingerMode, calculateDpi, type FingerCount } from '@ares/algorithms';
+import { DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX } from '@ares/config';
 import type { DeviceTier, PanelType } from '@prisma/client';
 
 import { useGeneratorStore } from '@/stores/generator.store';
 import { HeadshotHero } from '@/components/headshot/headshot-hero';
 import { HeadshotScoreGauge } from '@/components/headshot/headshot-score-gauge';
 import { HeadshotSensitivityPanel } from '@/components/headshot/headshot-sensitivity-panel';
-import { FireButtonDisplay } from '@/components/headshot/fire-button-display';
 import { FingerSelector } from '@/components/headshot/finger-selector';
+import { DpiToggle } from '@/components/generator/dpi-toggle';
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
 import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { HeadshotTechniques } from '@/components/headshot/headshot-techniques';
@@ -277,9 +278,23 @@ const sectionVariants = {
 export default function HeadshotPage() {
   const { selectedDevice, userRam, setUserRam } = useGeneratorStore();
   const [fingers, setFingers] = useState<FingerCount>(3);
+  const [dpiEnabled, setDpiEnabled] = useState(false);
   const [data, setData] = useState<HeadshotApiResponse['data'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Calcula DPI del dispositivo para mostrar en el toggle
+  const deviceDpiValue: number | null = useMemo(() => {
+    if (!selectedDevice) return null;
+    const specs: DeviceSpecs = {
+      screenHz: selectedDevice.screenHz,
+      screenSize: selectedDevice.screenSize ?? 6.5,
+      ramGb: selectedDevice.ramGb,
+      panelType: selectedDevice.panelType ?? 'LCD',
+      tier: selectedDevice.tier,
+    };
+    return calculateDpi(specs);
+  }, [selectedDevice]);
 
   const fetchHeadshot = useCallback(async () => {
     if (!selectedDevice) return;
@@ -318,27 +333,43 @@ export default function HeadshotPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userRam]);
 
+  // Aplica reducción DPI a la sensibilidad base (resta DPI_OFFSET, freeView intacto)
+  const dpiAdjustedSensitivity: SensitivityOutput | null = useMemo(() => {
+    if (!data) return null;
+    const sens = data.sensitivity;
+    if (!dpiEnabled) return sens;
+    const c = (v: number) => Math.round(Math.max(SENSITIVITY_MIN, Math.min(SENSITIVITY_MAX, v - DPI_OFFSET)));
+    return {
+      general: c(sens.general),
+      redPoint: c(sens.redPoint),
+      scope2x: c(sens.scope2x),
+      scope4x: c(sens.scope4x),
+      sniperScope: c(sens.sniperScope),
+      freeView: sens.freeView, // Free Look independiente del DPI
+    };
+  }, [data, dpiEnabled]);
+
   // Finger-adjusted sensitivity (client-side calculation)
   const fingerResult: HeadshotFingerResult | null = useMemo(() => {
-    if (!data) return null;
+    if (!dpiAdjustedSensitivity || !data) return null;
     return calculateHeadshotFingerMode(
-      data.sensitivity,
+      dpiAdjustedSensitivity,
       fingers,
       data.device.screenHz,
       data.device.screenSize,
     );
-  }, [data, fingers]);
+  }, [dpiAdjustedSensitivity, data, fingers]);
 
   // 3-finger baseline for comparison diffs
   const threeFingerBaseline: HeadshotFingerResult | null = useMemo(() => {
-    if (!data) return null;
+    if (!dpiAdjustedSensitivity || !data) return null;
     return calculateHeadshotFingerMode(
-      data.sensitivity,
+      dpiAdjustedSensitivity,
       3,
       data.device.screenHz,
       data.device.screenSize,
     );
-  }, [data]);
+  }, [dpiAdjustedSensitivity, data]);
 
   // Gyroscope values mapped to GyroscopeOutput format for the panel
   const fingerGyroscope: GyroscopeOutput | null = useMemo(() => {
@@ -374,6 +405,13 @@ export default function HeadshotPage() {
                 value={userRam}
                 onChange={setUserRam}
                 suggestedRam={selectedDevice.ramGb}
+              />
+            </div>
+            <div className="glass-card p-4">
+              <DpiToggle
+                enabled={dpiEnabled}
+                onChange={setDpiEnabled}
+                dpiValue={dpiEnabled ? deviceDpiValue : null}
               />
             </div>
             <div className="glass-card p-4">
@@ -488,19 +526,13 @@ export default function HeadshotPage() {
               />
             </motion.div>
 
-            {/* SECTION 5 — FIRE BUTTON (upgraded with recommendation) */}
+            {/* SECTION 5 — FIRE BUTTON (finger-adjusted with range bar + comparison) */}
             <motion.div custom={5} variants={sectionVariants}>
-              <FireButtonDisplay
-                fireButton={data.fireButton}
+              <FireButtonRecommendation
+                fireButton={fingerResult.fireButton}
+                fingers={fingers}
                 screenSize={data.device.screenSize}
               />
-              <div className="mt-4">
-                <FireButtonRecommendation
-                  fireButton={fingerResult.fireButton}
-                  fingers={fingers}
-                  screenSize={data.device.screenSize}
-                />
-              </div>
             </motion.div>
 
             {/* SECTION 6 — HUD PERSONALIZADO */}
