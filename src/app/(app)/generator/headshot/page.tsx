@@ -18,6 +18,10 @@ import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { HeadshotTechniques } from '@/components/headshot/headshot-techniques';
 import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
 import { TrainingPlan } from '@/components/headshot/training-plan';
+import { FingerTrainingPlan } from '@/components/headshot/finger-training-plan';
+import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
+import { ProBadge } from '@/components/headshot/pro-badge';
+import { CopyAllButton } from '@/components/headshot/copy-all-button';
 import { RamSelector } from '@/components/generator/ram-selector';
 import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
 import { GyroscopeRecommendation } from '@/components/headshot/gyroscope-recommendation';
@@ -491,21 +495,47 @@ export default function HeadshotPage() {
               <HeadshotTechniques fingers={fingers} />
             </motion.section>
 
-            {/* SECTION 7 — ARSENAL HEADSHOT */}
-            <motion.div custom={8} variants={sectionVariants}>
+            {/* SECTION 7 — ARMAS RECOMENDADAS POR TIER */}
+            <motion.section custom={8} variants={sectionVariants}>
+              <WeaponTierDisplay fingers={fingers} />
+            </motion.section>
+
+            {/* SECTION 8 — PLAN DE ENTRENAMIENTO 7 DÍAS */}
+            <motion.section custom={9} variants={sectionVariants}>
+              <FingerTrainingPlan fingers={fingers} />
+            </motion.section>
+
+            {/* SECTION 8.5 — PRO BADGE (solo 4 dedos) */}
+            <motion.section custom={10} variants={sectionVariants}>
+              <ProBadge fingers={fingers} />
+            </motion.section>
+
+            {/* SECTION 9 — COPIAR TODA LA CONFIGURACIÓN */}
+            <motion.section custom={11} variants={sectionVariants}>
+              <CopyAllButton
+                sensitivity={fingerResult.sensitivity}
+                gyroscope={fingerResult.sensitivity.gyroscope ?? null}
+                fingers={fingers}
+                fireButton={fingerResult.fireButton}
+                deviceName={`${data.device.brand} ${data.device.model}`}
+              />
+            </motion.section>
+
+            {/* SECTION 10 — ARSENAL HEADSHOT */}
+            <motion.div custom={12} variants={sectionVariants}>
               <WeaponGrid
                 weapons={data.weapons}
                 baseSensitivity={data.sensitivity}
               />
             </motion.div>
 
-            {/* SECTION 8 — CROSSHAIR PLACEMENT */}
-            <motion.div custom={9} variants={sectionVariants}>
+            {/* SECTION 11 — CROSSHAIR PLACEMENT */}
+            <motion.div custom={13} variants={sectionVariants}>
               <CrosshairGuide tips={data.tips} />
             </motion.div>
 
-            {/* SECTION 9 — TRAINING PLAN */}
-            <motion.div custom={10} variants={sectionVariants}>
+            {/* SECTION 12 — TRAINING DRILLS (diarios) */}
+            <motion.div custom={14} variants={sectionVariants}>
               <TrainingPlan drills={data.drills} />
             </motion.div>
           </motion.div>

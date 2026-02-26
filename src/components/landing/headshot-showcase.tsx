@@ -24,11 +24,14 @@ const TECHNIQUES: DragTechnique[] = [
 ];
 
 const BULLETS = [
-  'Sensibilidad diferenciada: Punto Rojo +18% para drag shots',
-  '5 técnicas de drag con guías animadas paso a paso',
-  '15 armas con sensibilidad específica por arma',
-  'Calculador de tamaño de botón de disparo',
-  'Plan de entrenamiento diario de 15 minutos',
+  'Sensibilidad adaptada a 2, 3 o 4 dedos con ajustes en tiempo real',
+  'HUD personalizado con posición de botones por tipo de agarre',
+  'Técnicas de drag (Vertical, Rotation, Direction) por nivel de dedos',
+  'Tier list de armas S/A/B según tu estilo de agarre',
+  'Plan de entrenamiento de 7 días con timer y repeticiones',
+  'Ajuste de giroscopio, botón de disparo y tabla de armas por dedo',
+  'Badge Pro Player para usuarios de 4 dedos (garra)',
+  'Copiar toda la configuración al portapapeles con un toque',
 ];
 
 // --- Mini SVG animado por técnica ---

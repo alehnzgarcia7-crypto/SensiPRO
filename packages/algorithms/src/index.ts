@@ -52,6 +52,10 @@ export {
   getTechniquesForFingers,
 } from './drag-techniques-data';
 export type { DragType, DragTechniqueData, FingerTechniqueSet } from './drag-techniques-data';
+export { TRAINING_PLANS, getTrainingPlan } from './training-plans';
+export type { TrainingExercise, TrainingDay, TrainingPlanData } from './training-plans';
+export { WEAPON_RECOMMENDATIONS, getWeaponRecommendation } from './weapon-tiers';
+export type { WeaponTierEntry, WeaponTier, WeaponRecommendation } from './weapon-tiers';
 export type {
   AlgorithmInput,
   AlgorithmOutput,
