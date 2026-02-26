@@ -3,11 +3,13 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Headshot HUD Codes — Códigos HUD REALES de Free Fire
 // personalizados por número de dedos (2/3/4) en Headshot Mode.
-// Reutiliza HudCodeBlock del generador normal + useHudCodes hook.
+// Incluye screenshots reales con frame premium de celular,
+// zoom modal, y fallback SVG para variantes sin foto.
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
   Gamepad2,
   Import,
@@ -15,29 +17,35 @@ import {
   Zap,
   ChevronDown,
   Crosshair,
+  X,
+  Maximize2,
 } from 'lucide-react';
 
 import type { FingerCount } from '@ares/algorithms';
 import { cn } from '@/lib/cn';
 import { useHudCodes } from '@/hooks/use-hud-codes';
 import { HudCodeBlock } from '@/components/generator/hud-code-block';
+import { HudVisualization } from '@/components/headshot/hud-visualization';
 
 // ─── Headshot-specific metadata per variant ───────────────────
-// Mapea los códigos de la DB con contexto para Headshot Mode.
-// Los "tags" identifican el label en la DB para hacer match.
 
 interface HeadshotHudVariant {
-  /** Coincide con el label de la DB */
   dbLabel: string;
-  /** Nombre mostrado en el Headshot Mode */
   nameEs: string;
-  /** Descripción corta para headshot */
   descriptionEs: string;
-  /** Pros en contexto de headshot */
   prosEs: string[];
-  /** Contras en contexto de headshot */
   consEs: string[];
+  /** Ruta a screenshot real de Free Fire (si existe) */
+  screenshot?: string;
 }
+
+// ─── Mapeo de screenshots por código HUD ──────────────────────
+
+const SCREENSHOT_BY_CODE: Record<string, string> = {
+  '#FFHUDT6O3jSJjT59Po7eO': '/images/hud/hud-2d-clasico.png',
+  '#FFHUDT6O3jjZ0/KhPo7eM': '/images/hud/hud-3d-velocidad.png',
+  '#FFHUDT6O3jAwzFJlPo7eM': '/images/hud/hud-4d-garra-tactica.png',
+};
 
 const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
   2: [
@@ -55,6 +63,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Sin botón dedicado de agacharse',
         'Difícil hacer peek + shoot simultáneo',
       ],
+      screenshot: '/images/hud/hud-2d-clasico.png',
     },
     {
       dbLabel: 'Precisión Alta',
@@ -102,6 +111,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Requiere adaptación si vienes de 2 dedos',
         'El tercer dedo puede cansarse al inicio',
       ],
+      screenshot: '/images/hud/hud-3d-velocidad.png',
     },
     {
       dbLabel: 'Precisión Sniper',
@@ -149,6 +159,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Requiere ~14 días de adaptación',
         'Puede ser incómodo en celulares pequeños',
       ],
+      screenshot: '/images/hud/hud-4d-garra-tactica.png',
     },
     {
       dbLabel: 'Garra Equilibrada',
@@ -216,6 +227,204 @@ function StatBar({ value, delay }: { value: number; delay: number }) {
   );
 }
 
+// ─── Phone Frame con Screenshot Premium ───────────────────────
+
+interface PhoneFrameProps {
+  screenshot: string;
+  variantName: string;
+  onZoom: () => void;
+}
+
+function PhoneFrame({ screenshot, variantName, onZoom }: PhoneFrameProps) {
+  return (
+    <div className="relative mx-auto w-full max-w-[480px]">
+      {/* Frame del celular */}
+      <motion.div
+        className="relative rounded-[24px] overflow-hidden cursor-pointer group/frame"
+        style={{
+          border: '1px solid rgba(0,255,255,0.15)',
+          boxShadow:
+            '0 0 40px rgba(0,255,255,0.08), 0 20px 60px rgba(0,0,0,0.5)',
+          background: '#000',
+        }}
+        whileHover={{
+          y: -4,
+          boxShadow:
+            '0 0 60px rgba(0,255,255,0.15), 0 24px 70px rgba(0,0,0,0.6)',
+        }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        onClick={onZoom}
+      >
+        {/* Imagen del screenshot */}
+        <div className="relative aspect-[16/9] w-full">
+          <Image
+            src={screenshot}
+            alt={`HUD ${variantName} — Captura real de Free Fire`}
+            fill
+            className="object-cover rounded-[22px]"
+            sizes="(max-width: 640px) 100vw, 480px"
+            priority
+          />
+
+          {/* Reflejo de vidrio — gradiente diagonal */}
+          <div
+            className="absolute inset-0 rounded-[22px] pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%)',
+            }}
+          />
+
+          {/* Hover overlay con icono de zoom */}
+          <div className="absolute inset-0 rounded-[22px] bg-black/0 group-hover/frame:bg-black/20 transition-colors duration-200 flex items-center justify-center">
+            <motion.div
+              className="opacity-0 group-hover/frame:opacity-100 transition-opacity duration-200"
+              initial={false}
+            >
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                <Maximize2 size={12} className="text-white/80" />
+                <span className="text-[10px] font-ui text-white/80 uppercase tracking-wider">
+                  Ampliar
+                </span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Notch del celular */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-[3px] rounded-b-full bg-white/[0.06]" />
+      </motion.div>
+
+      {/* Badge flotante — CAPTURA REAL */}
+      <div
+        className="absolute -top-2.5 right-3 z-10 px-2.5 py-1 rounded-lg"
+        style={{
+          background: 'rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
+        <span className="text-[9px] font-ui font-bold uppercase tracking-[0.15em] text-cyan-300/90">
+          CAPTURA REAL
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── SVG Preview Fallback ─────────────────────────────────────
+
+interface SvgPreviewProps {
+  fingers: FingerCount;
+}
+
+function SvgPreview({ fingers }: SvgPreviewProps) {
+  return (
+    <div className="relative mx-auto w-full max-w-[480px]">
+      <div
+        className="relative rounded-[24px] overflow-hidden"
+        style={{
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+          background: 'linear-gradient(145deg, rgba(15,23,42,0.95), rgba(2,6,23,0.98))',
+        }}
+      >
+        <HudVisualization fingers={fingers} showLabels />
+      </div>
+
+      {/* Badge — Vista Previa */}
+      <div
+        className="absolute -top-2.5 right-3 z-10 px-2.5 py-1 rounded-lg"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <span className="text-[9px] font-ui font-bold uppercase tracking-[0.15em] text-slate-500">
+          VISTA PREVIA
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Zoom Modal Fullscreen ────────────────────────────────────
+
+interface ZoomModalProps {
+  screenshot: string;
+  variantName: string;
+  onClose: () => void;
+}
+
+function ZoomModal({ screenshot, variantName, onClose }: ZoomModalProps) {
+  // Cerrar con ESC
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKey);
+    // Bloquear scroll del body
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/90"
+        onClick={onClose}
+      />
+
+      {/* Imagen con animación de scale */}
+      <motion.div
+        className="relative z-10 w-[95vw] max-w-[900px] aspect-[16/9]"
+        initial={{ scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.85, opacity: 0 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+      >
+        <Image
+          src={screenshot}
+          alt={`HUD ${variantName} — Vista ampliada`}
+          fill
+          className="object-contain rounded-xl"
+          sizes="95vw"
+          priority
+        />
+
+        {/* Nombre de la variante */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/70 backdrop-blur-md border border-white/10">
+          <span className="text-xs font-ui font-semibold text-white/90 tracking-wide">
+            {variantName}
+          </span>
+        </div>
+      </motion.div>
+
+      {/* Botón cerrar */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-20 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+        aria-label="Cerrar vista ampliada"
+      >
+        <X size={20} />
+      </button>
+    </motion.div>
+  );
+}
+
 // ─── Props ────────────────────────────────────────────────────
 
 interface HeadshotHudCodesProps {
@@ -227,6 +436,8 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
   const { codes, isLoading, error } = useHudCodes({ fingers, screenSize });
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const [expandedPros, setExpandedPros] = useState(false);
+  const [zoomScreenshot, setZoomScreenshot] = useState<string | null>(null);
+  const [zoomVariantName, setZoomVariantName] = useState('');
 
   // Reset selección cuando cambian los dedos
   const [prevFingers, setPrevFingers] = useState(fingers);
@@ -238,16 +449,28 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
 
   const variants = HEADSHOT_VARIANTS[fingers];
 
-  // Mapear variantes headshot a códigos de la DB
+  // Mapear variantes headshot a códigos de la DB, resolviendo screenshot dinámico
   const variantCodes = useMemo(() => {
     return variants.map((variant) => {
       const match = codes.find((c) => c.label === variant.dbLabel);
-      return { variant, code: match ?? null };
+      // Determinar screenshot: primero del mapeo por código, luego el estático de la variante
+      const codeScreenshot = match ? SCREENSHOT_BY_CODE[match.code] : undefined;
+      const resolvedScreenshot = codeScreenshot ?? variant.screenshot;
+      return { variant: { ...variant, screenshot: resolvedScreenshot }, code: match ?? null };
     });
   }, [variants, codes]);
 
   const active = variantCodes[selectedVariantIdx];
   if (!active) return null;
+
+  const handleOpenZoom = useCallback((src: string, name: string) => {
+    setZoomScreenshot(src);
+    setZoomVariantName(name);
+  }, []);
+
+  const handleCloseZoom = useCallback(() => {
+    setZoomScreenshot(null);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -310,10 +533,53 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
           className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
         >
           <div className="p-4 space-y-4">
+            {/* ─── Screenshot / Preview (ARRIBA de todo) ─── */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`img-${fingers}-${selectedVariantIdx}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                {active.variant.screenshot ? (
+                  <PhoneFrame
+                    screenshot={active.variant.screenshot}
+                    variantName={active.variant.nameEs}
+                    onZoom={() =>
+                      handleOpenZoom(active.variant.screenshot!, active.variant.nameEs)
+                    }
+                  />
+                ) : (
+                  <SvgPreview fingers={fingers} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+
             {/* Descripción */}
             <p className="text-xs text-slate-400 leading-relaxed font-body">
               {active.variant.descriptionEs}
             </p>
+
+            {/* Código HUD */}
+            {isLoading ? (
+              <div className="flex items-center gap-2 py-3">
+                <div className="w-3 h-3 border-2 border-ice-400 border-t-transparent rounded-full animate-spin" />
+                <span className="text-[11px] text-slate-500">Cargando código HUD...</span>
+              </div>
+            ) : error || !active.code ? (
+              <div className="py-2 px-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                <p className="text-[11px] text-red-400/70">
+                  No se encontró el código HUD para esta variante
+                </p>
+              </div>
+            ) : (
+              <HudCodeBlock
+                code={active.code.code}
+                label={active.code.label}
+                playerName={active.code.playerName}
+              />
+            )}
 
             {/* Stats */}
             {active.code && (
@@ -337,26 +603,6 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
                   );
                 })}
               </div>
-            )}
-
-            {/* Código HUD */}
-            {isLoading ? (
-              <div className="flex items-center gap-2 py-3">
-                <div className="w-3 h-3 border-2 border-ice-400 border-t-transparent rounded-full animate-spin" />
-                <span className="text-[11px] text-slate-500">Cargando código HUD...</span>
-              </div>
-            ) : error || !active.code ? (
-              <div className="py-2 px-3 rounded-lg bg-red-500/5 border border-red-500/10">
-                <p className="text-[11px] text-red-400/70">
-                  No se encontró el código HUD para esta variante
-                </p>
-              </div>
-            ) : (
-              <HudCodeBlock
-                code={active.code.code}
-                label={active.code.label}
-                playerName={active.code.playerName}
-              />
             )}
 
             {/* Pros y Contras — Colapsable */}
@@ -422,6 +668,17 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
             </div>
           </div>
         </motion.div>
+      </AnimatePresence>
+
+      {/* ═══ ZOOM MODAL ═══ */}
+      <AnimatePresence>
+        {zoomScreenshot && (
+          <ZoomModal
+            screenshot={zoomScreenshot}
+            variantName={zoomVariantName}
+            onClose={handleCloseZoom}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
