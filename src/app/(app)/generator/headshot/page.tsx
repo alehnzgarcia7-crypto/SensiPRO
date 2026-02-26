@@ -340,6 +340,24 @@ export default function HeadshotPage() {
     );
   }, [data]);
 
+  // Gyroscope values mapped to GyroscopeOutput format for the panel
+  const fingerGyroscope: GyroscopeOutput | null = useMemo(() => {
+    if (!fingerResult) return null;
+    const gyro = fingerResult.sensitivity.gyroscope;
+    if (!gyro) {
+      // Gyroscope disabled for this finger count (e.g. 2 dedos) — use base values
+      return data?.gyroscope ?? null;
+    }
+    return {
+      gyroGeneral: gyro.general,
+      gyroRedPoint: gyro.redPoint,
+      gyroScope2x: gyro.scope2x,
+      gyroScope4x: gyro.scope4x,
+      gyroSniper: gyro.sniperScope,
+      gyroFreeView: Math.max(0, gyro.sniperScope - 10),
+    };
+  }, [fingerResult, data]);
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-4 pb-24 space-y-8">
       {/* SECTION 1 — HERO */}
@@ -419,8 +437,8 @@ export default function HeadshotPage() {
             {/* SECTION 4 — SENSIBILIDAD HEADSHOT (with finger diffs) */}
             <motion.div custom={2} variants={sectionVariants}>
               <HeadshotSensitivityPanel
-                sensitivity={data.sensitivity}
-                gyroscope={data.gyroscope}
+                sensitivity={fingerResult.sensitivity}
+                gyroscope={fingerGyroscope ?? data.gyroscope}
                 normalSensitivity={data.normalSensitivity}
                 normalGyroscope={data.normalGyroscope}
               />
