@@ -13,8 +13,9 @@ import { HeadshotScoreGauge } from '@/components/headshot/headshot-score-gauge';
 import { HeadshotSensitivityPanel } from '@/components/headshot/headshot-sensitivity-panel';
 import { FireButtonDisplay } from '@/components/headshot/fire-button-display';
 import { FingerSelector } from '@/components/headshot/finger-selector';
-import { DragTechniqueCard } from '@/components/headshot/drag-technique-card';
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
+import { HudRecommendation } from '@/components/headshot/hud-recommendation';
+import { HeadshotTechniques } from '@/components/headshot/headshot-techniques';
 import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
 import { TrainingPlan } from '@/components/headshot/training-plan';
 import { RamSelector } from '@/components/generator/ram-selector';
@@ -480,23 +481,18 @@ export default function HeadshotPage() {
               </div>
             </motion.div>
 
-            {/* SECTION 6 — TÉCNICAS DE DRAG */}
+            {/* SECTION 6 — HUD PERSONALIZADO */}
             <motion.section custom={6} variants={sectionVariants}>
-              <h3 className="font-heading font-bold text-white text-xl md:text-2xl mb-1">
-                TÉCNICAS DE DRAG HEADSHOT
-              </h3>
-              <p className="text-sm text-slate-500 font-body mb-5">
-                Domina estas 5 técnicas y serás imparable
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {data.techniques.map((tech, i) => (
-                  <DragTechniqueCard key={tech.id} technique={tech} index={i} />
-                ))}
-              </div>
+              <HudRecommendation fingers={fingers} />
+            </motion.section>
+
+            {/* SECTION 6.5 — TÉCNICAS DE HEADSHOT (finger-aware) */}
+            <motion.section custom={7} variants={sectionVariants}>
+              <HeadshotTechniques fingers={fingers} />
             </motion.section>
 
             {/* SECTION 7 — ARSENAL HEADSHOT */}
-            <motion.div custom={7} variants={sectionVariants}>
+            <motion.div custom={8} variants={sectionVariants}>
               <WeaponGrid
                 weapons={data.weapons}
                 baseSensitivity={data.sensitivity}
@@ -504,12 +500,12 @@ export default function HeadshotPage() {
             </motion.div>
 
             {/* SECTION 8 — CROSSHAIR PLACEMENT */}
-            <motion.div custom={8} variants={sectionVariants}>
+            <motion.div custom={9} variants={sectionVariants}>
               <CrosshairGuide tips={data.tips} />
             </motion.div>
 
             {/* SECTION 9 — TRAINING PLAN */}
-            <motion.div custom={9} variants={sectionVariants}>
+            <motion.div custom={10} variants={sectionVariants}>
               <TrainingPlan drills={data.drills} />
             </motion.div>
           </motion.div>
