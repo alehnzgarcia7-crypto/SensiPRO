@@ -8,7 +8,7 @@ const s24Ultra: DeviceForComparison = {
   brand: 'Samsung',
   model: 'Galaxy S24 Ultra',
   slug: 'samsung-galaxy-s24-ultra',
-  specs: { screenHz: 120, screenSize: 6.8, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING' },
+  specs: { screenHz: 120, screenSize: 6.8, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', screenDpi: 505 },
 };
 
 const a14: DeviceForComparison = {
@@ -16,7 +16,7 @@ const a14: DeviceForComparison = {
   brand: 'Samsung',
   model: 'Galaxy A14',
   slug: 'samsung-galaxy-a14',
-  specs: { screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW' },
+  specs: { screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', screenDpi: 270 },
 };
 
 describe('compareDevices', () => {
@@ -93,9 +93,10 @@ describe('compareDevices', () => {
   it('gyro values differ between high-end and low-end devices', () => {
     const result = compareDevices(s24Ultra, a14, 'BALANCED', true);
     expect(result.gyroDiff).not.toBeNull();
-    // S24 Ultra tiene AMOLED + GAMING bonus, sus gyro values deben ser mayores
+    // v4.0: A14 (DPI 270) tiene sensi/gyro MÁS ALTO que S24 Ultra (DPI 505)
+    // porque DPI bajo = más sensibilidad necesaria
     const gyroGeneral = result.gyroDiff!.find((f) => f.label === 'Gyro General');
     expect(gyroGeneral).toBeDefined();
-    expect(gyroGeneral!.winner).toBe('A');
+    expect(gyroGeneral!.winner).toBe('B');
   });
 });

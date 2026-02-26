@@ -7,39 +7,16 @@ export const APP_NAME = 'Sensibilidades PRO';
 export const APP_CODENAME = 'ARES';
 export const APP_DOMAIN = 'sensibilidadespro.com';
 
-// Sensitivity ranges (Free Fire escala 0-200 desde OB50)
-export const SENSITIVITY_MIN = 0;
+// Sensitivity ranges (Free Fire escala 1-200 desde OB50)
+export const SENSITIVITY_MIN = 1;
 export const SENSITIVITY_MAX = 200;
 
 // Gyroscope range (giroscopio usa escala 0-100, pros usan 20-40)
 export const GYRO_MIN = 0;
 export const GYRO_MAX = 100;
 
-// BASE: valores para un dispositivo MEDIO (6GB RAM, 60Hz, IPS, MID tier)
-// Basado en rangos reales de pro players de Free Fire LATAM:
-//   General 85-110 | Red Dot 75-95 | 2x 60-80 | 4x 45-65 | Sniper 25-45 | FreeView 70-90
-export const BASE_SENSITIVITY = {
-  general: 95,
-  redPoint: 85,
-  scope2x: 70,
-  scope4x: 55,
-  sniperScope: 35,
-  freeView: 80,
-} as const;
-
-// RAM: MÁS RAM = MENOS sensibilidad necesaria (hardware compensa)
-// MENOS RAM = MÁS sensibilidad necesaria (compensar input lag, touch delay)
-// Factores reducidos para mantener rangos realistas (±8 max)
+// RAM options para UI selector
 export const RAM_OPTIONS = [2, 3, 4, 6, 8, 12, 16] as const;
-export const RAM_FACTORS: Record<number, number> = {
-  2: +8,
-  3: +5,
-  4: +3,
-  6: 0,
-  8: -2,
-  12: -4,
-  16: -5,
-};
 
 // CALIBRACIÓN: offsets por estilo de juego
 // ALTA = agresivo/rush: valores más altos para reacciones rápidas

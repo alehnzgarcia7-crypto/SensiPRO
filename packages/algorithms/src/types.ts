@@ -7,6 +7,7 @@ export interface DeviceSpecs {
   panelType: PanelType;
   tier: DeviceTier;
   ppi?: number;
+  screenDpi?: number;
 }
 
 export interface AlgorithmInput {
@@ -14,6 +15,7 @@ export interface AlgorithmInput {
   style: SensitivityStyle;
   includeGyro?: boolean;
   userRam?: number;
+  customDpi?: number;
 }
 
 export interface CalibrationInput {
@@ -43,6 +45,19 @@ export interface GyroscopeOutput {
   gyroFreeView: number;
 }
 
+export interface ForensicMetadata {
+  algorithmVersion: string;
+  effectiveDpi: number;
+  generalBase: number;
+  adjustments: {
+    ram: number;
+    hz: number;
+    screen: number;
+    style: number;
+  };
+  tapering: number;
+}
+
 export interface AlgorithmOutput {
   sensitivity: SensitivityOutput;
   gyroscope: GyroscopeOutput | null;
@@ -52,6 +67,7 @@ export interface AlgorithmOutput {
     deviceTier: DeviceTier;
     algorithm: string;
   };
+  metadata: ForensicMetadata;
 }
 
 export interface CalibrationResult {

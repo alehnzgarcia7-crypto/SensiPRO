@@ -4,31 +4,32 @@ import { generateGyroscope } from '../gyroscope-engine';
 import type { SensitivityOutput } from '../types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES GYROSCOPE ENGINE v3.0 — Tests
+// ARES GYROSCOPE ENGINE v4.0 — Tests
 // Rango: 0-100 (giroscopio Free Fire, pros usan 20-40)
+// Factores recalibrados para sensitivity engine v4.0
 // ═══════════════════════════════════════════════════════════
 
-// Valores típicos para dispositivo medio (MEDIA calibración, 6GB)
+// Valores v4.0 para dispositivo medio (DPI 395, 4GB, 60Hz, 6.5")
 const midSensitivity: SensitivityOutput = {
-  general: 183,
+  general: 179,
+  redPoint: 164,
+  scope2x: 149,
+  scope4x: 134,
+  sniperScope: 119,
+  freeView: 19,
+};
+
+// Valores v4.0 para Samsung A13 (DPI 270, 4GB, 60Hz, 6.6")
+const lowEndSensitivity: SensitivityOutput = {
+  general: 187,
   redPoint: 172,
-  scope2x: 155,
-  scope4x: 133,
-  sniperScope: 80,
-  freeView: 166,
+  scope2x: 157,
+  scope4x: 142,
+  sniperScope: 127,
+  freeView: 20,
 };
 
-// Valores típicos para iPhone 14 Pro Max
-const highEndSensitivity: SensitivityOutput = {
-  general: 189,
-  redPoint: 177,
-  scope2x: 160,
-  scope4x: 137,
-  sniperScope: 83,
-  freeView: 171,
-};
-
-describe('generateGyroscope v3.0', () => {
+describe('generateGyroscope v4.0', () => {
   it('retorna todos los 6 campos de giroscopio', () => {
     const result = generateGyroscope(midSensitivity);
     expect(result).toHaveProperty('gyroGeneral');
@@ -40,40 +41,34 @@ describe('generateGyroscope v3.0', () => {
   });
 
   it('todos los valores clamped 0-100', () => {
-    const result = generateGyroscope(highEndSensitivity);
+    const result = generateGyroscope(midSensitivity);
     Object.values(result).forEach((v) => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(100);
     });
   });
 
-  it('valores en rango pro (20-40) para dispositivo medio', () => {
+  it('valores en rango razonable para dispositivo medio', () => {
     const result = generateGyroscope(midSensitivity);
-    // gyroGeneral: 183 * 0.18 = 32.94 → 33
+    // gyroGeneral: 179 * 0.17 = 30.43 → 30
     expect(result.gyroGeneral).toBeGreaterThanOrEqual(20);
     expect(result.gyroGeneral).toBeLessThanOrEqual(45);
-    // gyroRedPoint: 172 * 0.20 = 34.4 → 34
+    // gyroRedPoint: 164 * 0.19 = 31.16 → 31
     expect(result.gyroRedPoint).toBeGreaterThanOrEqual(20);
     expect(result.gyroRedPoint).toBeLessThanOrEqual(45);
   });
 
-  it('gyroSniper usa factor más alto (0.35) para estabilidad', () => {
+  it('gyroFreeView derivado de gyroGeneral (no de freeView directo)', () => {
     const result = generateGyroscope(midSensitivity);
-    // sniperScope: 80 * 0.35 = 28
-    expect(result.gyroSniper).toBe(28);
+    // gyroFreeView = round(gyroGeneral * 0.55), clamped 5-25
+    const expected = Math.round(result.gyroGeneral * 0.55);
+    expect(result.gyroFreeView).toBe(Math.max(5, Math.min(25, expected)));
   });
 
-  it('gyroFreeView usa factor más bajo (0.15)', () => {
+  it('scopes con más zoom producen valores razonables', () => {
     const result = generateGyroscope(midSensitivity);
-    // freeView: 166 * 0.15 = 24.9 → 25
-    expect(result.gyroFreeView).toBe(25);
-  });
-
-  it('miras con más zoom reciben factor más alto', () => {
-    const result = generateGyroscope(midSensitivity);
-    // Factor progresivo: general(0.18) < redPoint(0.20) < scope2x(0.22) < scope4x(0.25) < sniper(0.35)
-    // Sniper tiene factor alto para compensar su valor base bajo
-    expect(result.gyroSniper).toBeGreaterThanOrEqual(20);
+    // Los factores suben ligeramente para compensar valores base más bajos
+    expect(result.gyroSniper).toBeGreaterThanOrEqual(15);
     expect(result.gyroSniper).toBeLessThanOrEqual(40);
   });
 
@@ -85,17 +80,24 @@ describe('generateGyroscope v3.0', () => {
 
   it('verified calculation: mid device gyro values', () => {
     const result = generateGyroscope(midSensitivity);
-    // gyroGeneral:   183 * 0.18 = 32.94 → 33
-    expect(result.gyroGeneral).toBe(33);
-    // gyroRedPoint:  172 * 0.20 = 34.4 → 34
-    expect(result.gyroRedPoint).toBe(34);
-    // gyroScope2x:   155 * 0.22 = 34.1 → 34
-    expect(result.gyroScope2x).toBe(34);
-    // gyroScope4x:   133 * 0.25 = 33.25 → 33
-    expect(result.gyroScope4x).toBe(33);
-    // gyroSniper:    80 * 0.35 = 28
-    expect(result.gyroSniper).toBe(28);
-    // gyroFreeView:  166 * 0.15 = 24.9 → 25
-    expect(result.gyroFreeView).toBe(25);
+    // gyroGeneral:   179 * 0.17 = 30.43 → 30
+    expect(result.gyroGeneral).toBe(30);
+    // gyroRedPoint:  164 * 0.19 = 31.16 → 31
+    expect(result.gyroRedPoint).toBe(31);
+    // gyroScope2x:   149 * 0.19 = 28.31 → 28
+    expect(result.gyroScope2x).toBe(28);
+    // gyroScope4x:   134 * 0.20 = 26.8 → 27
+    expect(result.gyroScope4x).toBe(27);
+    // gyroSniper:    119 * 0.20 = 23.8 → 24
+    expect(result.gyroSniper).toBe(24);
+    // gyroFreeView:  round(30 * 0.55) = round(16.5) = 17, clamped [5,25] → 17
+    expect(result.gyroFreeView).toBe(17);
+  });
+
+  it('low-end device produces higher gyro (compensating lower response)', () => {
+    const midResult = generateGyroscope(midSensitivity);
+    const lowResult = generateGyroscope(lowEndSensitivity);
+    // Low-end has higher sensitivity → higher gyro general
+    expect(lowResult.gyroGeneral).toBeGreaterThanOrEqual(midResult.gyroGeneral);
   });
 });

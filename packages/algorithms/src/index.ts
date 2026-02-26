@@ -1,4 +1,4 @@
-export { generateSensitivity } from './sensitivity-engine';
+export { generateSensitivity, estimateDpiFromDevice } from './sensitivity-engine';
 export { generateGyroscope } from './gyroscope-engine';
 export { getStyleMultipliers, getAllStyles } from './style-system';
 export { analyzeDeviceSpecs, calculatePerformanceScore, autoDetectTier } from './device-analyzer';
@@ -34,6 +34,7 @@ export type {
   StyleMultipliers,
   DeviceSpecs,
   SpecWeights,
+  ForensicMetadata,
   FireButtonResult,
   HeadshotResult,
 } from './types';

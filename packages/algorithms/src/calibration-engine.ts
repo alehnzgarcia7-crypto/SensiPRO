@@ -29,7 +29,7 @@ import { generateGyroscope } from './gyroscope-engine';
 import { calculatePerformanceScore } from './device-analyzer';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES CALIBRATION ENGINE v3.0
+// ARES CALIBRATION ENGINE v4.0
 // ═══════════════════════════════════════════════════════════════
 //
 // Genera 6 combinaciones: BAJA×sinDPI, BAJA×conDPI,
@@ -41,7 +41,11 @@ import { calculatePerformanceScore } from './device-analyzer';
 // ALTA:  offset +15 (agresivo/rush)
 //
 // DPI: resta 12 puntos uniformemente (pantalla más densa)
-// Clamp global: 0-200
+// Clamp global: 1-200
+//
+// NOTE: Calibration offsets apply ON TOP of the v4.0 forensic
+// engine output, which already includes DPI-based calculation
+// and style adjustments.
 
 const CALIBRATION_LEVELS: CalibrationLevel[] = ['BAJA', 'MEDIA', 'ALTA'];
 const DPI_MODES = [false, true] as const;
@@ -150,7 +154,7 @@ export function generateHudRecommendation(screenSize: number): HudRecommendation
 export function generateCalibration(input: CalibrationInput): CalibrationResult {
   const { specs, style, calibration, dpiMode, includeGyro, userRam } = input;
 
-  // Generar sensibilidad base con el motor v3.0 (valores RAW)
+  // Generar sensibilidad base con el motor v4.0 (DPI-forensic)
   const baseResult = generateSensitivity({ specs, style, includeGyro, userRam });
 
   // Aplicar offset de calibración + clamp 0-200
@@ -210,7 +214,7 @@ export function generateAllCalibrations(
     meta: {
       styleApplied: style,
       deviceTier: specs.tier,
-      algorithm: 'ARES-v3.0-calibration',
+      algorithm: 'ARES-v4.0-calibration',
     },
   };
 }

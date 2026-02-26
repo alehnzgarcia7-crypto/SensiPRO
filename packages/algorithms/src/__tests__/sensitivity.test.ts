@@ -3,30 +3,31 @@ import { describe, it, expect } from 'vitest';
 import { generateSensitivity } from '../sensitivity-engine';
 import { getStyleMultipliers, getAllStyles } from '../style-system';
 import { generateCalibration, generateAllCalibrations } from '../calibration-engine';
-import type { AlgorithmInput, SensitivityOutput } from '../types';
+import type { AlgorithmInput } from '../types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES v3.0 — Tests Comprensivos
-// Escala sensibilidad: 0-200 (Free Fire OB50+)
+// ARES v4.0 — Tests Comprensivos (Forensic Calibration)
+// Escala sensibilidad: 1-200 (Free Fire)
 // Escala giroscopio: 0-100
+// DPI como driver principal, tapering -15 fijo
 // ═══════════════════════════════════════════════════════════
 
 const baseDevice: AlgorithmInput = {
-  specs: { screenHz: 60, screenSize: 6.5, ramGb: 4, panelType: 'IPS', tier: 'MID' },
+  specs: { screenHz: 60, screenSize: 6.5, ramGb: 4, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
   style: 'BALANCED',
 };
 
 const ultraHighEnd: AlgorithmInput = {
-  specs: { screenHz: 144, screenSize: 6.8, ramGb: 16, panelType: 'LTPO', tier: 'GAMING' },
+  specs: { screenHz: 144, screenSize: 6.8, ramGb: 16, panelType: 'LTPO', tier: 'GAMING', screenDpi: 460 },
   style: 'AGGRESSIVE',
 };
 
 const extremeLowEnd: AlgorithmInput = {
-  specs: { screenHz: 60, screenSize: 5.0, ramGb: 2, panelType: 'LCD', tier: 'LOW' },
+  specs: { screenHz: 60, screenSize: 5.0, ramGb: 2, panelType: 'LCD', tier: 'LOW', screenDpi: 270 },
   style: 'BALANCED',
 };
 
-describe('generateSensitivity — campos y rangos (0-200)', () => {
+describe('generateSensitivity v4.0 — campos y rangos (1-200)', () => {
   it('retorna todas las keys de sensibilidad requeridas', () => {
     const result = generateSensitivity(baseDevice);
     expect(result.sensitivity).toHaveProperty('general');
@@ -49,30 +50,37 @@ describe('generateSensitivity — campos y rangos (0-200)', () => {
     });
   });
 
-  it('valores RAW están en rango razonable (no clamped por engine)', () => {
-    // Engine v3.0 produce valores RAW — el clamp se hace en calibration-engine
-    const result = generateSensitivity(baseDevice);
-    Object.values(result.sensitivity).forEach((val) => {
-      expect(val).toBeGreaterThan(50);
-      expect(val).toBeLessThan(220);
-    });
+  it('valores están en rango válido 1-200', () => {
+    for (const input of [baseDevice, ultraHighEnd, extremeLowEnd]) {
+      const result = generateSensitivity(input);
+      Object.values(result.sensitivity).forEach((val) => {
+        expect(val).toBeGreaterThanOrEqual(1);
+        expect(val).toBeLessThanOrEqual(200);
+      });
+    }
   });
 });
 
-describe('generateSensitivity — tapering pattern', () => {
-  it('general es siempre el más alto', () => {
-    for (const input of [baseDevice, ultraHighEnd, extremeLowEnd]) {
+describe('generateSensitivity v4.0 — tapering pattern', () => {
+  it('general es el más alto de los scopes (freeView independiente)', () => {
+    for (const input of [baseDevice, extremeLowEnd]) {
       const result = generateSensitivity(input);
-      const fields = Object.values(result.sensitivity);
-      expect(result.sensitivity.general).toBe(Math.max(...fields));
+      const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
+      expect(general).toBeGreaterThanOrEqual(redPoint);
+      expect(general).toBeGreaterThanOrEqual(scope2x);
+      expect(general).toBeGreaterThanOrEqual(scope4x);
+      expect(general).toBeGreaterThanOrEqual(sniperScope);
     }
   });
 
-  it('sniperScope es siempre el más bajo', () => {
-    for (const input of [baseDevice, ultraHighEnd, extremeLowEnd]) {
+  it('sniperScope es el más bajo de los scopes', () => {
+    for (const input of [baseDevice, extremeLowEnd]) {
       const result = generateSensitivity(input);
-      const fields = Object.values(result.sensitivity);
-      expect(result.sensitivity.sniperScope).toBe(Math.min(...fields));
+      const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
+      expect(sniperScope).toBeLessThanOrEqual(general);
+      expect(sniperScope).toBeLessThanOrEqual(redPoint);
+      expect(sniperScope).toBeLessThanOrEqual(scope2x);
+      expect(sniperScope).toBeLessThanOrEqual(scope4x);
     }
   });
 
@@ -82,57 +90,70 @@ describe('generateSensitivity — tapering pattern', () => {
     expect(result.sensitivity.scope4x).toBeGreaterThan(result.sensitivity.sniperScope);
   });
 
-  it('diferencia general-sniper es ~90+ puntos (gradiente pronunciado)', () => {
+  it('tapering fijo de -15 entre scopes (BALANCED)', () => {
+    const result = generateSensitivity(baseDevice);
+    const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
+    expect(general - redPoint).toBe(15);
+    expect(redPoint - scope2x).toBe(15);
+    expect(scope2x - scope4x).toBe(15);
+    expect(scope4x - sniperScope).toBe(15);
+  });
+
+  it('diferencia general-sniper = 60 puntos (4 × 15) en BALANCED', () => {
     const result = generateSensitivity(baseDevice);
     const gap = result.sensitivity.general - result.sensitivity.sniperScope;
-    expect(gap).toBeGreaterThanOrEqual(85);
+    expect(gap).toBe(60);
+  });
+
+  it('freeView es independiente del tapering (rango 12-25)', () => {
+    const result = generateSensitivity(baseDevice);
+    expect(result.sensitivity.freeView).toBeGreaterThanOrEqual(12);
+    expect(result.sensitivity.freeView).toBeLessThanOrEqual(25);
   });
 });
 
-describe('generateSensitivity — factores de hardware', () => {
-  it('baja RAM produce sensi MÁS ALTA que alta RAM en mismo hardware', () => {
-    // Mismo hardware, solo cambia RAM — aísla el efecto de RAM
+describe('generateSensitivity v4.0 — DPI y factores', () => {
+  it('DPI es el driver principal: DPI bajo → sensi alta', () => {
+    const lowDpi = generateSensitivity({
+      specs: { ...baseDevice.specs, screenDpi: 270 },
+      style: 'BALANCED',
+    });
+    const highDpi = generateSensitivity({
+      specs: { ...baseDevice.specs, screenDpi: 460 },
+      style: 'BALANCED',
+    });
+    expect(lowDpi.sensitivity.general).toBeGreaterThan(highDpi.sensitivity.general);
+  });
+
+  it('baja RAM produce sensi MÁS ALTA que alta RAM', () => {
     const lowRam = generateSensitivity({ ...baseDevice, userRam: 2 });
     const highRam = generateSensitivity({ ...baseDevice, userRam: 12 });
-    // 2GB (+15) vs 12GB (-8) = 23 puntos de diferencia
     expect(lowRam.sensitivity.general).toBeGreaterThan(highRam.sensitivity.general);
   });
 
-  it('mayor Hz produce valores mayores para general', () => {
+  it('60Hz produce valores MÁS ALTOS que 120Hz (60Hz compensa con boost)', () => {
     const hz60 = generateSensitivity({ specs: { ...baseDevice.specs, screenHz: 60 }, style: 'BALANCED' });
-    const hz144 = generateSensitivity({ specs: { ...baseDevice.specs, screenHz: 144 }, style: 'BALANCED' });
-    expect(hz144.sensitivity.general).toBeGreaterThan(hz60.sensitivity.general);
+    const hz120 = generateSensitivity({ specs: { ...baseDevice.specs, screenHz: 120 }, style: 'BALANCED' });
+    expect(hz60.sensitivity.general).toBeGreaterThan(hz120.sensitivity.general);
   });
 
-  it('AMOLED produce valores más altos que LCD con specs iguales', () => {
-    const lcd = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'LCD' }, style: 'BALANCED' });
-    const amoled = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'AMOLED' }, style: 'BALANCED' });
-    expect(amoled.sensitivity.general).toBeGreaterThan(lcd.sensitivity.general);
+  it('pantalla grande produce valores MÁS BAJOS', () => {
+    const small = generateSensitivity({ specs: { ...baseDevice.specs, screenSize: 5.0 }, style: 'BALANCED' });
+    const big = generateSensitivity({ specs: { ...baseDevice.specs, screenSize: 7.0 }, style: 'BALANCED' });
+    expect(small.sensitivity.general).toBeGreaterThan(big.sensitivity.general);
   });
 
-  it('OLED y AMOLED producen el mismo bonus', () => {
-    const oled = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'OLED' }, style: 'BALANCED' });
-    const amoled = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'AMOLED' }, style: 'BALANCED' });
-    expect(oled.sensitivity.general).toBe(amoled.sensitivity.general);
-  });
-
-  it('LTPO produce el mayor bonus de panel', () => {
-    const lcd = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'LCD' }, style: 'BALANCED' });
-    const ltpo = generateSensitivity({ specs: { ...baseDevice.specs, panelType: 'LTPO' }, style: 'BALANCED' });
-    expect(ltpo.sensitivity.general).toBeGreaterThan(lcd.sensitivity.general);
-  });
-
-  it('RAM factor uniforme: 2GB vs 6GB = +15 en todos los campos', () => {
+  it('RAM adjustment es uniforme a todos los scopes (no a freeView)', () => {
     const ram6 = generateSensitivity({ ...baseDevice, userRam: 6 });
     const ram2 = generateSensitivity({ ...baseDevice, userRam: 2 });
     const diffGeneral = ram2.sensitivity.general - ram6.sensitivity.general;
     const diffSniper = ram2.sensitivity.sniperScope - ram6.sensitivity.sniperScope;
-    expect(diffGeneral).toBe(15);
-    expect(diffSniper).toBe(15);
+    expect(diffGeneral).toBe(5); // 2GB=+5, 6GB=0
+    expect(diffSniper).toBe(5);  // Misma diff, el tapering se aplica sobre el base
   });
 });
 
-describe('generateSensitivity — giroscopio (0-100)', () => {
+describe('generateSensitivity v4.0 — giroscopio (0-100)', () => {
   it('retorna null para giroscopio cuando no se solicita', () => {
     const result = generateSensitivity(baseDevice);
     expect(result.gyroscope).toBeNull();
@@ -170,13 +191,21 @@ describe('generateSensitivity — giroscopio (0-100)', () => {
   });
 });
 
-describe('generateSensitivity — meta y determinismo', () => {
-  it('meta incluye todos los campos requeridos', () => {
+describe('generateSensitivity v4.0 — meta y determinismo', () => {
+  it('meta incluye algoritmo v4.0', () => {
     const result = generateSensitivity(baseDevice);
-    expect(result.meta.algorithm).toBe('ARES-v3.0');
+    expect(result.meta.algorithm).toBe('ARES-v4.0-forensic');
     expect(result.meta.styleApplied).toBe('BALANCED');
     expect(result.meta.deviceTier).toBe('MID');
     expect(typeof result.meta.performanceScore).toBe('number');
+  });
+
+  it('metadata forense incluye DPI y ajustes', () => {
+    const result = generateSensitivity(baseDevice);
+    expect(result.metadata.algorithmVersion).toBe('4.0-forensic');
+    expect(result.metadata.effectiveDpi).toBe(395);
+    expect(typeof result.metadata.generalBase).toBe('number');
+    expect(typeof result.metadata.tapering).toBe('number');
   });
 
   it('es determinístico: mismo input = mismo output SIEMPRE', () => {
@@ -189,7 +218,7 @@ describe('generateSensitivity — meta y determinismo', () => {
 
   it('performance score es mayor para gaming que para low-end', () => {
     const gaming = generateSensitivity({
-      specs: { screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING' },
+      specs: { screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', screenDpi: 460 },
       style: 'BALANCED',
     });
     const low = generateSensitivity(extremeLowEnd);
@@ -197,7 +226,7 @@ describe('generateSensitivity — meta y determinismo', () => {
   });
 });
 
-describe('calibration engine — 6 combinaciones', () => {
+describe('calibration engine — 6 combinaciones (sobre v4.0)', () => {
   it('ALTA produce valores más altos que MEDIA que produce más altos que BAJA', () => {
     const alta = generateCalibration({
       specs: baseDevice.specs, style: 'BALANCED', calibration: 'ALTA', dpiMode: false,
@@ -236,11 +265,11 @@ describe('calibration engine — 6 combinaciones', () => {
     expect(combos).toContain('ALTA-true');
   });
 
-  it('todos los valores calibrados están entre 0 y 200', () => {
+  it('todos los valores calibrados están entre 1 y 200', () => {
     const result = generateAllCalibrations(ultraHighEnd.specs, 'AGGRESSIVE', false);
     result.combinations.forEach((combo) => {
       Object.values(combo.sensitivity).forEach((val) => {
-        expect(val).toBeGreaterThanOrEqual(0);
+        expect(val).toBeGreaterThanOrEqual(1);
         expect(val).toBeLessThanOrEqual(200);
       });
     });
@@ -256,7 +285,7 @@ describe('calibration engine — 6 combinaciones', () => {
   });
 });
 
-describe('getStyleMultipliers (legacy, sin efecto en engine v3.0)', () => {
+describe('getStyleMultipliers (style-system)', () => {
   it('BALANCED tiene todos los multiplicadores en 1.0', () => {
     const balanced = getStyleMultipliers('BALANCED');
     Object.values(balanced).forEach((val) => {

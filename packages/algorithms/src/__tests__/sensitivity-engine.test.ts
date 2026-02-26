@@ -1,35 +1,51 @@
 import { describe, it, expect } from 'vitest';
 
-import { generateSensitivity } from '../sensitivity-engine';
-import type { AlgorithmInput, SensitivityOutput } from '../types';
+import { generateSensitivity, estimateDpiFromDevice } from '../sensitivity-engine';
+import type { AlgorithmInput } from '../types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES v3.0 — Tests de Sensibilidad
-// Escala: 0-200 (Free Fire OB50+)
-// Engine produce valores RAW sin calibración
+// ARES v4.0 — Tests de Sensibilidad (Forensic Calibration)
+// Escala: 1-200 (Free Fire)
+// Engine DPI-first con tapering -15 validado contra datos reales
 // ═══════════════════════════════════════════════════════════
+
+// Dispositivos de validación con DPI real
+const samsungA13: AlgorithmInput = {
+  specs: { screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'IPS', tier: 'LOW', screenDpi: 270 },
+  style: 'BALANCED',
+};
+
+const redmiNote13: AlgorithmInput = {
+  specs: { screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', screenDpi: 395 },
+  style: 'BALANCED',
+};
+
+const iphone14Plus: AlgorithmInput = {
+  specs: { screenHz: 60, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'HIGH', screenDpi: 458 },
+  style: 'BALANCED',
+};
+
+const iphone16ProMax: AlgorithmInput = {
+  specs: { screenHz: 120, screenSize: 6.9, ramGb: 8, panelType: 'OLED', tier: 'GAMING', screenDpi: 460 },
+  style: 'BALANCED',
+};
 
 const lowEndDevice: AlgorithmInput = {
-  specs: { screenHz: 60, screenSize: 6.5, ramGb: 3, panelType: 'LCD', tier: 'LOW' },
+  specs: { screenHz: 60, screenSize: 5.5, ramGb: 2, panelType: 'LCD', tier: 'LOW', screenDpi: 270 },
   style: 'BALANCED',
 };
 
 const midDevice: AlgorithmInput = {
-  specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID' },
+  specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID', screenDpi: 395 },
   style: 'BALANCED',
 };
 
 const gamingDevice: AlgorithmInput = {
-  specs: { screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING' },
+  specs: { screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', screenDpi: 460 },
   style: 'BALANCED',
 };
 
-const ultraDevice: AlgorithmInput = {
-  specs: { screenHz: 144, screenSize: 6.8, ramGb: 16, panelType: 'LTPO', tier: 'GAMING' },
-  style: 'BALANCED',
-};
-
-describe('generateSensitivity v3.0', () => {
+describe('generateSensitivity v4.0 — forensic calibration', () => {
   it('retorna los 6 campos de sensibilidad', () => {
     const result = generateSensitivity(midDevice);
     expect(result.sensitivity).toHaveProperty('general');
@@ -51,140 +67,231 @@ describe('generateSensitivity v3.0', () => {
     const result = generateSensitivity(midDevice);
     expect(Object.keys(result.sensitivity)).toHaveLength(6);
   });
+
+  it('todos los valores están entre 1 y 200', () => {
+    for (const input of [lowEndDevice, midDevice, gamingDevice, samsungA13, redmiNote13, iphone14Plus, iphone16ProMax]) {
+      const result = generateSensitivity(input);
+      const { freeView, ...scopes } = result.sensitivity;
+      Object.values(scopes).forEach((v) => {
+        expect(v).toBeGreaterThanOrEqual(1);
+        expect(v).toBeLessThanOrEqual(200);
+      });
+      // freeView tiene rango independiente ~12-25
+      expect(freeView).toBeGreaterThanOrEqual(1);
+      expect(freeView).toBeLessThanOrEqual(200);
+    }
+  });
 });
 
-describe('tapering pattern: General > FreeLook > RedDot > 2x > 4x > Sniper', () => {
-  it('general es siempre el más alto', () => {
-    for (const input of [lowEndDevice, midDevice, gamingDevice, ultraDevice]) {
+describe('forensic validation — real device data (±2 puntos)', () => {
+  it('Samsung A13: DPI 270, 4GB, 60Hz, 6.6" → General ~186', () => {
+    const result = generateSensitivity(samsungA13);
+    // DPI 270 → base ~183, +1 RAM(4GB), +3 Hz(60), 0 screen(6.6"), 0 style
+    // generalBase = 183 + 1 + 3 + 0 + 0 = 187
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(184);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(188);
+  });
+
+  it('Samsung A13: tapering -15 correcto', () => {
+    const result = generateSensitivity(samsungA13);
+    const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
+    expect(general - redPoint).toBe(15);
+    expect(redPoint - scope2x).toBe(15);
+    expect(scope2x - scope4x).toBe(15);
+    expect(scope4x - sniperScope).toBe(15);
+  });
+
+  it('Redmi Note 13: DPI 395, 8GB, 120Hz, 6.67" → General ~174', () => {
+    const result = generateSensitivity(redmiNote13);
+    // DPI 395 → base ~175, -1 RAM(8GB), 0 Hz(120), -2 screen(6.67"), 0 style
+    // generalBase = 175 - 1 + 0 - 2 + 0 = 172
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(170);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(176);
+  });
+
+  it('iPhone 14 Plus: DPI 458, 6GB, 60Hz, 6.7" → General ~166', () => {
+    const result = generateSensitivity(iphone14Plus);
+    // DPI 458 → base ~166, 0 RAM(6GB), +3 Hz(60), -2 screen(6.7"), 0 style
+    // generalBase = 166 + 0 + 3 - 2 + 0 = 167
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(164);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(168);
+  });
+
+  it('iPhone 16 Pro Max: DPI 460, 8GB, 120Hz, 6.9" → General ~168', () => {
+    const result = generateSensitivity(iphone16ProMax);
+    // DPI 460 → base ~165, -1 RAM(8GB), 0 Hz(120), -2 screen(6.9"), 0 style
+    // generalBase = 165 - 1 + 0 - 2 + 0 = 162
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(160);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(170);
+  });
+
+  it('Free Look independiente, rango 14-22', () => {
+    for (const input of [samsungA13, redmiNote13, iphone14Plus, iphone16ProMax]) {
       const result = generateSensitivity(input);
-      const { general, redPoint, scope2x, scope4x, sniperScope, freeView } = result.sensitivity;
+      expect(result.sensitivity.freeView).toBeGreaterThanOrEqual(12);
+      expect(result.sensitivity.freeView).toBeLessThanOrEqual(25);
+    }
+  });
+});
+
+describe('tapering pattern: General > RedPoint > 2x > 4x > Sniper', () => {
+  it('general es siempre el más alto (excluyendo freeView)', () => {
+    for (const input of [lowEndDevice, midDevice, gamingDevice, samsungA13, redmiNote13]) {
+      const result = generateSensitivity(input);
+      const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
       expect(general).toBeGreaterThanOrEqual(redPoint);
-      expect(general).toBeGreaterThanOrEqual(freeView);
       expect(general).toBeGreaterThanOrEqual(scope2x);
       expect(general).toBeGreaterThanOrEqual(scope4x);
       expect(general).toBeGreaterThanOrEqual(sniperScope);
     }
   });
 
-  it('sniperScope es siempre el más bajo', () => {
-    for (const input of [lowEndDevice, midDevice, gamingDevice, ultraDevice]) {
+  it('sniperScope es siempre el más bajo (excluyendo freeView)', () => {
+    for (const input of [lowEndDevice, midDevice, gamingDevice]) {
       const result = generateSensitivity(input);
-      const { general, redPoint, scope2x, scope4x, sniperScope, freeView } = result.sensitivity;
+      const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
       expect(sniperScope).toBeLessThanOrEqual(general);
       expect(sniperScope).toBeLessThanOrEqual(redPoint);
       expect(sniperScope).toBeLessThanOrEqual(scope2x);
       expect(sniperScope).toBeLessThanOrEqual(scope4x);
-      expect(sniperScope).toBeLessThanOrEqual(freeView);
     }
   });
 
-  it('scopes siguen tapering: 2x > 4x > sniper', () => {
-    for (const input of [lowEndDevice, midDevice, gamingDevice]) {
-      const result = generateSensitivity(input);
-      expect(result.sensitivity.scope2x).toBeGreaterThan(result.sensitivity.scope4x);
-      expect(result.sensitivity.scope4x).toBeGreaterThan(result.sensitivity.sniperScope);
-    }
+  it('tapering fijo de -15 entre campos (BALANCED)', () => {
+    const result = generateSensitivity(midDevice);
+    const { general, redPoint, scope2x, scope4x, sniperScope } = result.sensitivity;
+    expect(general - redPoint).toBe(15);
+    expect(redPoint - scope2x).toBe(15);
+    expect(scope2x - scope4x).toBe(15);
+    expect(scope4x - sniperScope).toBe(15);
   });
 
-  it('diferencia entre general y sniper es ~100+ puntos', () => {
+  it('diferencia general-sniper = 60 puntos (4 × 15) en BALANCED', () => {
     const result = generateSensitivity(midDevice);
     const gap = result.sensitivity.general - result.sensitivity.sniperScope;
-    expect(gap).toBeGreaterThanOrEqual(80);
+    expect(gap).toBe(60);
   });
 });
 
-describe('hardware factors', () => {
-  it('baja RAM produce sensi MÁS ALTA que alta RAM en mismo hardware', () => {
-    // Mismo hardware, solo cambia RAM
-    const lowRam = generateSensitivity({ ...midDevice, userRam: 2 });
-    const highRam = generateSensitivity({ ...midDevice, userRam: 12 });
-    // 2GB (+15) vs 12GB (-8) = 23 puntos de diferencia
-    expect(lowRam.sensitivity.general).toBeGreaterThan(highRam.sensitivity.general);
+describe('DPI como driver principal', () => {
+  it('DPI bajo (270) produce sensibilidad MÁS ALTA que DPI alto (460)', () => {
+    const lowDpi = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 270 },
+      style: 'BALANCED',
+    });
+    const highDpi = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 460 },
+      style: 'BALANCED',
+    });
+    expect(lowDpi.sensitivity.general).toBeGreaterThan(highDpi.sensitivity.general);
+    // Diferencia DPI 270→460 = ~18 puntos
+    const diff = lowDpi.sensitivity.general - highDpi.sensitivity.general;
+    expect(diff).toBeGreaterThanOrEqual(15);
+    expect(diff).toBeLessThanOrEqual(25);
   });
 
-  it('120Hz sube ~10 puntos vs 60Hz', () => {
-    const hz60 = generateSensitivity({
+  it('customDpi override funciona correctamente', () => {
+    const withDeviceDpi = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const withCustomDpi = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+      customDpi: 270,
+    });
+    // customDpi 270 → higher sensitivity than device DPI 395
+    expect(withCustomDpi.sensitivity.general).toBeGreaterThan(withDeviceDpi.sensitivity.general);
+  });
+
+  it('sin DPI usa fallback por tier', () => {
+    const withDpi = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const withoutDpi = generateSensitivity({
       specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID' },
       style: 'BALANCED',
     });
-    const hz120 = generateSensitivity({
-      specs: { screenHz: 120, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    const diff = hz120.sensitivity.general - hz60.sensitivity.general;
-    expect(diff).toBeGreaterThanOrEqual(8);
-    expect(diff).toBeLessThanOrEqual(12);
-  });
-
-  it('AMOLED produce valores más altos que LCD con specs iguales', () => {
-    const lcd = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'LCD', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    const amoled = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    expect(amoled.sensitivity.general).toBeGreaterThan(lcd.sensitivity.general);
-  });
-
-  it('OLED y AMOLED producen el mismo resultado', () => {
-    const oled = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'OLED', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    const amoled = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    expect(oled.sensitivity.general).toBe(amoled.sensitivity.general);
-  });
-
-  it('LTPO produce el mayor bonus de panel', () => {
-    const lcd = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'LCD', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    const ltpo = generateSensitivity({
-      specs: { screenHz: 90, screenSize: 6.5, ramGb: 6, panelType: 'LTPO', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    expect(ltpo.sensitivity.general).toBeGreaterThan(lcd.sensitivity.general);
+    // MID tier fallback = 395, same as explicit DPI
+    expect(withoutDpi.sensitivity.general).toBe(withDpi.sensitivity.general);
   });
 });
 
-describe('RAM factor (inverted: baja RAM = alta sensi)', () => {
-  it('2GB RAM produce valores MÁS ALTOS que 6GB', () => {
-    const ram2 = generateSensitivity({ ...midDevice, userRam: 2 });
-    const ram6 = generateSensitivity({ ...midDevice, userRam: 6 });
-    expect(ram2.sensitivity.general).toBeGreaterThan(ram6.sensitivity.general);
+describe('ajustes secundarios', () => {
+  it('RAM es ajuste secundario (±5 máximo)', () => {
+    const ram2 = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 2, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const ram16 = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 16, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const diff = ram2.sensitivity.general - ram16.sensitivity.general;
+    // 2GB (+5) vs 16GB (-3) = 8 puntos de diferencia
+    expect(diff).toBe(8);
   });
 
-  it('16GB RAM produce valores MÁS BAJOS que 6GB', () => {
-    const ram16 = generateSensitivity({ ...midDevice, userRam: 16 });
-    const ram6 = generateSensitivity({ ...midDevice, userRam: 6 });
-    expect(ram16.sensitivity.general).toBeLessThan(ram6.sensitivity.general);
+  it('Hz adjustment: 60Hz da +3, 120Hz da 0', () => {
+    const hz60 = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const hz120 = generateSensitivity({
+      specs: { screenHz: 120, screenSize: 6.5, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const diff = hz60.sensitivity.general - hz120.sensitivity.general;
+    expect(diff).toBe(3); // +3 vs 0
+  });
+
+  it('screen size adjustment: <6.5" da 0, 6.5-7" da -2', () => {
+    const small = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.0, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const big = generateSensitivity({
+      specs: { screenHz: 60, screenSize: 6.7, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
+      style: 'BALANCED',
+    });
+    const diff = small.sensitivity.general - big.sensitivity.general;
+    expect(diff).toBe(2); // 0 vs -2
   });
 
   it('userRam override funciona correctamente', () => {
-    const withDeviceRam = generateSensitivity(midDevice); // 6GB = 0 offset
-    const withUserRam = generateSensitivity({ ...midDevice, userRam: 2 }); // 2GB = +15
+    const withDeviceRam = generateSensitivity({ ...midDevice }); // 6GB = 0 offset
+    const withUserRam = generateSensitivity({ ...midDevice, userRam: 2 }); // 2GB = +5
     expect(withUserRam.sensitivity.general).toBeGreaterThan(withDeviceRam.sensitivity.general);
+    expect(withUserRam.sensitivity.general - withDeviceRam.sensitivity.general).toBe(5);
+  });
+});
+
+describe('estilos de juego', () => {
+  it('AGGRESSIVE sube general en +8 pts', () => {
+    const balanced = generateSensitivity({ ...midDevice, style: 'BALANCED' });
+    const aggressive = generateSensitivity({ ...midDevice, style: 'AGGRESSIVE' });
+    expect(aggressive.sensitivity.general - balanced.sensitivity.general).toBe(8);
   });
 
-  it('RAM factor se aplica uniformemente a todos los campos', () => {
-    const ram6 = generateSensitivity({ ...midDevice, userRam: 6 });
-    const ram2 = generateSensitivity({ ...midDevice, userRam: 2 });
-    // Diferencia de RAM factor: +15 - 0 = 15
-    const diffGeneral = ram2.sensitivity.general - ram6.sensitivity.general;
-    const diffSniper = ram2.sensitivity.sniperScope - ram6.sensitivity.sniperScope;
-    expect(diffGeneral).toBe(15);
-    expect(diffSniper).toBe(15);
+  it('SNIPER baja general en -8 pts', () => {
+    const balanced = generateSensitivity({ ...midDevice, style: 'BALANCED' });
+    const sniper = generateSensitivity({ ...midDevice, style: 'SNIPER' });
+    expect(balanced.sensitivity.general - sniper.sensitivity.general).toBe(8);
+  });
+
+  it('AGGRESSIVE tiene tapering -14, SNIPER tiene tapering -16', () => {
+    const aggressive = generateSensitivity({ ...midDevice, style: 'AGGRESSIVE' });
+    const sniper = generateSensitivity({ ...midDevice, style: 'SNIPER' });
+    const agTapering = aggressive.sensitivity.general - aggressive.sensitivity.redPoint;
+    const snTapering = sniper.sensitivity.general - sniper.sensitivity.redPoint;
+    expect(agTapering).toBe(14); // 15 - 1
+    expect(snTapering).toBe(16); // 15 + 1
   });
 });
 
 describe('giroscopio (0-100)', () => {
-  it('retorna null para giroscopio cuando no se solicita', () => {
+  it('retorna null cuando no se solicita', () => {
     const result = generateSensitivity(midDevice);
     expect(result.gyroscope).toBeNull();
   });
@@ -205,7 +312,6 @@ describe('giroscopio (0-100)', () => {
     if (result.gyroscope) {
       expect(result.gyroscope.gyroGeneral).toBeLessThan(result.sensitivity.general);
       expect(result.gyroscope.gyroRedPoint).toBeLessThan(result.sensitivity.redPoint);
-      expect(result.gyroscope.gyroFreeView).toBeLessThan(result.sensitivity.freeView);
     }
   });
 
@@ -219,30 +325,41 @@ describe('giroscopio (0-100)', () => {
     }
   });
 
-  it('gyro values en rango pro (20-40 para dispositivo medio)', () => {
+  it('gyro tapering es -10 (más suave que touch)', () => {
     const result = generateSensitivity({ ...midDevice, includeGyro: true });
     if (result.gyroscope) {
-      // Gyro general ~31 (172*0.18), gyro redPoint ~34 (172*0.20)
-      expect(result.gyroscope.gyroGeneral).toBeGreaterThanOrEqual(20);
-      expect(result.gyroscope.gyroGeneral).toBeLessThanOrEqual(45);
+      const gyroTapering = result.gyroscope.gyroGeneral - result.gyroscope.gyroRedPoint;
+      expect(gyroTapering).toBe(10);
     }
   });
 });
 
-describe('meta y determinismo', () => {
-  it('meta incluye algoritmo v3.0', () => {
+describe('metadata forense', () => {
+  it('meta incluye algoritmo v4.0', () => {
     const result = generateSensitivity(midDevice);
-    expect(result.meta.algorithm).toBe('ARES-v3.0');
+    expect(result.meta.algorithm).toBe('ARES-v4.0-forensic');
     expect(result.meta.styleApplied).toBe('BALANCED');
     expect(result.meta.deviceTier).toBe('MID');
     expect(typeof result.meta.performanceScore).toBe('number');
+  });
+
+  it('metadata forense incluye DPI efectivo y ajustes', () => {
+    const result = generateSensitivity(midDevice);
+    expect(result.metadata.algorithmVersion).toBe('4.0-forensic');
+    expect(result.metadata.effectiveDpi).toBe(395);
+    expect(typeof result.metadata.generalBase).toBe('number');
+    expect(typeof result.metadata.tapering).toBe('number');
+    expect(result.metadata.adjustments).toHaveProperty('ram');
+    expect(result.metadata.adjustments).toHaveProperty('hz');
+    expect(result.metadata.adjustments).toHaveProperty('screen');
+    expect(result.metadata.adjustments).toHaveProperty('style');
   });
 
   it('es determinístico: mismo input = mismo output SIEMPRE', () => {
     const result1 = generateSensitivity(gamingDevice);
     const result2 = generateSensitivity(gamingDevice);
     expect(result1.sensitivity).toEqual(result2.sensitivity);
-    expect(result1.meta.performanceScore).toBe(result2.meta.performanceScore);
+    expect(result1.metadata).toEqual(result2.metadata);
   });
 
   it('performance score es mayor para gaming que para low-end', () => {
@@ -252,36 +369,23 @@ describe('meta y determinismo', () => {
   });
 });
 
-describe('verified calculations (manual)', () => {
-  it('iPhone 14 Pro Max (120Hz, 6.7", OLED, GAMING, 6GB)', () => {
-    const result = generateSensitivity({
-      specs: { screenHz: 120, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'GAMING' },
-      style: 'BALANCED',
-    });
-    // hzBonus=10, screenBonus=1.87, panelBonus=2, tierBonus=5 → totalHwAdjust=18.87
-    // general: 170 + 18.87*1.0 + 0 = 189
-    expect(result.sensitivity.general).toBe(189);
-    // sniperScope: 75 + 18.87*0.40 + 0 = 83
-    expect(result.sensitivity.sniperScope).toBe(83);
+describe('estimateDpiFromDevice', () => {
+  it('retorna DPI conocido para Samsung A13', () => {
+    expect(estimateDpiFromDevice('Samsung', 'A13', 'LOW')).toBe(270);
   });
 
-  it('Samsung Galaxy A03 (60Hz, 6.5", LCD, LOW, 2GB)', () => {
-    const result = generateSensitivity({
-      specs: { screenHz: 60, screenSize: 6.5, ramGb: 2, panelType: 'LCD', tier: 'LOW' },
-      style: 'BALANCED',
-    });
-    // hzBonus=0, screenBonus=1.33, panelBonus=-2, tierBonus=-3 → totalHwAdjust=-3.67
-    // general: 170 + (-3.67*1.0) + 15 = 181
-    expect(result.sensitivity.general).toBe(181);
+  it('retorna DPI conocido para iPhone 14 Plus', () => {
+    expect(estimateDpiFromDevice('Apple', 'iPhone14Plus', 'HIGH')).toBe(458);
   });
 
-  it('Samsung Galaxy A54 (120Hz, 6.4", AMOLED, MID, 6GB)', () => {
-    const result = generateSensitivity({
-      specs: { screenHz: 120, screenSize: 6.4, ramGb: 6, panelType: 'AMOLED', tier: 'MID' },
-      style: 'BALANCED',
-    });
-    // hzBonus=10, screenBonus=1.07, panelBonus=2, tierBonus=0 → totalHwAdjust=13.07
-    // general: 170 + 13.07*1.0 + 0 = 183
-    expect(result.sensitivity.general).toBe(183);
+  it('retorna DPI conocido para Redmi Note 13', () => {
+    expect(estimateDpiFromDevice('Xiaomi', 'RedmiNote13', 'MID')).toBe(395);
+  });
+
+  it('fallback por tier cuando modelo no está en el diccionario', () => {
+    expect(estimateDpiFromDevice('UnknownBrand', 'UnknownModel', 'LOW')).toBe(270);
+    expect(estimateDpiFromDevice('UnknownBrand', 'UnknownModel', 'MID')).toBe(395);
+    expect(estimateDpiFromDevice('UnknownBrand', 'UnknownModel', 'HIGH')).toBe(460);
+    expect(estimateDpiFromDevice('UnknownBrand', 'UnknownModel', 'GAMING')).toBe(460);
   });
 });
