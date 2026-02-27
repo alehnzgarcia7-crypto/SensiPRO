@@ -18,6 +18,9 @@ export const GYRO_MAX = 100;
 // RAM options para UI selector
 export const RAM_OPTIONS = [2, 3, 4, 6, 8, 12, 16] as const;
 
+// Hz options para UI selector (refresh rate)
+export const HZ_OPTIONS = [60, 90, 120] as const;
+
 // CALIBRACIÓN: offsets por estilo de juego
 // ALTA = agresivo/rush: valores más altos para reacciones rápidas
 // MEDIA = balanceado: sin cambio, baseline

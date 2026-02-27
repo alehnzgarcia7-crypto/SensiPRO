@@ -22,6 +22,7 @@ import { AnimatedBorder } from '@/components/effects/animated-border';
 import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
 import { RamSelector } from './ram-selector';
+import { HzSelector } from './hz-selector';
 import { HudRecommendationPanel } from './hud-recommendation';
 import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
 
@@ -104,10 +105,12 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     calibration,
     dpiMode,
     userRam,
+    userHz,
     isLoading,
     setCalibration,
     setDpiMode,
     setUserRam,
+    setUserHz,
     setLoading,
     setAllCalibrations,
     setError,
@@ -118,7 +121,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
   const [showFlash, setShowFlash] = useState(false);
   const prevComboKey = useRef('');
 
-  const regenerate = useCallback(async (ramOverride: number) => {
+  const regenerate = useCallback(async (ramOverride: number, hzOverride?: number) => {
     if (!selectedDevice) return;
     setLoading(true);
 
@@ -131,6 +134,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           style: selectedStyle,
           includeGyro,
           ...(ramOverride !== selectedDevice.ramGb ? { userRam: ramOverride } : {}),
+          ...(hzOverride && hzOverride !== selectedDevice.screenHz ? { userHz: hzOverride } : {}),
         }),
       });
 
@@ -157,14 +161,14 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     }
 
     if (userRam !== null) {
-      void regenerate(userRam);
+      void regenerate(userRam, userHz ?? undefined);
     }
-  }, [userRam, regenerate]);
+  }, [userRam, userHz, regenerate]);
 
   const currentCombo = getCurrentCombination();
 
   // Flash effect al cambiar calibración/DPI/RAM
-  const comboKey = `${calibration}-${dpiMode}-${userRam}`;
+  const comboKey = `${calibration}-${dpiMode}-${userRam}-${userHz}`;
   useEffect(() => {
     if (prevComboKey.current && prevComboKey.current !== comboKey) {
       setShowFlash(true);
@@ -220,6 +224,15 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           value={userRam}
           onChange={setUserRam}
           suggestedRam={selectedDevice.ramGb}
+        />
+      </motion.div>
+
+      {/* ═══ HZ SELECTOR ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-5">
+        <HzSelector
+          value={userHz}
+          onChange={setUserHz}
+          suggestedHz={selectedDevice.screenHz}
         />
       </motion.div>
 

@@ -89,9 +89,10 @@ export function generateHeadshotSensitivity(
   specs: DeviceSpecs,
   userRam?: number,
   userFingers?: 2 | 3 | 4,
+  userHz?: number,
 ): HeadshotResult {
   // 1. Generar sensibilidad NORMAL (BALANCED, sin calibrar) para comparación
-  const baseResult = generateSensitivity({ specs, style: 'BALANCED', userRam });
+  const baseResult = generateSensitivity({ specs, style: 'BALANCED', userRam, userHz });
   const normalSens = baseResult.sensitivity;
   const normalGyro = generateGyroscope(normalSens);
 

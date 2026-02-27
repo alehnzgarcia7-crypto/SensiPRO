@@ -15,6 +15,7 @@ export interface AlgorithmInput {
   style: SensitivityStyle;
   includeGyro?: boolean;
   userRam?: number;
+  userHz?: number;
   customDpi?: number;
 }
 
@@ -25,6 +26,7 @@ export interface CalibrationInput {
   dpiMode: boolean;
   includeGyro?: boolean;
   userRam?: number;
+  userHz?: number;
 }
 
 export interface SensitivityOutput {

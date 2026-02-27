@@ -49,7 +49,7 @@ export function HeadshotHero() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="text-xs text-slate-600 mt-3"
       >
-        Usado por 12,847 jugadores
+        Usado por 1,680 jugadores
       </motion.p>
     </section>
   );

@@ -80,6 +80,7 @@ export function StyleStep() {
     includeGyro,
     setIncludeGyro,
     userRam,
+    userHz,
     isLoading,
     error,
     setLoading,
@@ -100,6 +101,7 @@ export function StyleStep() {
           style: selectedStyle,
           includeGyro,
           ...(userRam !== null && userRam !== selectedDevice.ramGb ? { userRam } : {}),
+          ...(userHz !== null && userHz !== selectedDevice.screenHz ? { userHz } : {}),
         }),
       });
 

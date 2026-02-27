@@ -86,7 +86,7 @@ export function DeviceStep() {
             >
               <div className="text-left">
                 <p className="font-display font-bold text-white text-sm">{device.model}</p>
-                <p className="text-xs text-slate-500">{device.screenHz}Hz &bull; {device.ramGb}GB RAM</p>
+                <p className="text-xs text-slate-500">{device.tier}</p>
               </div>
               <div className="flex items-center gap-2">
                 {device.isPopular && (

@@ -154,10 +154,10 @@ export function generateHudRecommendation(screenSize: number): HudRecommendation
 
 /** Genera una sola combinación de calibración */
 export function generateCalibration(input: CalibrationInput): CalibrationResult {
-  const { specs, style, calibration, dpiMode, includeGyro, userRam } = input;
+  const { specs, style, calibration, dpiMode, includeGyro, userRam, userHz } = input;
 
   // Generar sensibilidad base con el motor v4.0 (DPI-forensic)
-  const baseResult = generateSensitivity({ specs, style, includeGyro, userRam });
+  const baseResult = generateSensitivity({ specs, style, includeGyro, userRam, userHz });
 
   // Aplicar offset de calibración + clamp 0-200
   const calibratedSensitivity = applyCalibratedSensitivity(
@@ -197,13 +197,14 @@ export function generateAllCalibrations(
   style: CalibrationInput['style'],
   includeGyro: boolean,
   userRam?: number,
+  userHz?: number,
 ): GenerateAllOutput {
   const combinations: CalibrationResult[] = [];
 
   for (const calibration of CALIBRATION_LEVELS) {
     for (const dpiMode of DPI_MODES) {
       combinations.push(
-        generateCalibration({ specs, style, calibration, dpiMode, includeGyro, userRam }),
+        generateCalibration({ specs, style, calibration, dpiMode, includeGyro, userRam, userHz }),
       );
     }
   }

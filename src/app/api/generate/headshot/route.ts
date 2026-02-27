@@ -19,6 +19,7 @@ import { enforceRateLimit } from '@/lib/security';
 const headshotSchema = z.object({
   deviceId: z.string().cuid('ID de dispositivo inválido'),
   userRam: z.number().int().min(1).max(32).optional(),
+  userHz: z.number().int().min(30).max(240).optional(),
   fingers: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
 });
 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { deviceId, userRam, fingers } = parsed.data;
+    const { deviceId, userRam, userHz, fingers } = parsed.data;
 
     const user = await getOptionalSession();
     const userId = user?.id ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
       },
       userRam,
       fingers,
+      userHz,
     );
 
     logger.info('Headshot sensitivity generated', {

@@ -23,7 +23,7 @@ export const LANDING_DATA = {
   gyroValues: 6,
 
   // Social proof (números creíbles para fase de lanzamiento)
-  playerCount: 12_847,
+  playerCount: 1_680,
   avgRating: 4.9,
   reviewCount: 847,
 } as const;

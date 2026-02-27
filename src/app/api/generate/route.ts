@@ -17,6 +17,7 @@ const generateSchema = z.object({
   }),
   includeGyro: z.boolean().optional().default(false),
   userRam: z.number().int().min(1).max(32).optional(),
+  userHz: z.number().int().min(30).max(240).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { deviceId, style, includeGyro, userRam } = parsed.data;
+    const { deviceId, style, includeGyro, userRam, userHz } = parsed.data;
 
     // Obtener sesión (opcional — usuarios anónimos pueden generar con límites)
     const user = await getOptionalSession();
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
       style,
       includeGyro,
       userRam,
+      userHz,
     });
 
     // Guardar en historial si el usuario está autenticado

@@ -183,11 +183,12 @@ function calculateForensicGyroscope(
 // ══════════════════════════════════════════════════════════════
 
 export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
-  const { specs, style, includeGyro, userRam, customDpi } = input;
+  const { specs, style, includeGyro, userRam, userHz, customDpi } = input;
   const styleConfig = STYLE_CONFIG[style];
 
-  // Usar userRam si viene, sino el RAM del device
+  // Usar userRam/userHz si vienen, sino los del device
   const ram = userRam ?? specs.ramGb;
+  const hz = userHz ?? specs.screenHz;
 
   // 1. DPI efectivo (driver principal)
   const dpi = getEffectiveDpi(specs.screenDpi, specs.tier, customDpi);
@@ -197,7 +198,7 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
 
   // 3. Ajustes secundarios
   const ramAdj = ramAdjustment(ram);
-  const hzAdj = hzAdjustment(specs.screenHz);
+  const hzAdj = hzAdjustment(hz);
   const screenAdj = screenSizeAdjustment(specs.screenSize);
   const styleAdj = styleConfig.generalBoost;
 

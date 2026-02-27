@@ -24,6 +24,7 @@ import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
 import { ProBadge } from '@/components/headshot/pro-badge';
 import { CopyAllButton } from '@/components/headshot/copy-all-button';
 import { RamSelector } from '@/components/generator/ram-selector';
+import { HzSelector } from '@/components/generator/hz-selector';
 import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
 import { GyroscopeRecommendation } from '@/components/headshot/gyroscope-recommendation';
 import { FireButtonRecommendation } from '@/components/headshot/fire-button-recommendation';
@@ -276,7 +277,7 @@ const sectionVariants = {
 };
 
 export default function HeadshotPage() {
-  const { selectedDevice, userRam, setUserRam } = useGeneratorStore();
+  const { selectedDevice, userRam, setUserRam, userHz, setUserHz } = useGeneratorStore();
   const [fingers, setFingers] = useState<FingerCount>(3);
   const [dpiEnabled, setDpiEnabled] = useState(false);
   const [data, setData] = useState<HeadshotApiResponse['data'] | null>(null);
@@ -308,6 +309,7 @@ export default function HeadshotPage() {
         body: JSON.stringify({
           deviceId: selectedDevice.id,
           ...(userRam && userRam !== selectedDevice.ramGb ? { userRam } : {}),
+          ...(userHz && userHz !== selectedDevice.screenHz ? { userHz } : {}),
           fingers,
         }),
       });
@@ -323,15 +325,15 @@ export default function HeadshotPage() {
       setError('Error de conexión');
     }
     setLoading(false);
-  }, [selectedDevice, userRam, fingers]);
+  }, [selectedDevice, userRam, userHz, fingers]);
 
-  // Re-fetch cuando cambia RAM (solo si ya hay data)
+  // Re-fetch cuando cambia RAM o Hz (solo si ya hay data)
   useEffect(() => {
     if (data && selectedDevice) {
       void fetchHeadshot();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userRam]);
+  }, [userRam, userHz]);
 
   // Aplica reducción DPI a la sensibilidad base (resta DPI_OFFSET, freeView intacto)
   const dpiAdjustedSensitivity: SensitivityOutput | null = useMemo(() => {
@@ -405,6 +407,13 @@ export default function HeadshotPage() {
                 value={userRam}
                 onChange={setUserRam}
                 suggestedRam={selectedDevice.ramGb}
+              />
+            </div>
+            <div className="glass-card p-4">
+              <HzSelector
+                value={userHz}
+                onChange={setUserHz}
+                suggestedHz={selectedDevice.screenHz}
               />
             </div>
             <div className="glass-card p-4">

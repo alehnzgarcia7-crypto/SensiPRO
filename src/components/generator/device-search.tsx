@@ -127,7 +127,7 @@ export function DeviceSearch() {
                   <p className="text-sm font-display font-bold text-white">
                     {device.brand} {device.model}
                   </p>
-                  <p className="text-xs text-slate-500">{device.screenHz}Hz &bull; {device.ramGb}GB</p>
+                  <p className="text-xs text-slate-500">{device.tier}</p>
                 </div>
                 <Badge
                   variant={getTierBadgeVariant(device.tier)}
