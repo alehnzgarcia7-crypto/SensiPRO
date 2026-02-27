@@ -1,64 +1,131 @@
-import { Metadata } from 'next';
-import { Lightbulb, BarChart3 } from 'lucide-react';
-import { getTips, getTipsRandom } from '@/lib/academy/academy-queries';
-import { CATEGORY_CONFIGS, CATEGORIES_ORDER } from '@/lib/academy/academy-config';
-import { TipCarousel } from '@/components/academy/tip-carousel';
-import type { GuideCategory, TipDifficulty } from '@prisma/client';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Tips y Trucos de Free Fire | Academia PRO — ARES SensiPRO',
-  description:
-    '100+ tips y trucos para mejorar tu gameplay en Free Fire. Sensibilidad, puntería, movimiento, estrategia y más.',
-};
+import { useState } from 'react';
+import { Lightbulb, Crosshair, PersonStanding, Settings } from 'lucide-react';
+import { cn } from '@/lib/cn';
 
-interface TipsPageProps {
-  searchParams: Promise<{
-    category?: string;
-    difficulty?: string;
-  }>;
+// ═══════════════════════════════════════════════════════════════
+// Tips hardcodeados — contenido REAL y ÚTIL de Free Fire
+// ═══════════════════════════════════════════════════════════════
+
+interface Tip {
+  id: number;
+  title: string;
+  content: string;
+  category: 'Puntería' | 'Movimiento' | 'Configuración';
 }
 
-const DIFFICULTY_OPTIONS = [
+const TIPS: Tip[] = [
+  // Puntería (4)
   {
-    key: 'BEGINNER',
-    label: 'Principiante',
-    color: '#22c55e',
-    bgActive: 'bg-green-500/15 text-green-400 border-green-500/30',
+    id: 1,
+    title: 'Apunta al pecho, no a la cabeza',
+    content:
+      'El recoil sube natural. Si apuntas al pecho, las balas suben a la cabeza solas. Funciona con M4, SCAR, AK.',
+    category: 'Puntería',
   },
   {
-    key: 'INTERMEDIATE',
-    label: 'Intermedio',
-    color: '#f97316',
-    bgActive: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
+    id: 2,
+    title: 'Practica drag shots en entrenamiento 10 min al día',
+    content:
+      'No en ranked. En el campo de entrenamiento. 10 minutos con AWM contra bots. En 2 semanas notas la diferencia.',
+    category: 'Puntería',
   },
   {
-    key: 'ADVANCED',
-    label: 'Avanzado',
-    color: '#ef4444',
-    bgActive: 'bg-red-500/15 text-red-400 border-red-500/30',
+    id: 3,
+    title: 'Baja tu sensibilidad de scope 2x y 4x',
+    content:
+      'La mayoría de jugadores tienen estas demasiado altas. Bájala 10-15 puntos y verás que controlas mejor el spray.',
+    category: 'Puntería',
   },
-] as const;
+  {
+    id: 4,
+    title: 'El crosshair siempre a altura de cabeza',
+    content:
+      'Cuando caminas, mantén el crosshair donde estaría la cabeza del enemigo. Así cuando aparece, ya estás apuntando.',
+    category: 'Puntería',
+  },
+  // Movimiento (4)
+  {
+    id: 5,
+    title: 'Nunca te quedes quieto en un 1v1',
+    content:
+      'Agáchate, muévete lateral, salta. Un blanco quieto es un blanco muerto.',
+    category: 'Movimiento',
+  },
+  {
+    id: 6,
+    title: 'Usa gloo walls ofensivamente, no solo defensivamente',
+    content:
+      'Pon una gloo y úsala para peekear. Es más útil que solo cubrirte.',
+    category: 'Movimiento',
+  },
+  {
+    id: 7,
+    title: 'Practica el drop shot',
+    content:
+      'Agacharte mientras disparas confunde al enemigo. Funciona mejor con 3+ dedos.',
+    category: 'Movimiento',
+  },
+  {
+    id: 8,
+    title: 'El jiggle peek gana 1v1s',
+    content:
+      'Asómate y escóndete rápido para ver al enemigo sin que te pegue. Luego peekea y dispara.',
+    category: 'Movimiento',
+  },
+  // Configuración (4)
+  {
+    id: 9,
+    title: 'Pon los gráficos en BAJO y el FPS en ALTO',
+    content:
+      'Más FPS = más suave = mejor puntería. Los gráficos bonitos no ganan partidas.',
+    category: 'Configuración',
+  },
+  {
+    id: 10,
+    title: 'Tu sensibilidad NO debe ser igual a la de un pro',
+    content:
+      'Ellos juegan en iPad con 120Hz. Tú en un Redmi con 60Hz. Necesitas TU sensibilidad.',
+    category: 'Configuración',
+  },
+  {
+    id: 11,
+    title: 'Revisa tu HUD cada mes',
+    content:
+      'Tus dedos se acostumbran y mejoran. Lo que funcionaba hace 2 meses puede mejorar hoy.',
+    category: 'Configuración',
+  },
+  {
+    id: 12,
+    title: 'Activa las notificaciones de enemigos cercanos',
+    content:
+      'En ajustes de sonido. Te avisa cuando hay pasos cerca. Muchos no saben que existe.',
+    category: 'Configuración',
+  },
+];
 
-export default async function TipsPage({ searchParams }: TipsPageProps) {
-  const params = await searchParams;
-  const { category, difficulty } = params;
+const CATEGORIES = ['Todos', 'Puntería', 'Movimiento', 'Configuración'] as const;
 
-  const validCategory =
-    category && CATEGORIES_ORDER.includes(category as GuideCategory)
-      ? (category as GuideCategory)
-      : undefined;
-  const validDifficulty =
-    difficulty && ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].includes(difficulty)
-      ? (difficulty as TipDifficulty)
-      : undefined;
+const CATEGORY_CONFIG: Record<
+  string,
+  { color: string; icon: React.ElementType; label: string }
+> = {
+  Puntería: { color: '#06b6d4', icon: Crosshair, label: 'Puntería' },
+  Movimiento: { color: '#22c55e', icon: PersonStanding, label: 'Movimiento' },
+  Configuración: { color: '#f97316', icon: Settings, label: 'Configuración' },
+};
 
-  const [{ tips }, carouselTips] = await Promise.all([
-    getTips({ category: validCategory, difficulty: validDifficulty, limit: 200 }),
-    getTipsRandom(5),
-  ]);
+export default function TipsPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
 
-  // Agrupar por categoría
-  const grouped = tips.reduce<Record<string, typeof tips>>((acc, tip) => {
+  const filtered =
+    selectedCategory === 'Todos'
+      ? TIPS
+      : TIPS.filter((t) => t.category === selectedCategory);
+
+  // Agrupar por categoría para mostrar secciones
+  const grouped = filtered.reduce<Record<string, Tip[]>>((acc, tip) => {
     if (!acc[tip.category]) acc[tip.category] = [];
     acc[tip.category]!.push(tip);
     return acc;
@@ -75,108 +142,77 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
           </span>
         </h1>
         <div className="section-heading-separator mb-3" />
-        <p className="text-slate-400 text-sm font-numbers">{tips.length} tips disponibles</p>
+        <p className="text-slate-400 text-sm">
+          Tips rápidos para mejorar tu puntería, movimiento y gameplay en Free
+          Fire. Aplícalos hoy.
+        </p>
       </div>
 
-      {/* Carousel — wrapped in AnimatedBorder */}
-      {carouselTips.length > 0 && (
-        <div className="academy-stagger" style={{ animationDelay: '50ms' }}>
-          <TipCarousel tips={carouselTips} />
-        </div>
-      )}
+      {/* Category Filters */}
+      <div
+        className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory md:snap-none academy-stagger"
+        style={{ animationDelay: '50ms' }}
+      >
+        {CATEGORIES.map((cat) => {
+          const isActive = selectedCategory === cat;
+          const config = cat === 'Todos' ? null : CATEGORY_CONFIG[cat];
+          const color = config?.color ?? '#ff6a00';
 
-      {/* Filtros */}
-      <div className="space-y-3 academy-stagger" style={{ animationDelay: '100ms' }}>
-        {/* Categoría */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory md:snap-none">
-          <a
-            href="/academy/tips"
-            className={`flex-shrink-0 snap-start px-4 py-2 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide transition-all duration-200 min-h-[44px] flex items-center border ${
-              !category
-                ? 'bg-fire-500/15 text-fire-400 border-fire-500/30 shadow-[0_0_12px_rgba(255,106,0,0.15)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
-            }`}
-          >
-            Todas
-          </a>
-          {CATEGORIES_ORDER.map((key) => {
-            const config = CATEGORY_CONFIGS[key];
-            const isActive = category === key;
-            return (
-              <a
-                key={key}
-                href={`/academy/tips?category=${key}${validDifficulty ? `&difficulty=${validDifficulty}` : ''}`}
-                className={`flex-shrink-0 snap-start px-3 py-2 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold transition-all duration-200 min-h-[44px] flex items-center border ${
-                  isActive
-                    ? 'text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
-                }`}
-                style={
-                  isActive
-                    ? {
-                        backgroundColor: `${config.color}20`,
-                        borderColor: `${config.color}40`,
-                        color: config.color,
-                        boxShadow: `0 0 12px ${config.color}25`,
-                      }
-                    : undefined
-                }
-              >
-                {config.nameEs}
-              </a>
-            );
-          })}
-        </div>
-
-        {/* Dificultad */}
-        <div className="flex items-center gap-2">
-          {DIFFICULTY_OPTIONS.map((opt) => (
-            <a
-              key={opt.key}
-              href={`/academy/tips?difficulty=${opt.key}${validCategory ? `&category=${validCategory}` : ''}`}
-              className={`flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold transition-all duration-200 min-h-[44px] border ${
-                difficulty === opt.key
-                  ? opt.bgActive
-                  : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent'
-              }`}
+          return (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={cn(
+                'flex-shrink-0 snap-start px-4 py-2 rounded-xl text-xs font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide transition-all duration-200 min-h-[44px] flex items-center gap-1.5 border',
+                isActive
+                  ? 'text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5 border-transparent',
+              )}
               style={
-                difficulty === opt.key
-                  ? { boxShadow: `0 0 10px ${opt.color}25` }
+                isActive
+                  ? {
+                      backgroundColor: `${color}20`,
+                      borderColor: `${color}40`,
+                      color,
+                      boxShadow: `0 0 12px ${color}25`,
+                    }
                   : undefined
               }
             >
-              <BarChart3 className="w-3 h-3" />
-              {opt.label}
-            </a>
-          ))}
-        </div>
+              {config && <config.icon className="w-3.5 h-3.5" />}
+              {cat}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tips por categoría */}
-      {Object.entries(grouped).map(([cat, catTips]) => {
-        const config = CATEGORY_CONFIGS[cat as keyof typeof CATEGORY_CONFIGS];
+      {Object.entries(grouped).map(([category, tips]) => {
+        const config = CATEGORY_CONFIG[category];
         if (!config) return null;
         const Icon = config.icon;
 
         return (
-          <section key={cat}>
+          <section key={category}>
             <div className="mb-2">
               <h2 className="font-[family-name:var(--font-orbitron)] text-base font-bold text-white uppercase tracking-wide flex items-center gap-2">
                 <Icon className="w-5 h-5" style={{ color: config.color }} />
-                {config.nameEs}
-                <span className="font-numbers text-xs text-slate-500 font-normal normal-case tracking-normal">({catTips.length})</span>
+                {config.label}
+                <span className="font-numbers text-xs text-slate-500 font-normal normal-case tracking-normal">
+                  ({tips.length})
+                </span>
               </h2>
             </div>
             <div className="section-heading-separator mb-4" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {catTips.map((tip, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {tips.map((tip, index) => (
                 <div
                   key={tip.id}
                   className="relative glass-card p-4 pl-6 academy-stagger group"
                   style={{ animationDelay: `${index * 40}ms` }}
                 >
-                  {/* Category accent bar — left side */}
+                  {/* Category accent bar */}
                   <div
                     className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl transition-all duration-200 group-hover:w-[5px]"
                     style={{
@@ -184,13 +220,18 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
                       boxShadow: `0 0 8px ${config.color}40`,
                     }}
                   />
+
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5 glow-pulse" />
+                    <span className="flex-shrink-0 font-[family-name:var(--font-orbitron)] font-black text-lg text-white/20 mt-[-2px]">
+                      {tip.id}
+                    </span>
                     <div>
                       <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1">
                         {tip.title}
                       </h3>
-                      <p className="text-xs text-slate-400 leading-relaxed">{tip.content}</p>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {tip.content}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -200,10 +241,12 @@ export default async function TipsPage({ searchParams }: TipsPageProps) {
         );
       })}
 
-      {tips.length === 0 && (
+      {filtered.length === 0 && (
         <div className="text-center py-16 text-slate-500">
           <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p className="text-lg font-[family-name:var(--font-rajdhani)] font-medium">No se encontraron tips</p>
+          <p className="text-lg font-[family-name:var(--font-rajdhani)] font-medium">
+            No se encontraron tips
+          </p>
         </div>
       )}
     </div>
