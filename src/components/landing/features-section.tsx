@@ -1,106 +1,195 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-  Cpu,
-  Crosshair,
-  Sliders,
-  Gamepad2,
-  RotateCcw,
-  BookOpen,
-  ArrowLeftRight,
-  Share2,
-  Shield,
-  Bot,
-} from 'lucide-react';
 
-import { FEATURES, type LandingFeature } from '@/lib/landing-data';
+import { useTilt } from '@/hooks/use-tilt';
 
-const ICON_MAP: Record<string, React.ElementType> = {
-  Cpu,
-  Crosshair,
-  Sliders,
-  Gamepad2,
-  RotateCcw,
-  BookOpen,
-  ArrowLeftRight,
-  Share2,
-  Shield,
-  Bot,
-};
+// ═══════════════════════════════════════════════════════════════
+// FeaturesSection — 10 real features with 3D tilt, glow borders,
+// holographic shine on hover, NUEVO badges, verified stats
+// ═══════════════════════════════════════════════════════════════
 
-function FeatureCard({ feature, index }: { feature: LandingFeature; index: number }) {
-  const Icon = ICON_MAP[feature.icon] ?? Cpu;
+interface FeatureDef {
+  icon: string;
+  title: string;
+  description: string;
+  badge: string | null;
+  stat: string;
+  color: string; // hex color for glow
+}
+
+const FEATURES: FeatureDef[] = [
+  {
+    icon: '🔬',
+    title: 'Calibración por DPI',
+    description: 'Algoritmo basado en el DPI real de tu pantalla. No configs genéricas — sensibilidad calculada para TU celular.',
+    badge: null,
+    stat: '±2 pts de precisión',
+    color: '#06b6d4',
+  },
+  {
+    icon: '🎯',
+    title: 'Headshot Mode',
+    description: 'Sensibilidad para tiro a la cabeza con ajuste por dedos, técnicas de drag, tier list de armas, y training plan de 7 días.',
+    badge: 'NUEVO',
+    stat: '24 features',
+    color: '#ef4444',
+  },
+  {
+    icon: '🎛️',
+    title: '9 Estilos de Calibración',
+    description: 'Desde Clásico Básico hasta Rush Master. Cada estilo ajusta los valores para tu forma de jugar.',
+    badge: null,
+    stat: '9 estilos',
+    color: '#3b82f6',
+  },
+  {
+    icon: '📐',
+    title: 'Códigos HUD Reales',
+    description: '17 códigos HUD para 2, 3, 4 y 5 dedos. Copia y pega directo en Free Fire. Con screenshots reales del juego.',
+    badge: 'NUEVO',
+    stat: '17 códigos',
+    color: '#a855f7',
+  },
+  {
+    icon: '📡',
+    title: 'Giroscopio Calibrado',
+    description: 'Valores de giroscopio calibrados por DPI y tipo de panel. Independiente de la sensibilidad táctil.',
+    badge: null,
+    stat: '6 valores',
+    color: '#22c55e',
+  },
+  {
+    icon: '📚',
+    title: 'Academia Completa',
+    description: '8 guías de sensibilidad, HUD, headshots, armas y más. 12 tips aplicables hoy. Meta actual y tier list.',
+    badge: 'NUEVO',
+    stat: '8 guías + 12 tips',
+    color: '#f59e0b',
+  },
+  {
+    icon: '📱',
+    title: '90 Hz para Gama Media',
+    description: 'Soporte para 60, 90 y 120 Hz. Porque la mayoría de jugadores de FF en LATAM tienen gama media con 90 Hz.',
+    badge: 'NUEVO',
+    stat: '3 opciones de Hz',
+    color: '#14b8a6',
+  },
+  {
+    icon: '📸',
+    title: 'Screenshots Reales',
+    description: 'Fotos reales de Free Fire con los códigos HUD aplicados. Ve exactamente cómo queda tu pantalla antes de aplicar.',
+    badge: 'NUEVO',
+    stat: 'Del juego real',
+    color: '#ec4899',
+  },
+  {
+    icon: '📤',
+    title: 'Exportar y Compartir',
+    description: 'Exporta tu config como imagen para Instagram Stories o comparte por WhatsApp con tu squad.',
+    badge: null,
+    stat: 'Imagen lista para redes',
+    color: '#f97316',
+  },
+  {
+    icon: '🤖',
+    title: 'ARES AI Coach',
+    description: 'Tu coach personal de Free Fire con IA. Conoce tu dispositivo y te da consejos específicos para subir de nivel.',
+    badge: 'PRÓXIMAMENTE',
+    stat: 'Coaching personalizado',
+    color: '#8b5cf6',
+  },
+];
+
+function FeatureCard({ feature, index }: { feature: FeatureDef; index: number }) {
+  const { ref } = useTilt({ maxTilt: 5, scale: 1.02 });
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.06 }}
-      className="glass-card p-6 relative group"
-      style={{
-        borderColor: `${feature.color}10`,
-      }}
+      transition={{ duration: 0.5, delay: index * 0.06 }}
     >
-      {/* NEW badge */}
-      {feature.isNew && (
-        <div className="absolute -top-2 -right-2 z-10">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-ui font-bold uppercase tracking-wider bg-red-500 text-white animate-pulse">
-            Nuevo
-          </span>
-        </div>
-      )}
-
-      {/* Icon */}
       <div
-        className="inline-flex items-center justify-center w-11 h-11 rounded-xl mb-4"
+        ref={ref}
+        className="relative bg-white/[0.02] border border-white/5 rounded-2xl p-6 min-h-[200px] group overflow-hidden"
         style={{
-          backgroundColor: `${feature.color}15`,
-          boxShadow: `0 0 20px ${feature.color}10`,
+          // CSS custom property for glow color
+          ['--card-glow' as string]: feature.color,
         }}
       >
-        <Icon size={22} style={{ color: feature.color }} />
-      </div>
+        {/* Badge */}
+        {feature.badge && (
+          <div className="absolute top-3 right-3 z-10">
+            {feature.badge === 'NUEVO' ? (
+              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-500 text-white animate-[badgePulse_2s_ease-in-out_infinite]">
+                {feature.badge}
+              </span>
+            ) : (
+              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                {feature.badge}
+              </span>
+            )}
+          </div>
+        )}
 
-      {/* Title */}
-      <h3 className="font-display font-bold text-white text-base">{feature.title}</h3>
+        {/* Icon */}
+        <div
+          className="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl mb-4 transition-shadow duration-300"
+          style={{
+            backgroundColor: `${feature.color}15`,
+            border: `1px solid ${feature.color}25`,
+          }}
+        >
+          {feature.icon}
+        </div>
 
-      {/* Description */}
-      <p className="mt-2 text-sm text-slate-400 leading-relaxed font-body">{feature.description}</p>
+        {/* Title */}
+        <h3 className="font-display font-bold text-white text-base">{feature.title}</h3>
 
-      {/* Highlight pill */}
-      {feature.highlight && (
+        {/* Description — line-clamp-3 */}
+        <p className="mt-2 text-sm text-slate-400 leading-relaxed line-clamp-3">{feature.description}</p>
+
+        {/* Stat */}
         <div className="mt-4">
           <span
-            className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-ui font-semibold"
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold"
             style={{
               backgroundColor: `${feature.color}12`,
               color: feature.color,
-              border: `1px solid ${feature.color}25`,
+              border: `1px solid ${feature.color}20`,
             }}
           >
-            {feature.highlight}
+            {feature.stat}
           </span>
         </div>
-      )}
 
-      {/* Hover border glow */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{
-          boxShadow: `inset 0 0 0 1px ${feature.color}30, 0 0 20px ${feature.color}10`,
-          borderRadius: '16px',
-        }}
-      />
+        {/* Glow border on hover */}
+        <div
+          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style={{
+            boxShadow: `inset 0 0 0 1px ${feature.color}30, 0 0 30px ${feature.color}10`,
+          }}
+        />
+
+        {/* Holographic shine sweep on hover */}
+        <div
+          className="absolute top-0 left-[-100%] w-[50%] h-full pointer-events-none transition-[left] duration-[600ms] ease-out group-hover:left-[150%]"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent)',
+          }}
+        />
+      </div>
     </motion.div>
   );
 }
 
 export function FeaturesSection() {
   return (
-    <section className="py-20 px-4">
+    <section className="py-20 md:py-28 px-4">
       <div className="mx-auto max-w-6xl">
+        {/* Heading */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +208,8 @@ export function FeaturesSection() {
           No solo generas sensibilidad — tienes toda la plataforma
         </motion.p>
 
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+        {/* Grid */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map((feat, i) => (
             <FeatureCard key={feat.title} feature={feat} index={i} />
           ))}

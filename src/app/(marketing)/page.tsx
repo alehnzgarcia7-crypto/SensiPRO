@@ -40,12 +40,12 @@ export default function LandingPage() {
       <SocialProofRibbon />
       {/* 3. Stats Counter — 4 métricas con count-up */}
       <StatsCounter />
-      {/* 4. ¿Cómo funciona? — 3 pasos */}
+      {/* 4. ¿Cómo funciona? — 3 pasos cinematográficos */}
       <HowItWorksSection />
-      {/* 5. Marcas soportadas */}
-      <BrandsSection />
-      {/* 6. Features — 10 cards */}
+      {/* 5. Features — 10 features con tilt 3D */}
       <FeaturesSection />
+      {/* 6. Marcas soportadas — 26 brands cloud */}
+      <BrandsSection />
       {/* 7. Showcase Demo — mockup animado */}
       <ShowcaseDemo />
       {/* 8. Headshot Mode Showcase — feature estrella */}
