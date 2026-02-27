@@ -427,6 +427,12 @@
   50% { transform: translateY(-8px); }
 }
 
+/* ═══ Pricing Shimmer Sweep ═══ */
+@keyframes shimmerSweep {
+  0%, 100% { left: -100%; }
+  50% { left: 150%; }
+}
+
 /* ═══ Typewriter Cursor Blink ═══ */
 @keyframes blink {
   0%, 100% { opacity: 1; }

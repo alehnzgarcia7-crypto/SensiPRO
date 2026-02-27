@@ -289,35 +289,35 @@ export interface FaqItem {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: '¿Cómo funciona el generador?',
-    a: 'Nuestro algoritmo v4.0 usa el DPI (densidad de pixeles) de tu pantalla como driver principal. Selecciona tu dispositivo y el sistema ya tiene su DPI en la base de datos. A partir del DPI calcula tu General base, y luego aplica un tapering profesional de -15 entre cada mira (Punto Rojo, 2x, 4x, AWM). Ajustes secundarios como RAM, Hz y tamaño de pantalla afinan ±5 puntos. El resultado es una calibración forense única para tu hardware.',
+    a: `Buscas tu celular entre ${LANDING_DATA.deviceCount}+ dispositivos. El algoritmo calcula tu sensibilidad basándose en el DPI real de tu pantalla, tamaño, tasa de refresco (60/90/120 Hz) y RAM. Te da 6 valores: General, Punto Rojo, Scope 2x, Scope 4x, AWM y Vista Libre, más giroscopio y código HUD. Copias directo a Free Fire.`,
   },
   {
     q: '¿Es realmente gratis?',
-    a: 'Sí, el plan básico es gratis para siempre. Incluye el estilo Balanceado, 5 búsquedas por día, y acceso a la academia básica. Los estilos adicionales, giroscopio, comparador, headshot mode completo y exportar imagen son funciones Pro.',
+    a: `Sí. El plan básico es gratis para siempre. Incluye el generador completo con los 9 estilos, giroscopio, 1 código HUD, y acceso a las ${LANDING_DATA.guideCount} guías de la academia. El plan Pro agrega Headshot Mode completo, todos los códigos HUD, comparador de devices, y ARES AI Coach.`,
   },
   {
     q: '¿Qué tan preciso es el algoritmo?',
-    a: `Nuestro motor v4.0 de calibración forense DPI-first está validado contra datos reales de freefiremania.com.br 2026 con un margen de ±2 puntos de error en 12+ dispositivos. El DPI de cada uno de los ${LANDING_DATA.deviceCount}+ dispositivos está verificado de fuentes como GSMArena. Miles de jugadores usan nuestras configs en ranked diariamente.`,
+    a: `Precisión de ±2 puntos validada contra datos reales de freefiremania 2026. Usa calibración DPI-first con tapering -15 profesional. No son valores random — el algoritmo calcula usando el DPI real, el tamaño de pantalla, y la tasa de refresco de tu celular específico.`,
   },
   {
     q: '¿Soportan mi dispositivo?',
-    a: `Tenemos ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas incluyendo Samsung, Xiaomi, Redmi, POCO, Motorola, Apple, Realme, Infinix, Tecno, OPPO, Vivo, OnePlus, Honor, y más. Si tu dispositivo no está, contáctanos y lo agregamos en 24 horas.`,
+    a: `Tenemos ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas: Samsung, Apple, Xiaomi, Redmi, POCO, Motorola, Realme, OPPO, Vivo, OnePlus, Infinix, Tecno, Honor, Nothing, Google, Huawei, y más. Si no encuentras el tuyo, escríbenos y lo agregamos en 48 horas.`,
   },
   {
     q: '¿Por qué mis valores son diferentes a los de YouTube?',
-    a: 'Porque nuestros valores están calibrados específicamente para el DPI de TU pantalla, no son valores genéricos. Un Samsung A13 con DPI 270 necesita ~187 de general porque sus pixeles son más grandes, mientras que un iPhone con DPI 460 necesita ~168 porque los pixeles son más finos y tu dedo se mueve con más precisión. Por eso copiar la sensi de un youtuber nunca funciona: su DPI es diferente al tuyo.',
+    a: 'Porque cada celular tiene diferente DPI, tamaño de pantalla y tasa de refresco. Cuando un YouTuber comparte su sensibilidad, funciona para SU celular. SensiPRO calcula la sensibilidad para TU celular específico, por eso los valores son diferentes y por eso funcionan mejor.',
   },
   {
     q: '¿Qué es el Headshot Mode?',
-    a: 'Es un modo de sensibilidad calibrado para tiro a la cabeza. Incluye: sensibilidad con multiplicadores de headshot, 5 técnicas de drag animadas (vertical, rotación, dirección, situp, jump drag), 15 armas con datos de daño headshot, calculadora de botón de disparo, y un plan de entrenamiento diario con timer.',
+    a: `Un modo dedicado con ${LANDING_DATA.headshotFeatures} features para mejorar tu headshot rate. Incluye: sensibilidad ajustada por 2/3/4 dedos, ${LANDING_DATA.hudCodeCount} códigos HUD reales con screenshots, ${LANDING_DATA.techniqueCount} técnicas de drag shot, tier list de armas, training plan de ${LANDING_DATA.trainingDays} días, y giroscopio calibrado por tipo de agarre.`,
   },
   {
     q: '¿Qué son los códigos HUD?',
-    a: 'Son códigos REALES de Free Fire que configuran la posición y tamaño de los botones en pantalla. Tenemos layouts para 2, 3, 4 y 5 dedos usados por pro players. Solo vas a Free Fire → Ajustes → Usar código compartido, pegas el código, y tu HUD se configura al instante.',
+    a: `Son códigos reales de Free Fire que configuran la posición de TODOS tus botones en pantalla. En vez de mover cada botón manualmente, pegas un código en Ajustes → En Partida → Usar código compartido, y tu HUD queda configurado al instante. Tenemos ${LANDING_DATA.hudCodeCount} códigos para 2, 3, 4 y 5 dedos.`,
   },
   {
-    q: '¿Puedo usar la config en ranked?',
-    a: 'Absolutamente. Las configs son 100% legítimas — solo ajustan los valores de sensibilidad que ya existen en el juego. No es hack, mod ni truco. Están calibradas con datos forenses reales y probadas en miles de partidas clasificatorias.',
+    q: '¿Puedo cancelar el plan Pro cuando quiera?',
+    a: 'Sí. Sin contratos, sin permanencia. Cancelas cuando quieras y sigues con el plan gratis. Además tienes 7 días de garantía — si no mejoras tu gameplay en la primera semana, te devolvemos tu dinero.',
   },
 ];
 

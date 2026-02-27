@@ -52,15 +52,15 @@ export default function LandingPage() {
       <InteractiveDemo />
       {/* 9. Dispositivos populares — carousel horizontal */}
       <DeviceShowcase />
-      {/* 10. ARES AI Coach Showcase — demo interactivo */}
+      {/* 10. ARES AI Coach — preview estático */}
       <AresCoachShowcase />
-      {/* 11. Testimonios — 8 reviews + rating promedio */}
+      {/* 11. Testimonios — carousel horizontal */}
       <TestimonialsSection />
-      {/* 12. Pricing — 2 planes */}
+      {/* 12. Pricing — toggle mensual/anual + Pro animado */}
       <PricingSection />
-      {/* 13. FAQ — 8 preguntas */}
+      {/* 13. FAQ — 8 preguntas acordeón */}
       <FaqSection />
-      {/* 14. CTA Final — último empujón */}
+      {/* 14. CTA Final — cierre cinematográfico */}
       <CtaSection />
       {/* 15. Footer */}
       <LandingFooter />
