@@ -11,7 +11,7 @@ import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { LandingFooter } from '@/components/landing/landing-footer';
 import { PricingSection } from '@/components/landing/pricing-section';
-import { ShowcaseDemo } from '@/components/landing/showcase-demo';
+import { InteractiveDemo } from '@/components/landing/interactive-demo';
 import { SocialProofRibbon } from '@/components/landing/social-proof-ribbon';
 import { StatsCounter } from '@/components/landing/stats-counter';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
@@ -46,16 +46,16 @@ export default function LandingPage() {
       <FeaturesSection />
       {/* 6. Marcas soportadas — 26 brands cloud */}
       <BrandsSection />
-      {/* 7. Showcase Demo — mockup animado */}
-      <ShowcaseDemo />
-      {/* 8. Headshot Mode Showcase — feature estrella */}
+      {/* 7. Headshot Mode Showcase — feature estrella */}
       <HeadshotShowcase />
-      {/* 9. ARES AI Coach Showcase — demo interactivo */}
-      <AresCoachShowcase />
-      {/* 10. Testimonios — 8 reviews + rating promedio */}
-      <TestimonialsSection />
-      {/* 11. Dispositivos populares — 10 cards */}
+      {/* 8. Demo Interactivo — mini-generador funcional */}
+      <InteractiveDemo />
+      {/* 9. Dispositivos populares — carousel horizontal */}
       <DeviceShowcase />
+      {/* 10. ARES AI Coach Showcase — demo interactivo */}
+      <AresCoachShowcase />
+      {/* 11. Testimonios — 8 reviews + rating promedio */}
+      <TestimonialsSection />
       {/* 12. Pricing — 2 planes */}
       <PricingSection />
       {/* 13. FAQ — 8 preguntas */}
