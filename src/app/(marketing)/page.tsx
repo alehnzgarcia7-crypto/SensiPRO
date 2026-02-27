@@ -12,17 +12,19 @@ import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { LandingFooter } from '@/components/landing/landing-footer';
 import { PricingSection } from '@/components/landing/pricing-section';
 import { ShowcaseDemo } from '@/components/landing/showcase-demo';
-import { SocialProofBand } from '@/components/landing/social-proof-band';
+import { SocialProofRibbon } from '@/components/landing/social-proof-ribbon';
+import { StatsCounter } from '@/components/landing/stats-counter';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
+import { CyberParticles } from '@/components/effects/cyber-particles';
 
 export const metadata: Metadata = {
   title: 'Sensibilidades PRO — Generador #1 para Free Fire',
   description:
-    'Genera las mejores sensibilidades para Free Fire basadas en las specs reales de tu dispositivo. 503+ dispositivos, 26 marcas, 9 estilos, giroscopio calibrado. Gratis.',
+    'Genera las mejores sensibilidades para Free Fire basadas en el DPI real de tu pantalla. 503+ dispositivos, 26 marcas, 9 estilos, giroscopio calibrado. Gratis.',
   openGraph: {
     title: 'Sensibilidades PRO — Generador #1 para Free Fire',
     description:
-      'Genera las mejores sensibilidades para Free Fire basadas en las specs reales de tu dispositivo. 503+ dispositivos, 26 marcas, giroscopio calibrado.',
+      'Genera las mejores sensibilidades para Free Fire basadas en el DPI real de tu pantalla. 503+ dispositivos, 26 marcas, giroscopio calibrado.',
     type: 'website',
   },
 };
@@ -30,33 +32,37 @@ export const metadata: Metadata = {
 export default function LandingPage() {
   return (
     <>
+      {/* 0. Background particles — fixed, z-0, pointer-events-none */}
+      <CyberParticles />
       {/* 1. Hero — impacto, CTA, stats */}
       <HeroSection />
-      {/* 2. Social Proof Band — marquee de actividad */}
-      <SocialProofBand />
-      {/* 3. ¿Cómo funciona? — 3 pasos */}
+      {/* 2. Social Proof Ribbon — marquee doble fila */}
+      <SocialProofRibbon />
+      {/* 3. Stats Counter — 4 métricas con count-up */}
+      <StatsCounter />
+      {/* 4. ¿Cómo funciona? — 3 pasos */}
       <HowItWorksSection />
-      {/* 4. Marcas soportadas */}
+      {/* 5. Marcas soportadas */}
       <BrandsSection />
-      {/* 5. Features — 10 cards */}
+      {/* 6. Features — 10 cards */}
       <FeaturesSection />
-      {/* 6. Showcase Demo — mockup animado */}
+      {/* 7. Showcase Demo — mockup animado */}
       <ShowcaseDemo />
-      {/* 7. Headshot Mode Showcase — feature estrella */}
+      {/* 8. Headshot Mode Showcase — feature estrella */}
       <HeadshotShowcase />
-      {/* 8. ARES AI Coach Showcase — demo interactivo */}
+      {/* 9. ARES AI Coach Showcase — demo interactivo */}
       <AresCoachShowcase />
-      {/* 9. Testimonios — 8 reviews + rating promedio */}
+      {/* 10. Testimonios — 8 reviews + rating promedio */}
       <TestimonialsSection />
-      {/* 10. Dispositivos populares — 10 cards */}
+      {/* 11. Dispositivos populares — 10 cards */}
       <DeviceShowcase />
-      {/* 11. Pricing — 2 planes */}
+      {/* 12. Pricing — 2 planes */}
       <PricingSection />
-      {/* 12. FAQ — 8 preguntas */}
+      {/* 13. FAQ — 8 preguntas */}
       <FaqSection />
-      {/* 13. CTA Final — último empujón */}
+      {/* 14. CTA Final — último empujón */}
       <CtaSection />
-      {/* 14. Footer */}
+      {/* 15. Footer */}
       <LandingFooter />
     </>
   );

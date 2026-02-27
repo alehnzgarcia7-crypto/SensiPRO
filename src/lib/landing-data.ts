@@ -4,23 +4,25 @@
 // un número en un componente — siempre usar LANDING_DATA.
 // ═══════════════════════════════════════════════════════════════
 
-// --- Counts reales de la DB (actualizados desde seed) ---
-// 503 devices, 26 brands (de devices.seed.ts)
-// 77 guías, 104 tips (de guides.seed.ts y tips.seed.ts)
-// 15 armas headshot, 5 técnicas drag, 17 HUD codes (de constants.ts)
+// --- Counts reales de la DB (actualizados desde seed y componentes) ---
+// 503 devices, 26 brands (de devices.seed.ts — verificado Feb 2026)
+// 8 guías reales en academia, 12 tips reales
+// 24 features en headshot mode, 17 HUD codes, 5 técnicas drag
 
 export const LANDING_DATA = {
-  // Conteos reales de la base de datos
+  // Conteos reales verificados
   deviceCount: 503,
   brandCount: 26,
   styleCount: 9,
-  guideCount: 77,
-  tipCount: 104,
-  weaponCount: 15,
-  techniqueCount: 5,
-  hudCodeCount: 17,
+  guideCount: 8,             // 8 guías reales con contenido completo
+  tipCount: 12,              // 12 tips reales
+  weaponCount: 32,           // armas en weapon-categories
+  headshotFeatures: 24,      // 24 features en headshot mode
+  techniqueCount: 5,         // 5 técnicas drag
+  hudCodeCount: 17,          // 17 códigos HUD reales
   sensitivityValues: 6,
   gyroValues: 6,
+  trainingDays: 7,           // plan de entrenamiento de 7 días
 
   // Social proof (números creíbles para fase de lanzamiento)
   playerCount: 1_680,
@@ -210,7 +212,7 @@ export const FEATURES: LandingFeature[] = [
       'Guías desde principiante hasta pro, tips diarios, análisis detallado de armas, estrategias de combate, y video tutoriales. Todo en español.',
     color: '#3b82f6',
     isNew: true,
-    highlight: `${LANDING_DATA.guideCount}+ guías y ${LANDING_DATA.tipCount}+ tips`,
+    highlight: `${LANDING_DATA.guideCount} guías y ${LANDING_DATA.tipCount} tips`,
   },
   {
     icon: 'ArrowLeftRight',
@@ -339,11 +341,12 @@ export const SOCIAL_PROOF_ITEMS: string[] = [
   '🎯 BryanElPro hace one-tap con iPhone 14',
   '💪 MateoSniper_ llegó a Heroico por primera vez',
   `⭐ ${LANDING_DATA.avgRating}/5 rating promedio`,
-  `🏆 ${LANDING_DATA.playerCount.toLocaleString()} jugadores`,
-  '💎 NahomiFF_ llegó a Platino con Galaxy A14',
+  `🏆 ${LANDING_DATA.playerCount.toLocaleString()} jugadores calibrados`,
+  '💎 NahomiFF_ subió a Platino con Galaxy A14',
   '🔥 CamiRush22 recomienda SensiPRO a toda su squad',
-  '🎯 AndresGOAT mejoró en clasificatoria con Infinix Hot 40',
-  '🤖 ARES respondió 3,847 preguntas esta semana',
+  '🎯 AndresGOAT mejoró en ranked con Infinix Hot 40',
+  '📱 ElChema_GG dice que es la mejor app que ha usado',
+  '🎮 XxDiego_FFxX logró headshots consistentes con POCO X5',
 ];
 
 // ═══════════════════════════════════════════════════════════════

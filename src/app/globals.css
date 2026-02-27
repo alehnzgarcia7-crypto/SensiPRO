@@ -354,6 +354,85 @@
   animation: marquee 40s linear infinite;
 }
 
+/* ═══ Landing Navbar Badge Pulse ═══ */
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ═══ Marquee for Social Proof Ribbon ═══ */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 60s linear infinite;
+}
+
+.marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 60s linear infinite;
+}
+
+.marquee-left:hover,
+.marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* ═══ Hero CTA Shimmer ═══ */
+@keyframes cta-shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* ═══ Hero Gradient Mesh Blobs ═══ */
+@keyframes meshFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(30px, -40px); }
+  50% { transform: translate(-20px, 20px); }
+  75% { transform: translate(40px, 10px); }
+}
+
+@keyframes meshFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-40px, 30px); }
+  50% { transform: translate(20px, -30px); }
+  75% { transform: translate(-10px, 40px); }
+}
+
+@keyframes meshFloat3 {
+  0%, 100% { transform: translate(-50%, -50%); }
+  33% { transform: translate(-45%, -55%); }
+  66% { transform: translate(-55%, -45%); }
+}
+
+/* ═══ Scroll Indicator Bounce ═══ */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ═══ Float Animation ═══ */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ═══ Typewriter Cursor Blink ═══ */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
