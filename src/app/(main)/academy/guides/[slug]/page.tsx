@@ -103,13 +103,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
         <p className="text-slate-300 text-base leading-relaxed max-w-3xl">{guide.intro}</p>
       </header>
 
-      {/* Main content area with TOC sidebar */}
-      <div className="flex gap-8">
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Mobile TOC */}
-          <GuideToc sections={guide.sections} />
+      {/* Mobile TOC — collapsible dropdown arriba del contenido */}
+      <GuideToc variant="mobile" sections={guide.sections} />
 
+      {/* Main content area with TOC sidebar */}
+      <div className="flex gap-8 lg:gap-10">
+        {/* Content — margin derecho implícito via flex para no taparse con sidebar */}
+        <div className="flex-1 min-w-0">
           {/* Guide Content */}
           <GuideRenderer sections={guide.sections} />
 
@@ -117,8 +117,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <GuideFooter relatedSlugs={guide.relatedSlugs} currentSlug={guide.slug} />
         </div>
 
-        {/* Desktop TOC sidebar */}
-        <GuideToc sections={guide.sections} />
+        {/* Desktop TOC sidebar — sticky a la derecha, z-10 para no tapar contenido */}
+        <GuideToc variant="sidebar" sections={guide.sections} />
       </div>
     </article>
   );
