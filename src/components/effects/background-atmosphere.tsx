@@ -50,20 +50,14 @@ export function BackgroundAtmosphere() {
         <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(168,85,247,0.06)_0%,_transparent_60%)] blur-[80px]" />
       </div>
 
-      {/* Partículas flotantes — CSS puro */}
+      {/* Partículas flotantes — CSS puro (6 partículas, optimizado para low-end) */}
       <div className="absolute inset-0">
-        <div className="atmosphere-particle" style={{ left: '10%', top: '20%', animationDuration: '12s', animationDelay: '0s' }} />
-        <div className="atmosphere-particle" style={{ left: '25%', top: '60%', animationDuration: '15s', animationDelay: '2s' }} />
-        <div className="atmosphere-particle" style={{ left: '40%', top: '35%', animationDuration: '18s', animationDelay: '4s' }} />
-        <div className="atmosphere-particle" style={{ left: '55%', top: '75%', animationDuration: '14s', animationDelay: '1s' }} />
-        <div className="atmosphere-particle" style={{ left: '70%', top: '15%', animationDuration: '16s', animationDelay: '3s' }} />
-        <div className="atmosphere-particle" style={{ left: '85%', top: '45%', animationDuration: '13s', animationDelay: '5s' }} />
-        <div className="atmosphere-particle" style={{ left: '15%', top: '80%', animationDuration: '17s', animationDelay: '6s' }} />
-        <div className="atmosphere-particle" style={{ left: '60%', top: '50%', animationDuration: '11s', animationDelay: '7s' }} />
-        <div className="atmosphere-particle" style={{ left: '90%', top: '70%', animationDuration: '19s', animationDelay: '2.5s' }} />
-        <div className="atmosphere-particle" style={{ left: '35%', top: '10%', animationDuration: '14s', animationDelay: '4.5s' }} />
-        <div className="atmosphere-particle" style={{ left: '75%', top: '90%', animationDuration: '16s', animationDelay: '1.5s' }} />
-        <div className="atmosphere-particle" style={{ left: '5%', top: '50%', animationDuration: '20s', animationDelay: '3.5s' }} />
+        <div className="atmosphere-particle" style={{ left: '10%', top: '20%', animationDuration: '14s', animationDelay: '0s' }} />
+        <div className="atmosphere-particle" style={{ left: '40%', top: '60%', animationDuration: '18s', animationDelay: '3s' }} />
+        <div className="atmosphere-particle" style={{ left: '70%', top: '15%', animationDuration: '16s', animationDelay: '1s' }} />
+        <div className="atmosphere-particle" style={{ left: '85%', top: '45%', animationDuration: '15s', animationDelay: '5s' }} />
+        <div className="atmosphere-particle" style={{ left: '25%', top: '80%', animationDuration: '17s', animationDelay: '2s' }} />
+        <div className="atmosphere-particle" style={{ left: '60%', top: '50%', animationDuration: '19s', animationDelay: '4s' }} />
       </div>
     </div>
   );

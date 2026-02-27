@@ -167,14 +167,17 @@ export function AresCoachShowcase() {
   const [greetingDone, setGreetingDone] = useState(false);
   const [notified, setNotified] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const hasTriggeredGreeting = useRef(false);
 
-  // --- Scroll al fondo ---
+  // --- Scroll al fondo (SOLO dentro del chat container, no la página) ---
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
@@ -436,11 +439,10 @@ export function AresCoachShowcase() {
               </div>
 
               {/* Messages area */}
-              <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 scrollbar-hide min-h-[280px]">
+              <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3 scrollbar-hide min-h-[280px]">
                 {messages.map((msg) => (
                   <ChatBubble key={msg.id} message={msg} />
                 ))}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Questions area */}
