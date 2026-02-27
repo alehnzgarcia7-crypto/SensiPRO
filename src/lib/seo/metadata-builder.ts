@@ -62,7 +62,7 @@ export function buildDeviceMetadata(device: {
 }): Metadata {
   return buildMetadata({
     title: `Sensibilidad ${device.brand} ${device.model} — Free Fire`,
-    description: `Configuración de sensibilidad perfecta para ${device.brand} ${device.model} en Free Fire. Valores optimizados para dispositivo ${device.tier}. Generador PRO gratuito.`,
+    description: `Configuración de sensibilidad para ${device.brand} ${device.model} en Free Fire. Valores ajustados para dispositivo ${device.tier}. Generador PRO gratuito.`,
     path: `/devices/${device.slug}`,
     ogImage: `${BASE_URL}/api/og/device/${device.slug}`,
   });
@@ -88,7 +88,7 @@ export function buildGuideMetadata(guide: {
 export function buildBrandMetadata(brand: string, deviceCount: number): Metadata {
   return buildMetadata({
     title: `Sensibilidades ${brand} — Free Fire | ${deviceCount} dispositivos`,
-    description: `Configuraciones de sensibilidad para todos los dispositivos ${brand} en Free Fire. ${deviceCount} modelos con ajustes optimizados.`,
+    description: `Configuraciones de sensibilidad para todos los dispositivos ${brand} en Free Fire. ${deviceCount} modelos con ajustes calibrados.`,
     path: `/devices/brand/${brand.toLowerCase()}`,
   });
 }

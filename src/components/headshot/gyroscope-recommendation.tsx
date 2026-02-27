@@ -73,7 +73,7 @@ export function GyroscopeRecommendation({ gyroscope, fingerProfile }: GyroscopeR
 
           <div className="mt-3 px-3 py-2 rounded-lg bg-orange-500/5 border border-orange-500/10">
             <p className="text-xs text-orange-400/80 font-body">
-              💡 Cambia a 3 o 4 dedos para desbloquear el giroscopio.
+              💡 Cambia a 3 o 4 dedos para poder usar el giroscopio.
             </p>
           </div>
         </>

@@ -26,7 +26,7 @@ export function HeadshotHero() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="font-ui text-lg text-slate-400 mt-3"
       >
-        Optimiza tu sensibilidad para tiro a la cabeza
+        Sensibilidad calibrada para tiro a la cabeza
       </motion.p>
 
       <motion.div

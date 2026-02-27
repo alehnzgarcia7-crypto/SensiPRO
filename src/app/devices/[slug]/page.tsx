@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Configuracion de sensibilidades para ${device.brand} ${device.model} (${device.screenHz}Hz, ${device.ramGb}GB RAM, ${device.panelType}, Tier ${device.tier}) en Free Fire. 3 estilos: Agresivo, Balanceado, Francotirador.`,
     openGraph: {
       title: `${device.brand} ${device.model} — Sensibilidades Free Fire`,
-      description: `Config optimizada para ${device.screenHz}Hz, ${device.ramGb}GB RAM. Generada por SensiPRO.`,
+      description: `Config calibrada para ${device.screenHz}Hz, ${device.ramGb}GB RAM. Generada por SensiPRO.`,
     },
   };
 }

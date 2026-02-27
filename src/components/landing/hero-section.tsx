@@ -78,9 +78,8 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.55 }}
           className="mt-6 text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-body leading-relaxed"
         >
-          Calibración forense v4.0 basada en el DPI real de tu pantalla con tapering
-          profesional -15. Validado contra datos reales con ±2 puntos de precisión.
-          No más copiar configs genéricas de YouTube.
+          Calculamos tu sensibilidad con el DPI real de tu pantalla y tapering -15.
+          Precisión de ±2 puntos. Olvídate de copiar configs genéricas de YouTube.
         </motion.p>
 
         {/* CTAs */}
@@ -127,7 +126,7 @@ export function HeroSection() {
             </span>
           </div>
           <p className="text-xs text-slate-500">
-            {LANDING_DATA.playerCount.toLocaleString()} jugadores ya optimizaron su sensibilidad
+            {LANDING_DATA.playerCount.toLocaleString()} jugadores ya calibraron su sensibilidad
           </p>
         </motion.div>
 

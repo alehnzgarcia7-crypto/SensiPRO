@@ -34,8 +34,8 @@ export function ProBadge({ fingers, style }: ProBadgeProps) {
           Configuración Pro Player
         </p>
         <p className="text-xs text-slate-400 font-body mt-2 leading-relaxed">
-          Esta es la configuración que usan los competitivos de Free Fire LATAM.
-          {isAggressiveStyle && ' Estilo agresivo + 4 dedos = máximo potencial.'}
+          La misma config que usan los competitivos de Free Fire LATAM.
+          {isAggressiveStyle && ' Agresivo + 4 dedos = la combinación más letal.'}
         </p>
         <p className="text-xs text-amber-500/60 font-body mt-2">
           Solo el 8% de jugadores usan garra. Tú eres parte de ese 8%.

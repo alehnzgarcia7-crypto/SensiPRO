@@ -118,7 +118,7 @@ export function HeadshotShowcase() {
           <div className="text-center mb-12">
             {/* Badge */}
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-ui font-bold uppercase tracking-wider mb-6 headshot-badge-pulse">
-              Exclusivo — Nadie más lo tiene
+              Solo en SensiPRO
             </span>
 
             <h2 className="text-3xl md:text-4xl font-heading font-bold">
@@ -126,7 +126,7 @@ export function HeadshotShowcase() {
               <span className="headshot-text-gradient">HEADSHOT MODE</span>
             </h2>
             <p className="mt-3 text-lg text-slate-400 font-ui">
-              La ventaja que tu squad necesita
+              Dale la ventaja a tu squad
             </p>
           </div>
         </ScrollReveal>
@@ -138,7 +138,7 @@ export function HeadshotShowcase() {
             <div>
               <p className="text-slate-300 font-body leading-relaxed mb-8">
                 El 73% de las eliminaciones en ranked son por headshot. Si no estás
-                optimizado para tiro a la cabeza, estás perdiendo peleas que deberías ganar.
+                calibrado para tiro a la cabeza, estás perdiendo peleas que deberías ganar.
               </p>
 
               <ul className="space-y-4">

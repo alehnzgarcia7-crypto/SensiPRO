@@ -15,10 +15,10 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreLabel(score: number): string {
-  if (score >= 90) return 'Setup ÉLITE. Tu dispositivo es una máquina de headshots.';
-  if (score >= 75) return 'Setup muy bueno para headshots. Estás listo para competir.';
-  if (score >= 50) return 'Setup decente. Practica las técnicas de drag para maximizar.';
-  return 'Tu dispositivo tiene limitaciones para headshots. Compensa con técnica.';
+  if (score >= 90) return 'Score 95+ — Tu config está lista para ranked.';
+  if (score >= 75) return 'Buen setup para headshots. Practica el drag y vas a notar la diferencia.';
+  if (score >= 50) return 'Setup decente. Enfócate en las técnicas de drag para sacarle más provecho.';
+  return 'Tu cel tiene limitaciones, pero con buena técnica se compensa.';
 }
 
 export function HeadshotScoreGauge({ score }: HeadshotScoreGaugeProps) {

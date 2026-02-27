@@ -20,7 +20,7 @@ const FEATURE_UPSELL: Partial<Record<FeatureKey, { title: string; description: s
   gyroscope: { title: 'Giroscopio PRO', description: 'Valores de giroscopio calibrados para tu dispositivo', icon: Zap },
   compareDevices: { title: 'Comparador', description: 'Compara 2 dispositivos side-by-side', icon: Crown },
   exportImage: { title: 'Exportar Imagen', description: 'Descarga tu config como imagen para compartir', icon: Crown },
-  styleAggressive: { title: 'Estilo Agresivo', description: 'Sensibilidades optimizadas para rush', icon: Zap },
+  styleAggressive: { title: 'Estilo Agresivo', description: 'Sensibilidades calibradas para rush', icon: Zap },
   styleSniper: { title: 'Estilo Francotirador', description: 'Máxima precisión para largo alcance', icon: Zap },
   vipThemes: { title: 'Temas VIP', description: 'Temas exclusivos: Neon Purple, Blood Red, Matrix Green', icon: Crown },
 };

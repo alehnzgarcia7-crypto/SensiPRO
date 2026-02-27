@@ -107,7 +107,7 @@ export function FeaturesSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-display font-bold text-center text-white"
         >
-          Todo lo que necesitas
+          Todo lo que trae SensiPRO
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 15 }}
@@ -116,7 +116,7 @@ export function FeaturesSection() {
           transition={{ delay: 0.1 }}
           className="mt-3 text-center text-slate-400 font-body"
         >
-          Más que un generador — una plataforma gaming completa
+          No solo generas sensibilidad — tienes toda la plataforma
         </motion.p>
 
         <div className="mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">

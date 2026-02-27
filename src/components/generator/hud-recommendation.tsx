@@ -32,19 +32,19 @@ const FINGER_META: Record<2 | 3 | 4 | 5, { emoji: string; title: string; subtitl
   3: {
     emoji: '🤟',
     title: '3 DEDOS — VERSÁTIL',
-    subtitle: 'Balance perfecto entre control y velocidad',
+    subtitle: 'Buen balance entre control y velocidad',
     icon: Zap,
   },
   4: {
     emoji: '🖐️',
     title: '4 DEDOS — GARRA',
-    subtitle: 'Máximo rendimiento para jugadores competitivos',
+    subtitle: 'Para jugadores competitivos que quieren todo',
     icon: Trophy,
   },
   5: {
     emoji: '🖐️',
-    title: '5 DEDOS — ÉLITE',
-    subtitle: 'Control absoluto para los más pro',
+    title: '5 DEDOS — FULL CONTROL',
+    subtitle: 'Control total. Para los más pro',
     icon: Target,
   },
 };

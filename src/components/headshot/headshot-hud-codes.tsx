@@ -101,7 +101,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
       dbLabel: 'Balanceado',
       nameEs: 'Competitivo Estándar',
       descriptionEs:
-        'El layout estándar de LATAM para 3 dedos. Equilibrio perfecto entre movilidad y disparo para headshots.',
+        'El layout estándar de LATAM para 3 dedos. Buen balance entre movilidad y disparo para headshots.',
       prosEs: [
         'Layout más usado en LATAM competitivo',
         'Permite mover + disparar simultáneamente',
@@ -117,7 +117,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
       dbLabel: 'Precisión Sniper',
       nameEs: 'Peek Master',
       descriptionEs:
-        'Optimizado para Peek & Fire — el botón de peek está posicionado para combinar con disparo instantáneo a la cabeza.',
+        'Hecho para Peek & Fire — el botón de peek queda donde puedes combinarlo con disparo instantáneo a la cabeza.',
       prosEs: [
         'Peek + headshot en un movimiento fluido',
         'Dominante en combates de esquina',
@@ -132,7 +132,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
       dbLabel: 'Rush Master',
       nameEs: 'Rush Agresivo',
       descriptionEs:
-        'Optimizado para combate cercano y rushes. Botón de disparo accesible para headshots rápidos en CQB.',
+        'Para combate cercano y rushes. Botón de disparo accesible para headshots rápidos en CQB.',
       prosEs: [
         'Disparo rápido para headshots en rush',
         'MP40/UMP dominante a corta distancia',
@@ -165,10 +165,10 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
       dbLabel: 'Garra Equilibrada',
       nameEs: 'Garra Pro (Two9 Style)',
       descriptionEs:
-        'Optimizado para Jump-Crouch-Fire simultáneo. El layout que usan los pros para headshots en movimiento.',
+        'Hecho para Jump-Crouch-Fire simultáneo. El layout que usan los pros para headshots en movimiento.',
       prosEs: [
         'Jump + crouch + fire = combo letal de headshot',
-        'Estilo usado por jugadores élite LATAM',
+        'Estilo usado por los mejores de LATAM',
         'Máxima tasa de headshot en ranked',
       ],
       consEs: [
@@ -180,7 +180,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
       dbLabel: 'Garra Precisión',
       nameEs: 'Sniper Garra',
       descriptionEs:
-        'Optimizado para AWM + peek a larga distancia. Botones de mira y peek en posición premium para one-tap headshots.',
+        'Hecho para AWM + peek a larga distancia. Botones de mira y peek bien colocados para one-tap headshots.',
       prosEs: [
         'One-tap headshots con AWM consistentes',
         'Peek + scope fluido a larga distancia',
@@ -485,7 +485,7 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
               CÓDIGOS HUD — HEADSHOT MODE
             </h4>
             <p className="text-xs text-slate-500">
-              Códigos reales de Free Fire optimizados para {fingers} dedos
+              Códigos reales de Free Fire para {fingers} dedos
             </p>
           </div>
         </div>

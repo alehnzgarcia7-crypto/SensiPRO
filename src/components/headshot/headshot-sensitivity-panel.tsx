@@ -62,7 +62,7 @@ export function HeadshotSensitivityPanel({
                 Sensibilidad Headshot
               </h3>
               <span className="text-[10px] font-ui font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
-                OPTIMIZADO PARA TIRO A LA CABEZA
+                AJUSTADO PARA HEADSHOT
               </span>
             </div>
 

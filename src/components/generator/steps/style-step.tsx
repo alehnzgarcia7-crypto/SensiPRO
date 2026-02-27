@@ -33,7 +33,7 @@ const STYLES: StyleOption[] = [
     key: 'BALANCED',
     name: 'Balanceado',
     icon: Target,
-    description: 'Equilibrio perfecto. Para todos.',
+    description: 'Buen balance. Para todos.',
     color: 'text-style-balanced',
     border: 'border-style-balanced/30',
   },

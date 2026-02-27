@@ -18,7 +18,7 @@ export function HeadshotCtaBanner() {
           ¿Quieres HEADSHOTS?
         </p>
         <p className="text-sm text-slate-400 font-body mt-1">
-          Sensibilidad optimizada + técnicas de drag + arsenal de armas
+          Sensibilidad calibrada + técnicas de drag + arsenal de armas
         </p>
         <Link
           href="/generator/headshot"

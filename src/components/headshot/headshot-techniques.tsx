@@ -126,7 +126,7 @@ export function HeadshotTechniques({ fingers }: HeadshotTechniquesProps) {
               <p className="text-xs text-orange-400/80 font-body">{fingerSet.limitationEs}</p>
               {fingers < 4 && (
                 <p className="text-[11px] text-slate-600 font-body mt-1.5">
-                  Tip: Cambia a {fingers + 1} dedos para desbloquear{' '}
+                  Tip: Cambia a {fingers + 1} dedos para poder usar{' '}
                   {fingers === 2 ? 'Peek & Fire' : 'Jump-Crouch-Fire (Two9)'}
                 </p>
               )}

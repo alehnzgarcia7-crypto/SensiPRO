@@ -595,7 +595,7 @@ export const CURRENT_META: MetaSnapshot = {
     },
     {
       name: 'Versatile Classic',
-      description: 'M4A1 estable para todo rango + M1887 one-tap en close. Equilibrio perfecto entre seguridad y agresividad.',
+      description: 'M4A1 estable para todo rango + M1887 one-tap en close. Buen balance entre seguridad y agresividad.',
       weapons: ['M4A1', 'M1887'],
       style: 'balanced',
     },

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 
 export const metadata: Metadata = {
   title: 'Todos los Dispositivos',
-  description: 'Explora 500+ dispositivos con sensibilidades optimizadas para Free Fire.',
+  description: 'Explora 500+ dispositivos con sensibilidades calibradas para Free Fire.',
 };
 
 interface DeviceSummary {

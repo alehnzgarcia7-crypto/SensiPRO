@@ -171,7 +171,7 @@ export const FEATURES: LandingFeature[] = [
     icon: 'Crosshair',
     title: 'Headshot Mode',
     description:
-      'Sensibilidad optimizada para tiro a la cabeza. 5 técnicas de drag con guías animadas, 15 armas con ajustes específicos, tamaño de botón calculado, y plan de entrenamiento diario.',
+      'Sensibilidad calibrada para tiro a la cabeza. 5 técnicas de drag con guías animadas, 15 armas con ajustes específicos, tamaño de botón calculado, y plan de entrenamiento diario.',
     color: '#ef4444',
     isNew: true,
     highlight: '15 armas + 5 técnicas',
@@ -307,7 +307,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: '¿Qué es el Headshot Mode?',
-    a: 'Es un modo de sensibilidad optimizado específicamente para tiro a la cabeza. Incluye: sensibilidad con multiplicadores de headshot, 5 técnicas de drag animadas (vertical, rotación, dirección, situp, jump drag), 15 armas con datos de daño headshot, calculadora de botón de disparo, y un plan de entrenamiento diario con timer.',
+    a: 'Es un modo de sensibilidad calibrado para tiro a la cabeza. Incluye: sensibilidad con multiplicadores de headshot, 5 técnicas de drag animadas (vertical, rotación, dirección, situp, jump drag), 15 armas con datos de daño headshot, calculadora de botón de disparo, y un plan de entrenamiento diario con timer.',
   },
   {
     q: '¿Qué son los códigos HUD?',
