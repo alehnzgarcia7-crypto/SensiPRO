@@ -10,6 +10,7 @@ import {
   Target,
   ArrowRight,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { cn } from '@/lib/cn';
@@ -214,9 +215,10 @@ export default function GuidesPage() {
           const Icon = guide.icon;
 
           return (
-            <div
+            <Link
               key={guide.slug}
-              className="group glass-card p-5 academy-stagger transition-all duration-300 hover:-translate-y-1"
+              href={`/academy/guides/${guide.slug}`}
+              className="group glass-card p-5 academy-stagger transition-all duration-300 hover:-translate-y-1 block"
               style={{
                 animationDelay: `${index * 60}ms`,
               }}
@@ -283,7 +285,7 @@ export default function GuidesPage() {
                   Leer guía <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
