@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import type { DeviceTier } from '@prisma/client';
+import { useState, useEffect } from 'react';
 
-import { useGeneratorStore } from '@/stores/generator.store';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/cn';
+import { useGeneratorStore } from '@/stores/generator.store';
 
 interface DeviceItem {
   id: string;

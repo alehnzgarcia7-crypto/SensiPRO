@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { Ticket, Crown, Star, Shield } from 'lucide-react';
+import type { Metadata } from 'next';
 
 import { RedeemCode } from '@/components/features/redeem-code';
 

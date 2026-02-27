@@ -1,6 +1,6 @@
+import { logger } from '@ares/logger';
 import * as Sentry from '@sentry/nextjs';
 
-import { logger } from '@ares/logger';
 
 export function initSentry(): void {
   if (!process.env.SENTRY_DSN) return;

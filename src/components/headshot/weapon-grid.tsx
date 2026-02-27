@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import type { SensitivityOutput } from '@ares/algorithms';
 import { getWeaponAdjustedSensitivity } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+
 import { WeaponCard } from './weapon-card';
 
 type RangeTab = 'close' | 'mid' | 'long';

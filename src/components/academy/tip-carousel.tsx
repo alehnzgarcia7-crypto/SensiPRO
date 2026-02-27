@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Lightbulb, BarChart3 } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { useState, useEffect, useCallback } from 'react';
+
 import { AnimatedBorder } from '@/components/effects/animated-border';
+import { cn } from '@/lib/cn';
 
 interface Tip {
   id: string;

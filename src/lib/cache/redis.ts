@@ -1,6 +1,6 @@
+import { logger } from '@ares/logger';
 import { Redis } from 'ioredis';
 
-import { logger } from '@ares/logger';
 
 let redis: Redis | null = null;
 

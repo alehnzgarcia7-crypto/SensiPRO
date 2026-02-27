@@ -1,12 +1,12 @@
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Settings, Crown, Users, History, Heart, Trophy } from 'lucide-react';
-
-import { auth } from '@/lib/auth';
 import { prisma } from '@ares/database';
-import { getTierConfig } from '@/lib/tiers';
+import { Settings, Crown, Users, History, Heart, Trophy } from 'lucide-react';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
+import { getTierConfig } from '@/lib/tiers';
 
 // ══════════════════════════════════════════════════════════
 // Perfil privado del usuario autenticado

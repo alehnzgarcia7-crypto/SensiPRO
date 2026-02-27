@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
@@ -17,6 +15,8 @@ import {
   RefreshCw,
   Mail,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 import { cn } from '@/lib/cn';
 

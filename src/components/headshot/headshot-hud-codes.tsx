@@ -7,9 +7,9 @@
 // zoom modal, y fallback SVG para variantes sin foto.
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+
+import type { FingerCount } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import {
   Gamepad2,
   Import,
@@ -20,12 +20,13 @@ import {
   X,
   Maximize2,
 } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 
-import type { FingerCount } from '@ares/algorithms';
-import { cn } from '@/lib/cn';
-import { useHudCodes } from '@/hooks/use-hud-codes';
 import { HudCodeBlock } from '@/components/generator/hud-code-block';
 import { HudVisualization } from '@/components/headshot/hud-visualization';
+import { useHudCodes } from '@/hooks/use-hud-codes';
+import { cn } from '@/lib/cn';
 
 // ─── Headshot-specific metadata per variant ───────────────────
 
@@ -460,9 +461,6 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
     });
   }, [variants, codes]);
 
-  const active = variantCodes[selectedVariantIdx];
-  if (!active) return null;
-
   const handleOpenZoom = useCallback((src: string, name: string) => {
     setZoomScreenshot(src);
     setZoomVariantName(name);
@@ -471,6 +469,9 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
   const handleCloseZoom = useCallback(() => {
     setZoomScreenshot(null);
   }, []);
+
+  const active = variantCodes[selectedVariantIdx];
+  if (!active) return null;
 
   return (
     <div className="space-y-4">

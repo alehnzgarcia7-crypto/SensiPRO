@@ -1,8 +1,14 @@
+import { logger } from '@ares/logger';
 import { Resend } from 'resend';
 
-import { logger } from '@ares/logger';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY ?? '');
+  }
+  return _resend;
+}
 const FROM_EMAIL = 'SensiPRO <noreply@sensibilidadespro.com>';
 
 interface EmailInput {
@@ -17,7 +23,7 @@ interface EmailResult {
 
 async function sendEmail(input: EmailInput): Promise<EmailResult | null> {
   try {
-    const result = await resend.emails.send({
+    const result = await getResend().emails.send({
       from: FROM_EMAIL,
       to: input.to,
       subject: input.subject,

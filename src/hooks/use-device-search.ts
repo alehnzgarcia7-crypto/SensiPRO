@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import type { DeviceTier } from '@prisma/client';
+import { useState, useEffect, useRef } from 'react';
 
 import { useDebounce } from './use-debounce';
 

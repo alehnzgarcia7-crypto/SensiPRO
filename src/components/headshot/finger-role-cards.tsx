@@ -1,8 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import { getHudLayout, type FingerCount } from '@ares/algorithms';
+import { motion } from 'framer-motion';
 
 interface FingerRoleCardsProps {
   fingers: FingerCount;

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { ChevronDown, ChevronUp, Lock } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { useState } from 'react';
+
 import { canAccessSection } from '@/lib/academy/academy-config';
+import { cn } from '@/lib/cn';
 
 interface Section {
   id: string;

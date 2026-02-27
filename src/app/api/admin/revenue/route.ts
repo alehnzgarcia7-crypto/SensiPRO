@@ -1,15 +1,15 @@
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { handleApiError } from '@ares/errors';
 
-import { requireRole } from '@/lib/auth/auth.middleware';
 import {
   getRevenueAnalytics,
   getMonthlyRevenue,
   getConversionTrend,
 } from '@/lib/analytics/revenue';
+import { requireRole } from '@/lib/auth/auth.middleware';
 
 // ══════════════════════════════════════════════════════════
 // GET /api/admin/revenue — Revenue analytics dashboard

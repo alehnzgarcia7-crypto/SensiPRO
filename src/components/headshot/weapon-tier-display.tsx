@@ -1,8 +1,9 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import { getWeaponRecommendation, type FingerCount } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import { cn } from '@/lib/cn';
 
 interface WeaponTierDisplayProps {
   fingers: FingerCount;

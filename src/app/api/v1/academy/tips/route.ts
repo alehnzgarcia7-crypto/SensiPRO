@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { logger } from '@ares/logger';
-import { getTips, getTipsRandom } from '@/lib/academy/academy-queries';
 import type { GuideCategory, TipDifficulty } from '@prisma/client';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+import { getTips, getTipsRandom } from '@/lib/academy/academy-queries';
+
 
 const VALID_CATEGORIES = ['SENSITIVITY', 'MOVEMENT', 'AIM', 'STRATEGY', 'DEVICE', 'META'] as const;
 const VALID_DIFFICULTIES = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const;

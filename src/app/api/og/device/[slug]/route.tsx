@@ -4,9 +4,9 @@
 // Usado por: WhatsApp preview, Twitter Cards, Facebook, Telegram.
 // ═══════════════════════════════════════════════════════════════
 
+import { prisma } from '@ares/database';
 import { ImageResponse } from 'next/og';
 
-import { prisma } from '@ares/database';
 
 const TIER_COLORS: Record<string, string> = {
   GAMING: '#a855f7',

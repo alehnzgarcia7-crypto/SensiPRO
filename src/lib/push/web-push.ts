@@ -1,6 +1,6 @@
+import { logger } from '@ares/logger';
 import webpush from 'web-push';
 
-import { logger } from '@ares/logger';
 
 const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY ?? '';

@@ -1,6 +1,6 @@
+import { prisma } from '@ares/database';
 import { ImageResponse } from 'next/og';
 
-import { prisma } from '@ares/database';
 
 // ═══════════════════════════════════════════════════════════════
 // OG Image — Imagen dinamica Open Graph para configs compartidas

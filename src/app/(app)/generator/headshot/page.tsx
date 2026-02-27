@@ -1,33 +1,33 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import type { SensitivityOutput, GyroscopeOutput, FireButtonResult, HeadshotFingerResult, DeviceSpecs } from '@ares/algorithms';
 import { calculateHeadshotFingerMode, calculateDpi, type FingerCount } from '@ares/algorithms';
 import { DPI_OFFSET, SENSITIVITY_MIN, SENSITIVITY_MAX } from '@ares/config';
 import type { DeviceTier, PanelType } from '@prisma/client';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { useGeneratorStore } from '@/stores/generator.store';
+import { DpiToggle } from '@/components/generator/dpi-toggle';
+import { HzSelector } from '@/components/generator/hz-selector';
+import { RamSelector } from '@/components/generator/ram-selector';
+import { CopyAllButton } from '@/components/headshot/copy-all-button';
+import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
+import { FingerSelector } from '@/components/headshot/finger-selector';
+import { FingerTrainingPlan } from '@/components/headshot/finger-training-plan';
+import { FireButtonRecommendation } from '@/components/headshot/fire-button-recommendation';
+import { GyroscopeRecommendation } from '@/components/headshot/gyroscope-recommendation';
 import { HeadshotHero } from '@/components/headshot/headshot-hero';
 import { HeadshotScoreGauge } from '@/components/headshot/headshot-score-gauge';
 import { HeadshotSensitivityPanel } from '@/components/headshot/headshot-sensitivity-panel';
-import { FingerSelector } from '@/components/headshot/finger-selector';
-import { DpiToggle } from '@/components/generator/dpi-toggle';
-import { WeaponGrid } from '@/components/headshot/weapon-grid';
-import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { HeadshotTechniques } from '@/components/headshot/headshot-techniques';
-import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
-import { TrainingPlan } from '@/components/headshot/training-plan';
-import { FingerTrainingPlan } from '@/components/headshot/finger-training-plan';
-import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
+import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { ProBadge } from '@/components/headshot/pro-badge';
-import { CopyAllButton } from '@/components/headshot/copy-all-button';
-import { RamSelector } from '@/components/generator/ram-selector';
-import { HzSelector } from '@/components/generator/hz-selector';
+import { TrainingPlan } from '@/components/headshot/training-plan';
 import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
-import { GyroscopeRecommendation } from '@/components/headshot/gyroscope-recommendation';
-import { FireButtonRecommendation } from '@/components/headshot/fire-button-recommendation';
+import { WeaponGrid } from '@/components/headshot/weapon-grid';
+import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
+import { useGeneratorStore } from '@/stores/generator.store';
 
 // ═══════════════════════════════════════════════════════════════
 // ARES — Headshot Mode v4.1 — Finger-based sensitivity system

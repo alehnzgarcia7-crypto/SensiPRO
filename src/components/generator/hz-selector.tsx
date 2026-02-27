@@ -5,9 +5,9 @@
 // Mismo estilo que RamSelector: pills futuristas con glow
 // ═══════════════════════════════════════════════════════════════
 
+import { HZ_OPTIONS } from '@ares/config';
 import { motion } from 'framer-motion';
 
-import { HZ_OPTIONS } from '@ares/config';
 import { cn } from '@/lib/cn';
 
 interface HzSelectorProps {

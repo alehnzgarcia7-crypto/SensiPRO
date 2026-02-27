@@ -1,11 +1,11 @@
+import { handleApiError, NotFoundError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { handleApiError, NotFoundError } from '@ares/errors';
 
-import { requireRole } from '@/lib/auth/auth.middleware';
 import { toggleExperiment, getExperimentResults } from '@/lib/ab-testing/ab-engine';
+import { requireRole } from '@/lib/auth/auth.middleware';
 
 const updateSchema = z.object({
   isActive: z.boolean(),

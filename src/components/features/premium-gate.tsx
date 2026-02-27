@@ -4,8 +4,8 @@ import { Lock, Crown, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { getMinimumTier, getUpgradeFeatures, type FeatureKey } from '@/lib/tiers';
 import { cn } from '@/lib/cn';
+import { getMinimumTier, getUpgradeFeatures, type FeatureKey } from '@/lib/tiers';
 
 interface PremiumGateProps {
   feature: FeatureKey;

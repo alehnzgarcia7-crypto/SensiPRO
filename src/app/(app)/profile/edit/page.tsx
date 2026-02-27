@@ -1,8 +1,8 @@
+import { prisma } from '@ares/database';
 import { redirect } from 'next/navigation';
 
-import { auth } from '@/lib/auth';
-import { prisma } from '@ares/database';
 import { EditProfileForm } from '@/components/features/edit-profile-form';
+import { auth } from '@/lib/auth';
 
 // ══════════════════════════════════════════════════════════
 // Página de edición de perfil

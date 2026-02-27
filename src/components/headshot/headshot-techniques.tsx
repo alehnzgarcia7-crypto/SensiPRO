@@ -1,13 +1,15 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import {
   getFingerTechniques,
   getTechniquesForFingers,
   getDragTechniqueData,
   type FingerCount,
 } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import { cn } from '@/lib/cn';
+
 import { FingerDragTechniqueCard } from './finger-drag-technique-card';
 
 interface HeadshotTechniquesProps {

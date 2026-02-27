@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import type { SensitivityOutput, GyroscopeOutput } from '@ares/algorithms';
+import { useState, useCallback } from 'react';
 
 interface HeadshotCopyButtonProps {
   sensitivity: SensitivityOutput;

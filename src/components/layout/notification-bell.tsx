@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import { Bell } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
 

@@ -1,10 +1,9 @@
-import { createClient, type RedisClientType } from 'redis';
 
+import { FREE_SEARCH_LIMIT } from '@ares/config';
 import { RateLimitError } from '@ares/errors';
 import { logger } from '@ares/logger';
-import { FREE_SEARCH_LIMIT } from '@ares/config';
-
 import type { UserTier } from '@prisma/client';
+import { createClient, type RedisClientType } from 'redis';
 
 interface RateLimitResult {
   allowed: boolean;

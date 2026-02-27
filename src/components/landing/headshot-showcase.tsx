@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { Crosshair, Check } from 'lucide-react';
+import Link from 'next/link';
 
 import { ScrollReveal } from './scroll-reveal';
 

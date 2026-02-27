@@ -1,8 +1,9 @@
 import { prisma } from '@ares/database';
+
+import { AdminContentGuides } from '@/components/admin/admin-content-guides';
+import { AdminKpiCard } from '@/components/admin/admin-kpi-card';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { AdminKpiCard } from '@/components/admin/admin-kpi-card';
-import { AdminContentGuides } from '@/components/admin/admin-content-guides';
 
 interface ContentStats {
   guidesTotal: number;

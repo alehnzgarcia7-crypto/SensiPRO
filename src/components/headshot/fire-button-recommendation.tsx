@@ -1,10 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import type { FireButtonRecommendation as FireBtnRec } from '@ares/algorithms';
 import { FINGER_PROFILES, type FingerCount } from '@ares/algorithms';
+import { motion } from 'framer-motion';
+
 import { CountUp } from '@/components/effects/count-up';
+import { cn } from '@/lib/cn';
 
 interface FireButtonRecommendationProps {
   fireButton: FireBtnRec;

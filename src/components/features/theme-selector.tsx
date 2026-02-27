@@ -2,10 +2,10 @@
 
 import { Lock, Check } from 'lucide-react';
 
-import { useTheme } from '@/lib/themes/theme-context';
-import { getAvailableThemes, THEMES, type ThemeConfig } from '@/lib/themes/theme-config';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/cn';
+import { getAvailableThemes, THEMES, type ThemeConfig } from '@/lib/themes/theme-config';
+import { useTheme } from '@/lib/themes/theme-context';
 
 interface ThemeSelectorProps {
   userTier: 'FREE' | 'PREMIUM' | 'VIP';

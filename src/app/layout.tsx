@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 
-import { SessionProvider } from './session-provider';
 import { BackgroundAtmosphere } from '@/components/effects/background-atmosphere';
+
+import { SessionProvider } from './session-provider';
 import './globals.css';
 
 export const viewport: Viewport = {

@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import { getHudLayout, type FingerCount, type HudButton } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+
+import { cn } from '@/lib/cn';
+
 
 interface HudVisualizationProps {
   fingers: FingerCount;

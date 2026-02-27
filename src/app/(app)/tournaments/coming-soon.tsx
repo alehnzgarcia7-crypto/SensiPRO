@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Crosshair, Zap, Trophy, Target, Users, Medal, Bell } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
-import { cn } from '@/lib/cn';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
+import { cn } from '@/lib/cn';
 
 const UPCOMING_TOURNAMENTS = [
   {

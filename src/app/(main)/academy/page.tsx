@@ -1,5 +1,3 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
 import {
   GraduationCap,
   ArrowRight,
@@ -10,6 +8,8 @@ import {
   Crosshair,
   Smartphone,
 } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Academia | SensiPRO — Aprende a Dominar Free Fire',

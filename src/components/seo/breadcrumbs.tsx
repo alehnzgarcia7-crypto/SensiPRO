@@ -3,10 +3,13 @@
 // Navegación jerárquica accesible + structured data para SEO
 // ═══════════════════════════════════════════════════════════════
 
-import Link from 'next/link';
 import { ChevronRight, Home } from 'lucide-react';
-import { JsonLd } from './json-ld';
+import Link from 'next/link';
+
 import { generateBreadcrumbSchema } from '@/lib/seo/structured-data';
+
+import { JsonLd } from './json-ld';
+
 
 interface BreadcrumbItem {
   label: string;

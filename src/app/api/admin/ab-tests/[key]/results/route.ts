@@ -1,9 +1,9 @@
+import { handleApiError, NotFoundError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 
-import { handleApiError, NotFoundError } from '@ares/errors';
 
-import { requireRole } from '@/lib/auth/auth.middleware';
 import { getExperimentResults } from '@/lib/ab-testing/ab-engine';
+import { requireRole } from '@/lib/auth/auth.middleware';
 
 // GET /api/admin/ab-tests/:key/results — Resultados de un experimento
 export async function GET(

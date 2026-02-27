@@ -1,11 +1,11 @@
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { handleApiError } from '@ares/errors';
 
-import { getOptionalSession } from '@/lib/auth/auth.middleware';
 import { trackConversion } from '@/lib/ab-testing/ab-engine';
+import { getOptionalSession } from '@/lib/auth/auth.middleware';
 
 const conversionSchema = z.object({
   experiment: z.string().min(1),

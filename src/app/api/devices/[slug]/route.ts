@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
 
 import { prisma } from '@ares/database';
 import { NotFoundError, handleApiError } from '@ares/errors';
 import { logger } from '@ares/logger';
+import { NextResponse } from 'next/server';
 
 export async function GET(
   _request: Request,

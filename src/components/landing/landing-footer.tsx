@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { Zap } from 'lucide-react';
+import Link from 'next/link';
 
 const PRODUCT_LINKS = [
   { label: 'Generador', href: '/generator' },
@@ -59,16 +59,15 @@ export function LandingFooter() {
               Generador de sensibilidades #1 para Free Fire. Basado en hardware real.
             </p>
 
-            {/* Social icons placeholder */}
+            {/* Social icons — links pendientes */}
             <div className="mt-4 flex gap-3">
               {['X', 'IG', 'TT', 'DC'].map((icon) => (
-                <a
+                <span
                   key={icon}
-                  href="#"
-                  className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-ui font-bold text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
+                  className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-ui font-bold text-slate-500 cursor-default"
                 >
                   {icon}
-                </a>
+                </span>
               ))}
             </div>
           </div>

@@ -1,6 +1,6 @@
-import { Navbar } from '@/components/layout/navbar';
-import { MobileNav } from '@/components/layout/mobile-nav';
 import { Footer } from '@/components/layout/footer';
+import { MobileNav } from '@/components/layout/mobile-nav';
+import { Navbar } from '@/components/layout/navbar';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Video, Play, Clock, Bell, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // Videos — Coming Soon premium design

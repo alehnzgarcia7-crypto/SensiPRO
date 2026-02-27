@@ -1,8 +1,8 @@
+import { prisma } from '@ares/database';
+import { NotFoundError, handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { prisma } from '@ares/database';
-import { NotFoundError, handleApiError } from '@ares/errors';
 
 const paramsSchema = z.object({
   id: z.string().cuid('ID de torneo inválido'),

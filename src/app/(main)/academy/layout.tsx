@@ -1,8 +1,5 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
   BookOpen,
   Lightbulb,
@@ -13,6 +10,11 @@ import {
   GraduationCap,
   Crown,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type { ReactNode} from 'react';
+import { useState } from 'react';
+
 import { cn } from '@/lib/cn';
 
 interface SidebarItem {

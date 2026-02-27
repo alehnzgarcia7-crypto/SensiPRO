@@ -1,7 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import type { FingerCount } from '@ares/algorithms';
+import { motion } from 'framer-motion';
 
 interface ProBadgeProps {
   fingers: FingerCount;

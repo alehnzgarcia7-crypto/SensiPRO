@@ -6,10 +6,10 @@
 // deselected cards dimmed, spring animations
 // ═══════════════════════════════════════════════════════════════
 
-import { useCallback, useRef } from 'react';
+import type { CalibrationLevel } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { Crosshair, Scale, Zap } from 'lucide-react';
-import type { CalibrationLevel } from '@prisma/client';
+import { useCallback, useRef } from 'react';
 
 import { cn } from '@/lib/cn';
 

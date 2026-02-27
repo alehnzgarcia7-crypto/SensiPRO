@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { logger } from '@ares/logger';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { getGuides } from '@/lib/academy/academy-queries';
 
 const querySchema = z.object({

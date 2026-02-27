@@ -1,12 +1,12 @@
+import { prisma } from '@ares/database';
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { prisma } from '@ares/database';
-import { handleApiError } from '@ares/errors';
 
-import { requireRole } from '@/lib/auth/auth.middleware';
 import { createExperiment } from '@/lib/ab-testing/ab-engine';
+import { requireRole } from '@/lib/auth/auth.middleware';
 
 const createExperimentSchema = z.object({
   key: z

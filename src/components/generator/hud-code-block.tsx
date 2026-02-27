@@ -6,9 +6,9 @@
 // badge de pro player si aplica, e instrucciones de importación.
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Clipboard, Check, Star } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -18,7 +18,7 @@ interface HudCodeBlockProps {
   playerName?: string | null;
 }
 
-export function HudCodeBlock({ code, label, playerName }: HudCodeBlockProps) {
+export function HudCodeBlock({ code, label: _label, playerName }: HudCodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {

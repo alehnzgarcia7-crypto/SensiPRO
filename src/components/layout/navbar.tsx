@@ -1,9 +1,9 @@
-import Link from 'next/link';
 import { Zap } from 'lucide-react';
+import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { auth } from '@/lib/auth';
 import '@/lib/auth/auth.types';
-import { Badge } from '@/components/ui/badge';
 
 export async function Navbar() {
   const session = await auth();

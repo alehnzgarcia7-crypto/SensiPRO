@@ -3,8 +3,8 @@
 import { useRef, useState } from 'react';
 import type { ReactNode, MouseEvent } from 'react';
 
-import { cn } from '@/lib/cn';
 import { usePrefersReducedMotion } from '@/hooks/use-media-query';
+import { cn } from '@/lib/cn';
 
 interface GlowCardProps {
   children: ReactNode;

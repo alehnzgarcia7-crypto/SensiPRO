@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
 import { FAQ_ITEMS } from '@/lib/landing-data';
+
 import { ScrollReveal } from './scroll-reveal';
 
 function FaqAccordion({

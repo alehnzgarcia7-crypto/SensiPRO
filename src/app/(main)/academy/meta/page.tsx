@@ -1,4 +1,3 @@
-import { Metadata } from 'next';
 import {
   Swords,
   Shield,
@@ -6,6 +5,8 @@ import {
   Zap,
   Calendar,
 } from 'lucide-react';
+import type { Metadata } from 'next';
+
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════

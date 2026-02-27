@@ -1,15 +1,14 @@
 'use client';
 
-import { Sword, Target, Crosshair } from 'lucide-react';
-import type { SensitivityStyle } from '@prisma/client';
-
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
+import type { SensitivityStyle } from '@prisma/client';
 import type { DeviceTier } from '@prisma/client';
+import { Sword, Target, Crosshair } from 'lucide-react';
 
-import { useGeneratorStore } from '@/stores/generator.store';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/cn';
+import { useGeneratorStore } from '@/stores/generator.store';
 
 interface StyleOption {
   key: SensitivityStyle;

@@ -1,8 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import { FINGER_PROFILES, type FingerCount } from '@ares/algorithms';
+import { motion } from 'framer-motion';
+
+import { cn } from '@/lib/cn';
 
 interface FingerSelectorProps {
   value: FingerCount;

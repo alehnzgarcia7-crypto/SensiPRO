@@ -1,9 +1,9 @@
+import { logger } from '@ares/logger';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
 import { expireSubscriptions, getExpiringSubscriptions } from '@/lib/payments/subscription';
-import { logger } from '@ares/logger';
 
 // ══════════════════════════════════════════════════════════
 // Cron Job: Expirar suscripciones vencidas

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 
 import { prisma } from '@ares/database';
 import { handleApiError } from '@ares/errors';
+import { NextResponse } from 'next/server';
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
 

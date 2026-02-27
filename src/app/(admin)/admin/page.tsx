@@ -1,8 +1,8 @@
+import { prisma } from '@ares/database';
 import Link from 'next/link';
 
-import { prisma } from '@ares/database';
-import { Card } from '@/components/ui/card';
 import { AdminKpiCard } from '@/components/admin/admin-kpi-card';
+import { Card } from '@/components/ui/card';
 
 interface DashboardKpis {
   totalUsers: number;

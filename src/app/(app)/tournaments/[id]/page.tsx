@@ -1,14 +1,16 @@
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
-import { Trophy, Users, Calendar, Clock, ArrowLeft, Crown } from 'lucide-react';
-import Link from 'next/link';
-
 import { prisma } from '@ares/database';
+import type { TournamentStatus, UserTier } from '@prisma/client';
+import { Trophy, Users, Calendar, Clock, ArrowLeft, Crown } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import { canAccessTier } from '@/lib/tiers';
-import type { TournamentStatus, UserTier } from '@prisma/client';
+
+
 import { JoinTournamentButton } from './join-button';
 
 const STATUS_LABELS: Record<TournamentStatus, string> = {
@@ -231,7 +233,7 @@ export default async function TournamentDetailPage({ params }: PageProps) {
                 para inscribirte
               </p>
               <Link
-                href="/payment"
+                href="/pricing"
                 className="mt-2 inline-block text-xs font-bold text-fire-400 hover:text-fire-300"
               >
                 Mejorar plan →

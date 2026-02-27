@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import type { SensitivityOutput } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
-import type { SensitivityOutput } from '@ares/algorithms';
-import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
-import { CountUp } from '@/components/effects/count-up';
 import { HeadshotCopyButton } from './headshot-copy-button';
 
 interface WeaponData {

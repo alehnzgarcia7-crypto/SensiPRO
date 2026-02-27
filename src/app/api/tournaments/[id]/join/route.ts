@@ -1,12 +1,14 @@
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-
 import { prisma } from '@ares/database';
 import { BusinessError, NotFoundError, handleApiError } from '@ares/errors';
 import { logger } from '@ares/logger';
+import type { UserTier } from '@prisma/client';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
 import { canAccessTier } from '@/lib/tiers';
-import type { UserTier } from '@prisma/client';
+
 
 const paramsSchema = z.object({
   id: z.string().cuid('ID de torneo inválido'),

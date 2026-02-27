@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Metadata } from 'next';
 import {
   BookOpen,
   Clock,
@@ -13,6 +10,8 @@ import {
   Target,
   ArrowRight,
 } from 'lucide-react';
+import { useState } from 'react';
+
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════

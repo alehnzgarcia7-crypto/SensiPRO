@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import {
   getHudLayout,
-  HUD_LAYOUTS,
   FINGER_PROFILES,
   type FingerCount,
 } from '@ares/algorithms';
-import { HudVisualization } from './hud-visualization';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback } from 'react';
+
+import { cn } from '@/lib/cn';
+
+
 import { FingerRoleCards } from './finger-role-cards';
 import { HeadshotHudCodes } from './headshot-hud-codes';
+import { HudVisualization } from './hud-visualization';
 
 interface HudRecommendationProps {
   fingers: FingerCount;

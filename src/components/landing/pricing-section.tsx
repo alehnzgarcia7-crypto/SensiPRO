@@ -1,9 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { Check, X, Lock } from 'lucide-react';
+import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
+
 import { ScrollReveal } from './scroll-reveal';
 
 interface PlanFeature {

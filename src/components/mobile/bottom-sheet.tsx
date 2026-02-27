@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useCallback, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-
-import { cn } from '@/lib/cn';
+import { useEffect, useCallback, useRef, useState } from 'react';
 
 interface BottomSheetProps {
   isOpen: boolean;

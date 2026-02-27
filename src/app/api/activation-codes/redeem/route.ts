@@ -1,8 +1,8 @@
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { handleApiError } from '@ares/errors';
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
 import { redeemCode } from '@/lib/payments/activation-codes';

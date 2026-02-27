@@ -3,8 +3,8 @@
 // Genera sitemap XML con todas las guías publicadas + páginas estáticas
 // ═══════════════════════════════════════════════════════════════
 
-import type { MetadataRoute } from 'next';
 import { prisma } from '@ares/database';
+import type { MetadataRoute } from 'next';
 
 const BASE_URL = 'https://sensibilidadespro.com';
 

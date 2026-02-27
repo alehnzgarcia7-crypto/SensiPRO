@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { cn } from '@/lib/cn';
-import { CATEGORY_CONFIGS, CATEGORIES_ORDER } from '@/lib/academy/academy-config';
 import type { GuideCategory } from '@prisma/client';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { CATEGORY_CONFIGS, CATEGORIES_ORDER } from '@/lib/academy/academy-config';
+import { cn } from '@/lib/cn';
 
 interface CategoryFilterProps {
   selected?: GuideCategory | null;

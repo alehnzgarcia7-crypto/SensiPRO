@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
 
 import { prisma } from '@ares/database';
 import { handleApiError } from '@ares/errors';
 import { logger } from '@ares/logger';
+import { NextResponse } from 'next/server';
 
-import { auth } from '@/lib/auth';
 import { checkAndUnlockAchievements } from '@/lib/achievements/achievement-checker';
 import { ACHIEVEMENTS } from '@/lib/achievements/achievement-definitions';
+import { auth } from '@/lib/auth';
 
 /**
  * GET /api/achievements

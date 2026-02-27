@@ -4,9 +4,9 @@
 // Usado por: WhatsApp preview, Twitter Cards, Facebook, Telegram.
 // ═══════════════════════════════════════════════════════════════
 
+import { prisma } from '@ares/database';
 import { ImageResponse } from 'next/og';
 
-import { prisma } from '@ares/database';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   SENSITIVITY: '🎯',

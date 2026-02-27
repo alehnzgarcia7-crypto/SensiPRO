@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import type { SensitivityStyle } from '@prisma/client';
+import { useState } from 'react';
 
-import { Tabs } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Tabs } from '@/components/ui/tabs';
 
 interface StyleComparisonProps {
   deviceId: string;

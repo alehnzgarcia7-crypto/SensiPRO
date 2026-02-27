@@ -1,10 +1,10 @@
+import { prisma } from '@ares/database';
 import { redirect } from 'next/navigation';
 
-import { prisma } from '@ares/database';
 
-import { auth } from '@/lib/auth';
-import { ACHIEVEMENTS } from '@/lib/achievements/achievement-definitions';
 import { Badge } from '@/components/ui/badge';
+import { ACHIEVEMENTS } from '@/lib/achievements/achievement-definitions';
+import { auth } from '@/lib/auth';
 import { cn } from '@/lib/cn';
 
 // Colores del borde por tier del logro

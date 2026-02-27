@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
 
-import { HeroSection } from '@/components/landing/hero-section';
-import { SocialProofBand } from '@/components/landing/social-proof-band';
-import { HowItWorksSection } from '@/components/landing/how-it-works';
-import { BrandsSection } from '@/components/landing/brands-section';
-import { FeaturesSection } from '@/components/landing/features-section';
-import { ShowcaseDemo } from '@/components/landing/showcase-demo';
-import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
 import { AresCoachShowcase } from '@/components/landing/ares-coach-showcase';
-import { TestimonialsSection } from '@/components/landing/testimonials-section';
-import { DeviceShowcase } from '@/components/landing/device-showcase';
-import { PricingSection } from '@/components/landing/pricing-section';
-import { FaqSection } from '@/components/landing/faq-section';
+import { BrandsSection } from '@/components/landing/brands-section';
 import { CtaSection } from '@/components/landing/cta-section';
+import { DeviceShowcase } from '@/components/landing/device-showcase';
+import { FaqSection } from '@/components/landing/faq-section';
+import { FeaturesSection } from '@/components/landing/features-section';
+import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
+import { HeroSection } from '@/components/landing/hero-section';
+import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { LandingFooter } from '@/components/landing/landing-footer';
+import { PricingSection } from '@/components/landing/pricing-section';
+import { ShowcaseDemo } from '@/components/landing/showcase-demo';
+import { SocialProofBand } from '@/components/landing/social-proof-band';
+import { TestimonialsSection } from '@/components/landing/testimonials-section';
 
 export const metadata: Metadata = {
   title: 'Sensibilidades PRO — Generador #1 para Free Fire',

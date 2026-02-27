@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useState, useMemo } from 'react';
+
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
+
 import { TrainingDrill } from './training-drill';
 
 interface DrillData {

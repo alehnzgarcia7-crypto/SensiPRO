@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { Share2, Copy, Check, MessageCircle, Send as SendIcon } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';

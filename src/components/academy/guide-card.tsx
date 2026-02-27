@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import Image from 'next/image';
 import { Clock, Eye, MessageSquare, Lock } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
 import { CATEGORY_CONFIGS } from '@/lib/academy/academy-config';
 import type { GuideListItem } from '@/lib/academy/academy-queries';
 

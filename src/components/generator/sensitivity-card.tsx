@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 
 import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/cn';
 
 interface SensitivityCardProps {
   label: string;

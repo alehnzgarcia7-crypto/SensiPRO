@@ -1,6 +1,6 @@
+import { prisma } from '@ares/database';
 import { ImageResponse } from 'next/og';
 
-import { prisma } from '@ares/database';
 
 // ═══════════════════════════════════════════════════════════════
 // OG Image — Imagen dinámica para Open Graph por dispositivo

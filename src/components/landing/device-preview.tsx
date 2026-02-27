@@ -1,7 +1,6 @@
-import Link from 'next/link';
 import type { DeviceTier } from '@ares/database';
-
 import { prisma } from '@ares/database';
+import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 

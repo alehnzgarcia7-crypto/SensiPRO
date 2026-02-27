@@ -5,11 +5,12 @@
 // Premium thumbnails con gradientes CSS, play pulse, glass cards
 // ═══════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
 import { Play, Lock, Clock, BarChart3 } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { useState } from 'react';
+
 import { DIFFICULTY_LABELS } from '@/lib/academy/video-config';
 import type { VideoTutorial } from '@/lib/academy/video-config';
+import { cn } from '@/lib/cn';
 
 interface VideoPlayerProps {
   video: VideoTutorial;

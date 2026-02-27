@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { Trophy, Users, Calendar, Clock, Loader2 } from 'lucide-react';
 import type { TournamentStatus, UserTier } from '@prisma/client';
+import { Trophy, Users, Calendar, Clock, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
-import { cn } from '@/lib/cn';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/cn';
 
 interface TournamentCardProps {
   tournament: {

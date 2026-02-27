@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
 import { Check, Bot } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
-import { cn } from '@/lib/cn';
 import {
   ARES_PERSONA,
   ARES_CATEGORIES,
   ARES_CONVERSATIONS,
   type AresConversation,
 } from '@/lib/ares-coach-data';
+import { cn } from '@/lib/cn';
+
 import { ScrollReveal } from './scroll-reveal';
 
 // ═══════════════════════════════════════════════════════════════

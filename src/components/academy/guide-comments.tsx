@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import { Send, Trash2, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { useState, useTransition } from 'react';
 
 interface CommentData {
   id: string;

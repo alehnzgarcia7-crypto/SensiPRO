@@ -1,8 +1,9 @@
+import { prisma } from '@ares/database';
+import { Search, Trophy, Share2 } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Search, Trophy, Share2 } from 'lucide-react';
 
-import { prisma } from '@ares/database';
+
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { getTierConfig } from '@/lib/tiers';

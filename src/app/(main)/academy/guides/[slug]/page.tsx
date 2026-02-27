@@ -1,7 +1,3 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import {
   Clock,
   Eye,
@@ -9,11 +5,16 @@ import {
   Lock,
   MessageSquare,
 } from 'lucide-react';
-import { getGuideBySlug, incrementGuideViews } from '@/lib/academy/academy-queries';
-import { CATEGORY_CONFIGS } from '@/lib/academy/academy-config';
-import { auth } from '@/lib/auth';
-import { GuideSections } from '@/components/academy/guide-sections';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
 import { GuideComments } from '@/components/academy/guide-comments';
+import { GuideSections } from '@/components/academy/guide-sections';
+import { CATEGORY_CONFIGS } from '@/lib/academy/academy-config';
+import { getGuideBySlug, incrementGuideViews } from '@/lib/academy/academy-queries';
+import { auth } from '@/lib/auth';
 
 interface GuidePageProps {
   params: { slug: string };

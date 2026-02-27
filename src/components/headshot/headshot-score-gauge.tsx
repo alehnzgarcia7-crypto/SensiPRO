@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+
 import { CountUp } from '@/components/effects/count-up';
 
 interface HeadshotScoreGaugeProps {

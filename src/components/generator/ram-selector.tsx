@@ -6,9 +6,9 @@
 // layoutId slider animation entre pills
 // ═══════════════════════════════════════════════════════════════
 
+import { RAM_OPTIONS } from '@ares/config';
 import { motion } from 'framer-motion';
 
-import { RAM_OPTIONS } from '@ares/config';
 import { cn } from '@/lib/cn';
 
 interface RamSelectorProps {

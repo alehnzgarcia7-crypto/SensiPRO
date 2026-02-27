@@ -1,22 +1,22 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-
-import { prisma } from '@ares/database';
-import type { DeviceSpecs } from '@ares/algorithms';
 import {
   generateSensitivity,
   analyzeDeviceSpecs,
   getRecommendedStyle,
   STYLE_PROFILES,
 } from '@ares/algorithms';
+import type { DeviceSpecs } from '@ares/algorithms';
 import type { SensitivityOutput, AlgorithmOutput } from '@ares/algorithms';
+import { prisma } from '@ares/database';
 import type { SensitivityStyle } from '@prisma/client';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 // ═══════════════════════════════════════════════════════════════
 // Página SEO individual por dispositivo

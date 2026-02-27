@@ -1,7 +1,7 @@
+import { prisma } from '@ares/database';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { prisma } from '@ares/database';
 import { Badge } from '@/components/ui/badge';
 
 export const metadata: Metadata = {

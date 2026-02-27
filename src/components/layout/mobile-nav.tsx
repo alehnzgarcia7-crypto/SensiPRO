@@ -1,8 +1,8 @@
 'use client';
 
+import { Zap, BookOpen, Users, User, Crosshair } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, BookOpen, Users, User, Crosshair } from 'lucide-react';
 
 import { cn } from '@/lib/cn';
 

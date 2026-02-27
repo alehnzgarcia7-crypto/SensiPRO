@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+
 import { DragTechniqueSvg } from './drag-technique-svg';
 
 interface DragTechnique {

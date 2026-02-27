@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { LANDING_DATA, AVATAR_STACK } from '@/lib/landing-data';
+
 import { ScrollReveal } from './scroll-reveal';
 
 export function CtaSection() {

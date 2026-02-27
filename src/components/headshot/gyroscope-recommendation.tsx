@@ -1,9 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Smartphone } from 'lucide-react';
 import type { GyroscopeFingerValues } from '@ares/algorithms';
 import type { FingerProfile } from '@ares/algorithms';
+import { motion } from 'framer-motion';
+import { Smartphone } from 'lucide-react';
+
 import { CountUp } from '@/components/effects/count-up';
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
 

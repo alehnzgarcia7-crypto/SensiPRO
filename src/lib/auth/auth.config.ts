@@ -1,10 +1,9 @@
-import type { NextAuthConfig } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { compare } from 'bcryptjs';
-import { z } from 'zod';
-
 import { prisma } from '@ares/database';
 import { logger } from '@ares/logger';
+import { compare } from 'bcryptjs';
+import type { NextAuthConfig } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
 
 // Importar para que las declaraciones de tipos se apliquen
 import './auth.types';

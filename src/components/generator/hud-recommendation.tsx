@@ -7,13 +7,14 @@
 // de importación reales para el juego.
 // ═══════════════════════════════════════════════════════════════
 
-import { useState } from 'react';
+import type { HudRecommendation } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
-import type { HudRecommendation } from '@ares/algorithms';
-import { cn } from '@/lib/cn';
 import { useHudCodes } from '@/hooks/use-hud-codes';
+import { cn } from '@/lib/cn';
+
 import { FingerLayoutSvg } from './finger-layout-svg';
 import { HudCodeBlock } from './hud-code-block';
 

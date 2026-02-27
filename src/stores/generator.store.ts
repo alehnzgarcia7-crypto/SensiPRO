@@ -1,12 +1,12 @@
-import { create } from 'zustand';
-import type { SensitivityStyle, DeviceTier, CalibrationLevel, PanelType } from '@prisma/client';
-
 import type {
   CalibrationResult,
   HudRecommendation,
   SensitivityOutput,
   GyroscopeOutput,
 } from '@ares/algorithms';
+import type { SensitivityStyle, DeviceTier, CalibrationLevel, PanelType } from '@prisma/client';
+import { create } from 'zustand';
+
 
 // ═══════════════════════════════════════════════════════════════
 // Zustand store para el flujo del generador de sensibilidades

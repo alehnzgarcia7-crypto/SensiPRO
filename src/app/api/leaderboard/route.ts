@@ -1,9 +1,9 @@
+import { prisma } from '@ares/database';
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { prisma } from '@ares/database';
-import { handleApiError } from '@ares/errors';
 
 // Tipos válidos de leaderboard
 type LeaderboardType = 'searches' | 'favorites' | 'shares' | 'achievements';

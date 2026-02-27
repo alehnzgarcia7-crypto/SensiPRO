@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
 import { Zap } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
+
 import { ScrollReveal } from './scroll-reveal';
 
 // --- Datos del demo (hardcodeados, NO fetch al API) ---
@@ -57,7 +58,6 @@ const DEMO_DEVICES: DemoDevice[] = [
   },
 ];
 
-const CYCLE_DURATION = 8000; // 8s entre devices
 const TYPING_SPEED = 80; // ms por letra
 const CALC_DURATION = 1500; // 1.5s loading bar
 const STAGGER_DELAY = 200; // delay entre cada valor

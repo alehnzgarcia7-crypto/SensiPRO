@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Lightbulb, Crosshair, PersonStanding, Settings } from 'lucide-react';
+import { useState } from 'react';
+
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════

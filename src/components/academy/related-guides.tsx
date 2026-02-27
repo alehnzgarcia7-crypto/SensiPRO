@@ -3,10 +3,12 @@
 // Sidebar de guías relacionadas con internal linking para SEO
 // ═══════════════════════════════════════════════════════════════
 
-import Link from 'next/link';
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { CATEGORY_CONFIGS } from '@/lib/academy/academy-config';
 import type { GuideCategory } from '@prisma/client';
+import { ArrowRight, BookOpen } from 'lucide-react';
+import Link from 'next/link';
+
+import { CATEGORY_CONFIGS } from '@/lib/academy/academy-config';
+
 
 interface RelatedGuide {
   slug: string;

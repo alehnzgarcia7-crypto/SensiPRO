@@ -1,12 +1,12 @@
 'use server';
 
-import { hash } from 'bcryptjs';
-import { z } from 'zod';
 
 import { prisma } from '@ares/database';
 import { BusinessError, AuthError, ValidationError } from '@ares/errors';
 import { logger } from '@ares/logger';
 import { generateReferralCode } from '@ares/utils';
+import { hash } from 'bcryptjs';
+import { z } from 'zod';
 
 import { signIn } from './index';
 

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { FlaskConical, Plus, ToggleLeft, ToggleRight, BarChart3 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 // ═══════════════════════════════════════════════════════════════
 // Tipos locales para la página de A/B Testing

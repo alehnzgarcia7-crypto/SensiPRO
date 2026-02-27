@@ -1,6 +1,6 @@
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 
-import { handleApiError } from '@ares/errors';
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
 import { getReferralStats } from '@/lib/payments/referrals';

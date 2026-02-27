@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import type { SensitivityStyle, DeviceTier, PanelType } from '@prisma/client';
+import { useState, useEffect, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // useFavorites — Hook para gestionar favoritos del usuario

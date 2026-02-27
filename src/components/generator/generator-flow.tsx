@@ -8,13 +8,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 
-import { useGeneratorStore } from '@/stores/generator.store';
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
+import { useGeneratorStore } from '@/stores/generator.store';
 
+import { ResultPanel } from './result-panel';
 import { BrandStep } from './steps/brand-step';
 import { DeviceStep } from './steps/device-step';
 import { StyleStep } from './steps/style-step';
-import { ResultPanel } from './result-panel';
 
 const stepTransition = {
   initial: { opacity: 0, y: 20, scale: 0.98 },

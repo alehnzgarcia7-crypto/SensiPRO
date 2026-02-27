@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { Ticket, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 // ══════════════════════════════════════════════════════════
 // RedeemCode — Componente para canjear codigos de activacion
@@ -22,7 +22,6 @@ export function RedeemCode() {
   const [code, setCode] = useState('');
   const [status, setStatus] = useState<RedeemStatus>('idle');
   const [message, setMessage] = useState('');
-  const [result, setResult] = useState<RedeemResult | null>(null);
 
   // Auto-formatear: insertar guiones en las posiciones correctas
   const handleChange = useCallback((value: string) => {
@@ -68,7 +67,6 @@ export function RedeemCode() {
 
       if (data.success && data.data) {
         setStatus('success');
-        setResult(data.data);
         const fechaExpiracion = new Date(data.data.expiresAt).toLocaleDateString(
           'es-MX',
           { year: 'numeric', month: 'long', day: 'numeric' },

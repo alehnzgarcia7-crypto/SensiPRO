@@ -1,11 +1,13 @@
+import { prisma } from '@ares/database';
+import type { TournamentStatus, UserTier } from '@prisma/client';
+import { Trophy, Users, Calendar, Clock } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Trophy, Users, Calendar, Clock } from 'lucide-react';
 
-import { prisma } from '@ares/database';
+
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import type { TournamentStatus, UserTier } from '@prisma/client';
+
 
 import { TournamentsComingSoon } from './coming-soon';
 

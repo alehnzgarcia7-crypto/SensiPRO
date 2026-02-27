@@ -1,14 +1,14 @@
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { Crown, AlertTriangle, Calendar, CreditCard, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
+import { RedeemCode } from '@/components/features/redeem-code';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import { getSubscriptionStatus, getCodeTypeLabel } from '@/lib/payments/subscription';
 import { getTierConfig } from '@/lib/tiers';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RedeemCode } from '@/components/features/redeem-code';
 
 // ══════════════════════════════════════════════════════════
 // Página de gestión de suscripción del usuario

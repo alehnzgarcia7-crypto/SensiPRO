@@ -6,25 +6,26 @@
 // staggered animations, 3D cards, glass morphism 2.0
 // ═══════════════════════════════════════════════════════════════
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
+import type { SensitivityStyle, DeviceTier } from '@prisma/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge, Crosshair, Eye, Scan } from 'lucide-react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
-import type { SensitivityStyle, DeviceTier } from '@prisma/client';
-import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
-
-import { useGeneratorStore } from '@/stores/generator.store';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { AnimatedBorder } from '@/components/effects/animated-border';
 import { CountUp } from '@/components/effects/count-up';
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
-import { AnimatedBorder } from '@/components/effects/animated-border';
+import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useGeneratorStore } from '@/stores/generator.store';
+
 import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
-import { RamSelector } from './ram-selector';
-import { HzSelector } from './hz-selector';
 import { HudRecommendationPanel } from './hud-recommendation';
-import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
+import { HzSelector } from './hz-selector';
+import { RamSelector } from './ram-selector';
+
 
 interface AllCalibrationsApiResponse {
   success: boolean;

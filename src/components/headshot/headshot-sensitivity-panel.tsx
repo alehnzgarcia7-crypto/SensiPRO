@@ -1,12 +1,13 @@
 'use client';
 
+import type { SensitivityOutput, GyroscopeOutput } from '@ares/algorithms';
 import { motion } from 'framer-motion';
 import { Crosshair, Target, Scan, Eye } from 'lucide-react';
 
-import type { SensitivityOutput, GyroscopeOutput } from '@ares/algorithms';
+import { AnimatedBorder } from '@/components/effects/animated-border';
 import { CountUp } from '@/components/effects/count-up';
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
-import { AnimatedBorder } from '@/components/effects/animated-border';
+
 import { HeadshotCopyButton } from './headshot-copy-button';
 
 interface HeadshotSensitivityPanelProps {

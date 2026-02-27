@@ -1,13 +1,13 @@
 import crypto from 'crypto';
 
-import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
-
-import { logger } from '@ares/logger';
-import { BusinessError } from '@ares/errors';
 import {
   PREMIUM_MONTHLY_PRICE,
   VIP_MONTHLY_PRICE,
 } from '@ares/config';
+import { BusinessError } from '@ares/errors';
+import { logger } from '@ares/logger';
+import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+
 
 // ══════════════════════════════════════════════════════════
 // MercadoPago SDK — Pasarela principal para Mexico

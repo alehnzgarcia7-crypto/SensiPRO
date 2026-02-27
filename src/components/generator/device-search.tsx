@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
 import type { DeviceTier } from '@prisma/client';
+import { Search, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
-import { useDeviceSearch } from '@/hooks/use-device-search';
-import { useGeneratorStore } from '@/stores/generator.store';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useDeviceSearch } from '@/hooks/use-device-search';
 import { cn } from '@/lib/cn';
+import { useGeneratorStore } from '@/stores/generator.store';
 
 interface DeviceItem {
   id: string;

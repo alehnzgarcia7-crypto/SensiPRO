@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { cn } from '@/lib/cn';
 import {
   getHudLayout,
   getFingerTechniques,
@@ -9,10 +7,12 @@ import {
   getTrainingPlan,
   FINGER_PROFILES,
   type FingerCount,
-  type FingerProfile,
   type FireButtonRecommendation,
 } from '@ares/algorithms';
 import type { SensitivityOutput } from '@ares/algorithms';
+import { useState, useCallback } from 'react';
+
+import { cn } from '@/lib/cn';
 
 interface CopyAllButtonProps {
   sensitivity: SensitivityOutput;

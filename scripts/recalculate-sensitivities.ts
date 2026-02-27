@@ -40,7 +40,7 @@ async function main() {
 
   for (let i = 0; i < devices.length; i += batchSize) {
     const batch = devices.slice(i, i + batchSize);
-    const records: Parameters<typeof prisma.sensitivity.createMany>[0]['data'] = [];
+    const records: import('@prisma/client').Prisma.SensitivityCreateManyInput[] = [];
 
     for (const device of batch) {
       const specs: DeviceSpecs = {

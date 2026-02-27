@@ -1,9 +1,9 @@
 'use client';
 
-import { cn } from '@/lib/cn';
+import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
 import type { WeaponMeta } from '@/lib/academy/meta-config';
 import { TIER_COLORS } from '@/lib/academy/meta-config';
-import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
+import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
 // MetaChart — Tarjeta premium de stats de un arma con GlowProgressBar

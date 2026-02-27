@@ -1,9 +1,9 @@
+import { prisma } from '@ares/database';
+import { logger } from '@ares/logger';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 
-import { prisma } from '@ares/database';
-import { logger } from '@ares/logger';
 
 import { constructWebhookEvent } from '@/lib/payments/stripe';
 

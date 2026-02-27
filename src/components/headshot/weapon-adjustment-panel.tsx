@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/cn';
 import type { WeaponAdjustmentRow } from '@ares/algorithms';
 import { WEAPON_CATEGORIES, type WeaponCategory } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+
+import { cn } from '@/lib/cn';
+
 
 interface WeaponAdjustmentPanelProps {
   adjustments: WeaponAdjustmentRow[];

@@ -1,5 +1,5 @@
 import type { GuideCategory } from '@prisma/client';
-import { BookOpen, Crosshair, Move, Brain, Smartphone, Swords } from 'lucide-react';
+import { Crosshair, Move, Brain, Smartphone, Swords } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export interface CategoryConfig {

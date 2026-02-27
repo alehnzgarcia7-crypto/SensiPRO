@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { useEffect, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
 

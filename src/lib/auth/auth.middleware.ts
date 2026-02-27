@@ -1,6 +1,6 @@
+import { AuthError, ForbiddenError } from '@ares/errors';
 import type { UserRole, UserTier } from '@prisma/client';
 
-import { AuthError, ForbiddenError } from '@ares/errors';
 
 import { auth } from './index';
 

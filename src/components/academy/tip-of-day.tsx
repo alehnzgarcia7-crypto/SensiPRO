@@ -1,6 +1,7 @@
+import { logger } from '@ares/logger';
 import { Lightbulb, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { logger } from '@ares/logger';
+
 import { getTipOfDay } from '@/lib/academy/academy-queries';
 
 interface TipOfDayData {

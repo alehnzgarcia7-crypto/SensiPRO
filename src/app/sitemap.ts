@@ -1,6 +1,6 @@
+import { prisma } from '@ares/database';
 import type { MetadataRoute } from 'next';
 
-import { prisma } from '@ares/database';
 
 const BASE_URL = 'https://sensibilidadespro.com';
 

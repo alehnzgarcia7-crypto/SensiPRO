@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
 import { POPULAR_DEVICES, LANDING_DATA, TIER_COLORS, type PopularDevice } from '@/lib/landing-data';
+
 import { ScrollReveal } from './scroll-reveal';
 
 const DEFAULT_TIER = { bg: 'bg-slate-500/15', text: 'text-slate-400', border: 'border-slate-500/30' };

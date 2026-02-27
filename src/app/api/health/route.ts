@@ -1,6 +1,6 @@
+import { prisma } from '@ares/database';
 import { NextResponse } from 'next/server';
 
-import { prisma } from '@ares/database';
 
 export async function GET(): Promise<NextResponse> {
   const checks: Record<string, string> = {};

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import type { SensitivityStyle } from '@prisma/client';
+import { useState, useCallback } from 'react';
 
-import { cn } from '@/lib/cn';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useFavorites } from '@/hooks/use-favorites';
+import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
 // /favorites — Pagina de configuraciones guardadas

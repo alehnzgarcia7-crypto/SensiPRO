@@ -1,11 +1,12 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, ThumbsUp, MessageSquare } from 'lucide-react';
-
 import { prisma } from '@ares/database';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ThumbsUp, MessageSquare } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+
 import { SocialShare } from '@/components/community/social-share';
+import { Badge } from '@/components/ui/badge';
 
 // ═══════════════════════════════════════════════════════════════
 // Pagina de config compartida individual

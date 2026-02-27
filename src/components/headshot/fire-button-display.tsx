@@ -1,8 +1,9 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { CountUp } from '@/components/effects/count-up';
 import type { FireButtonResult } from '@ares/algorithms';
+import { motion } from 'framer-motion';
+
+import { CountUp } from '@/components/effects/count-up';
 
 interface FireButtonDisplayProps {
   fireButton: FireButtonResult;

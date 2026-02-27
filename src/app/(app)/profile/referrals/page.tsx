@@ -1,10 +1,10 @@
-import { redirect } from 'next/navigation';
 import { Users, Gift } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
+import { CopyReferralCode } from '@/components/features/copy-referral';
+import { Card } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
 import { getReferralStats } from '@/lib/payments/referrals';
-import { Card } from '@/components/ui/card';
-import { CopyReferralCode } from '@/components/features/copy-referral';
 
 export const metadata = {
   title: 'Referidos — Sensibilidades PRO',

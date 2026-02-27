@@ -1,11 +1,10 @@
 import crypto from 'crypto';
 
-import type { CodeType, CodeStatus, UserTier } from '@prisma/client';
-
+import { CODE_PREFIX, TIER_DURATIONS } from '@ares/config';
 import { prisma } from '@ares/database';
 import { BusinessError, NotFoundError } from '@ares/errors';
 import { logger } from '@ares/logger';
-import { CODE_PREFIX, TIER_DURATIONS } from '@ares/config';
+import type { CodeType, CodeStatus, UserTier } from '@prisma/client';
 
 // ══════════════════════════════════════════════════════════
 // Activation Codes — Generacion, validacion y canje

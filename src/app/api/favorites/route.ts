@@ -1,11 +1,11 @@
+import { FREE_FAVORITE_LIMIT } from '@ares/config';
+import { prisma } from '@ares/database';
+import { BusinessError, handleApiError } from '@ares/errors';
+import { logger } from '@ares/logger';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
-import { prisma } from '@ares/database';
-import { BusinessError, handleApiError } from '@ares/errors';
-import { logger } from '@ares/logger';
-import { FREE_FAVORITE_LIMIT } from '@ares/config';
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
 

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/cn';
 import { getTrainingPlan, type FingerCount, type TrainingExercise } from '@ares/algorithms';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useCallback, useEffect } from 'react';
+
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
+import { cn } from '@/lib/cn';
+
+
 
 interface FingerTrainingPlanProps {
   fingers: FingerCount;
@@ -166,7 +169,7 @@ export function FingerTrainingPlan({ fingers }: FingerTrainingPlanProps) {
   const plan = getTrainingPlan(fingers);
   const [expandedDay, setExpandedDay] = useState<number | null>(1);
   const [completedDays, setCompletedDays] = useState<Set<number>>(new Set());
-  const [exerciseDone, setExerciseDone] = useState<Set<string>>(new Set());
+  const [, setExerciseDone] = useState<Set<string>>(new Set());
 
   // Reset state when fingers change
   useEffect(() => {

@@ -1,10 +1,10 @@
+import { handleApiError } from '@ares/errors';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { handleApiError } from '@ares/errors';
 
-import { getOptionalSession } from '@/lib/auth/auth.middleware';
 import { getVariantForUser } from '@/lib/ab-testing/ab-engine';
+import { getOptionalSession } from '@/lib/auth/auth.middleware';
 
 // GET /api/ab-variant?experiment=<key>
 // Retorna la variante asignada al usuario para un experimento
