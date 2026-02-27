@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState, useRef, useCallback } from 'react';
 import { Search, Sliders, Check } from 'lucide-react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { LANDING_DATA } from '@/lib/landing-data';
 

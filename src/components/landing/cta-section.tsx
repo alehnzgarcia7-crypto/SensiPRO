@@ -69,7 +69,7 @@ export function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="mt-10 inline-block"
+          className="mt-10 w-full md:inline-block"
         >
           <div className="relative rounded-2xl p-[2px] overflow-hidden group">
             {/* Rotating border */}
@@ -82,7 +82,7 @@ export function CtaSection() {
             />
             <Link
               href="/generator"
-              className="relative flex items-center gap-3 px-12 py-5 rounded-[14px] text-white font-bold text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.03] min-h-[56px]"
+              className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.03] min-h-[56px]"
               style={{ background: 'rgba(10, 15, 30, 0.9)' }}
             >
               GENERAR MI SENSIBILIDAD

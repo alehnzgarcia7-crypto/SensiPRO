@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { CyberParticles } from '@/components/effects/cyber-particles';
 import { AresCoachShowcase } from '@/components/landing/ares-coach-showcase';
 import { BrandsSection } from '@/components/landing/brands-section';
 import { CtaSection } from '@/components/landing/cta-section';
@@ -9,13 +10,12 @@ import { FeaturesSection } from '@/components/landing/features-section';
 import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
 import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
+import { InteractiveDemo } from '@/components/landing/interactive-demo';
 import { LandingFooter } from '@/components/landing/landing-footer';
 import { PricingSection } from '@/components/landing/pricing-section';
-import { InteractiveDemo } from '@/components/landing/interactive-demo';
 import { SocialProofRibbon } from '@/components/landing/social-proof-ribbon';
 import { StatsCounter } from '@/components/landing/stats-counter';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
-import { CyberParticles } from '@/components/effects/cyber-particles';
 
 export const metadata: Metadata = {
   title: 'Sensibilidades PRO — Generador #1 para Free Fire',

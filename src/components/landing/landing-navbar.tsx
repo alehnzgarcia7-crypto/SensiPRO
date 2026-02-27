@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Zap, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 import { cn } from '@/lib/cn';
 

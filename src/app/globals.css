@@ -546,6 +546,85 @@
 }
 .online-pulse { animation: onlinePulse 2s ease-in-out infinite; }
 
+/* ═══ Pulse Scale (badges NEW, POPULAR) ═══ */
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.pulse-scale { animation: pulseScale 2s ease-in-out infinite; }
+
+/* ═══ Star Fill (testimonials rating) ═══ */
+@keyframes starFill {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* ═══ Glow Pulse Cyan (icons, badges) ═══ */
+@keyframes glowPulseCyan {
+  0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
+}
+.glow-pulse-cyan { animation: glowPulseCyan 3s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════════════════
+   Shared Utility Classes
+   ═══════════════════════════════════════════════════════════ */
+
+/* Gradient text utilities */
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-red {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism strong — opaque glass */
+.glass-strong {
+  background: rgba(10, 15, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+/* Glow border utilities */
+.glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.15); }
+.glow-red { box-shadow: 0 0 30px rgba(239, 68, 68, 0.15); }
+.glow-purple { box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); }
+.glow-amber { box-shadow: 0 0 30px rgba(245, 158, 11, 0.15); }
+
+/* Fade mask for horizontal scrolls */
+.fade-mask-x {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+/* Section spacing utility */
+.section-padding {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 112px;
+    padding-bottom: 112px;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee {
@@ -566,7 +645,9 @@
   .headshot-badge-pulse,
   .ares-badge-pulse,
   .online-pulse,
-  .typing-dot {
+  .typing-dot,
+  .pulse-scale,
+  .glow-pulse-cyan {
     animation: none !important;
   }
   .chat-bubble-enter {

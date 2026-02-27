@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // PricingSection — 2 plans (Gratis + Pro) side by side,
@@ -109,7 +109,7 @@ export function PricingSection() {
           </div>
         </motion.div>
 
-        {/* Cards */}
+        {/* Cards — Pro first on mobile (order-2 md:order-1 for Gratis) */}
         <div className="mt-12 grid md:grid-cols-2 gap-6 items-start">
           {/* ── Card Gratis ── */}
           <motion.div
@@ -117,6 +117,7 @@ export function PricingSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
+            className="order-2 md:order-1"
           >
             <div
               className="rounded-[20px] p-8 flex flex-col h-full"
@@ -160,12 +161,13 @@ export function PricingSection() {
             </div>
           </motion.div>
 
-          {/* ── Card Pro ── */}
+          {/* ── Card Pro ── (first on mobile) */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="order-1 md:order-2"
           >
             {/* Animated border wrapper */}
             <div className="relative rounded-[20px] p-[2px] overflow-hidden">

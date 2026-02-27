@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 import { LANDING_DATA } from '@/lib/landing-data';
 
@@ -68,7 +68,10 @@ export function HeroSection() {
 
   const scrollToHowItWorks = useCallback(() => {
     const el = document.getElementById('how-it-works');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
   }, []);
 
   return (

@@ -2,15 +2,14 @@
  * FORENSIC VALIDATION — Pre-production algorithm checks
  * Validates sensitivity engine, finger profiles, weapons, DPI
  */
-import { describe, it, expect } from 'vitest';
+import type { DeviceSpecs, SensitivityOutput } from '@ares/algorithms';
 import {
   generateSensitivity,
   calculateHeadshotFingerMode,
   FINGER_PROFILES,
-  WEAPON_CATEGORIES,
   getAllWeaponCategories,
 } from '@ares/algorithms';
-import type { DeviceSpecs, SensitivityOutput } from '@ares/algorithms';
+import { describe, it, expect } from 'vitest';
 
 // ═══════════════════════════════════════════════════
 // TEST 1: Sensibilidad genera valores en rango

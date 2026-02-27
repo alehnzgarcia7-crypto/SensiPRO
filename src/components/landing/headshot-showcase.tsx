@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Crosshair } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // HeadshotShowcase — Split layout, 24 features in 4 tabbed

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // DeviceShowcase — Horizontal scroll carousel with snap points,

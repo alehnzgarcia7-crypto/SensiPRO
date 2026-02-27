@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Copy, Check, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // InteractiveDemo — FUNCTIONAL mini-generator on the landing
@@ -138,16 +138,16 @@ export function InteractiveDemo() {
         revealBarsSequentially();
       } else {
         // Fallback
-        useFallback();
+        applyFallback();
       }
     } catch {
-      useFallback();
+      applyFallback();
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const useFallback = () => {
+  const applyFallback = () => {
     setSensitivity(DEMO_FALLBACK.sensitivity);
     revealBarsSequentially();
   };

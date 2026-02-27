@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 import { FAQ_ITEMS } from '@/lib/landing-data';
 

@@ -50,7 +50,7 @@ export function BrandsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-2xl md:text-3xl font-display font-bold text-center text-white"
+          className="text-3xl md:text-4xl font-display font-bold text-center text-white"
         >
           26 marcas soportadas
         </motion.h2>

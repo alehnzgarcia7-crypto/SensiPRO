@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
+import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // AresCoachShowcase — STATIC preview (NO scrollIntoView, NO typing,
