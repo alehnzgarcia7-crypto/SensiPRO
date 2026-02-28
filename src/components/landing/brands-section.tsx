@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 // ═══════════════════════════════════════════════════════════════
 // BrandsSection — 26 brands cloud with stagger entrance,
@@ -108,10 +107,7 @@ export function BrandsSection() {
           transition={{ delay: 0.5 }}
           className="mt-8 text-center text-xs text-slate-500"
         >
-          ¿No encuentras tu celular?{' '}
-          <Link href="/community" className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2">
-            Escríbenos y lo agregamos en 48 horas
-          </Link>
+          ¿No encuentras tu celular? Escríbenos y lo agregamos en 48 horas
         </motion.p>
       </div>
     </section>

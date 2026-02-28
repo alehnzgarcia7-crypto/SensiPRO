@@ -46,16 +46,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Comunidad */}
-          <div>
-            <h4 className="font-ui font-semibold text-sm text-white mb-3">Comunidad</h4>
-            <div className="flex flex-col gap-2">
-              <Link href="/leaderboard" className="text-xs text-slate-500 hover:text-white transition-colors">Rankings</Link>
-              <Link href="/tournaments" className="text-xs text-slate-500 hover:text-white transition-colors">Torneos</Link>
-              <Link href="/shared" className="text-xs text-slate-500 hover:text-white transition-colors">Configs</Link>
-            </div>
-          </div>
-
           {/* Legal */}
           <div>
             <h4 className="font-ui font-semibold text-sm text-white mb-3">Legal</h4>

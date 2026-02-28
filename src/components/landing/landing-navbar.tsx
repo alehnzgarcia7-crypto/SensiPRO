@@ -16,7 +16,6 @@ const NAV_LINKS = [
   { href: '/generator', label: 'Generador' },
   { href: '/generator/headshot', label: 'Headshot', badge: 'NEW' },
   { href: '/academy', label: 'Academia' },
-  { href: '/community', label: 'Comunidad' },
 ];
 
 export function LandingNavbar() {

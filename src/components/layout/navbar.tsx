@@ -32,9 +32,6 @@ export async function Navbar() {
           <Link href="/academy" className="text-sm text-slate-400 hover:text-white transition-colors">
             Academia
           </Link>
-          <Link href="/community" className="text-sm text-slate-400 hover:text-white transition-colors">
-            Comunidad
-          </Link>
         </div>
 
         <div className="flex items-center gap-3">
