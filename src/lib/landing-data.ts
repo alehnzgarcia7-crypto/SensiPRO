@@ -127,7 +127,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'MID',
     avatar: 'C',
     rating: 5,
-    text: 'Moto G54 con DPI 401 me salió 173 de general y el tapering perfecto: 158, 143, 128, 113. Tiene todo: sensi por DPI, giroscopio calibrado, headshot mode, códigos HUD, academia completa... nmms es como tener un coach de FF en el celular y GRATIS 😭🙌',
+    text: 'Moto G54 con DPI 401 me salió 173 de general y el tapering perfecto: 158, 143, 128, 113. Tiene todo: sensi por DPI, giroscopio calibrado, headshot mode, códigos HUD, academia completa... nmms es como tener un coach de FF en el celular 😭🙌',
     rank: 'Diamante',
     feature: 'Todo',
     date: 'hace 1 semana',
@@ -291,10 +291,10 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: '¿Cómo funciona el generador?',
     a: `Buscas tu celular entre ${LANDING_DATA.deviceCount}+ dispositivos. El algoritmo calcula tu sensibilidad basándose en el DPI real de tu pantalla, tamaño, tasa de refresco (60/90/120 Hz) y RAM. Te da 6 valores: General, Punto Rojo, Scope 2x, Scope 4x, AWM y Vista Libre, más giroscopio y código HUD. Copias directo a Free Fire.`,
   },
-  {
-    q: '¿Es realmente gratis?',
-    a: `Sí. El plan básico es gratis para siempre. Incluye el generador completo con los 9 estilos, giroscopio, 1 código HUD, y acceso a las ${LANDING_DATA.guideCount} guías de la academia. El plan Pro agrega Headshot Mode completo, todos los códigos HUD, comparador de devices, y ARES AI Coach.`,
-  },
+  // {
+  //   q: '¿Es realmente gratis?',
+  //   a: `Sí. El plan básico es gratis para siempre. Incluye el generador completo con los 9 estilos, giroscopio, 1 código HUD, y acceso a las ${LANDING_DATA.guideCount} guías de la academia. El plan Pro agrega Headshot Mode completo, todos los códigos HUD, comparador de devices, y ARES AI Coach.`,
+  // },
   {
     q: '¿Qué tan preciso es el algoritmo?',
     a: `Precisión de ±5 puntos (2.5% de la escala 0-200) validada contra FreeFireMania. Para el 80% de dispositivos (DPI 270-460) la precisión es de ±3 puntos. No son valores random — el algoritmo calcula usando el DPI real, el tamaño de pantalla, y la tasa de refresco de tu celular específico.`,
@@ -315,10 +315,10 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: '¿Qué son los códigos HUD?',
     a: `Son códigos reales de Free Fire que configuran la posición de TODOS tus botones en pantalla. En vez de mover cada botón manualmente, pegas un código en Ajustes → En Partida → Usar código compartido, y tu HUD queda configurado al instante. Tenemos ${LANDING_DATA.hudCodeCount} códigos para 2, 3, 4 y 5 dedos.`,
   },
-  {
-    q: '¿Puedo cancelar el plan Pro cuando quiera?',
-    a: 'Sí. Sin contratos, sin permanencia. Cancelas cuando quieras y sigues con el plan gratis. Además tienes 7 días de garantía — si no mejoras tu gameplay en la primera semana, te devolvemos tu dinero.',
-  },
+  // {
+  //   q: '¿Puedo cancelar el plan Pro cuando quiera?',
+  //   a: 'Sí. Sin contratos, sin permanencia. Cancelas cuando quieras y sigues con el plan básico. Además tienes 7 días de garantía — si no mejoras tu gameplay en la primera semana, te devolvemos tu dinero.',
+  // },
 ];
 
 // ═══════════════════════════════════════════════════════════════

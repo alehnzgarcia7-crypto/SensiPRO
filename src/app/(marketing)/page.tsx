@@ -11,16 +11,16 @@ import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
 import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { InteractiveDemo } from '@/components/landing/interactive-demo';
-import { LandingFooter } from '@/components/landing/landing-footer';
+// import { LandingFooter } from '@/components/landing/landing-footer';
 import { PricingSection } from '@/components/landing/pricing-section';
 import { SocialProofRibbon } from '@/components/landing/social-proof-ribbon';
 import { StatsCounter } from '@/components/landing/stats-counter';
-import { TestimonialsSection } from '@/components/landing/testimonials-section';
+// import { TestimonialsSection } from '@/components/landing/testimonials-section';
 
 export const metadata: Metadata = {
   title: 'Sensibilidades PRO — Generador #1 para Free Fire',
   description:
-    'Genera las mejores sensibilidades para Free Fire basadas en el DPI real de tu pantalla. 503+ dispositivos, 26 marcas, 9 estilos, giroscopio calibrado. Gratis.',
+    'Genera las mejores sensibilidades para Free Fire basadas en el DPI real de tu pantalla. 503+ dispositivos, 26 marcas, 9 estilos, giroscopio calibrado.',
   openGraph: {
     title: 'Sensibilidades PRO — Generador #1 para Free Fire',
     description:
@@ -55,7 +55,8 @@ export default function LandingPage() {
       {/* 10. ARES AI Coach — preview estático */}
       <AresCoachShowcase />
       {/* 11. Testimonios — carousel horizontal */}
-      <TestimonialsSection />
+      {/* <TestimonialsSection /> */}
+      {/* Oculto temporalmente — se reactiva cuando tengamos comunidad activa */}
       {/* 12. Pricing — toggle mensual/anual + Pro animado */}
       <PricingSection />
       {/* 13. FAQ — 8 preguntas acordeón */}
@@ -63,7 +64,7 @@ export default function LandingPage() {
       {/* 14. CTA Final — cierre cinematográfico */}
       <CtaSection />
       {/* 15. Footer */}
-      <LandingFooter />
+      {/* <LandingFooter /> */}
     </>
   );
 }

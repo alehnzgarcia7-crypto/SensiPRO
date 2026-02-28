@@ -1,12 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
-// PricingSection — 2 plans (Gratis + Pro) side by side,
+// PricingSection — 2 plans (Básico + Pro) side by side,
 // animated rotating border on Pro card, shimmer effect,
 // monthly/annual toggle, guarantee badges, POPULAR badge
 // ═══════════════════════════════════════════════════════════════
@@ -17,25 +17,26 @@ interface PlanFeature {
   proExclusive?: boolean;
 }
 
-const FREE_FEATURES: PlanFeature[] = [
-  { text: 'Algoritmo DPI-first básico', included: true },
-  { text: '5 búsquedas por día', included: true },
-  { text: '3 configuraciones guardadas', included: true },
-  { text: 'Headshot Mode básico (sensibilidad + Vertical Drag)', included: true },
-  { text: 'Academia básica (8 guías gratis)', included: true },
-  { text: '1 código HUD (2 dedos)', included: true },
-  { text: '9 estilos de calibración', included: true },
-  { text: 'Giroscopio calibrado', included: true },
-  { text: 'Exportar imagen', included: true },
-  { text: 'Soporte 60/90/120 Hz', included: true },
-  { text: 'Headshot Mode COMPLETO', included: false },
-  { text: 'TODOS los códigos HUD (17)', included: false },
-  { text: 'ARES AI Coach', included: false },
-  { text: 'Comparador side-by-side', included: false },
-];
+// Card Básico oculta — datos preservados para reactivar
+// const FREE_FEATURES: PlanFeature[] = [
+//   { text: 'Algoritmo DPI-first básico', included: true },
+//   { text: '5 búsquedas por día', included: true },
+//   { text: '3 configuraciones guardadas', included: true },
+//   { text: 'Headshot Mode básico (sensibilidad + Vertical Drag)', included: true },
+//   { text: 'Academia básica (8 guías completas)', included: true },
+//   { text: '1 código HUD (2 dedos)', included: true },
+//   { text: '9 estilos de calibración', included: true },
+//   { text: 'Giroscopio calibrado', included: true },
+//   { text: 'Exportar imagen', included: true },
+//   { text: 'Soporte 60/90/120 Hz', included: true },
+//   { text: 'Headshot Mode COMPLETO', included: false },
+//   { text: 'TODOS los códigos HUD (17)', included: false },
+//   { text: 'ARES AI Coach', included: false },
+//   { text: 'Comparador side-by-side', included: false },
+// ];
 
 const PRO_FEATURES: PlanFeature[] = [
-  { text: 'Todo lo del plan Gratis', included: true },
+  { text: 'Todo lo del plan Básico', included: true },
   { text: 'Calibración forense completa + DPI custom', included: true, proExclusive: true },
   { text: 'Búsquedas ILIMITADAS', included: true, proExclusive: true },
   { text: 'Configuraciones guardadas ilimitadas', included: true, proExclusive: true },
@@ -74,7 +75,7 @@ export function PricingSection() {
           transition={{ delay: 0.1 }}
           className="mt-3 text-center text-slate-400 text-sm"
         >
-          Empieza gratis. Mejora cuando quieras.
+          Elige tu plan. Mejora cuando quieras.
         </motion.p>
 
         {/* Monthly/Annual toggle */}
@@ -109,65 +110,17 @@ export function PricingSection() {
           </div>
         </motion.div>
 
-        {/* Cards — Pro first on mobile (order-2 md:order-1 for Gratis) */}
-        <div className="mt-12 grid md:grid-cols-2 gap-6 items-start">
-          {/* ── Card Gratis ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="order-2 md:order-1"
-          >
-            <div
-              className="rounded-[20px] p-8 flex flex-col h-full"
-              style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-              }}
-            >
-              <h3 className="text-xl font-bold text-white">Gratis</h3>
+        {/* Cards */}
+        <div className="mt-12 flex justify-center">
+          {/* Card Básico oculta — se reactiva cuando definamos modelo freemium */}
 
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-5xl font-heading font-black text-white">$0</span>
-              </div>
-              <p className="mt-1 text-sm text-slate-400">siempre</p>
-
-              <div className="my-6 h-px bg-white/5" />
-
-              <ul className="space-y-3 flex-1">
-                {FREE_FEATURES.map((feat) => (
-                  <li key={feat.text} className="flex items-start gap-3 text-sm">
-                    {feat.included ? (
-                      <Check size={15} className="text-slate-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <X size={15} className="text-slate-700 shrink-0 mt-0.5" />
-                    )}
-                    <span className={feat.included ? 'text-slate-300' : 'text-slate-600 line-through'}>
-                      {feat.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-8">
-                <Link
-                  href="/register"
-                  className="flex items-center justify-center w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-white border border-white/20 hover:bg-white/5 transition-all duration-300 min-h-[48px]"
-                >
-                  EMPEZAR GRATIS
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── Card Pro ── (first on mobile) */}
+          {/* ── Card Pro ── */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="order-1 md:order-2"
+            className="w-full max-w-md"
           >
             {/* Animated border wrapper */}
             <div className="relative rounded-[20px] p-[2px] overflow-hidden">

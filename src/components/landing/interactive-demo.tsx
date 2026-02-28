@@ -196,9 +196,10 @@ export function InteractiveDemo() {
     };
   }, []);
 
-  const maxValue = sensitivity
-    ? Math.max(...SENSI_LABELS.map((s) => sensitivity[s.key]))
-    : 200;
+  // Free Fire max sensitivity = 200 (desde OB44, abril 2024)
+  // Vista Libre rango real: 12-25, usamos 30 como techo visual
+  const SENSITIVITY_MAX = 200;
+  const FREE_VIEW_MAX = 30;
 
   return (
     <section className="py-20 md:py-28 px-4">
@@ -296,7 +297,8 @@ export function InteractiveDemo() {
             {SENSI_LABELS.map((s, i) => {
               const value = sensitivity ? sensitivity[s.key] : 0;
               const isRevealed = i < revealedBars;
-              const barWidth = value > 0 ? (value / maxValue) * 100 : 0;
+              const barMax = s.key === 'freeView' ? FREE_VIEW_MAX : SENSITIVITY_MAX;
+              const barWidth = value > 0 ? Math.min((value / barMax) * 100, 100) : 0;
 
               return (
                 <div key={s.key} className="flex items-center gap-3">

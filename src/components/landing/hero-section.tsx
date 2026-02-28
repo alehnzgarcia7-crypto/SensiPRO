@@ -13,7 +13,7 @@ import { LANDING_DATA } from '@/lib/landing-data';
 // ═══════════════════════════════════════════════════════════════
 
 const TITLE_WORDS = ['Tu', 'sensibilidad', 'perfecta', 'en', '10', 'segundos'];
-const SUBTITLE = `Basada en el DPI real de tu pantalla. No copias genéricas de YouTube. ${LANDING_DATA.deviceCount}+ dispositivos. Gratis.`;
+const SUBTITLE = `Basada en el DPI real de tu pantalla. No copias genéricas de YouTube. ${LANDING_DATA.deviceCount}+ dispositivos. Precisión calibrada por DPI.`;
 
 function TypewriterText({ text, delay = 800 }: { text: string; delay?: number }) {
   const [displayed, setDisplayed] = useState('');

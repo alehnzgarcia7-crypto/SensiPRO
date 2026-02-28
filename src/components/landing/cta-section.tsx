@@ -60,7 +60,7 @@ export function CtaSection() {
           transition={{ delay: 0.1 }}
           className="mt-4 text-base md:text-lg text-slate-400"
         >
-          Genera la sensibilidad calibrada para tu celular en 10 segundos. Gratis.
+          Genera la sensibilidad calibrada para tu celular en 10 segundos.
         </motion.p>
 
         {/* CTA — rotating gradient border (matches hero) */}
