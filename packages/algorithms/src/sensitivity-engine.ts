@@ -13,7 +13,7 @@ import { generateGyroscope } from './gyroscope-engine';
 //
 // Basado en análisis forense de freefiremania 2026 + comunidadinsana
 // DPI como driver principal + tapering -15 validado contra datos reales
-// Error: ±1-2 puntos vs valores reales de 12+ dispositivos
+// Precisión: ±5 puntos vs valores reales de 12+ dispositivos
 //
 // RANGO: 1-200 (escala Free Fire)
 //
@@ -25,11 +25,11 @@ import { generateGyroscope } from './gyroscope-engine';
 //   5. Free Look independiente (rango 14-22)
 //   6. Gyroscope con base independiente y tapering -10
 //
-// DATOS DE VALIDACIÓN:
-//   Samsung A13 (DPI 270, 4GB, 60Hz, 6.6"): General ~186
+// DATOS DE VALIDACIÓN (post-audit 2026-02-27):
+//   Samsung A13 (DPI 400, 4GB, 60Hz, 6.6"): General ~179
 //   Redmi Note 13 (DPI 395, 8GB, 120Hz, 6.67"): General ~174
 //   iPhone 14 Plus (DPI 458, 6GB, 60Hz, 6.7"): General ~166
-//   iPhone 16 Pro Max (DPI 460, 8GB, 120Hz, 6.9"): General ~168
+//   iPhone 16 Pro Max (DPI 460, 8GB, 120Hz, 6.9"): General ~163
 
 const TAPERING_STEP = 15; // -15 entre cada nivel de mira (patrón forense)
 
@@ -75,20 +75,23 @@ function getEffectiveDpi(
  *
  * Curva: DPI bajo = sens alta, DPI alto = sens baja
  *   DPI 200 → 195
- *   DPI 270 → 183
- *   DPI 395 → 175
- *   DPI 460 → 165
- *   DPI 600 → 135
+ *   DPI 280 → 183
+ *   DPI 400 → 175
+ *   DPI 460 → 166
+ *   DPI 600 → 125
  */
 function calculateGeneralBase(dpi: number): number {
   if (dpi <= 200) return 195;
-  if (dpi >= 600) return 135;
+  if (dpi >= 600) return 125;
 
+  // Segmentos ajustados 2026-02-27: punto de corte movido de 470→460
+  // para no penalizar iPhone 16 PM (DPI 460). Segmento 4 más agresivo
+  // para reducir sobre-predicción en flagships DPI>460. Ver ALGORITHM-AUDIT.md
   const segments = [
     { dpiMin: 200, dpiMax: 280, sensHigh: 195, sensLow: 183 },
     { dpiMin: 280, dpiMax: 400, sensHigh: 183, sensLow: 175 },
-    { dpiMin: 400, dpiMax: 470, sensHigh: 175, sensLow: 165 },
-    { dpiMin: 470, dpiMax: 600, sensHigh: 165, sensLow: 135 },
+    { dpiMin: 400, dpiMax: 460, sensHigh: 175, sensLow: 166 },
+    { dpiMin: 460, dpiMax: 600, sensHigh: 166, sensLow: 125 },
   ];
 
   for (const seg of segments) {
@@ -131,12 +134,16 @@ function hzAdjustment(hz: number): number {
  * Ajuste por tamaño de pantalla.
  * Pantalla grande → dedo recorre más → menos sensibilidad.
  */
+// Granularidad mejorada 2026-02-27: nuevo punto de corte 6.5-6.7" (-1)
+// y separación tablets ≥8.0" (-6). Ver ALGORITHM-AUDIT.md
 function screenSizeAdjustment(inches: number): number {
-  if (inches < 5.5) return 3;
-  if (inches < 6.0) return 1;
-  if (inches < 6.5) return 0;
-  if (inches < 7.0) return -2;
-  return -4;
+  if (inches < 5.5) return 3;    // Compactos (iPhone SE, etc.)
+  if (inches < 6.0) return 1;    // Pequeños (iPhone 13 mini, etc.)
+  if (inches < 6.5) return 0;    // Estándar (Samsung A54, iPhone 15, etc.)
+  if (inches < 6.7) return -1;   // Grandes (iPhone 15 Plus, POCO X5, etc.)
+  if (inches < 7.0) return -2;   // Extra grandes (iPhone 16 Pro Max, etc.)
+  if (inches < 8.0) return -4;   // Phablets
+  return -6;                      // Tablets (iPad, Samsung Tab, etc.)
 }
 
 /**
@@ -161,8 +168,9 @@ function calculateForensicGyroscope(
 ): GyroscopeOutput {
   const styleConfig = STYLE_CONFIG[style];
 
-  // Gyro base ~40-55% del valor de touch
-  let gyroBase = dpi <= 300 ? 52 : dpi <= 450 ? 48 : 44;
+  // Gyro base recalibrado 2026-02-27: -10 uniforme para alinear con rango pro (20-40)
+  // Antes: 52/48/44 → DESPUÉS: 42/38/34. Ver ALGORITHM-AUDIT.md
+  let gyroBase = dpi <= 300 ? 42 : dpi <= 450 ? 38 : 34;
   gyroBase += ramAdjustment(ramGb);
   gyroBase += Math.round(styleConfig.generalBoost * 0.5);
 
@@ -255,12 +263,14 @@ export function estimateDpiFromDevice(
 ): number {
   const knownDpis: Record<string, number> = {
     // Samsung gama baja
-    'samsung_a03': 270, 'samsung_a04': 411, 'samsung_a04e': 600,
-    'samsung_a04s': 664, 'samsung_a13': 270, 'samsung_a14': 270,
-    'samsung_a15': 270, 'samsung_a24': 411, 'samsung_a25': 270,
+    // DPIs corregidos 2026-02-27: A13/A14/A15 son FHD+, A04/A04e/A04s son HD+ 720p
+    // Verificados contra GSMArena. Ver ALGORITHM-AUDIT.md
+    'samsung_a03': 270, 'samsung_a04': 270, 'samsung_a04e': 265,
+    'samsung_a04s': 270, 'samsung_a13': 400, 'samsung_a14': 400,
+    'samsung_a15': 396, 'samsung_a24': 396, 'samsung_a25': 396,
     // Samsung gama media
     'samsung_a34': 393, 'samsung_a54': 401, 'samsung_a55': 401,
-    'samsung_a73': 393, 'samsung_m14': 270, 'samsung_m34': 393,
+    'samsung_a73': 393, 'samsung_m14': 400, 'samsung_m34': 393,
     // Samsung gama alta
     'samsung_s21': 421, 'samsung_s22': 425, 'samsung_s23': 425,
     'samsung_s24': 416, 'samsung_s24ultra': 505,
@@ -290,7 +300,9 @@ export function estimateDpiFromDevice(
     'motorola_motog84': 409, 'motorola_edge40': 402,
     'motorola_edge50': 410,
     // Realme
+    // GT Neo 5 DPI corregido 2026-02-27: 2772×1240, 6.74" → 451 PPI (GSMArena)
     'realme_c55': 270, 'realme_11': 395, 'realme_12pro': 410,
+    'realme_gtneo5': 451,
     // OPPO
     'oppo_a78': 270, 'oppo_reno11': 410,
     // Tecno

@@ -24,7 +24,7 @@ const FEATURES: FeatureDef[] = [
     title: 'Calibración por DPI',
     description: 'Algoritmo basado en el DPI real de tu pantalla. No configs genéricas — sensibilidad calculada para TU celular.',
     badge: null,
-    stat: '±2 pts de precisión',
+    stat: '±5 pts de precisión',
     color: '#06b6d4',
   },
   {

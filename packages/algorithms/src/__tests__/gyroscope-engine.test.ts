@@ -7,25 +7,29 @@ import type { SensitivityOutput } from '../types';
 // ARES GYROSCOPE ENGINE v4.0 — Tests
 // Rango: 0-100 (giroscopio Free Fire, pros usan 20-40)
 // Factores recalibrados para sensitivity engine v4.0
+// Updated 2026-02-27: Input values adjusted for screen size granularity fix.
+// See ALGORITHM-AUDIT.md
 // ═══════════════════════════════════════════════════════════
 
 // Valores v4.0 para dispositivo medio (DPI 395, 4GB, 60Hz, 6.5")
+// Post-audit: screen 6.5" now gives -1 (was -2), so general goes from 179→178
 const midSensitivity: SensitivityOutput = {
-  general: 179,
-  redPoint: 164,
-  scope2x: 149,
-  scope4x: 134,
-  sniperScope: 119,
+  general: 178,
+  redPoint: 163,
+  scope2x: 148,
+  scope4x: 133,
+  sniperScope: 118,
   freeView: 19,
 };
 
 // Valores v4.0 para Samsung A13 (DPI 270, 4GB, 60Hz, 6.6")
+// Post-audit: screen 6.6" now gives -1 (was -2), so general goes from 187→188
 const lowEndSensitivity: SensitivityOutput = {
-  general: 187,
-  redPoint: 172,
-  scope2x: 157,
-  scope4x: 142,
-  sniperScope: 127,
+  general: 188,
+  redPoint: 173,
+  scope2x: 158,
+  scope4x: 143,
+  sniperScope: 128,
   freeView: 20,
 };
 
@@ -50,10 +54,10 @@ describe('generateGyroscope v4.0', () => {
 
   it('valores en rango razonable para dispositivo medio', () => {
     const result = generateGyroscope(midSensitivity);
-    // gyroGeneral: 179 * 0.17 = 30.43 → 30
+    // gyroGeneral: 178 * 0.17 = 30.26 → 30
     expect(result.gyroGeneral).toBeGreaterThanOrEqual(20);
     expect(result.gyroGeneral).toBeLessThanOrEqual(45);
-    // gyroRedPoint: 164 * 0.19 = 31.16 → 31
+    // gyroRedPoint: 163 * 0.19 = 30.97 → 31
     expect(result.gyroRedPoint).toBeGreaterThanOrEqual(20);
     expect(result.gyroRedPoint).toBeLessThanOrEqual(45);
   });
@@ -80,15 +84,15 @@ describe('generateGyroscope v4.0', () => {
 
   it('verified calculation: mid device gyro values', () => {
     const result = generateGyroscope(midSensitivity);
-    // gyroGeneral:   179 * 0.17 = 30.43 → 30
+    // gyroGeneral:   178 * 0.17 = 30.26 → 30
     expect(result.gyroGeneral).toBe(30);
-    // gyroRedPoint:  164 * 0.19 = 31.16 → 31
+    // gyroRedPoint:  163 * 0.19 = 30.97 → 31
     expect(result.gyroRedPoint).toBe(31);
-    // gyroScope2x:   149 * 0.19 = 28.31 → 28
+    // gyroScope2x:   148 * 0.19 = 28.12 → 28
     expect(result.gyroScope2x).toBe(28);
-    // gyroScope4x:   134 * 0.20 = 26.8 → 27
+    // gyroScope4x:   133 * 0.20 = 26.6 → 27
     expect(result.gyroScope4x).toBe(27);
-    // gyroSniper:    119 * 0.20 = 23.8 → 24
+    // gyroSniper:    118 * 0.20 = 23.6 → 24
     expect(result.gyroSniper).toBe(24);
     // gyroFreeView:  round(30 * 0.55) = round(16.5) = 17, clamped [5,25] → 17
     expect(result.gyroFreeView).toBe(17);

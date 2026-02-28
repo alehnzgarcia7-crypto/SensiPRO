@@ -164,7 +164,7 @@ export const FEATURES: LandingFeature[] = [
     icon: 'Cpu',
     title: 'Calibración Forense DPI-First',
     description:
-      'Algoritmo basado en el DPI real de tu pantalla con tapering -15 profesional. Validado contra 12+ dispositivos con ±2 puntos de precisión vs datos reales de freefiremania 2026.',
+      'Algoritmo basado en el DPI real de tu pantalla con tapering -15 profesional. Validado contra 12+ dispositivos con ±5 puntos de precisión vs datos reales de freefiremania 2026.',
     color: '#f97316',
     isNew: true,
     highlight: `${LANDING_DATA.deviceCount}+ dispositivos`,
@@ -297,7 +297,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: '¿Qué tan preciso es el algoritmo?',
-    a: `Precisión de ±2 puntos validada contra datos reales de freefiremania 2026. Usa calibración DPI-first con tapering -15 profesional. No son valores random — el algoritmo calcula usando el DPI real, el tamaño de pantalla, y la tasa de refresco de tu celular específico.`,
+    a: `Precisión de ±5 puntos (2.5% de la escala 0-200) validada contra FreeFireMania. Para el 80% de dispositivos (DPI 270-460) la precisión es de ±3 puntos. No son valores random — el algoritmo calcula usando el DPI real, el tamaño de pantalla, y la tasa de refresco de tu celular específico.`,
   },
   {
     q: '¿Soportan mi dispositivo?',

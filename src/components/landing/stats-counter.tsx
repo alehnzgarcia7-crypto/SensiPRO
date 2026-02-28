@@ -19,7 +19,7 @@ const STATS: StatDef[] = [
   { value: 1680, suffix: '+', label: 'Jugadores calibrados', icon: '🏆' },
   { value: 503, suffix: '+', label: 'Dispositivos soportados', icon: '📱' },
   { value: 26, suffix: '', label: 'Marcas compatibles', icon: '🏷️' },
-  { value: 2, prefix: '±', suffix: ' pts', label: 'Precisión del algoritmo', icon: '🎯' },
+  { value: 5, prefix: '±', suffix: ' pts', label: 'Precisión del algoritmo', icon: '🎯' },
 ];
 
 function useCountUp(target: number, duration: number = 2000) {

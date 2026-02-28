@@ -83,7 +83,7 @@ const GUIDES: GuideSeed[] = [
     slug: 'dpi-pantalla-factor-principal-sensibilidad',
     description: 'El DPI de tu pantalla es lo que realmente determina tu sensibilidad óptima en Free Fire. Aprende cómo funciona la calibración forense v4.0.',
     category: 'SENSITIVITY',
-    content: '<p>El DPI (puntos por pulgada) de tu pantalla es el factor #1 que determina tu sensibilidad en Free Fire. No es la RAM, no es el procesador — es cuántos píxeles tiene tu pantalla por pulgada. El algoritmo v4.0 de SensiPRO usa calibración forense DPI-first con ±2 puntos de precisión. Esta guía explica cómo funciona y por qué tu sensibilidad cambia entre dispositivos.</p>',
+    content: '<p>El DPI (puntos por pulgada) de tu pantalla es el factor #1 que determina tu sensibilidad en Free Fire. No es la RAM, no es el procesador — es cuántos píxeles tiene tu pantalla por pulgada. El algoritmo v4.0 de SensiPRO usa calibración forense DPI-first con ±5 puntos de precisión. Esta guía explica cómo funciona y por qué tu sensibilidad cambia entre dispositivos.</p>',
     readTimeMin: 7,
     isPremium: false,
     sections: [
@@ -101,7 +101,7 @@ const GUIDES: GuideSeed[] = [
       },
       {
         title: 'Ajustes Secundarios: RAM, Hz, Pantalla',
-        content: '<p>El DPI es el factor principal (~90% del cálculo), pero hay 3 ajustes secundarios que afinan tu sensibilidad:</p><p><strong>RAM (±5 puntos):</strong> 3GB o menos: -5 puntos (los frame drops hacen que sensi alta sea inconsistente). 4GB: -2. 6GB: base (0). 8GB: +3. 12GB+: +5. La RAM NO define tu sensibilidad — solo la ajusta ligeramente.</p><p><strong>Refresh Rate (±3 puntos):</strong> 60Hz: base (0). 90Hz: +1. 120Hz: +3. 144Hz: +3. Los frames más suaves permiten sensibilidad ligeramente más alta. Antes se creía que era 10-15% — en realidad son solo ±3 puntos.</p><p><strong>Tamaño de pantalla (±4 puntos):</strong> <5.5": -3 (menos distancia de swipe). 6-6.5": base (0). 6.5-7": +2. >7": +4 (tablets). El tamaño afecta la ergonomía del swipe pero no tanto la calibración.</p><p><strong>Ejemplo completo:</strong> Samsung A54 (DPI 401, 8GB, 120Hz, 6.4"): DPI base = 173, RAM +3 = 176, Hz +3 = 179... pero el engine interpola todo junto. SensiPRO calcula todo automáticamente con ±2 puntos de precisión.</p>',
+        content: '<p>El DPI es el factor principal (~90% del cálculo), pero hay 3 ajustes secundarios que afinan tu sensibilidad:</p><p><strong>RAM (±5 puntos):</strong> 3GB o menos: -5 puntos (los frame drops hacen que sensi alta sea inconsistente). 4GB: -2. 6GB: base (0). 8GB: +3. 12GB+: +5. La RAM NO define tu sensibilidad — solo la ajusta ligeramente.</p><p><strong>Refresh Rate (±3 puntos):</strong> 60Hz: base (0). 90Hz: +1. 120Hz: +3. 144Hz: +3. Los frames más suaves permiten sensibilidad ligeramente más alta. Antes se creía que era 10-15% — en realidad son solo ±3 puntos.</p><p><strong>Tamaño de pantalla (±4 puntos):</strong> <5.5": -3 (menos distancia de swipe). 6-6.5": base (0). 6.5-7": +2. >7": +4 (tablets). El tamaño afecta la ergonomía del swipe pero no tanto la calibración.</p><p><strong>Ejemplo completo:</strong> Samsung A54 (DPI 401, 8GB, 120Hz, 6.4"): DPI base = 173, RAM +3 = 176, Hz +3 = 179... pero el engine interpola todo junto. SensiPRO calcula todo automáticamente con ±5 puntos de precisión.</p>',
         orderIndex: 2,
         isPremium: true,
       },

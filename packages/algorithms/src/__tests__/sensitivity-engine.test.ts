@@ -7,6 +7,9 @@ import type { AlgorithmInput } from '../types';
 // ARES v4.0 — Tests de Sensibilidad (Forensic Calibration)
 // Escala: 1-200 (Free Fire)
 // Engine DPI-first con tapering -15 validado contra datos reales
+// Updated 2026-02-27: Algorithm audit fix — DPI curve adjusted for flagships,
+// screen size granularity improved, gyro base reduced to pro range.
+// See ALGORITHM-AUDIT.md
 // ═══════════════════════════════════════════════════════════
 
 // Dispositivos de validación con DPI real
@@ -83,13 +86,13 @@ describe('generateSensitivity v4.0 — forensic calibration', () => {
   });
 });
 
-describe('forensic validation — real device data (±2 puntos)', () => {
-  it('Samsung A13: DPI 270, 4GB, 60Hz, 6.6" → General ~186', () => {
+describe('forensic validation — real device data (±5 puntos)', () => {
+  it('Samsung A13: DPI 270, 4GB, 60Hz, 6.6" → General ~188', () => {
     const result = generateSensitivity(samsungA13);
-    // DPI 270 → base ~183, +1 RAM(4GB), +3 Hz(60), 0 screen(6.6"), 0 style
-    // generalBase = 183 + 1 + 3 + 0 + 0 = 187
-    expect(result.sensitivity.general).toBeGreaterThanOrEqual(184);
-    expect(result.sensitivity.general).toBeLessThanOrEqual(188);
+    // DPI 270 → base ~185, +1 RAM(4GB), +3 Hz(60), -1 screen(6.6"), 0 style
+    // generalBase = 185 + 1 + 3 - 1 + 0 = 188
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(186);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(190);
   });
 
   it('Samsung A13: tapering -15 correcto', () => {
@@ -101,28 +104,28 @@ describe('forensic validation — real device data (±2 puntos)', () => {
     expect(scope4x - sniperScope).toBe(15);
   });
 
-  it('Redmi Note 13: DPI 395, 8GB, 120Hz, 6.67" → General ~174', () => {
+  it('Redmi Note 13: DPI 395, 8GB, 120Hz, 6.67" → General ~173', () => {
     const result = generateSensitivity(redmiNote13);
-    // DPI 395 → base ~175, -1 RAM(8GB), 0 Hz(120), -2 screen(6.67"), 0 style
-    // generalBase = 175 - 1 + 0 - 2 + 0 = 172
-    expect(result.sensitivity.general).toBeGreaterThanOrEqual(170);
-    expect(result.sensitivity.general).toBeLessThanOrEqual(176);
+    // DPI 395 → base ~175, -1 RAM(8GB), 0 Hz(120), -1 screen(6.67"), 0 style
+    // generalBase = 175 - 1 + 0 - 1 + 0 = 173
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(171);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(175);
   });
 
-  it('iPhone 14 Plus: DPI 458, 6GB, 60Hz, 6.7" → General ~166', () => {
+  it('iPhone 14 Plus: DPI 458, 6GB, 60Hz, 6.7" → General ~167', () => {
     const result = generateSensitivity(iphone14Plus);
-    // DPI 458 → base ~166, 0 RAM(6GB), +3 Hz(60), -2 screen(6.7"), 0 style
+    // DPI 458 → base ~166 (seg 400-460), 0 RAM(6GB), +3 Hz(60), -2 screen(6.7"), 0 style
     // generalBase = 166 + 0 + 3 - 2 + 0 = 167
-    expect(result.sensitivity.general).toBeGreaterThanOrEqual(164);
-    expect(result.sensitivity.general).toBeLessThanOrEqual(168);
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(165);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(169);
   });
 
-  it('iPhone 16 Pro Max: DPI 460, 8GB, 120Hz, 6.9" → General ~168', () => {
+  it('iPhone 16 Pro Max: DPI 460, 8GB, 120Hz, 6.9" → General ~163', () => {
     const result = generateSensitivity(iphone16ProMax);
-    // DPI 460 → base ~165, -1 RAM(8GB), 0 Hz(120), -2 screen(6.9"), 0 style
-    // generalBase = 165 - 1 + 0 - 2 + 0 = 162
-    expect(result.sensitivity.general).toBeGreaterThanOrEqual(160);
-    expect(result.sensitivity.general).toBeLessThanOrEqual(170);
+    // DPI 460 → base ~166 (seg 400-460 boundary), -1 RAM(8GB), 0 Hz(120), -2 screen(6.9"), 0 style
+    // generalBase = 166 - 1 + 0 - 2 + 0 = 163
+    expect(result.sensitivity.general).toBeGreaterThanOrEqual(161);
+    expect(result.sensitivity.general).toBeLessThanOrEqual(165);
   });
 
   it('Free Look independiente, rango 14-22', () => {
@@ -246,7 +249,7 @@ describe('ajustes secundarios', () => {
     expect(diff).toBe(3); // +3 vs 0
   });
 
-  it('screen size adjustment: <6.5" da 0, 6.5-7" da -2', () => {
+  it('screen size adjustment: 6.0"=0, 6.7"=-2, diff=2', () => {
     const small = generateSensitivity({
       specs: { screenHz: 60, screenSize: 6.0, ramGb: 6, panelType: 'IPS', tier: 'MID', screenDpi: 395 },
       style: 'BALANCED',
@@ -256,7 +259,7 @@ describe('ajustes secundarios', () => {
       style: 'BALANCED',
     });
     const diff = small.sensitivity.general - big.sensitivity.general;
-    expect(diff).toBe(2); // 0 vs -2
+    expect(diff).toBe(2); // 0 vs -2 (6.7" is ≥6.7 and <7.0)
   });
 
   it('userRam override funciona correctamente', () => {
@@ -371,7 +374,8 @@ describe('metadata forense', () => {
 
 describe('estimateDpiFromDevice', () => {
   it('retorna DPI conocido para Samsung A13', () => {
-    expect(estimateDpiFromDevice('Samsung', 'A13', 'LOW')).toBe(270);
+    // Updated 2026-02-27: A13 es FHD+ (2408×1080, 6.6") → DPI 400, no 270
+    expect(estimateDpiFromDevice('Samsung', 'A13', 'LOW')).toBe(400);
   });
 
   it('retorna DPI conocido para iPhone 14 Plus', () => {

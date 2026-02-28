@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
 import { BackgroundAtmosphere } from '@/components/effects/background-atmosphere';
-
 import { Providers } from '@/components/providers';
 import './globals.css';
 
@@ -20,7 +19,7 @@ export const metadata: Metadata = {
     template: '%s | SensiPRO',
   },
   description:
-    'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos, ±2 puntos de precisión. Gratis.',
+    'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos, ±5 puntos de precisión. Gratis.',
   keywords: [
     'sensibilidades free fire',
     'sensibilidad free fire',
