@@ -10,6 +10,7 @@
 import type { HudRecommendation } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 
 import { useHudCodes } from '@/hooks/use-hud-codes';
@@ -17,6 +18,13 @@ import { cn } from '@/lib/cn';
 
 import { FingerLayoutSvg } from './finger-layout-svg';
 import { HudCodeBlock } from './hud-code-block';
+
+// Capturas reales de Free Fire por cantidad de dedos
+const FINGER_SCREENSHOTS: Partial<Record<2 | 3 | 4 | 5, string>> = {
+  2: '/images/hud/hud-2d-clasico.png',
+  3: '/images/hud/hud-3d-velocidad.png',
+  4: '/images/hud/hud-4d-garra-tactica.png',
+};
 
 interface HudRecommendationPanelProps {
   data: HudRecommendation;
@@ -77,6 +85,77 @@ function StatBar({ value, delay }: { value: number; delay: number }) {
         animate={{ left: `${Math.max(value - 1, 0)}%` }}
         transition={{ duration: 0.8, delay, ease: 'easeOut' }}
       />
+    </div>
+  );
+}
+
+/**
+ * Muestra captura real de Free Fire para 2/3/4 dedos,
+ * o el diagrama SVG interactivo para 5 dedos.
+ */
+function HudVisualSection({ fingers, screenSize, isRec }: { fingers: 2 | 3 | 4 | 5; screenSize?: number; isRec: boolean }) {
+  const screenshot = FINGER_SCREENSHOTS[fingers];
+
+  // 5 dedos: mantener diagrama interactivo (no tiene captura real)
+  if (!screenshot) {
+    return (
+      <div
+        className={cn(
+          'rounded-lg overflow-hidden border',
+          isRec ? 'border-white/10' : 'border-white/5',
+        )}
+      >
+        <FingerLayoutSvg fingers={fingers} screenSize={screenSize} />
+      </div>
+    );
+  }
+
+  // 2/3/4 dedos: mostrar captura real de Free Fire
+  return (
+    <div className="relative mx-auto w-full max-w-[480px]">
+      <div
+        className="relative rounded-[20px] overflow-hidden"
+        style={{
+          border: '1px solid rgba(0,255,255,0.15)',
+          boxShadow: '0 0 30px rgba(0,255,255,0.06), 0 12px 40px rgba(0,0,0,0.4)',
+          background: '#000',
+        }}
+      >
+        <div className="relative aspect-[16/9] w-full">
+          <Image
+            src={screenshot}
+            alt={`HUD ${fingers} dedos — Captura real de Free Fire`}
+            fill
+            className="object-cover rounded-[18px]"
+            sizes="(max-width: 640px) 100vw, 480px"
+          />
+          {/* Reflejo de vidrio */}
+          <div
+            className="absolute inset-0 rounded-[18px] pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%)',
+            }}
+          />
+        </div>
+        {/* Notch */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-[3px] rounded-b-full bg-white/[0.06]" />
+      </div>
+
+      {/* Badge CAPTURA REAL */}
+      <div
+        className="absolute -top-2 right-3 z-10 px-2 py-0.5 rounded-md"
+        style={{
+          background: 'rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
+        <span className="text-[8px] font-ui font-bold uppercase tracking-[0.15em] text-cyan-300/90">
+          CAPTURA REAL
+        </span>
+      </div>
     </div>
   );
 }
@@ -252,15 +331,8 @@ export function HudRecommendationPanel({ data, screenSize }: HudRecommendationPa
                   )}
                 </div>
 
-                {/* ═══ SVG MOCKUP — PIEZA CENTRAL ═══ */}
-                <div
-                  className={cn(
-                    'rounded-lg overflow-hidden border',
-                    isRec ? 'border-white/10' : 'border-white/5',
-                  )}
-                >
-                  <FingerLayoutSvg fingers={option.fingers} screenSize={screenSize} />
-                </div>
+                {/* ═══ VISUAL: Screenshot real o diagrama SVG ═══ */}
+                <HudVisualSection fingers={option.fingers} screenSize={screenSize} isRec={isRec} />
 
                 {/* ═══ STATS BARS — Fila horizontal ═══ */}
                 <HudStatsSection fingers={option.fingers} screenSize={screenSize} cardIdx={cardIdx} />

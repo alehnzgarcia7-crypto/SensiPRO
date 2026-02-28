@@ -10,10 +10,7 @@ import { useState, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
 
-
-import { FingerRoleCards } from './finger-role-cards';
 import { HeadshotHudCodes } from './headshot-hud-codes';
-import { HudVisualization } from './hud-visualization';
 
 interface HudRecommendationProps {
   fingers: FingerCount;
@@ -57,28 +54,6 @@ export function HudRecommendation({ fingers }: HudRecommendationProps) {
       <p className="text-sm text-slate-500 font-body mb-5">
         {layout.descriptionEs}
       </p>
-
-      {/* HUD Visualization */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={fingers}
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.3 }}
-          className="glass-card p-4 mb-4"
-        >
-          <HudVisualization fingers={fingers} />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Finger Role Cards */}
-      <div className="mb-4">
-        <p className="text-xs font-heading uppercase tracking-[0.15em] text-slate-500 mb-2">
-          Distribución de dedos
-        </p>
-        <FingerRoleCards fingers={fingers} />
-      </div>
 
       {/* HUD Codes — Códigos reales para copiar y pegar */}
       <div className="mb-4">
@@ -173,11 +148,6 @@ export function HudRecommendation({ fingers }: HudRecommendationProps) {
                         : 'bg-white/[0.02] border-white/[0.05] opacity-60',
                     )}
                   >
-                    {/* Mini phone */}
-                    <div className="mb-2">
-                      <HudVisualization fingers={f} showLabels={false} />
-                    </div>
-
                     {/* Stats */}
                     <p className="text-[10px] font-heading font-bold text-center text-white mb-1">
                       {f} Dedos
