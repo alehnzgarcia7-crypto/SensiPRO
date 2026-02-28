@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { useState, useCallback } from 'react';
 
 import { cn } from '@/lib/cn';
+import { usePremiumContext } from '@/providers/premium-provider';
 
 /* ═══════════════════════════════════════════════════════════
    EXCHANGE RATES — Tasas aproximadas desde USD
@@ -284,6 +285,8 @@ function PlanCard({
   highlighted,
   savings,
   index,
+  onCtaClick,
+  isPremium,
 }: {
   name: string;
   icon: React.ReactNode;
@@ -301,6 +304,8 @@ function PlanCard({
   highlighted: boolean;
   savings: string | null;
   index: number;
+  onCtaClick?: () => void;
+  isPremium?: boolean;
 }) {
   const currentPrice = annual ? annualMonthlyPriceUsd : monthlyPriceUsd;
   const monthlyFormatted = formatPrice(monthlyPriceUsd, currency);
@@ -390,20 +395,40 @@ function PlanCard({
       </ul>
 
       <div className="mt-8">
-        <Link
-          href={ctaHref}
-          className={cn(
-            'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px]',
-            highlighted
-              ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
-              : monthlyPriceUsd === 0
-                ? 'bg-transparent border border-slate-600/50 text-slate-400 hover:bg-white/5'
+        {isPremium && monthlyPriceUsd > 0 ? (
+          <div className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase bg-success/10 border border-success/20 text-success min-h-[48px]">
+            <Check size={16} />
+            Ya tienes acceso
+          </div>
+        ) : onCtaClick ? (
+          <button
+            onClick={onCtaClick}
+            className={cn(
+              'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px] cursor-pointer',
+              highlighted
+                ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
                 : `bg-transparent border ${borderClass} text-white hover:bg-white/5`,
-          )}
-        >
-          {cta}
-          {highlighted && <span className="ml-1">\u2192</span>}
-        </Link>
+            )}
+          >
+            {cta}
+            {highlighted && <span className="ml-1">{'\u2192'}</span>}
+          </button>
+        ) : (
+          <Link
+            href={ctaHref}
+            className={cn(
+              'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px]',
+              highlighted
+                ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
+                : monthlyPriceUsd === 0
+                  ? 'bg-transparent border border-slate-600/50 text-slate-400 hover:bg-white/5'
+                  : `bg-transparent border ${borderClass} text-white hover:bg-white/5`,
+            )}
+          >
+            {cta}
+            {highlighted && <span className="ml-1">{'\u2192'}</span>}
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -544,6 +569,7 @@ function ComparisonTable() {
 export default function PricingPage() {
   const [currency, setCurrency] = useState<CurrencyCode>('MXN');
   const [annual, setAnnual] = useState(false);
+  const { isPremium, showPaywall } = usePremiumContext();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 md:py-20">
@@ -638,6 +664,8 @@ export default function PricingPage() {
           highlighted={true}
           savings="AHORRA 20%"
           index={1}
+          isPremium={isPremium}
+          onCtaClick={() => showPaywall({ source: 'pricing' })}
         />
 
         {/* ELITE */}
@@ -668,6 +696,8 @@ export default function PricingPage() {
           highlighted={false}
           savings="AHORRA 25%"
           index={2}
+          isPremium={isPremium}
+          onCtaClick={() => showPaywall({ source: 'pricing' })}
         />
       </div>
 

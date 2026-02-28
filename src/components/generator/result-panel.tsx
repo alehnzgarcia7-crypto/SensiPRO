@@ -16,6 +16,7 @@ import { AnimatedBorder } from '@/components/effects/animated-border';
 import { CountUp } from '@/components/effects/count-up';
 import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
 import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
+import { PremiumBlur } from '@/components/paywall';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useGeneratorStore } from '@/stores/generator.store';
@@ -268,7 +269,8 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               {isLoading ? 'Recalculando...' : 'Sensibilidades'}
             </h3>
             <div className="space-y-4">
-              {sensitivityEntries.map(([key, value], i) => {
+              {/* General — SIEMPRE VISIBLE (gancho de conversión) */}
+              {sensitivityEntries.slice(0, 1).map(([key, value]) => {
                 const meta = FIELD_META[key];
                 const Icon = meta?.icon ?? Crosshair;
                 const colorClass = getNumberColorClass(value, 200);
@@ -277,7 +279,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     key={`${key}-${userRam}`}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: i * 0.08 }}
+                    transition={{ duration: 0.3 }}
                     className="group"
                   >
                     <div className="flex items-center justify-between mb-1.5">
@@ -289,10 +291,48 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                         <CountUp end={value} duration={600} />
                       </span>
                     </div>
-                    <GlowProgressBar value={value} max={200} delay={i * 0.06} />
+                    <GlowProgressBar value={value} max={200} />
                   </motion.div>
                 );
               })}
+
+              {/* Valores 2-6 — BLOQUEADOS para usuarios gratis */}
+              <PremiumBlur
+                source="generator"
+                device={`${selectedDevice.brand} ${selectedDevice.model}`}
+                style={selectedStyle}
+                revealedGeneral={sensitivityEntries[0]?.[1]}
+                revealFirst
+                intensity={14}
+              >
+                <div className="space-y-4">
+                  {sensitivityEntries.slice(1).map(([key, value], i) => {
+                    const meta = FIELD_META[key];
+                    const Icon = meta?.icon ?? Crosshair;
+                    const colorClass = getNumberColorClass(value, 200);
+                    return (
+                      <motion.div
+                        key={`${key}-${userRam}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: (i + 1) * 0.08 }}
+                        className="group"
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <Icon size={14} className="text-slate-600 group-hover:text-fire-400 transition-colors" />
+                            <span className="text-sm font-ui font-medium text-slate-400">{meta?.label ?? key}</span>
+                          </div>
+                          <span className={`text-2xl font-mono font-black ${colorClass}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            <CountUp end={value} duration={600} />
+                          </span>
+                        </div>
+                        <GlowProgressBar value={value} max={200} delay={(i + 1) * 0.06} />
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </PremiumBlur>
             </div>
 
             {/* Separador gradiente */}
@@ -345,51 +385,55 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         </AnimatedBorder>
       </motion.div>
 
-      {/* ═══ GIROSCOPIO ═══ */}
+      {/* ═══ GIROSCOPIO — PREMIUM ═══ */}
       {gyroscopeEntries && (
         <motion.div variants={itemVariants}>
-          <AnimatedBorder active speed="slow">
-            <div className="p-6">
-              <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-5">
-                Giroscopio
-              </h3>
-              <div className="space-y-4">
-                {gyroscopeEntries.map(([key, value], i) => {
-                  const meta = GYRO_META[key];
-                  const Icon = meta?.icon ?? Crosshair;
-                  return (
-                    <motion.div
-                      key={`${key}-${userRam}`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.08 }}
-                      className="group"
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <Icon size={14} className="text-slate-600 group-hover:text-ice-400 transition-colors" />
-                          <span className="text-sm font-ui font-medium text-slate-400">{meta?.label ?? key}</span>
+          <PremiumBlur source="generator" device={`${selectedDevice.brand} ${selectedDevice.model}`} intensity={14}>
+            <AnimatedBorder active speed="slow">
+              <div className="p-6">
+                <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-5">
+                  Giroscopio
+                </h3>
+                <div className="space-y-4">
+                  {gyroscopeEntries.map(([key, value], i) => {
+                    const meta = GYRO_META[key];
+                    const Icon = meta?.icon ?? Crosshair;
+                    return (
+                      <motion.div
+                        key={`${key}-${userRam}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: i * 0.08 }}
+                        className="group"
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <Icon size={14} className="text-slate-600 group-hover:text-ice-400 transition-colors" />
+                            <span className="text-sm font-ui font-medium text-slate-400">{meta?.label ?? key}</span>
+                          </div>
+                          <span className="text-2xl font-mono font-black text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            <CountUp end={value} duration={600} />
+                          </span>
                         </div>
-                        <span className="text-2xl font-mono font-black text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          <CountUp end={value} duration={600} />
-                        </span>
-                      </div>
-                      <GlowProgressBar value={value} max={100} delay={i * 0.06} />
-                    </motion.div>
-                  );
-                })}
+                        <GlowProgressBar value={value} max={100} delay={i * 0.06} />
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </AnimatedBorder>
+            </AnimatedBorder>
+          </PremiumBlur>
         </motion.div>
       )}
 
-      {/* ═══ HUD RECOMMENDATION ═══ */}
+      {/* ═══ HUD RECOMMENDATION — PREMIUM ═══ */}
       <motion.div variants={itemVariants}>
-        <HudRecommendationPanel
-          data={allCalibrations.hudRecommendation}
-          screenSize={selectedDevice.screenSize}
-        />
+        <PremiumBlur source="generator" device={`${selectedDevice.brand} ${selectedDevice.model}`} intensity={14}>
+          <HudRecommendationPanel
+            data={allCalibrations.hudRecommendation}
+            screenSize={selectedDevice.screenSize}
+          />
+        </PremiumBlur>
       </motion.div>
 
       {/* ═══ HEADSHOT CTA ═══ */}

@@ -27,6 +27,7 @@ import { TrainingPlan } from '@/components/headshot/training-plan';
 import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
 import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
+import { PremiumBlur } from '@/components/paywall';
 import { useGeneratorStore } from '@/stores/generator.store';
 
 // ═══════════════════════════════════════════════════════════════
@@ -481,122 +482,130 @@ export default function HeadshotPage() {
               <HeadshotScoreGauge score={data.headshotScore} />
             </motion.div>
 
-            {/* SECTION 4 — SENSIBILIDAD HEADSHOT (with finger diffs) */}
-            <motion.div custom={2} variants={sectionVariants}>
-              <HeadshotSensitivityPanel
-                sensitivity={fingerResult.sensitivity}
-                gyroscope={fingerGyroscope ?? data.gyroscope}
-                normalSensitivity={data.normalSensitivity}
-                normalGyroscope={data.normalGyroscope}
-              />
+            {/* SECCIONES 4-12 — PREMIUM (todo bloqueado para usuarios gratis) */}
+            <PremiumBlur
+              source="headshot"
+              device={selectedDevice ? `${selectedDevice.brand} ${selectedDevice.model}` : undefined}
+              fingerCount={fingers}
+              intensity={16}
+            >
+              {/* SECTION 4 — SENSIBILIDAD HEADSHOT (with finger diffs) */}
+              <motion.div custom={2} variants={sectionVariants}>
+                <HeadshotSensitivityPanel
+                  sensitivity={fingerResult.sensitivity}
+                  gyroscope={fingerGyroscope ?? data.gyroscope}
+                  normalSensitivity={data.normalSensitivity}
+                  normalGyroscope={data.normalGyroscope}
+                />
 
-              {/* Finger diff overlay */}
-              {fingers !== 3 && (
-                <div className="mt-3 glass-card p-4">
-                  <p className="text-xs font-heading uppercase tracking-[0.15em] text-red-400/70 mb-3">
-                    Diferencia vs 3 dedos (estándar)
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {([
-                      { key: 'general' as const, label: 'General' },
-                      { key: 'redPoint' as const, label: 'P.Rojo' },
-                      { key: 'scope2x' as const, label: '2x' },
-                      { key: 'scope4x' as const, label: '4x' },
-                      { key: 'sniperScope' as const, label: 'AWM' },
-                      { key: 'freeView' as const, label: 'Vista Libre' },
-                    ]).map(({ key, label }) => {
-                      const current = fingerResult.sensitivity[key];
-                      const base = threeFingerBaseline.sensitivity[key];
-                      return (
-                        <div key={key} className="px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-                          <p className="text-[10px] text-slate-600 font-body">{label}</p>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-mono font-bold text-slate-300">{current}</span>
-                            <FingerDiffLabel current={current} base={base} fingers={fingers} />
+                {/* Finger diff overlay */}
+                {fingers !== 3 && (
+                  <div className="mt-3 glass-card p-4">
+                    <p className="text-xs font-heading uppercase tracking-[0.15em] text-red-400/70 mb-3">
+                      Diferencia vs 3 dedos (estándar)
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {([
+                        { key: 'general' as const, label: 'General' },
+                        { key: 'redPoint' as const, label: 'P.Rojo' },
+                        { key: 'scope2x' as const, label: '2x' },
+                        { key: 'scope4x' as const, label: '4x' },
+                        { key: 'sniperScope' as const, label: 'AWM' },
+                        { key: 'freeView' as const, label: 'Vista Libre' },
+                      ]).map(({ key, label }) => {
+                        const current = fingerResult.sensitivity[key];
+                        const base = threeFingerBaseline.sensitivity[key];
+                        return (
+                          <div key={key} className="px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                            <p className="text-[10px] text-slate-600 font-body">{label}</p>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-mono font-bold text-slate-300">{current}</span>
+                              <FingerDiffLabel current={current} base={base} fingers={fingers} />
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
-            </motion.div>
+                )}
+              </motion.div>
 
-            {/* SECTION 4.5 — WEAPON ADJUSTMENT TABLE (NEW) */}
-            <motion.div custom={3} variants={sectionVariants}>
-              <WeaponAdjustmentPanel adjustments={fingerResult.weaponAdjustments} />
-            </motion.div>
+              {/* SECTION 4.5 — WEAPON ADJUSTMENT TABLE */}
+              <motion.div custom={3} variants={sectionVariants}>
+                <WeaponAdjustmentPanel adjustments={fingerResult.weaponAdjustments} />
+              </motion.div>
 
-            {/* SECTION 4.6 — GYROSCOPE RECOMMENDATION (NEW) */}
-            <motion.div custom={4} variants={sectionVariants}>
-              <GyroscopeRecommendation
-                gyroscope={fingerResult.sensitivity.gyroscope}
-                fingerProfile={fingerResult.fingerProfile}
-              />
-            </motion.div>
+              {/* SECTION 4.6 — GYROSCOPE RECOMMENDATION */}
+              <motion.div custom={4} variants={sectionVariants}>
+                <GyroscopeRecommendation
+                  gyroscope={fingerResult.sensitivity.gyroscope}
+                  fingerProfile={fingerResult.fingerProfile}
+                />
+              </motion.div>
 
-            {/* SECTION 5 — FIRE BUTTON (finger-adjusted with range bar + comparison) */}
-            <motion.div custom={5} variants={sectionVariants}>
-              <FireButtonRecommendation
-                fireButton={fingerResult.fireButton}
-                fingers={fingers}
-                screenSize={data.device.screenSize}
-              />
-            </motion.div>
+              {/* SECTION 5 — FIRE BUTTON */}
+              <motion.div custom={5} variants={sectionVariants}>
+                <FireButtonRecommendation
+                  fireButton={fingerResult.fireButton}
+                  fingers={fingers}
+                  screenSize={data.device.screenSize}
+                />
+              </motion.div>
 
-            {/* SECTION 6 — HUD PERSONALIZADO */}
-            <motion.section custom={6} variants={sectionVariants}>
-              <HudRecommendation fingers={fingers} />
-            </motion.section>
+              {/* SECTION 6 — HUD PERSONALIZADO */}
+              <motion.section custom={6} variants={sectionVariants}>
+                <HudRecommendation fingers={fingers} />
+              </motion.section>
 
-            {/* SECTION 6.5 — TÉCNICAS DE HEADSHOT (finger-aware) */}
-            <motion.section custom={7} variants={sectionVariants}>
-              <HeadshotTechniques fingers={fingers} />
-            </motion.section>
+              {/* SECTION 6.5 — TÉCNICAS DE HEADSHOT */}
+              <motion.section custom={7} variants={sectionVariants}>
+                <HeadshotTechniques fingers={fingers} />
+              </motion.section>
 
-            {/* SECTION 7 — ARMAS RECOMENDADAS POR TIER */}
-            <motion.section custom={8} variants={sectionVariants}>
-              <WeaponTierDisplay fingers={fingers} />
-            </motion.section>
+              {/* SECTION 7 — ARMAS RECOMENDADAS POR TIER */}
+              <motion.section custom={8} variants={sectionVariants}>
+                <WeaponTierDisplay fingers={fingers} />
+              </motion.section>
 
-            {/* SECTION 8 — PLAN DE ENTRENAMIENTO 7 DÍAS */}
-            <motion.section custom={9} variants={sectionVariants}>
-              <FingerTrainingPlan fingers={fingers} />
-            </motion.section>
+              {/* SECTION 8 — PLAN DE ENTRENAMIENTO 7 DÍAS */}
+              <motion.section custom={9} variants={sectionVariants}>
+                <FingerTrainingPlan fingers={fingers} />
+              </motion.section>
 
-            {/* SECTION 8.5 — PRO BADGE (solo 4 dedos) */}
-            <motion.section custom={10} variants={sectionVariants}>
-              <ProBadge fingers={fingers} />
-            </motion.section>
+              {/* SECTION 8.5 — PRO BADGE */}
+              <motion.section custom={10} variants={sectionVariants}>
+                <ProBadge fingers={fingers} />
+              </motion.section>
 
-            {/* SECTION 9 — COPIAR TODA LA CONFIGURACIÓN */}
-            <motion.section custom={11} variants={sectionVariants}>
-              <CopyAllButton
-                sensitivity={fingerResult.sensitivity}
-                gyroscope={fingerResult.sensitivity.gyroscope ?? null}
-                fingers={fingers}
-                fireButton={fingerResult.fireButton}
-                deviceName={`${data.device.brand} ${data.device.model}`}
-              />
-            </motion.section>
+              {/* SECTION 9 — COPIAR CONFIGURACIÓN */}
+              <motion.section custom={11} variants={sectionVariants}>
+                <CopyAllButton
+                  sensitivity={fingerResult.sensitivity}
+                  gyroscope={fingerResult.sensitivity.gyroscope ?? null}
+                  fingers={fingers}
+                  fireButton={fingerResult.fireButton}
+                  deviceName={`${data.device.brand} ${data.device.model}`}
+                />
+              </motion.section>
 
-            {/* SECTION 10 — ARSENAL HEADSHOT */}
-            <motion.div custom={12} variants={sectionVariants}>
-              <WeaponGrid
-                weapons={data.weapons}
-                baseSensitivity={data.sensitivity}
-              />
-            </motion.div>
+              {/* SECTION 10 — ARSENAL HEADSHOT */}
+              <motion.div custom={12} variants={sectionVariants}>
+                <WeaponGrid
+                  weapons={data.weapons}
+                  baseSensitivity={data.sensitivity}
+                />
+              </motion.div>
 
-            {/* SECTION 11 — CROSSHAIR PLACEMENT */}
-            <motion.div custom={13} variants={sectionVariants}>
-              <CrosshairGuide tips={data.tips} />
-            </motion.div>
+              {/* SECTION 11 — CROSSHAIR PLACEMENT */}
+              <motion.div custom={13} variants={sectionVariants}>
+                <CrosshairGuide tips={data.tips} />
+              </motion.div>
 
-            {/* SECTION 12 — TRAINING DRILLS (diarios) */}
-            <motion.div custom={14} variants={sectionVariants}>
-              <TrainingPlan drills={data.drills} />
-            </motion.div>
+              {/* SECTION 12 — TRAINING DRILLS */}
+              <motion.div custom={14} variants={sectionVariants}>
+                <TrainingPlan drills={data.drills} />
+              </motion.div>
+            </PremiumBlur>
           </motion.div>
         )}
       </AnimatePresence>

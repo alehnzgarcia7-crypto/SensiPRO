@@ -244,8 +244,39 @@ export function PremiumBlur({
         >
           <span className="text-slate-500 line-through">$599</span>
           <span className="text-cyan-400 font-bold">$299 MXN</span>
-          <span className="text-slate-500">• Pago único</span>
+          <span className="text-slate-500">{'\u2022'} Pago único</span>
         </motion.div>
+
+        {/* Restaurar acceso para usuarios que ya compraron */}
+        <motion.button
+          onClick={() => {
+            const userEmail = prompt('Ingresa el email con el que compraste:');
+            if (userEmail && userEmail.includes('@')) {
+              fetch('/api/payments/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail }),
+              })
+                .then(r => r.json())
+                .then(data => {
+                  if (data.isPremium) {
+                    document.cookie = `sensipro_premium=${encodeURIComponent(userEmail)}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+                    localStorage.setItem('sensipro_premium_email', userEmail);
+                    window.location.reload();
+                  } else {
+                    alert('No encontramos una licencia premium con ese email.');
+                  }
+                })
+                .catch(() => alert('Error verificando. Intenta de nuevo.'));
+            }
+          }}
+          className="mt-2 text-[11px] text-slate-500 hover:text-slate-300 underline underline-offset-2 transition-colors cursor-pointer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+        >
+          {'\u00BF'}Ya compraste? Restaurar acceso
+        </motion.button>
       </motion.div>
 
       <style jsx global>{`

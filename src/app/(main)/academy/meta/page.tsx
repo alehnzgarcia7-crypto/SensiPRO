@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 
+import { PremiumGuideContent } from '@/components/academy/premium-guide-content';
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
@@ -163,6 +164,8 @@ export default function MetaPage() {
         </div>
       </div>
 
+      {/* Contenido premium — bloqueado para usuarios gratis */}
+      <PremiumGuideContent>
       {/* SECCIÓN 1: Weapon Tier List */}
       <section>
         <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide flex items-center gap-2 mb-1">
@@ -291,6 +294,7 @@ export default function MetaPage() {
           ))}
         </div>
       </section>
+      </PremiumGuideContent>
     </div>
   );
 }

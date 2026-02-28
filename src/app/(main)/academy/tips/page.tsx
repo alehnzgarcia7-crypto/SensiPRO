@@ -3,6 +3,7 @@
 import { Lightbulb, Crosshair, PersonStanding, Settings } from 'lucide-react';
 import { useState } from 'react';
 
+import { PremiumBlur } from '@/components/paywall';
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
@@ -187,7 +188,8 @@ export default function TipsPage() {
         })}
       </div>
 
-      {/* Tips por categoría */}
+      {/* Tips por categoría — PREMIUM */}
+      <PremiumBlur source="academy" intensity={12}>
       {Object.entries(grouped).map(([category, tips]) => {
         const config = CATEGORY_CONFIG[category];
         if (!config) return null;
@@ -241,6 +243,8 @@ export default function TipsPage() {
           </section>
         );
       })}
+
+      </PremiumBlur>
 
       {filtered.length === 0 && (
         <div className="text-center py-16 text-slate-500">

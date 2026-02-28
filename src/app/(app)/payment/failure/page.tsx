@@ -1,71 +1,64 @@
 'use client';
 
-import { XCircle, CreditCard, MessageCircle, Home } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AlertCircle, ArrowLeft, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { Button } from '@/components/ui/button';
-
-const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
+const FAILURE_MESSAGES: Record<string, { title: string; desc: string }> = {
   cancelled: {
-    title: 'Pago cancelado',
-    description: 'Cancelaste el proceso de pago. No se realizó ningún cargo. Puedes intentar de nuevo cuando quieras.',
+    title: 'Pago Cancelado',
+    desc: 'Cancelaste el proceso de pago. Tu sensibilidad sigue esperándote.',
   },
   failed: {
-    title: 'Pago no completado',
-    description: 'El pago no se pudo procesar. Verifica los datos de tu tarjeta o intenta con otro método de pago.',
+    title: 'Error en el Pago',
+    desc: 'Hubo un problema procesando tu pago. Intenta con otro método.',
   },
   expired: {
-    title: 'Sesión expirada',
-    description: 'La sesión de pago expiró. Por seguridad, las sesiones duran máximo 30 minutos. Inténtalo de nuevo.',
+    title: 'Sesión Expirada',
+    desc: 'Tu sesión de pago expiró. Regresa al generador para intentar de nuevo.',
   },
 };
 
 function PaymentFailureContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const reason = searchParams.get('reason') || 'failed';
-  const errorInfo = ERROR_MESSAGES[reason] ?? ERROR_MESSAGES['failed'] ?? { title: 'Error', description: 'Ocurrió un error con el pago.' };
+  const msg = FAILURE_MESSAGES[reason] ?? FAILURE_MESSAGES['failed']!;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-20 text-center">
-      {/* Icono de error */}
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 mb-6">
-        <XCircle size={40} className="text-red-400" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <motion.div
+        className="max-w-md w-full text-center p-8 rounded-2xl border border-red-500/15 bg-red-500/5"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
 
-      {/* Titulo */}
-      <h1 className="text-3xl font-bold text-white font-display">
-        {errorInfo.title}
-      </h1>
+        <h1 className="text-xl font-bold text-white mb-2 font-[family-name:var(--font-orbitron),sans-serif]">
+          {msg.title}
+        </h1>
 
-      {/* Descripcion */}
-      <p className="mt-3 text-slate-400 leading-relaxed">
-        {errorInfo.description}
-      </p>
+        <p className="text-slate-400 mb-6 text-sm">{msg.desc}</p>
 
-      {/* Acciones */}
-      <div className="mt-8 flex flex-col gap-3">
-        <Button
-          variant="primary"
-          className="w-full"
-          leftIcon={<CreditCard size={18} />}
-          onClick={() => router.back()}
-        >
-          Intentar de nuevo
-        </Button>
-        <Link href="/contact">
-          <Button variant="ghost" className="w-full" leftIcon={<MessageCircle size={18} />}>
-            Contactar soporte
-          </Button>
-        </Link>
-        <Link href="/">
-          <Button variant="ghost" className="w-full" leftIcon={<Home size={18} />}>
-            Volver al inicio
-          </Button>
-        </Link>
-      </div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/generator"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-semibold text-sm hover:from-cyan-400 hover:to-cyan-500 transition-all"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Intentar de nuevo
+          </Link>
+
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Soporte
+          </Link>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -73,11 +66,8 @@ function PaymentFailureContent() {
 export default function PaymentFailurePage() {
   return (
     <Suspense fallback={
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/10 mb-6">
-          <XCircle size={40} className="text-red-400/50" />
-        </div>
-        <p className="text-slate-400">Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <AlertCircle className="w-12 h-12 text-red-400/50 mx-auto" />
       </div>
     }>
       <PaymentFailureContent />

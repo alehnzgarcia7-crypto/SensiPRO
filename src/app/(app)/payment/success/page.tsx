@@ -1,147 +1,201 @@
 'use client';
 
-import { CheckCircle, Gamepad2, Clock, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Crown, Sparkles, ArrowRight, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { usePremium } from '@/hooks/use-premium';
+import { usePremiumContext } from '@/providers/premium-provider';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const provider = searchParams.get('provider');
   const status = searchParams.get('status');
-  const { setPremiumEmail } = usePremium();
+  const { unlock, verifyPremium } = usePremiumContext();
+
+  const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-
-  const isOxxoPending = status === 'pending';
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
-    async function verifyPayment() {
+    async function verify() {
       try {
-        // Si es Stripe, verificar la sesión y activar licencia
         if (sessionId) {
+          // Stripe — verificar sesión
           const res = await fetch(`/api/payments/verify-session?session_id=${sessionId}`);
           const data = await res.json();
+
           if (data.success && data.email) {
             setEmail(data.email);
-            setPremiumEmail(data.email);
             setVerified(true);
-            return;
+            unlock(data.email);
+          } else if (data.status === 'unpaid') {
+            // OXXO pendiente
+            setEmail(data.email);
+            setIsPending(true);
           }
-          // Fallback al endpoint antiguo
-          const fallback = await fetch(`/api/payments/stripe/status?session_id=${sessionId}`);
-          const fbData = await fallback.json();
-          if (fbData.success && fbData.data?.email) {
-            setEmail(fbData.data.email);
-            setPremiumEmail(fbData.data.email);
-            setVerified(true);
-            return;
+        } else if (provider === 'mercadopago') {
+          if (status === 'pending') {
+            setIsPending(true);
+          } else {
+            // MP aprobado — el webhook ya activó la licencia
+            const capturedEmail = sessionStorage.getItem('sensipro_captured_email');
+            if (capturedEmail) {
+              const isP = await verifyPremium(capturedEmail);
+              if (isP) {
+                setEmail(capturedEmail);
+                setVerified(true);
+                unlock(capturedEmail);
+              }
+            }
           }
         }
-
-        // Si es MP, leer email de localStorage
-        if (provider === 'mercadopago') {
-          const savedEmail = localStorage.getItem('sensipro_checkout_email');
-          if (savedEmail) {
-            setPremiumEmail(savedEmail);
-            setEmail(savedEmail);
-            localStorage.removeItem('sensipro_checkout_email');
-          }
-          setVerified(true);
-          return;
-        }
-
-        setVerified(true);
       } catch {
-        setVerified(true);
+        // Error silencioso — no crashear la success page
+      } finally {
+        setVerifying(false);
       }
     }
 
-    verifyPayment();
-  }, [sessionId, provider, setPremiumEmail]);
+    verify();
+  }, [sessionId, provider, status, unlock, verifyPremium]);
 
-  if (isOxxoPending) {
+  // Loading
+  if (verifying) {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 mb-6">
-          <Clock size={40} className="text-amber-400" />
-        </div>
-
-        <h1 className="text-3xl font-bold text-white font-display">
-          Pago en proceso
-        </h1>
-
-        <p className="mt-3 text-slate-400 leading-relaxed">
-          Tu pago OXXO se procesará en <strong className="text-amber-400">24-72 horas</strong>.
-          Recibirás acceso automáticamente cuando se confirme el pago.
-        </p>
-
-        {email && (
-          <p className="mt-2 text-sm text-slate-500">
-            Email registrado: <span className="text-slate-300">{email}</span>
-          </p>
-        )}
-
-        <div className="mt-8 flex flex-col gap-3">
-          <Link href="/generator">
-            <Button variant="primary" className="w-full" leftIcon={<Gamepad2 size={18} />}>
-              Volver al Generador
-            </Button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className="w-12 h-12 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full mx-auto mb-4"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          />
+          <p className="text-slate-400">Verificando tu pago...</p>
+        </motion.div>
       </div>
     );
   }
 
+  // OXXO Pendiente
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <motion.div
+          className="max-w-md w-full text-center p-8 rounded-2xl border border-yellow-500/20 bg-yellow-500/5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Clock className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-2 font-[family-name:var(--font-orbitron),sans-serif]">
+            Pago en Proceso
+          </h1>
+          <p className="text-slate-400 mb-4">
+            Tu pago en OXXO se procesará en <span className="text-yellow-400 font-bold">24-72 horas</span>.
+          </p>
+          {email && (
+            <p className="text-sm text-slate-500 mb-6">
+              Te enviaremos una confirmación a <span className="text-white">{email}</span> cuando tu pago se procese.
+            </p>
+          )}
+          <p className="text-xs text-slate-600 mb-6">
+            Guarda tu voucher de OXXO. Si no recibes confirmación en 72 horas, contáctanos.
+          </p>
+          <Link
+            href="/generator"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
+          >
+            Volver al generador
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Pago Exitoso
   return (
-    <div className="mx-auto max-w-md px-4 py-20 text-center">
-      {/* Icono de éxito */}
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 mb-6 relative">
-        <CheckCircle size={40} className="text-emerald-400" />
-        <Sparkles size={20} className="text-amber-400 absolute -top-1 -right-1 animate-pulse" />
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Confetti */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full"
+            style={{
+              background: ['#06b6d4', '#8b5cf6', '#fbbf24', '#10b981', '#f43f5e'][i % 5],
+              left: `${(i * 3.3) % 100}%`,
+              top: '-5%',
+            }}
+            animate={{
+              y: ['0vh', '110vh'],
+              x: [0, ((i % 7) - 3) * 30],
+              rotate: [0, (i % 4) * 180],
+              opacity: [1, 1, 0],
+            }}
+            transition={{
+              duration: 3 + (i % 4),
+              repeat: Infinity,
+              delay: (i % 10) * 0.3,
+              ease: 'easeIn',
+            }}
+          />
+        ))}
       </div>
 
-      {/* Titulo */}
-      <h1 className="text-3xl font-bold text-white font-display">
-        Pago exitoso!
-      </h1>
+      <motion.div
+        className="relative max-w-md w-full text-center p-8 rounded-2xl border border-cyan-500/20 bg-slate-950/80 backdrop-blur-sm shadow-[0_0_60px_rgba(6,182,212,0.1)]"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', damping: 20 }}
+      >
+        {/* Glow */}
+        <div className="absolute -top-px left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent" />
 
-      {/* Descripcion */}
-      <p className="mt-3 text-slate-400 leading-relaxed">
-        Ya tienes <strong className="text-emerald-400">acceso de por vida</strong> a todo SensiPRO Premium:
-        sensibilidad calibrada, Headshot Mode, HUD Codes, y Academia completa.
-      </p>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', damping: 10, delay: 0.3 }}
+        >
+          <Crown className="w-14 h-14 text-yellow-400 mx-auto mb-4" />
+        </motion.div>
 
-      {email && (
-        <p className="mt-2 text-sm text-slate-500">
-          Licencia activada para: <span className="text-slate-300">{email}</span>
+        <h1 className="text-2xl font-bold text-white mb-2 font-[family-name:var(--font-orbitron),sans-serif] flex items-center justify-center gap-2">
+          <Sparkles className="w-5 h-5 text-cyan-400" />
+          PREMIUM ACTIVADO
+          <Sparkles className="w-5 h-5 text-cyan-400" />
+        </h1>
+
+        <p className="text-slate-400 mb-6">
+          Tu sensibilidad profesional está desbloqueada <span className="text-cyan-400 font-bold">de por vida</span>.
         </p>
-      )}
 
-      {/* Premium badge */}
-      <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">
-        <Sparkles size={16} className="text-amber-400" />
-        <span className="text-sm font-semibold text-amber-300">PREMIUM DE POR VIDA</span>
-      </div>
+        {email && (
+          <p className="text-xs text-slate-500 mb-6">
+            Licencia registrada en: <span className="text-white">{email}</span>
+          </p>
+        )}
 
-      {/* Acciones */}
-      <div className="mt-8 flex flex-col gap-3">
-        <Link href="/generator">
-          <Button variant="primary" className="w-full" leftIcon={<Gamepad2 size={18} />}>
-            Ir a mi sensibilidad
-          </Button>
+        <Link
+          href="/generator"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-bold hover:from-cyan-400 hover:to-cyan-500 transition-all shadow-lg shadow-cyan-500/20"
+        >
+          Ver mi sensibilidad
+          <ArrowRight className="w-5 h-5" />
         </Link>
-      </div>
 
-      {!verified && (
-        <p className="mt-4 text-xs text-slate-600 animate-pulse">
-          Verificando pago...
-        </p>
-      )}
+        {!verified && !isPending && (
+          <p className="text-xs text-slate-600 mt-4">
+            También tienes acceso a Headshot Mode + Academia + HUD Codes
+          </p>
+        )}
+      </motion.div>
     </div>
   );
 }
@@ -149,11 +203,15 @@ function PaymentSuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/10 mb-6 animate-pulse">
-          <CheckCircle size={40} className="text-emerald-400/50" />
-        </div>
-        <p className="text-slate-400">Verificando pago...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div className="w-12 h-12 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full mx-auto mb-4 animate-spin" />
+          <p className="text-slate-400">Verificando pago...</p>
+        </motion.div>
       </div>
     }>
       <PaymentSuccessContent />

@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { GuideFooter } from '@/components/academy/guide-footer';
 import { GuideRenderer } from '@/components/academy/guide-renderer';
 import { GuideToc } from '@/components/academy/guide-toc';
+import { PremiumGuideContent } from '@/components/academy/premium-guide-content';
 import {
   CATEGORY_COLOR_MAP,
   DIFFICULTY_COLOR_MAP,
@@ -110,8 +111,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
       <div className="flex gap-8 lg:gap-10">
         {/* Content — margin derecho implícito via flex para no taparse con sidebar */}
         <div className="flex-1 min-w-0">
-          {/* Guide Content */}
-          <GuideRenderer sections={guide.sections} />
+          {/* Guide Content — Premium (bloqueado para usuarios gratis) */}
+          <PremiumGuideContent>
+            <GuideRenderer sections={guide.sections} />
+          </PremiumGuideContent>
 
           {/* Footer: related guides + CTA */}
           <GuideFooter relatedSlugs={guide.relatedSlugs} currentSlug={guide.slug} />
