@@ -22,19 +22,28 @@ function PaymentSuccessContent() {
   useEffect(() => {
     async function verifyPayment() {
       try {
-        // Si es Stripe, verificar la sesión
+        // Si es Stripe, verificar la sesión y activar licencia
         if (sessionId) {
-          const res = await fetch(`/api/payments/stripe/status?session_id=${sessionId}`);
+          const res = await fetch(`/api/payments/verify-session?session_id=${sessionId}`);
           const data = await res.json();
-          if (data.success && data.data?.email) {
-            setEmail(data.data.email);
-            setPremiumEmail(data.data.email);
+          if (data.success && data.email) {
+            setEmail(data.email);
+            setPremiumEmail(data.email);
+            setVerified(true);
+            return;
+          }
+          // Fallback al endpoint antiguo
+          const fallback = await fetch(`/api/payments/stripe/status?session_id=${sessionId}`);
+          const fbData = await fallback.json();
+          if (fbData.success && fbData.data?.email) {
+            setEmail(fbData.data.email);
+            setPremiumEmail(fbData.data.email);
             setVerified(true);
             return;
           }
         }
 
-        // Si es MP, intentar leer email de localStorage
+        // Si es MP, leer email de localStorage
         if (provider === 'mercadopago') {
           const savedEmail = localStorage.getItem('sensipro_checkout_email');
           if (savedEmail) {

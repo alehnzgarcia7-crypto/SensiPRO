@@ -16,8 +16,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 
-import { stripeLifetime } from '@/lib/payments/stripe-config';
 import { activatePremiumLicense } from '@/lib/payments/payment-service';
+import { stripeLifetime } from '@/lib/payments/stripe-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,7 +116,8 @@ export async function POST(request: NextRequest) {
       case 'payment_intent.payment_failed': {
         // Pago falló — registrar para analytics
         const failedIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(`[SensiPRO] Payment failed for ${failedIntent.receipt_email}: ${failedIntent.last_payment_error?.message}`);
+        // eslint-disable-next-line no-console -- Server-side error logging for payment failures
+        console.error(`[SensiPRO] Payment failed for ${failedIntent.receipt_email}: ${failedIntent.last_payment_error?.message}`);
         break;
       }
 

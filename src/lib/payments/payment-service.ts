@@ -12,8 +12,8 @@
 import { prisma } from '@ares/database';
 import { v4 as uuidv4 } from 'uuid';
 
-import { stripeLifetime, PRICING, type PaymentMetadata } from './stripe-config';
 import { mpPreference, LATAM_PRICES } from './mercadopago-config';
+import { stripeLifetime, PRICING, type PaymentMetadata } from './stripe-config';
 
 // ═══════════════════════════════════════════════════════
 // TIPOS
@@ -372,6 +372,7 @@ export async function activatePremiumLicense(params: {
       data: { converted: true, convertedAt: new Date() },
     });
 
+    // eslint-disable-next-line no-console -- Server-side logging for successful activations
     console.log(`[SensiPRO] Premium activado para ${email} via ${params.paymentMethod}`);
     return { success: true, isNew: true };
   } catch (error) {
