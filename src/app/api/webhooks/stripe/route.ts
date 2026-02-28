@@ -1,169 +1,137 @@
-import { prisma } from '@ares/database';
-import { logger } from '@ares/logger';
+/**
+ * POST /api/webhooks/stripe
+ *
+ * Stripe envía eventos aquí cuando un pago se completa.
+ * ESTO es lo que activa la licencia premium.
+ *
+ * Eventos que manejamos:
+ * - checkout.session.completed → Pago con tarjeta exitoso
+ * - payment_intent.succeeded → Pago OXXO completado
+ *
+ * SEGURIDAD: Verificamos la firma del webhook para asegurar
+ * que el evento viene de Stripe y no de un atacante.
+ */
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 
+import { stripeLifetime } from '@/lib/payments/stripe-config';
+import { activatePremiumLicense } from '@/lib/payments/payment-service';
 
-import { constructWebhookEvent } from '@/lib/payments/stripe';
+export const dynamic = 'force-dynamic';
 
-// ══════════════════════════════════════════════════════════
-// POST /api/webhooks/stripe
-// Procesa eventos de webhook de Stripe
-// ══════════════════════════════════════════════════════════
+// Stripe envía raw body, necesitamos leerlo así
+async function getRawBody(request: NextRequest): Promise<Buffer> {
+  const reader = request.body?.getReader();
+  const chunks: Uint8Array[] = [];
 
-export async function POST(request: NextRequest) {
-  try {
-    const payload = await request.text();
-    const signature = request.headers.get('stripe-signature') ?? '';
+  if (!reader) throw new Error('No request body');
 
-    if (!signature) {
-      logger.warn('Stripe webhook received without signature');
-      return NextResponse.json(
-        { success: false, error: { code: 'MISSING_SIGNATURE', message: 'Falta firma stripe-signature', statusCode: 401 } },
-        { status: 401 },
-      );
-    }
-
-    const event = constructWebhookEvent(payload, signature);
-
-    logger.info('Stripe webhook received', {
-      type: event.type,
-      eventId: event.id,
-    });
-
-    // Solo procesar checkout.session.completed
-    if (event.type === 'checkout.session.completed') {
-      await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
-    }
-
-    return NextResponse.json({ received: true });
-  } catch (error) {
-    logger.error('Stripe webhook error', {
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    // Retornar 400 para que Stripe reintente con errores de firma
-    // Retornar 200 para errores de procesamiento
-    const isSignatureError =
-      error instanceof Error && error.message.includes('signature');
-    return NextResponse.json(
-      { received: false, error: 'Webhook processing failed' },
-      { status: isSignatureError ? 400 : 200 },
-    );
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
   }
+
+  return Buffer.concat(chunks);
 }
 
-// ──────────────────────────────────────────────────────────
-// Handler: checkout.session.completed
-// ──────────────────────────────────────────────────────────
-
-async function handleCheckoutCompleted(
-  session: Stripe.Checkout.Session,
-): Promise<void> {
-  const metadata = session.metadata ?? {};
-  const userId = metadata['userId'];
-  const tier = metadata['tier'] as 'PREMIUM' | 'VIP' | undefined;
-  const monthsStr = metadata['months'] ?? '1';
-  const months = parseInt(monthsStr, 10) || 1;
-
-  if (!userId || !tier || (tier !== 'PREMIUM' && tier !== 'VIP')) {
-    logger.warn('Stripe checkout missing metadata', {
-      sessionId: session.id,
-      metadata,
-    });
-    return;
+export async function POST(request: NextRequest) {
+  if (!stripeLifetime) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
   }
 
-  // Verificar pago duplicado
-  const existingPayment = await prisma.payment.findFirst({
-    where: { externalId: session.id },
-  });
+  try {
+    const rawBody = await getRawBody(request);
+    const signature = request.headers.get('stripe-signature');
 
-  if (existingPayment) {
-    logger.info('Stripe payment already processed, skipping', {
-      sessionId: session.id,
-      existingId: existingPayment.id,
-    });
-    return;
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    }
+
+    // Verificar firma del webhook
+    let event: Stripe.Event;
+
+    try {
+      event = stripeLifetime.webhooks.constructEvent(
+        rawBody,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET || '',
+      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('[SensiPRO] Webhook signature verification failed:', message);
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    }
+
+    // Procesar evento
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        // Pago con TARJETA completado
+        const session = event.data.object as Stripe.Checkout.Session;
+
+        if (session.payment_status === 'paid') {
+          const email = session.customer_email || session.metadata?.email;
+
+          if (email) {
+            await activatePremiumLicense({
+              email,
+              paymentProvider: 'stripe',
+              paymentId: session.id,
+              paymentMethod: 'card',
+              amountPaid: session.amount_total || 29900,
+              currency: (session.currency || 'mxn').toUpperCase(),
+              device: session.metadata?.device,
+              fingerCount: session.metadata?.fingerCount ? parseInt(session.metadata.fingerCount) : undefined,
+            });
+          }
+        }
+        break;
+      }
+
+      case 'payment_intent.succeeded': {
+        // Pago OXXO completado (o cualquier payment intent)
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const email = paymentIntent.receipt_email || paymentIntent.metadata?.email;
+
+        if (email) {
+          // Verificar que es un pago de SensiPRO
+          if (paymentIntent.metadata?.product === 'sensipro_premium_lifetime') {
+            await activatePremiumLicense({
+              email,
+              paymentProvider: 'stripe',
+              paymentId: paymentIntent.id,
+              paymentMethod: paymentIntent.payment_method_types?.[0] === 'oxxo' ? 'oxxo' : 'card',
+              amountPaid: paymentIntent.amount,
+              currency: paymentIntent.currency.toUpperCase(),
+              device: paymentIntent.metadata?.device,
+              fingerCount: paymentIntent.metadata?.fingerCount ? parseInt(paymentIntent.metadata.fingerCount) : undefined,
+            });
+          }
+        }
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
+        // Pago falló — registrar para analytics
+        const failedIntent = event.data.object as Stripe.PaymentIntent;
+        console.log(`[SensiPRO] Payment failed for ${failedIntent.receipt_email}: ${failedIntent.last_payment_error?.message}`);
+        break;
+      }
+
+      default:
+        // Eventos que no nos interesan — ignorar silenciosamente
+        break;
+    }
+
+    // Stripe espera 200 OK para confirmar recepción
+    return NextResponse.json({ received: true });
+  } catch (error: unknown) {
+    console.error('[SensiPRO] Webhook error:', error);
+    return NextResponse.json(
+      { error: 'Webhook processing error' },
+      { status: 500 },
+    );
   }
-
-  // Verificar que el usuario existe
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) {
-    logger.error('User not found for Stripe payment', {
-      userId,
-      sessionId: session.id,
-    });
-    return;
-  }
-
-  // Calcular fecha de expiracion
-  const now = new Date();
-  const expiresAt = new Date(now);
-  expiresAt.setMonth(expiresAt.getMonth() + months);
-
-  // Si ya tiene suscripcion activa, extender desde esa fecha
-  if (user.tierExpiresAt && user.tierExpiresAt > now) {
-    expiresAt.setTime(user.tierExpiresAt.getTime());
-    expiresAt.setMonth(expiresAt.getMonth() + months);
-  }
-
-  // Monto en centavos (Stripe ya devuelve en centavos)
-  const amountCentavos = session.amount_total ?? 0;
-
-  // Transaccion: actualizar usuario + registrar pago + crear suscripcion
-  await prisma.$transaction(async (tx) => {
-    // Actualizar tier del usuario
-    await tx.user.update({
-      where: { id: userId },
-      data: {
-        tier,
-        tierExpiresAt: expiresAt,
-      },
-    });
-
-    // Registrar pago
-    const payment = await tx.payment.create({
-      data: {
-        userId,
-        provider: 'STRIPE',
-        externalId: session.id,
-        amount: amountCentavos,
-        currency: (session.currency ?? 'mxn').toUpperCase(),
-        status: 'COMPLETED',
-        metadata: {
-          stripeSessionId: session.id,
-          stripePaymentIntent: session.payment_intent as string | null,
-          stripeCustomerEmail: session.customer_email,
-          tier,
-          months,
-        },
-      },
-    });
-
-    // Crear suscripcion
-    await tx.subscription.create({
-      data: {
-        userId,
-        tier,
-        startDate: now,
-        endDate: expiresAt,
-        isActive: true,
-        paymentId: payment.id,
-      },
-    });
-  });
-
-  logger.info('Stripe payment processed — user upgraded', {
-    userId,
-    tier,
-    months,
-    expiresAt: expiresAt.toISOString(),
-    stripeSessionId: session.id,
-    amount: amountCentavos,
-  });
 }

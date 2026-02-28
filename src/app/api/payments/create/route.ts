@@ -1,62 +1,98 @@
-import { handleApiError } from '@ares/errors';
-import { logger } from '@ares/logger';
+/**
+ * POST /api/payments/create
+ *
+ * Crea una sesión de pago según el método elegido.
+ * Body: { email, method, device?, fingerCount?, style?, source, currency? }
+ *
+ * Returns:
+ * - card: { checkoutUrl } → redirigir al checkout de Stripe
+ * - oxxo: { clientSecret } → usar con Stripe Elements para mostrar voucher
+ * - mercadopago: { checkoutUrl } → redirigir al checkout de MP
+ */
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { z } from 'zod';
 
-
-import { getRequiredSession } from '@/lib/auth/auth.middleware';
-import { createPaymentPreference } from '@/lib/payments/mercadopago';
-
-// ══════════════════════════════════════════════════════════
-// POST /api/payments/create
-// Crea una preferencia de pago en MercadoPago
-// ══════════════════════════════════════════════════════════
-
-const CreatePaymentSchema = z.object({
-  tier: z.enum(['PREMIUM', 'VIP'], {
-    errorMap: () => ({ message: 'Tier debe ser PREMIUM o VIP' }),
-  }),
-  months: z.coerce.number().int().min(1).max(12).optional().default(1),
-});
+import {
+  createStripeCardPayment,
+  createStripeOxxoPayment,
+  createMercadoPagoPayment,
+  checkPremiumStatus,
+  type CreatePaymentInput,
+} from '@/lib/payments/payment-service';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getRequiredSession();
-    const body: unknown = await request.json();
-    const parsed = CreatePaymentSchema.safeParse(body);
+    const body = await request.json();
 
-    if (!parsed.success) {
+    // Validación
+    const { email, method, device, fingerCount, style, source, currency } = body;
+
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
       return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: parsed.error.issues[0]?.message ?? 'Datos invalidos',
-            statusCode: 400,
-          },
-        },
+        { error: 'Email inválido' },
         { status: 400 },
       );
     }
 
-    const { tier, months } = parsed.data;
+    if (!method || !['card', 'oxxo', 'mercadopago'].includes(method)) {
+      return NextResponse.json(
+        { error: 'Método de pago inválido. Usa: card, oxxo, o mercadopago' },
+        { status: 400 },
+      );
+    }
 
-    logger.info('Payment creation requested', {
-      userId: session.user.id,
-      tier,
-      months,
-    });
+    // Verificar si ya es premium
+    const premiumStatus = await checkPremiumStatus(email);
+    if (premiumStatus.isPremium) {
+      return NextResponse.json(
+        { error: 'Este email ya tiene acceso Premium', isPremium: true },
+        { status: 409 },
+      );
+    }
 
-    const result = await createPaymentPreference({
-      userId: session.user.id,
-      userEmail: session.user.email ?? '',
-      tier,
-      months,
-    });
+    // Crear pago según método
+    const input: CreatePaymentInput = {
+      email: email.toLowerCase().trim(),
+      method,
+      device,
+      fingerCount,
+      style,
+      source: source || 'generator',
+      ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+      userAgent: request.headers.get('user-agent') || undefined,
+      currency,
+    };
 
-    return NextResponse.json({ success: true, data: result });
-  } catch (error) {
-    return handleApiError(error);
+    let result;
+
+    switch (method) {
+      case 'card':
+        result = await createStripeCardPayment(input);
+        break;
+      case 'oxxo':
+        result = await createStripeOxxoPayment(input);
+        break;
+      case 'mercadopago':
+        result = await createMercadoPagoPayment(input);
+        break;
+      default:
+        return NextResponse.json({ error: 'Método no soportado' }, { status: 400 });
+    }
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error || 'Error procesando el pago' },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(result);
+  } catch (error: unknown) {
+    console.error('[SensiPRO] Payment creation error:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 },
+    );
   }
 }

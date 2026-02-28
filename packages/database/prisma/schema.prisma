@@ -839,3 +839,105 @@ model UTMTracking {
   @@index([campaign])
   @@index([createdAt(sort: Desc)])
 }
+
+// ──────────────────────────────────
+// 29. PREMIUM LICENSE — Licencia de por vida
+// ──────────────────────────────────
+// Cada pago exitoso crea UNA licencia.
+// El email es el identificador del usuario.
+// Una licencia = acceso de por vida a todo SensiPRO.
+model PremiumLicense {
+  id              String   @id @default(cuid())
+
+  email           String   @unique
+  isActive        Boolean  @default(true) @map("is_active")
+  activatedAt     DateTime @default(now()) @map("activated_at")
+
+  paymentProvider String   @map("payment_provider")
+  paymentId       String   @unique @map("payment_id")
+  paymentMethod   String   @map("payment_method")
+
+  amountPaid      Int      @map("amount_paid")
+  currency        String   @default("MXN")
+  originalPrice   Int      @default(59900) @map("original_price")
+
+  deviceUsed      String?  @map("device_used")
+  fingerCount     Int?     @map("finger_count") @db.SmallInt
+
+  ipAddress       String?  @map("ip_address") @db.VarChar(45)
+  userAgent       String?  @map("user_agent") @db.VarChar(500)
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  paymentAttempts PaymentAttempt[]
+
+  @@map("premium_licenses")
+  @@index([email])
+  @@index([paymentId])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 30. PAYMENT ATTEMPT — Registro de CADA intento de pago
+// ──────────────────────────────────
+model PaymentAttempt {
+  id              String    @id @default(cuid())
+
+  email           String
+  provider        String
+  method          String
+  status          String
+
+  amount          Int
+  currency        String    @default("MXN")
+
+  externalId      String?   @map("external_id")
+  checkoutUrl     String?   @map("checkout_url") @db.VarChar(500)
+
+  oxxoVoucherUrl  String?   @map("oxxo_voucher_url") @db.VarChar(500)
+  oxxoExpiresAt   DateTime? @map("oxxo_expires_at")
+
+  errorCode       String?   @map("error_code")
+  errorMessage    String?   @map("error_message") @db.VarChar(500)
+
+  deviceUsed      String?   @map("device_used")
+  ipAddress       String?   @map("ip_address") @db.VarChar(45)
+  userAgent       String?   @map("user_agent") @db.VarChar(500)
+
+  license         PremiumLicense? @relation(fields: [licenseId], references: [id])
+  licenseId       String?   @map("license_id")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("payment_attempts")
+  @@index([email])
+  @@index([externalId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 31. EMAIL CAPTURE — Emails capturados ANTES del pago
+// ──────────────────────────────────
+model EmailCapture {
+  id              String    @id @default(cuid())
+
+  email           String
+  source          String
+
+  deviceUsed      String?   @map("device_used")
+  styleUsed       String?   @map("style_used")
+  fingerCount     Int?      @map("finger_count") @db.SmallInt
+
+  converted       Boolean   @default(false)
+  convertedAt     DateTime? @map("converted_at")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("email_captures")
+  @@index([email])
+  @@index([converted])
+  @@index([createdAt])
+}
