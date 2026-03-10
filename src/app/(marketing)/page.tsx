@@ -10,7 +10,7 @@ import { FeaturesSection } from '@/components/landing/features-section';
 import { HeadshotShowcase } from '@/components/landing/headshot-showcase';
 import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
-import { InteractiveDemo } from '@/components/landing/interactive-demo';
+// import { InteractiveDemo } from '@/components/landing/interactive-demo';
 // import { LandingFooter } from '@/components/landing/landing-footer';
 import { PricingSection } from '@/components/landing/pricing-section';
 import { SocialProofRibbon } from '@/components/landing/social-proof-ribbon';
@@ -49,7 +49,8 @@ export default function LandingPage() {
       {/* 7. Headshot Mode Showcase — feature estrella */}
       <HeadshotShowcase />
       {/* 8. Demo Interactivo — mini-generador funcional */}
-      <InteractiveDemo />
+      {/* <InteractiveDemo /> */}
+      {/* Oculto temporalmente — se reactiva cuando estemos listos para demo pública */}
       {/* 9. Dispositivos populares — carousel horizontal */}
       <DeviceShowcase />
       {/* 10. ARES AI Coach — preview estático */}

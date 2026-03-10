@@ -3,105 +3,32 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Check,
-  X,
   ChevronDown,
   Shield,
   Zap,
-  Crown,
-  Gamepad2,
-  Target,
 } from 'lucide-react';
-import Link from 'next/link';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 import { cn } from '@/lib/cn';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 /* ═══════════════════════════════════════════════════════════
-   EXCHANGE RATES — Tasas aproximadas desde USD
+   PRO FEATURES — Todo lo que incluye el plan
    ═══════════════════════════════════════════════════════════ */
 
-interface CurrencyInfo {
-  rate: number;
-  symbol: string;
-  flag: string;
-  name: string;
-  decimals: number;
-}
-
-type CurrencyCode = 'MXN' | 'COP' | 'ARS' | 'PEN' | 'CLP' | 'BRL' | 'USD' | 'GTQ' | 'CRC' | 'DOP' | 'BOB' | 'PYG' | 'UYU' | 'HNL' | 'NIO' | 'VES';
-
-const EXCHANGE_RATES: Record<CurrencyCode, CurrencyInfo> = {
-  MXN: { rate: 17.5, symbol: '$', flag: '\u{1F1F2}\u{1F1FD}', name: 'Peso Mexicano', decimals: 0 },
-  COP: { rate: 4200, symbol: '$', flag: '\u{1F1E8}\u{1F1F4}', name: 'Peso Colombiano', decimals: 0 },
-  ARS: { rate: 870, symbol: '$', flag: '\u{1F1E6}\u{1F1F7}', name: 'Peso Argentino', decimals: 0 },
-  PEN: { rate: 3.75, symbol: 'S/', flag: '\u{1F1F5}\u{1F1EA}', name: 'Sol Peruano', decimals: 2 },
-  CLP: { rate: 950, symbol: '$', flag: '\u{1F1E8}\u{1F1F1}', name: 'Peso Chileno', decimals: 0 },
-  BRL: { rate: 5.0, symbol: 'R$', flag: '\u{1F1E7}\u{1F1F7}', name: 'Real', decimals: 2 },
-  USD: { rate: 1, symbol: '$', flag: '\u{1F1FA}\u{1F1F8}', name: 'Dólar', decimals: 2 },
-  GTQ: { rate: 7.8, symbol: 'Q', flag: '\u{1F1EC}\u{1F1F9}', name: 'Quetzal', decimals: 2 },
-  CRC: { rate: 520, symbol: '\u20A1', flag: '\u{1F1E8}\u{1F1F7}', name: 'Colón', decimals: 0 },
-  DOP: { rate: 57, symbol: 'RD$', flag: '\u{1F1E9}\u{1F1F4}', name: 'Peso Dominicano', decimals: 0 },
-  BOB: { rate: 6.9, symbol: 'Bs', flag: '\u{1F1E7}\u{1F1F4}', name: 'Boliviano', decimals: 2 },
-  PYG: { rate: 7300, symbol: '\u20B2', flag: '\u{1F1F5}\u{1F1FE}', name: 'Guaraní', decimals: 0 },
-  UYU: { rate: 40, symbol: '$U', flag: '\u{1F1FA}\u{1F1FE}', name: 'Peso Uruguayo', decimals: 0 },
-  HNL: { rate: 24.7, symbol: 'L', flag: '\u{1F1ED}\u{1F1F3}', name: 'Lempira', decimals: 2 },
-  NIO: { rate: 36.5, symbol: 'C$', flag: '\u{1F1F3}\u{1F1EE}', name: 'Córdoba', decimals: 2 },
-  VES: { rate: 36.5, symbol: 'Bs.D', flag: '\u{1F1FB}\u{1F1EA}', name: 'Bolívar', decimals: 2 },
-};
-
-/* ═══════════════════════════════════════════════════════════
-   PLANES
-   ═══════════════════════════════════════════════════════════ */
-
-interface PlanFeature {
-  text: string;
-  free: boolean;
-  pro: boolean;
-  elite: boolean;
-}
-
-const BASE_PRICES_USD = {
-  proOneTime: 9.99,
-  proOriginal: 29.99,
-  eliteOneTime: 19.99,
-  eliteOriginal: 49.99,
-};
-
-function formatPrice(usd: number, currency: CurrencyCode): string {
-  const info = EXCHANGE_RATES[currency];
-  const converted = usd * info.rate;
-  if (info.decimals === 0) {
-    return `${info.symbol}${Math.round(converted).toLocaleString('es-MX')}`;
-  }
-  return `${info.symbol}${converted.toFixed(info.decimals)}`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   COMPARISON TABLE DATA
-   ═══════════════════════════════════════════════════════════ */
-
-const comparisonFeatures: PlanFeature[] = [
-  { text: 'Generador de sensibilidad', free: true, pro: true, elite: true },
-  { text: '485+ dispositivos soportados', free: true, pro: true, elite: true },
-  { text: 'Sensibilidad por DPI', free: true, pro: true, elite: true },
-  { text: 'Configuraciones guardadas', free: false, pro: true, elite: true },
-  { text: 'Headshot Mode completo', free: false, pro: true, elite: true },
-  { text: 'Custom HUD Codes (17 códigos)', free: false, pro: true, elite: true },
-  { text: 'Screenshots reales de Free Fire', free: false, pro: true, elite: true },
-  { text: 'Training Plans de 7 días', free: false, pro: true, elite: true },
-  { text: 'Armas Tier S/A/B', free: false, pro: true, elite: true },
-  { text: 'Giroscopio calibrado', free: false, pro: true, elite: true },
-  { text: 'Sin publicidad', free: false, pro: true, elite: true },
-  { text: 'Soporte prioritario', free: false, pro: true, elite: true },
-  { text: 'Coaching IA personalizado', free: false, pro: false, elite: true },
-  { text: 'Badge exclusivo ELITE', free: false, pro: false, elite: true },
-  { text: 'Discord VIP con pros', free: false, pro: false, elite: true },
-  { text: 'Análisis avanzado de gameplay', free: false, pro: false, elite: true },
-  { text: 'Configuraciones ilimitadas', free: false, pro: false, elite: true },
-  { text: 'Soporte VIP 24/7', free: false, pro: false, elite: true },
-  { text: 'Descarga de configuración en PDF', free: false, pro: false, elite: true },
-  { text: 'Acceso anticipado a features', free: false, pro: false, elite: true },
+const PRO_FEATURES = [
+  '6 valores de sensibilidad calibrada por DPI real',
+  'Headshot Mode completo (24 features, 32 armas, 5 técnicas)',
+  '17 códigos HUD reales con capturas de Free Fire',
+  'Giroscopio calibrado al rango pro (32-39)',
+  'Academia completa: 8 guías + 12 tips pro',
+  '503+ dispositivos soportados de 26 marcas',
+  'Training Plans de 7 días para mejorar aim',
+  'Armas Tier S/A/B con análisis completo',
+  'Comparador de devices side-by-side',
+  'Búsquedas y configuraciones ilimitadas',
+  'Sin publicidad — experiencia limpia',
+  'Actualizaciones de por vida + soporte prioritario',
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -111,275 +38,29 @@ const comparisonFeatures: PlanFeature[] = [
 const faqs = [
   {
     q: '¿Es realmente pago único?',
-    a: 'Sí, un solo pago y acceso de por vida. Sin cargos recurrentes, sin renovaciones automáticas.',
+    a: 'Sí, un solo pago y acceso de por vida. Sin cargos recurrentes, sin renovaciones automáticas, sin sorpresas.',
   },
   {
     q: '¿Qué métodos de pago aceptan?',
-    a: 'MercadoPago, tarjeta de crédito/débito, OXXO, transferencia bancaria (México), PSE (Colombia), y más según tu país.',
-  },
-  {
-    q: '¿El Headshot Mode funciona sin PRO?',
-    a: 'No, el Headshot Mode completo (HUD codes, training plans, técnicas de drag) es exclusivo de PRO y ELITE. El plan Gratis solo incluye sensibilidad básica.',
+    a: 'Tarjeta de crédito/débito (Visa, Mastercard, Amex), OXXO (efectivo en México), y Mercado Pago (tarjetas locales, transferencia, efectivo).',
   },
   {
     q: '¿Ofrecen reembolsos?',
     a: 'Sí, 7 días de garantía. Si no estás satisfecho, te devolvemos tu dinero sin preguntas.',
   },
   {
-    q: '¿Los precios incluyen IVA?',
-    a: 'Los precios mostrados no incluyen impuestos locales. El IVA se calcula al momento del pago según tu país.',
+    q: '¿Funciona en cualquier celular?',
+    a: 'Sí, tenemos 503+ dispositivos de 26 marcas incluyendo Samsung, iPhone, Xiaomi, Redmi, POCO, Motorola, Infinix, y más.',
   },
   {
-    q: '¿El generador básico siempre será gratis?',
-    a: 'Sí, el generador de sensibilidad básico siempre será gratuito. Es nuestra promesa.',
+    q: '¿Qué incluye el Headshot Mode?',
+    a: 'Sensibilidad optimizada para tiros a la cabeza, ajuste por cantidad de dedos (2-5), técnicas de drag headshot, tier list de armas, y un training plan de 7 días.',
   },
 ];
 
 /* ═══════════════════════════════════════════════════════════
    COMPONENTES
    ═══════════════════════════════════════════════════════════ */
-
-function CurrencySelector({
-  selected,
-  onSelect,
-}: {
-  selected: CurrencyCode;
-  onSelect: (c: CurrencyCode) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const current = EXCHANGE_RATES[selected as CurrencyCode] ?? EXCHANGE_RATES.MXN;
-
-  const handleSelect = useCallback(
-    (code: CurrencyCode) => {
-      onSelect(code);
-      setOpen(false);
-    },
-    [onSelect],
-  );
-
-  return (
-    <div className="relative inline-block">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass border border-white/10 hover:border-ice-500/30 transition-colors min-h-[44px]"
-      >
-        <span className="text-lg">{current.flag}</span>
-        <span className="font-ui font-semibold text-sm text-white">{selected}</span>
-        <ChevronDown
-          size={14}
-          className={cn('text-slate-400 transition-transform', open && 'rotate-180')}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="absolute top-full mt-2 left-0 z-50 w-64 max-h-72 overflow-y-auto rounded-xl glass border border-white/10 shadow-card p-1"
-            >
-              {(Object.entries(EXCHANGE_RATES) as [CurrencyCode, CurrencyInfo][]).map(([code, info]) => (
-                <button
-                  key={code}
-                  onClick={() => handleSelect(code)}
-                  className={cn(
-                    'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-left transition-colors min-h-[44px]',
-                    selected === code
-                      ? 'bg-ice-500/10 text-white'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white',
-                  )}
-                >
-                  <span className="text-lg">{info.flag}</span>
-                  <span className="font-ui font-semibold text-sm">{code}</span>
-                  <span className="text-xs text-slate-500 ml-auto">{info.name}</span>
-                </button>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// BillingToggle removed — all plans are one-time payment
-
-function PlanCard({
-  name,
-  icon,
-  badge,
-  priceUsd,
-  originalPriceUsd,
-  currency,
-  color,
-  glowClass,
-  borderClass,
-  features,
-  cta,
-  ctaHref,
-  highlighted,
-  index,
-  onCtaClick,
-  isPremium,
-}: {
-  name: string;
-  icon: React.ReactNode;
-  badge: string | null;
-  priceUsd: number;
-  originalPriceUsd?: number;
-  currency: CurrencyCode;
-  color: string;
-  glowClass: string;
-  borderClass: string;
-  features: { text: string; included: boolean }[];
-  cta: string;
-  ctaHref: string;
-  highlighted: boolean;
-  index: number;
-  onCtaClick?: () => void;
-  isPremium?: boolean;
-}) {
-  const currentFormatted = formatPrice(priceUsd, currency);
-  const originalFormatted = originalPriceUsd ? formatPrice(originalPriceUsd, currency) : null;
-
-  const card = (
-    <div
-      className={cn(
-        'glass-card p-7 md:p-8 relative flex flex-col h-full',
-        highlighted && 'shadow-card-hover',
-      )}
-    >
-      {badge && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-          <span
-            className={cn(
-              'inline-flex items-center px-4 py-1 rounded-full text-white text-xs font-ui font-bold whitespace-nowrap animate-pulse',
-              highlighted ? 'bg-gradient-to-r from-ice-500 to-fire-500' : 'bg-amber-500/90',
-            )}
-          >
-            {badge}
-          </span>
-        </div>
-      )}
-
-      <div className="flex items-center gap-2">
-        {icon}
-        <h3 className="font-heading font-bold text-xl text-white">{name}</h3>
-      </div>
-
-      <div className="mt-5 flex items-baseline gap-2">
-        {originalFormatted && (
-          <span className="text-xl text-slate-600 line-through font-mono">
-            {originalFormatted}
-          </span>
-        )}
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={`${priceUsd}-${currency}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="text-5xl font-heading font-black text-white"
-          >
-            {priceUsd === 0 ? '$0' : currentFormatted}
-          </motion.span>
-        </AnimatePresence>
-      </div>
-      <span className="text-sm text-slate-500 font-body mt-1">
-        {priceUsd === 0 ? 'Gratis para siempre' : 'Pago único de por vida'}
-      </span>
-
-      <div className="my-6 h-px bg-white/5" />
-
-      <ul className="space-y-3 flex-1">
-        {features.map((feat) => (
-          <li key={feat.text} className="flex items-start gap-3 text-sm">
-            {feat.included ? (
-              <Check size={15} className="text-success shrink-0 mt-0.5" />
-            ) : (
-              <X size={15} className="text-slate-700 shrink-0 mt-0.5" />
-            )}
-            <span
-              className={cn(
-                'font-body leading-snug',
-                feat.included ? 'text-slate-300' : 'text-slate-600',
-              )}
-            >
-              {feat.text}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-8">
-        {isPremium && priceUsd > 0 ? (
-          <div className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase bg-success/10 border border-success/20 text-success min-h-[48px]">
-            <Check size={16} />
-            Ya tienes acceso
-          </div>
-        ) : onCtaClick ? (
-          <button
-            onClick={onCtaClick}
-            className={cn(
-              'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px] cursor-pointer',
-              highlighted
-                ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
-                : `bg-transparent border ${borderClass} text-white hover:bg-white/5`,
-            )}
-          >
-            {cta}
-            {highlighted && <span className="ml-1">{'\u2192'}</span>}
-          </button>
-        ) : (
-          <Link
-            href={ctaHref}
-            className={cn(
-              'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px]',
-              highlighted
-                ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
-                : priceUsd === 0
-                  ? 'bg-transparent border border-slate-600/50 text-slate-400 hover:bg-white/5'
-                  : `bg-transparent border ${borderClass} text-white hover:bg-white/5`,
-            )}
-          >
-            {cta}
-            {highlighted && <span className="ml-1">{'\u2192'}</span>}
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-
-  if (highlighted) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-      >
-        <div className="animated-border-wrapper">
-          <div className="animated-border-gradient" />
-          <div className="animated-border-content">{card}</div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-    >
-      {card}
-    </motion.div>
-  );
-}
 
 function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
@@ -422,78 +103,15 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   );
 }
 
-function ComparisonTable() {
-  return (
-    <div className="overflow-x-auto -mx-4 px-4">
-      <table className="w-full min-w-[600px]">
-        <thead>
-          <tr className="border-b border-white/5">
-            <th className="text-left py-4 px-3 font-ui font-semibold text-sm text-slate-400 w-[40%]">
-              Feature
-            </th>
-            <th className="text-center py-4 px-3 font-ui font-semibold text-sm text-slate-500 w-[20%]">
-              <Gamepad2 size={14} className="inline mr-1" />
-              Gratis
-            </th>
-            <th className="text-center py-4 px-3 font-ui font-semibold text-sm text-ice-400 w-[20%]">
-              <Zap size={14} className="inline mr-1" />
-              PRO
-            </th>
-            <th className="text-center py-4 px-3 font-ui font-semibold text-sm text-amber-400 w-[20%]">
-              <Crown size={14} className="inline mr-1" />
-              ELITE
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {comparisonFeatures.map((feat, i) => (
-            <tr
-              key={feat.text}
-              className={cn(
-                'border-b border-white/[0.03] transition-colors hover:bg-white/[0.02]',
-                i % 2 === 0 && 'bg-white/[0.01]',
-              )}
-            >
-              <td className="py-3 px-3 text-sm text-slate-300 font-body">{feat.text}</td>
-              <td className="py-3 px-3 text-center">
-                {feat.free ? (
-                  <Check size={16} className="text-success mx-auto" />
-                ) : (
-                  <X size={16} className="text-slate-700 mx-auto" />
-                )}
-              </td>
-              <td className="py-3 px-3 text-center bg-ice-500/[0.03]">
-                {feat.pro ? (
-                  <Check size={16} className="text-ice-400 mx-auto" />
-                ) : (
-                  <X size={16} className="text-slate-700 mx-auto" />
-                )}
-              </td>
-              <td className="py-3 px-3 text-center">
-                {feat.elite ? (
-                  <Check size={16} className="text-amber-400 mx-auto" />
-                ) : (
-                  <X size={16} className="text-slate-700 mx-auto" />
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 /* ═══════════════════════════════════════════════════════════
    PAGE
    ═══════════════════════════════════════════════════════════ */
 
 export default function PricingPage() {
-  const [currency, setCurrency] = useState<CurrencyCode>('MXN');
   const { isPremium, showPaywall } = usePremiumContext();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 md:py-20">
+    <div className="mx-auto max-w-2xl px-4 py-12 md:py-20">
       {/* ── Header ────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -503,7 +121,7 @@ export default function PricingPage() {
       >
         <h1 className="text-4xl md:text-5xl font-heading font-black">
           <span className="bg-gradient-to-r from-ice-500 to-fire-500 bg-clip-text text-transparent">
-            Elige tu Plan
+            Desbloquea SensiPRO
           </span>
         </h1>
         <p className="mt-4 text-lg text-slate-400 font-ui max-w-lg mx-auto">
@@ -511,128 +129,109 @@ export default function PricingPage() {
         </p>
       </motion.div>
 
-      {/* ── Controles: Moneda ───────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.15 }}
-        className="flex items-center justify-center gap-6 mb-12"
-      >
-        <CurrencySelector selected={currency} onSelect={setCurrency} />
-      </motion.div>
-
-      {/* ── Plan Cards ────────────────────────────────── */}
-      <div className="grid md:grid-cols-3 gap-6 items-start mb-8">
-        {/* GRATIS */}
-        <PlanCard
-          name="Gratis"
-          icon={<Gamepad2 size={20} className="text-slate-500" />}
-          badge={null}
-          priceUsd={0}
-          currency={currency}
-          color=""
-          glowClass=""
-          borderClass=""
-          features={[
-            { text: 'Generador de sensibilidad básico', included: true },
-            { text: '485+ dispositivos soportados', included: true },
-            { text: '3 configuraciones guardadas', included: true },
-            { text: 'Sensibilidad por DPI', included: true },
-            { text: 'Headshot Mode', included: false },
-            { text: 'Custom HUD Codes', included: false },
-            { text: 'Sin ads', included: false },
-            { text: 'Coaching IA', included: false },
-            { text: 'Training Plans', included: false },
-          ]}
-          cta="Empezar Gratis"
-          ctaHref="/register"
-          highlighted={false}
-          index={0}
-        />
-
-        {/* PRO */}
-        <PlanCard
-          name="PRO"
-          icon={<Zap size={20} className="text-ice-400" />}
-          badge={'\u26A1 PAGO ÚNICO'}
-          priceUsd={BASE_PRICES_USD.proOneTime}
-          originalPriceUsd={BASE_PRICES_USD.proOriginal}
-          currency={currency}
-          color="from-ice-500 to-blue-600"
-          glowClass="shadow-glow-ice"
-          borderClass="border-ice-500/30"
-          features={[
-            { text: 'Todo de Gratis', included: true },
-            { text: 'Headshot Mode completo (24 features)', included: true },
-            { text: 'Custom HUD Codes (17 códigos reales)', included: true },
-            { text: 'Screenshots reales de Free Fire', included: true },
-            { text: 'Training Plans de 7 días', included: true },
-            { text: 'Armas Tier S/A/B', included: true },
-            { text: 'Giroscopio calibrado', included: true },
-            { text: 'Sin publicidad', included: true },
-            { text: '50 configuraciones guardadas', included: true },
-            { text: 'Soporte prioritario', included: true },
-            { text: 'Coaching IA personalizado', included: false },
-            { text: 'Badge exclusivo', included: false },
-          ]}
-          cta="Elegir PRO"
-          ctaHref="/payment?plan=pro"
-          highlighted={true}
-          index={1}
-          isPremium={isPremium}
-          onCtaClick={() => showPaywall({ source: 'pricing' })}
-        />
-
-        {/* ELITE */}
-        <PlanCard
-          name="ELITE"
-          icon={<Crown size={20} className="text-amber-400" />}
-          badge={'\u{1F3C6} ELITE'}
-          priceUsd={BASE_PRICES_USD.eliteOneTime}
-          originalPriceUsd={BASE_PRICES_USD.eliteOriginal}
-          currency={currency}
-          color="from-amber-500 to-yellow-600"
-          glowClass="shadow-glow-premium"
-          borderClass="border-amber-500/30"
-          features={[
-            { text: 'Todo de PRO', included: true },
-            { text: 'Coaching IA personalizado por chat', included: true },
-            { text: 'Acceso anticipado a features nuevas', included: true },
-            { text: 'Badge exclusivo ELITE en perfil', included: true },
-            { text: 'Discord VIP con pros y desarrolladores', included: true },
-            { text: 'Análisis avanzado de tu gameplay', included: true },
-            { text: 'Configuraciones ilimitadas guardadas', included: true },
-            { text: 'Soporte VIP 24/7', included: true },
-            { text: 'Descarga de configuración en PDF', included: true },
-          ]}
-          cta="Elegir ELITE"
-          ctaHref="/payment?plan=elite"
-          highlighted={false}
-          index={2}
-          isPremium={isPremium}
-          onCtaClick={() => showPaywall({ source: 'pricing' })}
-        />
-      </div>
-
-      {/* ── Nota de precios ───────────────────────────── */}
-      <p className="text-center text-xs text-slate-600 mb-16">
-        * Precios aproximados en {EXCHANGE_RATES[currency].name}. La conversión final se
-        realiza al momento del pago.
-      </p>
-
-      {/* ── Comparación de Planes ─────────────────────── */}
+      {/* ── PRO Card ────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.5 }}
-        className="mb-20"
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="mb-8"
       >
-        <h2 className="text-2xl md:text-3xl font-heading font-bold text-white text-center mb-8">
-          Compara todos los planes
-        </h2>
-        <div className="glass-card p-4 md:p-6">
-          <ComparisonTable />
+        <div className="animated-border-wrapper">
+          <div className="animated-border-gradient" />
+          <div className="animated-border-content">
+            <div className="glass-card p-7 md:p-10 relative">
+              {/* Badge */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                <span className="inline-flex items-center px-5 py-1.5 rounded-full text-white text-xs font-ui font-bold whitespace-nowrap animate-pulse bg-gradient-to-r from-ice-500 to-fire-500">
+                  PAGO ÚNICO DE POR VIDA
+                </span>
+              </div>
+
+              {/* Plan name */}
+              <div className="flex items-center gap-2 mt-2">
+                <Zap size={22} className="text-ice-400" />
+                <h2 className="font-heading font-bold text-2xl text-white">PRO</h2>
+              </div>
+
+              {/* Precio */}
+              <div className="mt-5 flex items-baseline gap-3">
+                <span className="text-2xl text-slate-600 line-through font-mono">$349</span>
+                <span className="text-5xl md:text-6xl font-heading font-black text-white">$199</span>
+                <span className="text-lg text-slate-400">MXN</span>
+              </div>
+              <p className="text-sm text-cyan-400 mt-1 font-ui">Pago único de por vida</p>
+
+              <div className="my-6 h-px bg-white/5" />
+
+              {/* Features */}
+              <ul className="space-y-3.5">
+                {PRO_FEATURES.map((feat) => (
+                  <li key={feat} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check size={14} className="text-emerald-400" />
+                    </div>
+                    <span className="text-sm text-slate-200 font-body leading-snug">{feat}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="my-6 h-px bg-white/5" />
+
+              {/* CTA */}
+              {isPremium ? (
+                <div className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-ui font-bold text-sm tracking-wider uppercase bg-success/10 border border-success/20 text-success min-h-[52px]">
+                  <Check size={18} />
+                  Ya tienes acceso PRO
+                </div>
+              ) : (
+                <motion.button
+                  onClick={() => showPaywall({ source: 'pricing' })}
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[52px] cursor-pointer bg-gradient-to-r from-ice-500 to-blue-600 text-white shadow-glow-ice hover:scale-[1.02] hover:shadow-lg"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  DESBLOQUEAR AHORA
+                  <span className="ml-1">{'\u2192'}</span>
+                </motion.button>
+              )}
+
+              {/* Sub-CTA text */}
+              <div className="mt-5 flex flex-col items-center gap-2 text-center">
+                <p className="text-sm text-slate-500">
+                  Un solo pago. Acceso de por vida. Sin cargos recurrentes.
+                </p>
+                <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 mt-1">
+                  <span className="text-sm text-slate-500">💳 Pago seguro con Stripe</span>
+                  <span className="text-sm text-slate-500">↩️ 7 días de garantía de devolución</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Garantía ──────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4 }}
+        className="glass-card p-6 md:p-8 border border-emerald-500/20 mb-16"
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+          <div className="shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <Shield size={28} className="text-emerald-400" />
+            </div>
+          </div>
+          <div>
+            <h3 className="font-heading font-bold text-lg text-white">
+              7 días de garantía
+            </h3>
+            <p className="text-sm text-slate-400 font-body mt-1">
+              Si no mejoras tu gameplay, te devolvemos tu dinero. Sin preguntas, sin letras chiquitas.
+            </p>
+          </div>
         </div>
       </motion.div>
 
@@ -653,51 +252,6 @@ export default function PricingPage() {
           ))}
         </div>
       </div>
-
-      {/* ── Garantía ──────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4 }}
-        className="glass-card p-6 md:p-8 border border-emerald-500/20 mb-12"
-      >
-        <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          <div className="shrink-0">
-            <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Shield size={28} className="text-emerald-400" />
-            </div>
-          </div>
-          <div>
-            <h3 className="font-heading font-bold text-lg text-white">
-              7 días de garantía
-            </h3>
-            <p className="text-sm text-slate-400 font-body mt-1">
-              Si no mejoras tu gameplay, te devolvemos tu dinero. Sin preguntas, sin letras chiquitas.
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── CTA Final ─────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4 }}
-        className="text-center"
-      >
-        <p className="text-lg text-slate-400 font-ui mb-5">
-          ¿Aún no estás seguro? Prueba el generador gratis y ve la diferencia.
-        </p>
-        <Link
-          href="/generator"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-fire-500 to-ice-500 text-white font-ui font-bold text-sm tracking-wider uppercase shadow-glow-fire hover:scale-[1.02] transition-all duration-300 min-h-[48px]"
-        >
-          <Target size={18} />
-          Probar Generador Gratis
-        </Link>
-      </motion.div>
     </div>
   );
 }

@@ -116,7 +116,7 @@ export function PricingSection() {
                 </h3>
 
                 <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl text-slate-600 line-through font-heading">$599</span>
+                  <span className="text-2xl text-slate-600 line-through font-heading">$349</span>
                   <span className="text-5xl md:text-6xl font-heading font-black text-white">
                     $199
                   </span>
@@ -172,9 +172,7 @@ export function PricingSection() {
             <span className="text-sm text-slate-500">💳 Pago seguro con Stripe</span>
             <span className="text-sm text-slate-500">↩️ 7 días de garantía de devolución</span>
           </div>
-          <Link href="/pricing" className="mt-3 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
-            Ver comparación completa con precios en tu moneda →
-          </Link>
+          {/* Enlace de comparación eliminado — pricing simplificado */}
         </motion.div>
       </div>
     </section>

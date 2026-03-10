@@ -35,7 +35,7 @@ export const PRICING = {
   launchPrice: parseInt(process.env.PREMIUM_PRICE_MXN || '19900', 10),
 
   // Precio original (tachado, para mostrar el descuento)
-  originalPrice: parseInt(process.env.PREMIUM_ORIGINAL_PRICE_MXN || '59900', 10),
+  originalPrice: parseInt(process.env.PREMIUM_ORIGINAL_PRICE_MXN || '34900', 10),
 
   // Moneda
   currency: (process.env.PREMIUM_CURRENCY || 'MXN').toLowerCase() as 'mxn',

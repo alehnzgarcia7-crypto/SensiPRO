@@ -242,7 +242,7 @@ export function PaywallModal() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <Zap className="w-3 h-3" />
-                <span className="font-semibold">67% OFF — LANZAMIENTO</span>
+                <span className="font-semibold">43% OFF — LANZAMIENTO</span>
               </motion.div>
 
               {/* Título */}
@@ -256,9 +256,9 @@ export function PaywallModal() {
                   $199
                 </span>
                 <span className="text-sm text-slate-400">MXN</span>
-                <span className="text-lg text-slate-500 line-through">$599</span>
+                <span className="text-lg text-slate-500 line-through">$349</span>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">
-                  -67%
+                  -43%
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">Pago único. Acceso de por vida. Sin suscripción.</p>
