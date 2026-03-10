@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
               paymentProvider: 'stripe',
               paymentId: session.id,
               paymentMethod: 'card',
-              amountPaid: session.amount_total || 29900,
+              amountPaid: session.amount_total || 19900,
               currency: (session.currency || 'mxn').toUpperCase(),
               device: session.metadata?.device,
               fingerCount: session.metadata?.fingerCount ? parseInt(session.metadata.fingerCount) : undefined,

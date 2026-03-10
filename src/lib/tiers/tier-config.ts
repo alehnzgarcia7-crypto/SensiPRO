@@ -43,8 +43,8 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
     key: 'PREMIUM',
     name: 'Premium',
     nameEs: 'Premium',
-    priceMxn: 49,
-    priceLabel: '$49 MXN/mes',
+    priceMxn: 199,
+    priceLabel: '$199 MXN (pago único)',
     color: '#f59e0b',
     icon: '⭐',
     features: {
@@ -70,8 +70,8 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
     key: 'VIP',
     name: 'VIP',
     nameEs: 'VIP',
-    priceMxn: 99,
-    priceLabel: '$99 MXN/mes',
+    priceMxn: 399,
+    priceLabel: '$399 MXN (pago único)',
     color: '#a855f7',
     icon: '👑',
     features: {

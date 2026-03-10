@@ -62,11 +62,11 @@ export const FREE_HISTORY_LIMIT = 10;
 export const FREE_BRANDS = ['Samsung', 'Apple', 'Redmi'];
 export const FREE_STYLES = ['BALANCED'] as const;
 
-// Pricing (centavos MXN)
-export const PREMIUM_MONTHLY_PRICE = 4900;    // $49 MXN
-export const PREMIUM_ANNUAL_PRICE = 39900;    // $399 MXN
-export const VIP_MONTHLY_PRICE = 9900;        // $99 MXN
-export const VIP_ANNUAL_PRICE = 79900;        // $799 MXN
+// Pricing (centavos MXN — pago único)
+export const PREMIUM_MONTHLY_PRICE = 19900;   // $199 MXN (pago único)
+export const PREMIUM_ANNUAL_PRICE = 19900;    // $199 MXN (pago único)
+export const VIP_MONTHLY_PRICE = 39900;       // $399 MXN (pago único)
+export const VIP_ANNUAL_PRICE = 39900;        // $399 MXN (pago único)
 
 // Code format
 export const CODE_PREFIX = 'ARES';

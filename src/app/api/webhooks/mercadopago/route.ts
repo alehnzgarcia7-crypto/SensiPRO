@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             paymentProvider: 'mercadopago',
             paymentId: String(payment.id),
             paymentMethod: 'mercadopago',
-            amountPaid: Math.round((payment.transaction_amount || 299) * 100),
+            amountPaid: Math.round((payment.transaction_amount || 199) * 100),
             currency: payment.currency_id || 'MXN',
             device: metadata?.device as string | undefined,
             fingerCount: metadata?.fingerCount

@@ -243,7 +243,7 @@ export function PremiumBlur({
           transition={{ delay: 1 }}
         >
           <span className="text-slate-500 line-through">$599</span>
-          <span className="text-cyan-400 font-bold">$299 MXN</span>
+          <span className="text-cyan-400 font-bold">$199 MXN</span>
           <span className="text-slate-500">{'\u2022'} Pago único</span>
         </motion.div>
 

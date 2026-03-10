@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search, Copy, Check, ChevronRight } from 'lucide-react';
+import { Search, Lock, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -67,7 +67,6 @@ export function InteractiveDemo() {
   const [sensitivity, setSensitivity] = useState<SensitivityResult | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [revealedBars, setRevealedBars] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -159,23 +158,6 @@ export function InteractiveDemo() {
       setRevealedBars(count);
       if (count >= 6) clearInterval(interval);
     }, 100);
-  };
-
-  // Copy to clipboard
-  const handleCopy = async () => {
-    if (!sensitivity) return;
-
-    const text = SENSI_LABELS
-      .map((s) => `${s.label}: ${sensitivity[s.key]}`)
-      .join('\n');
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard API not available
-    }
   };
 
   // Close dropdown on click outside
@@ -313,9 +295,9 @@ export function InteractiveDemo() {
                     />
                   </div>
                   <span className={`text-lg font-heading font-bold w-12 text-right tabular-nums transition-opacity duration-300 ${
-                    isRevealed ? 'text-white opacity-100' : 'opacity-0'
+                    isRevealed ? 'text-cyan-400/60 opacity-100 blur-[6px] select-none' : 'opacity-0'
                   }`}>
-                    {isRevealed ? value : 0}
+                    {isRevealed ? '???' : ''}
                   </span>
                 </div>
               );
@@ -336,26 +318,15 @@ export function InteractiveDemo() {
             )}
           </div>
 
-          {/* Actions */}
+          {/* CTA to generator */}
           {sensitivity && (
-            <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
-              <button
-                onClick={handleCopy}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 min-h-[44px] ${
-                  copied
-                    ? 'bg-green-500/15 text-green-400 border border-green-500/30'
-                    : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/15'
-                }`}
-              >
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-                {copied ? '¡Copiados!' : 'Copiar valores'}
-              </button>
-
+            <div className="mt-6 flex flex-col items-center gap-3">
               <Link
                 href="/generator"
-                className="flex items-center gap-1 text-sm text-slate-400 hover:text-cyan-400 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 min-h-[44px] bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:scale-[1.03] shadow-[0_0_20px_rgba(6,182,212,0.3)]"
               >
-                ¿Quieres Headshot Mode, HUD codes y más?
+                <Lock size={16} />
+                Ve al Generador para ver tus resultados
                 <ChevronRight size={14} />
               </Link>
             </div>

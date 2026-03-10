@@ -31,7 +31,7 @@ export const mpPayment = mercadopagoClient
   : null;
 
 // Conversiones de precio por país (aproximados)
-// Base: $299 MXN = ~$14.90 USD (Feb 2026)
+// Base: $199 MXN = ~$9.95 USD (Mar 2026)
 export const LATAM_PRICES: Record<string, {
   amount: number;
   currency: string;
@@ -39,14 +39,14 @@ export const LATAM_PRICES: Record<string, {
   country: string;
   formatted: string;
 }> = {
-  MXN: { amount: 299, currency: 'MXN', symbol: '$', country: 'México', formatted: '$299 MXN' },
-  ARS: { amount: 14900, currency: 'ARS', symbol: '$', country: 'Argentina', formatted: '$14,900 ARS' },
-  BRL: { amount: 79.90, currency: 'BRL', symbol: 'R$', country: 'Brasil', formatted: 'R$79.90' },
-  COP: { amount: 64900, currency: 'COP', symbol: '$', country: 'Colombia', formatted: '$64,900 COP' },
-  CLP: { amount: 14900, currency: 'CLP', symbol: '$', country: 'Chile', formatted: '$14,900 CLP' },
-  PEN: { amount: 54.90, currency: 'PEN', symbol: 'S/', country: 'Perú', formatted: 'S/54.90' },
-  UYU: { amount: 649, currency: 'UYU', symbol: '$', country: 'Uruguay', formatted: '$649 UYU' },
-  USD: { amount: 14.99, currency: 'USD', symbol: '$', country: 'Internacional', formatted: '$14.99 USD' },
+  MXN: { amount: 199, currency: 'MXN', symbol: '$', country: 'México', formatted: '$199 MXN' },
+  ARS: { amount: 9900, currency: 'ARS', symbol: '$', country: 'Argentina', formatted: '$9,900 ARS' },
+  BRL: { amount: 49.90, currency: 'BRL', symbol: 'R$', country: 'Brasil', formatted: 'R$49.90' },
+  COP: { amount: 42900, currency: 'COP', symbol: '$', country: 'Colombia', formatted: '$42,900 COP' },
+  CLP: { amount: 9900, currency: 'CLP', symbol: '$', country: 'Chile', formatted: '$9,900 CLP' },
+  PEN: { amount: 36.90, currency: 'PEN', symbol: 'S/', country: 'Perú', formatted: 'S/36.90' },
+  UYU: { amount: 399, currency: 'UYU', symbol: '$', country: 'Uruguay', formatted: '$399 UYU' },
+  USD: { amount: 9.99, currency: 'USD', symbol: '$', country: 'Internacional', formatted: '$9.99 USD' },
 };
 
 // Detectar moneda por país

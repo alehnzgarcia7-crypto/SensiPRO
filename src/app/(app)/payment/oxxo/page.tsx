@@ -41,7 +41,7 @@ function OxxoContent() {
 
           <div className="flex items-start gap-3">
             <div className="w-7 h-7 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-yellow-400">4</div>
-            <p className="text-sm text-slate-300">Paga <span className="text-yellow-400 font-bold">$299 MXN</span> en efectivo</p>
+            <p className="text-sm text-slate-300">Paga <span className="text-yellow-400 font-bold">$199 MXN</span> en efectivo</p>
           </div>
 
           <div className="flex items-start gap-3">

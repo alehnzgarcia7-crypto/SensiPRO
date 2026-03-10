@@ -224,15 +224,6 @@ export const FEATURES: LandingFeature[] = [
     highlight: 'Side-by-side',
   },
   {
-    icon: 'Share2',
-    title: 'Exportar y Compartir',
-    description:
-      'Exporta tu configuración como imagen profesional para Instagram Stories o comparte los valores por WhatsApp, Telegram o cualquier red social.',
-    color: '#14b8a6',
-    isNew: false,
-    highlight: 'Instagram ready',
-  },
-  {
     icon: 'Shield',
     title: 'Precisión + DPI Custom',
     description:
@@ -301,7 +292,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: '¿Soportan mi dispositivo?',
-    a: `Tenemos ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas: Samsung, Apple, Xiaomi, Redmi, POCO, Motorola, Realme, OPPO, Vivo, OnePlus, Infinix, Tecno, Honor, Nothing, Google, Huawei, y más. Si no encuentras el tuyo, escríbenos y lo agregamos en 48 horas.`,
+    a: `Tenemos ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas: Samsung, Apple, Xiaomi, Redmi, POCO, Motorola, Realme, OPPO, Vivo, OnePlus, Infinix, Tecno, Honor, Nothing, Google, Huawei, y más. Si no encuentras el tuyo, escríbenos y lo agregamos.`,
   },
   {
     q: '¿Por qué mis valores son diferentes a los de YouTube?',

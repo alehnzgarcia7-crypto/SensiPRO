@@ -242,7 +242,7 @@ export function PaywallModal() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <Zap className="w-3 h-3" />
-                <span className="font-semibold">50% OFF — LANZAMIENTO</span>
+                <span className="font-semibold">67% OFF — LANZAMIENTO</span>
               </motion.div>
 
               {/* Título */}
@@ -253,12 +253,12 @@ export function PaywallModal() {
               {/* Precio */}
               <div className="flex items-baseline gap-3 mt-2">
                 <span className="text-3xl sm:text-4xl font-bold text-white font-[family-name:var(--font-orbitron),sans-serif]">
-                  $299
+                  $199
                 </span>
                 <span className="text-sm text-slate-400">MXN</span>
                 <span className="text-lg text-slate-500 line-through">$599</span>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">
-                  -50%
+                  -67%
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">Pago único. Acceso de por vida. Sin suscripción.</p>
@@ -501,7 +501,7 @@ export function PaywallModal() {
                     >
                       <Lock className="w-4 h-4" />
                       {selectedMethod
-                        ? `PAGAR $299 MXN${selectedMethod === 'oxxo' ? ' EN OXXO' : ''}`
+                        ? `PAGAR $199 MXN${selectedMethod === 'oxxo' ? ' EN OXXO' : ''}`
                         : 'Selecciona un método de pago'
                       }
                     </motion.button>

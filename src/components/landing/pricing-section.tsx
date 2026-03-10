@@ -3,39 +3,12 @@
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
-// PricingSection — 2 plans (Básico + Pro) side by side,
-// animated rotating border on Pro card, shimmer effect,
-// monthly/annual toggle, guarantee badges, POPULAR badge
+// PricingSection — Single Pro plan, one-time $199 MXN lifetime
 // ═══════════════════════════════════════════════════════════════
 
-interface PlanFeature {
-  text: string;
-  included: boolean;
-  proExclusive?: boolean;
-}
-
-// Card Básico oculta — datos preservados para reactivar
-// const FREE_FEATURES: PlanFeature[] = [
-//   { text: 'Algoritmo DPI-first básico', included: true },
-//   { text: '5 búsquedas por día', included: true },
-//   { text: '3 configuraciones guardadas', included: true },
-//   { text: 'Headshot Mode básico (sensibilidad + Vertical Drag)', included: true },
-//   { text: 'Academia básica (8 guías completas)', included: true },
-//   { text: '1 código HUD (2 dedos)', included: true },
-//   { text: '9 estilos de calibración', included: true },
-//   { text: 'Giroscopio calibrado', included: true },
-//   { text: 'Exportar imagen', included: true },
-//   { text: 'Soporte 60/90/120 Hz', included: true },
-//   { text: 'Headshot Mode COMPLETO', included: false },
-//   { text: 'TODOS los códigos HUD (17)', included: false },
-//   { text: 'ARES AI Coach', included: false },
-//   { text: 'Comparador side-by-side', included: false },
-// ];
-
-const PRO_FEATURES: PlanFeature[] = [
+const PRO_FEATURES: { text: string; included: boolean; proExclusive?: boolean }[] = [
   { text: 'Todo lo del plan Básico', included: true },
   { text: 'Calibración forense completa + DPI custom', included: true, proExclusive: true },
   { text: 'Búsquedas ILIMITADAS', included: true, proExclusive: true },
@@ -50,12 +23,6 @@ const PRO_FEATURES: PlanFeature[] = [
 ];
 
 export function PricingSection() {
-  const [isAnnual, setIsAnnual] = useState(false);
-
-  const monthlyPrice = '$4.99';
-  const annualPrice = '$2.99';
-  const currentPrice = isAnnual ? annualPrice : monthlyPrice;
-
   return (
     <section id="pricing" className="py-20 md:py-28 px-4">
       <div className="mx-auto max-w-4xl">
@@ -66,7 +33,7 @@ export function PricingSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-display font-bold text-center text-white"
         >
-          Planes simples, sin sorpresas
+          Un solo pago, acceso de por vida
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -75,46 +42,11 @@ export function PricingSection() {
           transition={{ delay: 0.1 }}
           className="mt-3 text-center text-slate-400 text-sm"
         >
-          Elige tu plan. Mejora cuando quieras.
+          Desbloquea todo SensiPRO con un pago único.
         </motion.p>
 
-        {/* Monthly/Annual toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="mt-8 flex justify-center"
-        >
-          <div className="inline-flex items-center rounded-xl p-1" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 min-h-[40px] ${
-                !isAnnual
-                  ? 'bg-cyan-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Mensual
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 min-h-[40px] ${
-                isAnnual
-                  ? 'bg-cyan-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Anual
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Cards */}
+        {/* Card */}
         <div className="mt-12 flex justify-center">
-          {/* Card Básico oculta — se reactiva cuando definamos modelo freemium */}
-
-          {/* ── Card Pro ── */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -157,7 +89,7 @@ export function PricingSection() {
                       boxShadow: '0 0 20px rgba(6, 182, 212, 0.4)',
                     }}
                   >
-                    ⭐ POPULAR
+                    PAGO ÚNICO
                   </span>
                 </motion.div>
 
@@ -183,32 +115,17 @@ export function PricingSection() {
                   </span>
                 </h3>
 
-                <div className="mt-4 flex items-baseline gap-1">
-                  {isAnnual && (
-                    <span className="text-2xl text-slate-600 line-through font-heading mr-2">$4.99</span>
-                  )}
-                  <span className="text-5xl md:text-6xl font-heading font-black text-white transition-all duration-300">
-                    {currentPrice}
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="text-2xl text-slate-600 line-through font-heading">$599</span>
+                  <span className="text-5xl md:text-6xl font-heading font-black text-white">
+                    $199
                   </span>
-                  <span className="text-lg text-slate-400">/mes</span>
+                  <span className="text-lg text-slate-400">MXN</span>
                 </div>
 
-                {isAnnual ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-2 inline-flex items-center gap-2"
-                  >
-                    <span className="text-sm text-cyan-400">facturado anual</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-                      AHORRA 40%
-                    </span>
-                  </motion.div>
-                ) : (
-                  <p className="mt-2 text-sm text-cyan-400">
-                    $2.99/mes si pagas anual
-                  </p>
-                )}
+                <p className="mt-2 text-sm text-cyan-400">
+                  Pago único de por vida
+                </p>
 
                 <div className="my-6 h-px bg-white/5" />
 
@@ -232,7 +149,7 @@ export function PricingSection() {
                       boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)',
                     }}
                   >
-                    COMENZAR PRO →
+                    DESBLOQUEAR PRO — $199 MXN
                   </Link>
                 </div>
               </div>
@@ -249,7 +166,9 @@ export function PricingSection() {
           className="mt-10 flex flex-col items-center gap-2"
         >
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
-            <span className="text-sm text-slate-500">🔒 Cancela cuando quieras. Sin contratos.</span>
+            <span className="text-sm text-slate-500">Un solo pago. Acceso de por vida. Sin cargos recurrentes.</span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-1">
             <span className="text-sm text-slate-500">💳 Pago seguro con Stripe</span>
             <span className="text-sm text-slate-500">↩️ 7 días de garantía de devolución</span>
           </div>

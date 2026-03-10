@@ -107,7 +107,7 @@ export function BrandsSection() {
           transition={{ delay: 0.5 }}
           className="mt-8 text-center text-xs text-slate-500"
         >
-          ¿No encuentras tu celular? Escríbenos y lo agregamos en 48 horas
+          ¿No encuentras tu celular? Escríbenos y lo agregamos
         </motion.p>
       </div>
     </section>

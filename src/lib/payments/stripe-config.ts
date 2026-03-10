@@ -32,7 +32,7 @@ export const stripeLifetime = process.env.STRIPE_SECRET_KEY
 // Configuración de precios
 export const PRICING = {
   // Precio de lanzamiento (lo que paga el usuario)
-  launchPrice: parseInt(process.env.PREMIUM_PRICE_MXN || '29900', 10),
+  launchPrice: parseInt(process.env.PREMIUM_PRICE_MXN || '19900', 10),
 
   // Precio original (tachado, para mostrar el descuento)
   originalPrice: parseInt(process.env.PREMIUM_ORIGINAL_PRICE_MXN || '59900', 10),

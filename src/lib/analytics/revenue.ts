@@ -7,11 +7,11 @@ import type { UserTier, PaymentProvider, CodeType } from '@prisma/client';
 // MRR, conversión, LTV, revenue diario, métricas de códigos
 // ══════════════════════════════════════════════════════════
 
-/** Precios mensuales por tier en centavos MXN */
-const MONTHLY_PRICE_CENTAVOS: Record<UserTier, number> = {
+/** Precios por tier en centavos MXN (pago único) */
+const PRICE_CENTAVOS: Record<UserTier, number> = {
   FREE: 0,
-  PREMIUM: 4900,
-  VIP: 9900,
+  PREMIUM: 19900,
+  VIP: 39900,
 };
 
 /** Resumen general de usuarios y conversión */
@@ -153,7 +153,7 @@ export async function getRevenueAnalytics(): Promise<RevenueAnalytics> {
   const paidUsers = premiumUsers + vipUsers;
   const conversionRate = totalUsers > 0 ? (paidUsers / totalUsers) * 100 : 0;
   const totalRevenueCentavos = totalRevenue._sum.amount ?? 0;
-  const mrr = (premiumUsers * MONTHLY_PRICE_CENTAVOS.PREMIUM) + (vipUsers * MONTHLY_PRICE_CENTAVOS.VIP);
+  const mrr = (premiumUsers * PRICE_CENTAVOS.PREMIUM) + (vipUsers * PRICE_CENTAVOS.VIP);
   const arr = mrr * 12;
   const ltv = paidUsers > 0 ? Math.round(totalRevenueCentavos / paidUsers) : 0;
 

@@ -84,14 +84,6 @@ const FEATURES: FeatureDef[] = [
     color: '#ec4899',
   },
   {
-    icon: '📤',
-    title: 'Exportar y Compartir',
-    description: 'Exporta tu config como imagen para Instagram Stories o comparte por WhatsApp con tu squad.',
-    badge: null,
-    stat: 'Imagen lista para redes',
-    color: '#f97316',
-  },
-  {
     icon: '🤖',
     title: 'ARES AI Coach',
     description: 'Tu coach personal de Free Fire con IA. Conoce tu dispositivo y te da consejos específicos para subir de nivel.',

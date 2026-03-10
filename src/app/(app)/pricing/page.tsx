@@ -62,10 +62,10 @@ interface PlanFeature {
 }
 
 const BASE_PRICES_USD = {
-  proMonthly: 4.99,
-  proAnnualMonthly: 3.99,
-  eliteMonthly: 9.99,
-  eliteAnnualMonthly: 7.49,
+  proOneTime: 9.99,
+  proOriginal: 29.99,
+  eliteOneTime: 19.99,
+  eliteOriginal: 49.99,
 };
 
 function formatPrice(usd: number, currency: CurrencyCode): string {
@@ -75,11 +75,6 @@ function formatPrice(usd: number, currency: CurrencyCode): string {
     return `${info.symbol}${Math.round(converted).toLocaleString('es-MX')}`;
   }
   return `${info.symbol}${converted.toFixed(info.decimals)}`;
-}
-
-function formatAnnualTotal(monthlyUsd: number, currency: CurrencyCode): string {
-  const annual = monthlyUsd * 12;
-  return formatPrice(annual, currency);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -115,8 +110,8 @@ const comparisonFeatures: PlanFeature[] = [
 
 const faqs = [
   {
-    q: '¿Puedo cancelar en cualquier momento?',
-    a: 'Sí, sin compromiso. Tu plan sigue activo hasta el final del periodo pagado. No hay cargos adicionales ni penalizaciones.',
+    q: '¿Es realmente pago único?',
+    a: 'Sí, un solo pago y acceso de por vida. Sin cargos recurrentes, sin renovaciones automáticas.',
   },
   {
     q: '¿Qué métodos de pago aceptan?',
@@ -125,10 +120,6 @@ const faqs = [
   {
     q: '¿El Headshot Mode funciona sin PRO?',
     a: 'No, el Headshot Mode completo (HUD codes, training plans, técnicas de drag) es exclusivo de PRO y ELITE. El plan Gratis solo incluye sensibilidad básica.',
-  },
-  {
-    q: '¿Puedo cambiar de plan?',
-    a: 'Sí, puedes subir o bajar de plan en cualquier momento. El cambio aplica en tu siguiente ciclo de facturación.',
   },
   {
     q: '¿Ofrecen reembolsos?',
@@ -141,10 +132,6 @@ const faqs = [
   {
     q: '¿El generador básico siempre será gratis?',
     a: 'Sí, el generador de sensibilidad básico siempre será gratuito. Es nuestra promesa.',
-  },
-  {
-    q: '¿Qué pasa con mis datos si cancelo?',
-    a: 'Tus configuraciones guardadas se mantienen por 30 días. Puedes reactivar tu plan para recuperarlas.',
   },
 ];
 
@@ -219,62 +206,14 @@ function CurrencySelector({
   );
 }
 
-function BillingToggle({
-  annual,
-  onToggle,
-}: {
-  annual: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div className="flex items-center justify-center gap-4">
-      <span
-        className={cn(
-          'font-ui text-sm font-semibold transition-colors',
-          !annual ? 'text-white' : 'text-slate-500',
-        )}
-      >
-        Mensual
-      </span>
-      <button
-        onClick={onToggle}
-        className="relative w-14 h-7 rounded-full bg-background-elevated border border-white/10 transition-colors hover:border-ice-500/30"
-        aria-label="Cambiar entre mensual y anual"
-      >
-        <motion.div
-          className="absolute top-0.5 w-6 h-6 rounded-full bg-gradient-to-r from-ice-500 to-fire-500 shadow-glow-ice"
-          animate={{ left: annual ? '1.75rem' : '0.125rem' }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        />
-      </button>
-      <span
-        className={cn(
-          'font-ui text-sm font-semibold transition-colors',
-          annual ? 'text-white' : 'text-slate-500',
-        )}
-      >
-        Anual
-      </span>
-      {annual && (
-        <motion.span
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="px-2.5 py-0.5 rounded-full bg-success/10 border border-success/20 text-success text-xs font-ui font-bold"
-        >
-          AHORRA 20-25%
-        </motion.span>
-      )}
-    </div>
-  );
-}
+// BillingToggle removed — all plans are one-time payment
 
 function PlanCard({
   name,
   icon,
   badge,
-  monthlyPriceUsd,
-  annualMonthlyPriceUsd,
-  annual,
+  priceUsd,
+  originalPriceUsd,
   currency,
   color,
   glowClass,
@@ -283,7 +222,6 @@ function PlanCard({
   cta,
   ctaHref,
   highlighted,
-  savings,
   index,
   onCtaClick,
   isPremium,
@@ -291,9 +229,8 @@ function PlanCard({
   name: string;
   icon: React.ReactNode;
   badge: string | null;
-  monthlyPriceUsd: number;
-  annualMonthlyPriceUsd: number;
-  annual: boolean;
+  priceUsd: number;
+  originalPriceUsd?: number;
   currency: CurrencyCode;
   color: string;
   glowClass: string;
@@ -302,15 +239,12 @@ function PlanCard({
   cta: string;
   ctaHref: string;
   highlighted: boolean;
-  savings: string | null;
   index: number;
   onCtaClick?: () => void;
   isPremium?: boolean;
 }) {
-  const currentPrice = annual ? annualMonthlyPriceUsd : monthlyPriceUsd;
-  const monthlyFormatted = formatPrice(monthlyPriceUsd, currency);
-  const currentFormatted = formatPrice(currentPrice, currency);
-  const annualTotalFormatted = annual ? formatAnnualTotal(annualMonthlyPriceUsd, currency) : '';
+  const currentFormatted = formatPrice(priceUsd, currency);
+  const originalFormatted = originalPriceUsd ? formatPrice(originalPriceUsd, currency) : null;
 
   const card = (
     <div
@@ -337,40 +271,28 @@ function PlanCard({
         <h3 className="font-heading font-bold text-xl text-white">{name}</h3>
       </div>
 
-      <div className="mt-5 flex items-baseline gap-1">
+      <div className="mt-5 flex items-baseline gap-2">
+        {originalFormatted && (
+          <span className="text-xl text-slate-600 line-through font-mono">
+            {originalFormatted}
+          </span>
+        )}
         <AnimatePresence mode="wait">
           <motion.span
-            key={`${currentPrice}-${currency}`}
+            key={`${priceUsd}-${currency}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             className="text-5xl font-heading font-black text-white"
           >
-            {monthlyPriceUsd === 0 ? '$0' : currentFormatted}
+            {priceUsd === 0 ? '$0' : currentFormatted}
           </motion.span>
         </AnimatePresence>
-        <span className="text-sm text-slate-500 font-body">
-          {monthlyPriceUsd === 0 ? 'siempre' : '/mes'}
-        </span>
       </div>
-
-      {monthlyPriceUsd > 0 && annual && (
-        <div className="mt-1 flex items-center gap-2">
-          <span className="text-sm text-slate-600 line-through font-mono">
-            {monthlyFormatted}/mes
-          </span>
-          <span className="px-2 py-0.5 rounded-full bg-success/10 border border-success/20 text-success text-xs font-ui font-bold">
-            {savings}
-          </span>
-        </div>
-      )}
-
-      {monthlyPriceUsd > 0 && annual && (
-        <p className="mt-1 text-xs text-slate-500 font-body">
-          {annualTotalFormatted}/año facturado
-        </p>
-      )}
+      <span className="text-sm text-slate-500 font-body mt-1">
+        {priceUsd === 0 ? 'Gratis para siempre' : 'Pago único de por vida'}
+      </span>
 
       <div className="my-6 h-px bg-white/5" />
 
@@ -395,7 +317,7 @@ function PlanCard({
       </ul>
 
       <div className="mt-8">
-        {isPremium && monthlyPriceUsd > 0 ? (
+        {isPremium && priceUsd > 0 ? (
           <div className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase bg-success/10 border border-success/20 text-success min-h-[48px]">
             <Check size={16} />
             Ya tienes acceso
@@ -420,7 +342,7 @@ function PlanCard({
               'flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-ui font-bold text-sm tracking-wider uppercase transition-all duration-300 min-h-[48px]',
               highlighted
                 ? `bg-gradient-to-r ${color} text-white ${glowClass} hover:scale-[1.02] hover:shadow-lg`
-                : monthlyPriceUsd === 0
+                : priceUsd === 0
                   ? 'bg-transparent border border-slate-600/50 text-slate-400 hover:bg-white/5'
                   : `bg-transparent border ${borderClass} text-white hover:bg-white/5`,
             )}
@@ -568,7 +490,6 @@ function ComparisonTable() {
 
 export default function PricingPage() {
   const [currency, setCurrency] = useState<CurrencyCode>('MXN');
-  const [annual, setAnnual] = useState(false);
   const { isPremium, showPaywall } = usePremiumContext();
 
   return (
@@ -586,19 +507,18 @@ export default function PricingPage() {
           </span>
         </h1>
         <p className="mt-4 text-lg text-slate-400 font-ui max-w-lg mx-auto">
-          Desde sensibilidad básica hasta coaching profesional completo
+          Un solo pago, acceso de por vida. Sin suscripciones.
         </p>
       </motion.div>
 
-      {/* ── Controles: Moneda + Billing ───────────────── */}
+      {/* ── Controles: Moneda ───────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.15 }}
-        className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12"
+        className="flex items-center justify-center gap-6 mb-12"
       >
         <CurrencySelector selected={currency} onSelect={setCurrency} />
-        <BillingToggle annual={annual} onToggle={() => setAnnual(!annual)} />
       </motion.div>
 
       {/* ── Plan Cards ────────────────────────────────── */}
@@ -608,9 +528,7 @@ export default function PricingPage() {
           name="Gratis"
           icon={<Gamepad2 size={20} className="text-slate-500" />}
           badge={null}
-          monthlyPriceUsd={0}
-          annualMonthlyPriceUsd={0}
-          annual={annual}
+          priceUsd={0}
           currency={currency}
           color=""
           glowClass=""
@@ -629,7 +547,6 @@ export default function PricingPage() {
           cta="Empezar Gratis"
           ctaHref="/register"
           highlighted={false}
-          savings={null}
           index={0}
         />
 
@@ -637,10 +554,9 @@ export default function PricingPage() {
         <PlanCard
           name="PRO"
           icon={<Zap size={20} className="text-ice-400" />}
-          badge="\u26A1 MÁS POPULAR"
-          monthlyPriceUsd={BASE_PRICES_USD.proMonthly}
-          annualMonthlyPriceUsd={BASE_PRICES_USD.proAnnualMonthly}
-          annual={annual}
+          badge={'\u26A1 PAGO ÚNICO'}
+          priceUsd={BASE_PRICES_USD.proOneTime}
+          originalPriceUsd={BASE_PRICES_USD.proOriginal}
           currency={currency}
           color="from-ice-500 to-blue-600"
           glowClass="shadow-glow-ice"
@@ -662,7 +578,6 @@ export default function PricingPage() {
           cta="Elegir PRO"
           ctaHref="/payment?plan=pro"
           highlighted={true}
-          savings="AHORRA 20%"
           index={1}
           isPremium={isPremium}
           onCtaClick={() => showPaywall({ source: 'pricing' })}
@@ -672,10 +587,9 @@ export default function PricingPage() {
         <PlanCard
           name="ELITE"
           icon={<Crown size={20} className="text-amber-400" />}
-          badge="\u{1F3C6} ELITE"
-          monthlyPriceUsd={BASE_PRICES_USD.eliteMonthly}
-          annualMonthlyPriceUsd={BASE_PRICES_USD.eliteAnnualMonthly}
-          annual={annual}
+          badge={'\u{1F3C6} ELITE'}
+          priceUsd={BASE_PRICES_USD.eliteOneTime}
+          originalPriceUsd={BASE_PRICES_USD.eliteOriginal}
           currency={currency}
           color="from-amber-500 to-yellow-600"
           glowClass="shadow-glow-premium"
@@ -694,7 +608,6 @@ export default function PricingPage() {
           cta="Elegir ELITE"
           ctaHref="/payment?plan=elite"
           highlighted={false}
-          savings="AHORRA 25%"
           index={2}
           isPremium={isPremium}
           onCtaClick={() => showPaywall({ source: 'pricing' })}
