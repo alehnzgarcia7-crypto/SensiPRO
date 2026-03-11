@@ -43,9 +43,14 @@ interface HeadshotHudVariant {
 // ─── Mapeo de screenshots por código HUD ──────────────────────
 
 const SCREENSHOT_BY_CODE: Record<string, string> = {
-  '#FFHUDT6O3jSJjT59Po7eO': '/images/hud/hud-2d-clasico.png',
-  '#FFHUDT6O3jjZ0/KhPo7eM': '/images/hud/hud-3d-velocidad.png',
-  '#FFHUDT6O3jAwzFJlPo7eM': '/images/hud/hud-4d-garra-tactica.png',
+  // 2D — Clásico Básico (fingers: 2)
+  '#FFHUDT6O3jSJjT59Po7eO': '/images/hud-codes/hud-2d-clasico.png',
+  // 3D — Balanceado (fingers: 3)
+  '#FFHUDT6O3jqVY6q1Po7eP': '/images/hud-codes/hud-3d-velocidad.png',
+  // 4D — Garra Estándar (fingers: 4)
+  '#FFHUDT6O3jqVY6q1Po7eO': '/images/hud-codes/hud-4d-garra-tactica.png',
+  // 5D — Pro 5 Dedos (fingers: 5, fallback a 4D)
+  '#FFHUDT6O3jAwzFJlPo7eO': '/images/hud-codes/hud-4d-garra-tactica.png',
 };
 
 const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
@@ -64,7 +69,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Sin botón dedicado de agacharse',
         'Difícil hacer peek + shoot simultáneo',
       ],
-      screenshot: '/images/hud/hud-2d-clasico.png',
+      screenshot: '/images/hud-codes/hud-2d-clasico.png',
     },
     {
       dbLabel: 'Precisión Alta',
@@ -112,7 +117,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Requiere adaptación si vienes de 2 dedos',
         'El tercer dedo puede cansarse al inicio',
       ],
-      screenshot: '/images/hud/hud-3d-velocidad.png',
+      screenshot: '/images/hud-codes/hud-3d-velocidad.png',
     },
     {
       dbLabel: 'Precisión Sniper',
@@ -160,7 +165,7 @@ const HEADSHOT_VARIANTS: Record<FingerCount, HeadshotHudVariant[]> = {
         'Requiere ~14 días de adaptación',
         'Puede ser incómodo en celulares pequeños',
       ],
-      screenshot: '/images/hud/hud-4d-garra-tactica.png',
+      screenshot: '/images/hud-codes/hud-4d-garra-tactica.png',
     },
     {
       dbLabel: 'Garra Equilibrada',

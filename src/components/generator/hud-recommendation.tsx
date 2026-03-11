@@ -21,9 +21,9 @@ import { HudCodeBlock } from './hud-code-block';
 
 // Capturas reales de Free Fire por cantidad de dedos
 const FINGER_SCREENSHOTS: Partial<Record<2 | 3 | 4 | 5, string>> = {
-  2: '/images/hud/hud-2d-clasico.png',
-  3: '/images/hud/hud-3d-velocidad.png',
-  4: '/images/hud/hud-4d-garra-tactica.png',
+  2: '/images/hud-codes/hud-2d-clasico.png',
+  3: '/images/hud-codes/hud-3d-velocidad.png',
+  4: '/images/hud-codes/hud-4d-garra-tactica.png',
 };
 
 interface HudRecommendationPanelProps {
