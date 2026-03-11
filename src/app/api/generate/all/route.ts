@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 
 import { getOptionalSession } from '@/lib/auth/auth.middleware';
-import { enforceRateLimit } from '@/lib/security';
 
 const generateAllSchema = z.object({
   deviceId: z.string().cuid('ID de dispositivo inválido'),
@@ -41,13 +40,8 @@ export async function POST(request: NextRequest) {
 
     const { deviceId, style, includeGyro, userRam, userHz } = parsed.data;
 
-    // Obtener sesión (opcional — usuarios anónimos pueden generar con límites)
+    // Obtener sesión (opcional — usuarios anónimos pueden generar)
     const user = await getOptionalSession();
-    const userId = user?.id ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
-    const tier = user?.tier ?? 'FREE';
-
-    // Verificar rate limit (admin bypass via email)
-    await enforceRateLimit(userId, tier, user?.email);
 
     // Buscar dispositivo con todos sus specs
     const device = await prisma.device.findUnique({

@@ -30,7 +30,7 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
       exportImage: false,
       maxFavorites: 3,
       maxHistory: 10,
-      maxSearchesPerDay: 5,
+      maxSearchesPerDay: 9999,
       noAds: false,
       vipThemes: false,
       tournaments: false,

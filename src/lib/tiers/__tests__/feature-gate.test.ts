@@ -61,8 +61,8 @@ describe('getFeatureLimit', () => {
   it('PREMIUM maxFavorites is 9999', () => {
     expect(getFeatureLimit('PREMIUM', 'maxFavorites')).toBe(9999);
   });
-  it('FREE maxSearchesPerDay is 5', () => {
-    expect(getFeatureLimit('FREE', 'maxSearchesPerDay')).toBe(5);
+  it('FREE maxSearchesPerDay is unlimited', () => {
+    expect(getFeatureLimit('FREE', 'maxSearchesPerDay')).toBe(9999);
   });
   it('VIP maxHistory is 9999', () => {
     expect(getFeatureLimit('VIP', 'maxHistory')).toBe(9999);

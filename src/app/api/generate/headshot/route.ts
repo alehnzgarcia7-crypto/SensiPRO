@@ -14,7 +14,6 @@ import { z } from 'zod';
 
 
 import { getOptionalSession } from '@/lib/auth/auth.middleware';
-import { enforceRateLimit } from '@/lib/security';
 
 const headshotSchema = z.object({
   deviceId: z.string().cuid('ID de dispositivo inválido'),
@@ -45,14 +44,6 @@ export async function POST(request: NextRequest) {
     const { deviceId, userRam, userHz, fingers } = parsed.data;
 
     const user = await getOptionalSession();
-    const userId = user?.id ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
-    const tier = user?.tier ?? 'FREE';
-
-    // Verificar rate limit (admin bypass via email)
-    if (process.env.NODE_ENV !== 'development') {
-      await enforceRateLimit(userId, tier, user?.email);
-    }
-
     const device = await prisma.device.findUnique({
       where: { id: deviceId },
     });

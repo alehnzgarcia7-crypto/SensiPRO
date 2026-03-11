@@ -11,7 +11,7 @@ import Link from 'next/link';
 const PRO_FEATURES: { text: string; included: boolean; proExclusive?: boolean }[] = [
   { text: 'Todo lo del plan Básico', included: true },
   { text: 'Calibración forense completa + DPI custom', included: true, proExclusive: true },
-  { text: 'Búsquedas ILIMITADAS', included: true, proExclusive: true },
+  { text: 'Resultados DESBLOQUEADOS (sin blur)', included: true, proExclusive: true },
   { text: 'Configuraciones guardadas ilimitadas', included: true, proExclusive: true },
   { text: 'Headshot Mode COMPLETO (24 features, 32 armas, 5 técnicas, training 7 días)', included: true, proExclusive: true },
   { text: 'TODOS los códigos HUD (17 códigos, 2-5 dedos, con screenshots)', included: true, proExclusive: true },
