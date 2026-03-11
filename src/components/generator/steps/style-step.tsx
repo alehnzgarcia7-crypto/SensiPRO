@@ -7,6 +7,7 @@ import { Sword, Target, Crosshair } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
+import { useTrackEvent } from '@/hooks/use-track-event';
 import { cn } from '@/lib/cn';
 import { useGeneratorStore } from '@/stores/generator.store';
 
@@ -86,6 +87,7 @@ export function StyleStep() {
     setAllCalibrations,
     setError,
   } = useGeneratorStore();
+  const { track } = useTrackEvent();
 
   const handleGenerate = async () => {
     if (!selectedDevice) return;
@@ -111,6 +113,11 @@ export function StyleStep() {
           combinations: data.data.combinations,
           hudRecommendation: data.data.hudRecommendation,
           meta: data.data.meta,
+        });
+        track('SENSI_GENERATED', {
+          deviceBrand: selectedDevice.brand,
+          deviceModel: selectedDevice.model,
+          style: selectedStyle,
         });
       } else {
         setError(data.error?.message ?? 'Error al generar');

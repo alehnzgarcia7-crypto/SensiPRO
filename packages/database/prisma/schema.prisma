@@ -941,3 +941,75 @@ model EmailCapture {
   @@index([converted])
   @@index([createdAt])
 }
+
+// ──────────────────────────────────
+// 32. ANALYTICS EVENT — Tracking de eventos del Command Center
+// ──────────────────────────────────
+enum AnalyticsEventType {
+  PAGE_VIEW
+  SENSI_GENERATED
+  PAYWALL_SHOWN
+  PAYWALL_CLICKED
+  PAYMENT_STARTED
+  PAYMENT_COMPLETED
+  PAYMENT_FAILED
+  SIGNUP
+  LOGIN
+  DEVICE_SEARCHED
+  HEADSHOT_MODE_USED
+  ACADEMY_VIEWED
+  PREMIUM_ACTIVATED
+}
+
+model AnalyticsEvent {
+  id              String              @id @default(cuid())
+  eventType       AnalyticsEventType  @map("event_type")
+  userId          String?             @map("user_id")
+  sessionId       String              @map("session_id") @db.VarChar(100)
+  metadata        Json?
+  deviceInfo      Json?               @map("device_info")
+  ipHash          String?             @map("ip_hash") @db.VarChar(64)
+  path            String?             @db.VarChar(500)
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@map("analytics_events")
+  @@index([eventType])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([eventType, createdAt])
+}
+
+// ──────────────────────────────────
+// 33. APP CONFIG — Configuración dinámica de la app
+// ──────────────────────────────────
+model AppConfig {
+  id                  String    @id @default(cuid())
+  key                 String    @unique @db.VarChar(100)
+  value               String    @db.Text
+  description         String?   @db.VarChar(300)
+
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@map("app_config")
+  @@index([key])
+}
+
+// ──────────────────────────────────
+// 34. COMMAND CENTER ACCESS LOG
+// ──────────────────────────────────
+model CommandCenterLog {
+  id              String    @id @default(cuid())
+  email           String    @db.VarChar(255)
+  action          String    @db.VarChar(100)
+  path            String?   @db.VarChar(500)
+  ipAddress       String?   @map("ip_address") @db.VarChar(45)
+  userAgent       String?   @map("user_agent") @db.VarChar(500)
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("command_center_logs")
+  @@index([email])
+  @@index([createdAt(sort: Desc)])
+}

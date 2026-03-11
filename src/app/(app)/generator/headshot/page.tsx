@@ -28,6 +28,7 @@ import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-p
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
 import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
 import { PremiumBlur } from '@/components/paywall';
+import { useTrackEvent } from '@/hooks/use-track-event';
 import { useGeneratorStore } from '@/stores/generator.store';
 
 // ═══════════════════════════════════════════════════════════════
@@ -279,6 +280,7 @@ const sectionVariants = {
 
 export default function HeadshotPage() {
   const { selectedDevice, userRam, setUserRam, userHz, setUserHz } = useGeneratorStore();
+  const { track } = useTrackEvent();
   const [fingers, setFingers] = useState<FingerCount>(3);
   const [dpiEnabled, setDpiEnabled] = useState(false);
   const [data, setData] = useState<HeadshotApiResponse['data'] | null>(null);
@@ -319,6 +321,11 @@ export default function HeadshotPage() {
 
       if (json.success && json.data) {
         setData(json.data);
+        track('HEADSHOT_MODE_USED', {
+          deviceBrand: selectedDevice.brand,
+          deviceModel: selectedDevice.model,
+          fingers,
+        });
       } else {
         setError(json.error?.message ?? 'Error al generar');
       }

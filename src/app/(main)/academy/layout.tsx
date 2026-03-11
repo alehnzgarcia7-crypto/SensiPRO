@@ -13,8 +13,9 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode} from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useTrackEvent } from '@/hooks/use-track-event';
 import { cn } from '@/lib/cn';
 
 interface SidebarItem {
@@ -59,7 +60,13 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
 
 export default function AcademyLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { track } = useTrackEvent();
   const [collapsed, setCollapsed] = useState(false);
+
+  // Track academy page views on navigation
+  useEffect(() => {
+    track('ACADEMY_VIEWED', { path: pathname });
+  }, [pathname, track]);
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">

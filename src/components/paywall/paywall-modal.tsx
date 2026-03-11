@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
+import { useTrackEvent } from '@/hooks/use-track-event';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
@@ -85,6 +86,7 @@ type PaymentStep = 'email' | 'payment' | 'processing' | 'error';
 export function PaywallModal() {
   const { isPaywallOpen, hidePaywall, paywallContext, capturedEmail, setCapturedEmail, unlock } = usePremiumContext();
   const countdown = useCountdown();
+  const { track } = useTrackEvent();
 
   const [step, setStep] = useState<PaymentStep>('email');
   const [email, setEmail] = useState('');
@@ -96,6 +98,7 @@ export function PaywallModal() {
   // Si ya tenemos email capturado, ir directo a payment
   useEffect(() => {
     if (isPaywallOpen) {
+      track('PAYWALL_SHOWN', { source: paywallContext?.source ?? 'unknown' });
       if (capturedEmail) {
         setEmail(capturedEmail);
         setStep('payment');
@@ -105,7 +108,7 @@ export function PaywallModal() {
         setSelectedMethod(null);
       }
     }
-  }, [isPaywallOpen, capturedEmail]);
+  }, [isPaywallOpen, capturedEmail, track, paywallContext?.source]);
 
   // Focus en el input de email al abrir
   useEffect(() => {
@@ -141,6 +144,7 @@ export function PaywallModal() {
   const handlePayment = useCallback(async () => {
     if (!selectedMethod || !email) return;
 
+    track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown' });
     setIsSubmitting(true);
     setError(null);
     setStep('processing');
@@ -188,7 +192,7 @@ export function PaywallModal() {
       setStep('error');
       setIsSubmitting(false);
     }
-  }, [selectedMethod, email, paywallContext, unlock]);
+  }, [selectedMethod, email, paywallContext, unlock, track]);
 
   // ═══════════════════════════════════════════════════
   // RENDER

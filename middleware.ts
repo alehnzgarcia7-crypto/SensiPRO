@@ -20,6 +20,10 @@ const protectedRoutes = [
 // Rutas exclusivas de admin
 const adminRoutes = ['/admin'];
 
+// Command Center — acceso blindado por email
+const COMMAND_CENTER_EMAIL = 'alehnzgarcia7@gmail.com';
+const commandCenterRoutes = ['/command-center'];
+
 // Rutas de auth (redirigir si ya esta autenticado)
 const authRoutes = ['/login', '/register'];
 
@@ -58,6 +62,30 @@ export async function middleware(request: NextRequest) {
     }
     if (token.role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/generator', request.url));
+    }
+  }
+
+  // Command Center — acceso blindado solo por email autorizado
+  const isCommandCenter = pathname.startsWith('/command-center') || pathname.startsWith('/api/command-center');
+  if (isCommandCenter) {
+    // API routes del command center (excepto /track que es publico)
+    if (pathname.startsWith('/api/command-center') && !pathname.endsWith('/track')) {
+      if (!isAuthenticated || token.email !== COMMAND_CENTER_EMAIL) {
+        return NextResponse.json(
+          { success: false, error: 'unauthorized' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Paginas del command center
+    if (pathname.startsWith('/command-center')) {
+      if (!isAuthenticated) {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
+      if (token.email !== COMMAND_CENTER_EMAIL) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
     }
   }
 
