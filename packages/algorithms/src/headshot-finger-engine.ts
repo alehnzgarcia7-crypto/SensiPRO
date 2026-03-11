@@ -1,8 +1,18 @@
 // ============================================================
-// HEADSHOT FINGER ENGINE v4.1
+// HEADSHOT FINGER ENGINE v4.2
 // Applies finger-count-based adjustments ON TOP of the v4.0
 // headshot sensitivity base. Consumed exclusively by Headshot Mode.
+//
+// v4.2: Added playstyle-aware fire button sizing.
+//       Fire button = base[fingers][screen] + styleOffset[playstyle]
 // ============================================================
+
+import {
+  FIRE_BUTTON_STYLE_OFFSET,
+  FIRE_BUTTON_MIN,
+  FIRE_BUTTON_MAX,
+  FIRE_BUTTON_SCREEN_THRESHOLDS,
+} from '@ares/config';
 
 import { FINGER_PROFILES, type FingerCount, type FingerProfile } from './finger-profiles';
 import { WEAPON_CATEGORIES, type WeaponCategory } from './weapon-categories';
@@ -55,6 +65,7 @@ export interface HeadshotFingerResult {
     fingersUsed: FingerCount;
     taperingUsed: number;
     gyroscopeEnabled: boolean;
+    playstyle: FireButtonPlaystyle;
   };
 }
 
@@ -66,11 +77,14 @@ function clamp(value: number, min: number = 0, max: number = 200): number {
 
 // --- MAIN HEADSHOT FINGER-ADJUSTED FUNCTION ---
 
+export type FireButtonPlaystyle = 'AGGRESSIVE' | 'BALANCED' | 'SNIPER';
+
 export function calculateHeadshotFingerMode(
   baseSensitivity: SensitivityOutput,
   fingers: FingerCount,
   deviceHz: number = 60,
   screenSizeInches: number = 6.5,
+  playstyle: FireButtonPlaystyle = 'BALANCED',
 ): HeadshotFingerResult {
   const profile = FINGER_PROFILES[fingers];
 
@@ -133,15 +147,19 @@ export function calculateHeadshotFingerMode(
     sniperScope: clamp(adjusted.sniperScope * cat.sensitivityModifier),
   }));
 
-  // 6. Calculate fire button recommendation
+  // 6. Calculate fire button recommendation (playstyle-aware v4.2)
   let screenCat: 'small' | 'medium' | 'large' | 'xlarge';
-  if (screenSizeInches < 6.0) screenCat = 'small';
-  else if (screenSizeInches <= 6.5) screenCat = 'medium';
-  else if (screenSizeInches <= 6.8) screenCat = 'large';
+  if (screenSizeInches < FIRE_BUTTON_SCREEN_THRESHOLDS.SMALL) screenCat = 'small';
+  else if (screenSizeInches <= FIRE_BUTTON_SCREEN_THRESHOLDS.MEDIUM) screenCat = 'medium';
+  else if (screenSizeInches <= FIRE_BUTTON_SCREEN_THRESHOLDS.LARGE) screenCat = 'large';
   else screenCat = 'xlarge';
 
+  const baseSize = profile.fireButton.sizeByScreen[screenCat];
+  const styleOffset = FIRE_BUTTON_STYLE_OFFSET[playstyle] ?? 0;
+  const clampedSize = Math.max(FIRE_BUTTON_MIN, Math.min(FIRE_BUTTON_MAX, baseSize + styleOffset));
+
   const fireButton: FireButtonRecommendation = {
-    size: profile.fireButton.sizeByScreen[screenCat],
+    size: clampedSize,
     transparency: profile.fireButton.transparency,
     positionEs: profile.fireButton.positionEs,
     dragTipEs: profile.fireButton.dragTipEs,
@@ -153,10 +171,11 @@ export function calculateHeadshotFingerMode(
     fireButton,
     fingerProfile: profile,
     meta: {
-      engineVersion: '4.1-headshot',
+      engineVersion: '4.2-headshot',
       fingersUsed: fingers,
       taperingUsed: profile.tapering,
       gyroscopeEnabled: profile.gyroscope.enabled,
+      playstyle,
     },
   };
 }

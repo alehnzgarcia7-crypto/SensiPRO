@@ -9,6 +9,11 @@ import {
   DPI_MAX,
   DPI_PRECISION_BONUS,
   BUTTON_SIZE_MAP,
+  FIRE_BUTTON_BASE,
+  FIRE_BUTTON_STYLE_OFFSET,
+  FIRE_BUTTON_MIN,
+  FIRE_BUTTON_MAX,
+  FIRE_BUTTON_SCREEN_THRESHOLDS,
   HUD_THRESHOLD_SMALL,
   HUD_THRESHOLD_LARGE,
   SENSITIVITY_MIN,
@@ -92,10 +97,28 @@ export function calculateDpi(specs: DeviceSpecs): number {
   return clamp(rawDpi, DPI_MIN, DPI_MAX);
 }
 
-/** Calcula tamaño de botón recomendado basado en screenSize */
+/** Calcula tamaño de botón recomendado en mm basado en screenSize */
 export function calculateButtonSize(screenSize: number): number {
   const entry = BUTTON_SIZE_MAP.find((e) => screenSize < e.maxScreen);
   return entry?.sizeMm ?? 54;
+}
+
+/** Calcula tamaño de botón de disparo en % (playstyle-aware)
+ *  Usa la tabla maestra FIRE_BUTTON_BASE + FIRE_BUTTON_STYLE_OFFSET */
+export function calculateFireButtonPercentage(
+  screenSize: number,
+  fingers: 2 | 3 | 4,
+  playstyle: string = 'BALANCED',
+): number {
+  let screenCat: 'small' | 'medium' | 'large' | 'xlarge';
+  if (screenSize < FIRE_BUTTON_SCREEN_THRESHOLDS.SMALL) screenCat = 'small';
+  else if (screenSize <= FIRE_BUTTON_SCREEN_THRESHOLDS.MEDIUM) screenCat = 'medium';
+  else if (screenSize <= FIRE_BUTTON_SCREEN_THRESHOLDS.LARGE) screenCat = 'large';
+  else screenCat = 'xlarge';
+
+  const base = FIRE_BUTTON_BASE[fingers][screenCat];
+  const offset = FIRE_BUTTON_STYLE_OFFSET[playstyle] ?? 0;
+  return Math.max(FIRE_BUTTON_MIN, Math.min(FIRE_BUTTON_MAX, base + offset));
 }
 
 /** Calcula precision score para rango 0-200 (inverso: más sensi = menos precisión) */

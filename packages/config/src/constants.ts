@@ -141,11 +141,74 @@ export const HEADSHOT_GYRO_MODIFIERS = {
   gyroFreeView: 1.0,
 } as const;
 
-// Fire button % por tamaño de pantalla y número de dedos
+// ════════════════ FIRE BUTTON — TABLA MAESTRA ════════════════
+//
+// Recalibración científica: dedos × pantalla × playstyle
+//
+// ESCALA: % del slider de tamaño de botón en Free Fire (0-100)
+// El valor representa proporción relativa en pantalla, no píxeles.
+// El mismo valor en pantallas distintas da cobertura proporcional similar.
+//
+// BIOMECÁNICA por dedos:
+//   2 dedos (pulgares): Pulgar derecho alterna aim/fire → botón GRANDE
+//     para compensar falta de dedo dedicado. Drag headshot con pulgar.
+//   3 dedos (pulgares + índice der): Índice dedicado a scope,
+//     pulgar sigue con fire → botón mediano, menos obstrucción visual.
+//   4 dedos (garra): Índice der dedicado a fire → botón PEQUEÑO,
+//     máxima precisión con dedo dedicado, prioriza visibilidad.
+//
+// PLAYSTYLE:
+//   AGGRESSIVE/Rush: CQC constante, disparo rápido → botón +5%
+//   BALANCED: Mix CQC y medio alcance → baseline (0)
+//   SNIPER/Defensivo: Largo alcance, máxima visibilidad → botón -5%
+//
+// PANTALLA:
+//   Pantallas chicas = dedos cubren más % → botón proporcionalmente mayor
+//   Pantallas grandes = más área disponible → botón puede ser menor
+//
+// FUENTES: finger-profiles.ts (forensically verified), weapon-categories.ts,
+// BitTopup, EsportZone, Sportskeeda, BlueStacks guides, freefiremania
+//
+// Para modificar en el futuro: ajustar FIRE_BUTTON_BASE (valores BALANCED)
+// y FIRE_BUTTON_STYLE_OFFSET (delta por playstyle). Los engines calculan
+// dinámicamente: base[fingers][screen] + styleOffset[playstyle]
+// ══════════════════════════════════════════════════════════════
+
+// Categorías de pantalla unificadas (usadas en TODOS los sistemas de botón)
+export const FIRE_BUTTON_SCREEN_THRESHOLDS = {
+  SMALL: 6.0,    // < 6.0" (gama baja, pantallas compactas)
+  MEDIUM: 6.5,   // 6.0" - 6.5" (mainstream, la mayoría de jugadores)
+  LARGE: 6.8,    // 6.5" - 6.8" (gama alta, flagships)
+  // > 6.8" = XLARGE (tablets, phablets)
+} as const;
+
+// Valores BASE por dedos × pantalla (playstyle BALANCED)
+// Estos son los valores canónicos — otros playstyles aplican offset encima
+export const FIRE_BUTTON_BASE: Record<2 | 3 | 4, { small: number; medium: number; large: number; xlarge: number }> = {
+  //                     <6.0"  6.0-6.5"  6.5-6.8"  >6.8"
+  2: { small: 70, medium: 65,   large: 60,   xlarge: 55 },
+  3: { small: 60, medium: 55,   large: 52,   xlarge: 48 },
+  4: { small: 55, medium: 50,   large: 48,   xlarge: 44 },
+};
+
+// Offset por playstyle (se suma al valor BASE)
+// Rango final clampeado a [FIRE_BUTTON_MIN, FIRE_BUTTON_MAX]
+export const FIRE_BUTTON_STYLE_OFFSET: Record<string, number> = {
+  AGGRESSIVE: 5,   // CQC rush: botón más grande = reacción más rápida
+  BALANCED: 0,     // Baseline
+  SNIPER: -5,      // Largo alcance: botón más chico = más visibilidad
+};
+
+// Clamp absoluto del botón (valores fuera de este rango son unusables)
+export const FIRE_BUTTON_MIN = 35;
+export const FIRE_BUTTON_MAX = 80;
+
+// Legacy: mantener FIRE_BUTTON_CONFIG para backward compat con headshot-engine
+// Los valores ahora están alineados con FIRE_BUTTON_BASE (BALANCED)
 export const FIRE_BUTTON_CONFIG = {
-  SMALL_SCREEN: { max: 5.8, twoFinger: 75, threeFinger: 68, fourFinger: 62 },
-  MEDIUM_SCREEN: { max: 6.5, twoFinger: 65, threeFinger: 60, fourFinger: 55 },
-  LARGE_SCREEN: { max: 99, twoFinger: 60, threeFinger: 55, fourFinger: 50 },
+  SMALL_SCREEN: { max: 6.0, twoFinger: 70, threeFinger: 60, fourFinger: 55 },
+  MEDIUM_SCREEN: { max: 6.5, twoFinger: 65, threeFinger: 55, fourFinger: 50 },
+  LARGE_SCREEN: { max: 99, twoFinger: 60, threeFinger: 52, fourFinger: 48 },
 } as const;
 
 // ═══ ARSENAL DE ARMAS PARA HEADSHOT ═══
@@ -490,7 +553,7 @@ export const CROSSHAIR_TIPS = [
   'Activa "Cambio rápido de arma" para combos: disparo → switch → disparo headshot.',
   'Gráficos en Smooth + High FPS = mejor respuesta táctil = mejores headshots.',
   'DPI del sistema entre 480-600 es óptimo para drag headshots.',
-  'El tamaño del botón de disparo importa: 50-70% es el sweet spot para drag.',
+  'El tamaño del botón de disparo importa: 44-70% según tus dedos y playstyle. Rusher: más grande. Sniper: más chico.',
   'Practica 10-15 minutos DIARIOS en Training Ground. Músculo memoria > sensibilidad.',
   'En combate cercano, apunta al cuello. El retroceso natural sube al headshot.',
 ] as const;

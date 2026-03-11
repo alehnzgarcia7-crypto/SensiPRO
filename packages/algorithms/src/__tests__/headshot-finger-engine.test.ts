@@ -5,8 +5,8 @@ import { FINGER_PROFILES } from '../finger-profiles';
 import type { SensitivityOutput } from '../types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES v4.1 — Tests de Headshot Finger Engine
-// Validates finger-based sensitivity adjustments
+// ARES v4.2 — Tests de Headshot Finger Engine
+// Validates finger-based sensitivity adjustments + playstyle fire button
 // ═══════════════════════════════════════════════════════════
 
 // Base headshot sensitivity (typical mid-range device, 3-finger standard)
@@ -40,8 +40,8 @@ describe('calculateHeadshotFingerMode', () => {
       expect(result.sensitivity.gyroscope).not.toBeNull();
     });
 
-    it('should have engine version 4.1-headshot', () => {
-      expect(result.meta.engineVersion).toBe('4.1-headshot');
+    it('should have engine version 4.2-headshot', () => {
+      expect(result.meta.engineVersion).toBe('4.2-headshot');
     });
 
     it('should return 7 weapon adjustments', () => {
@@ -212,6 +212,38 @@ describe('calculateHeadshotFingerMode', () => {
       const small = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 5.5);
       const large = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 7.0);
       expect(small.fireButton.size).toBeGreaterThan(large.fireButton.size);
+    });
+  });
+
+  describe('playstyle fire button adjustment', () => {
+    it('AGGRESSIVE should give larger fire button than BALANCED', () => {
+      const balanced = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'BALANCED');
+      const aggressive = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'AGGRESSIVE');
+      expect(aggressive.fireButton.size).toBeGreaterThan(balanced.fireButton.size);
+    });
+
+    it('SNIPER should give smaller fire button than BALANCED', () => {
+      const balanced = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'BALANCED');
+      const sniper = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'SNIPER');
+      expect(sniper.fireButton.size).toBeLessThan(balanced.fireButton.size);
+    });
+
+    it('should clamp fire button within min/max bounds', () => {
+      // 4 fingers on xlarge screen with SNIPER: 44 - 5 = 39, should not go below 35
+      const result = calculateHeadshotFingerMode(baseSensitivity, 4, 60, 7.5, 'SNIPER');
+      expect(result.fireButton.size).toBeGreaterThanOrEqual(35);
+      expect(result.fireButton.size).toBeLessThanOrEqual(80);
+    });
+
+    it('default playstyle should be BALANCED', () => {
+      const withDefault = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5);
+      const withExplicit = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'BALANCED');
+      expect(withDefault.fireButton.size).toBe(withExplicit.fireButton.size);
+    });
+
+    it('meta should include playstyle', () => {
+      const result = calculateHeadshotFingerMode(baseSensitivity, 3, 60, 6.5, 'AGGRESSIVE');
+      expect(result.meta.playstyle).toBe('AGGRESSIVE');
     });
   });
 

@@ -2,6 +2,9 @@ import {
   HEADSHOT_SENSITIVITY_MODIFIERS,
   HEADSHOT_GYRO_MODIFIERS,
   FIRE_BUTTON_CONFIG,
+  FIRE_BUTTON_STYLE_OFFSET,
+  FIRE_BUTTON_MIN,
+  FIRE_BUTTON_MAX,
   SENSITIVITY_MIN,
   SENSITIVITY_MAX,
   GYRO_MIN,
@@ -34,7 +37,11 @@ function clampGyro(v: number): number {
   return Math.round(Math.max(GYRO_MIN, Math.min(GYRO_MAX, v)));
 }
 
-function calculateFireButton(screenSize: number, userFingers?: 2 | 3 | 4): FireButtonResult {
+function calculateFireButton(
+  screenSize: number,
+  userFingers?: 2 | 3 | 4,
+  playstyle: string = 'BALANCED',
+): FireButtonResult {
   const config = screenSize < FIRE_BUTTON_CONFIG.SMALL_SCREEN.max
     ? FIRE_BUTTON_CONFIG.SMALL_SCREEN
     : screenSize <= FIRE_BUTTON_CONFIG.MEDIUM_SCREEN.max
@@ -45,6 +52,9 @@ function calculateFireButton(screenSize: number, userFingers?: 2 | 3 | 4): FireB
   const fingers = userFingers ?? autoFingers;
 
   const key = fingers === 2 ? 'twoFinger' : fingers === 3 ? 'threeFinger' : 'fourFinger';
+  const basePercentage = config[key];
+  const styleOffset = FIRE_BUTTON_STYLE_OFFSET[playstyle] ?? 0;
+  const percentage = Math.max(FIRE_BUTTON_MIN, Math.min(FIRE_BUTTON_MAX, basePercentage + styleOffset));
 
   const positionTips: Record<2 | 3 | 4, string> = {
     2: 'Coloca el botón de disparo en la esquina inferior derecha, a la altura natural de tu pulgar',
@@ -53,7 +63,7 @@ function calculateFireButton(screenSize: number, userFingers?: 2 | 3 | 4): FireB
   };
 
   return {
-    percentage: config[key],
+    percentage,
     fingers,
     positionTip: positionTips[fingers],
   };
@@ -90,6 +100,7 @@ export function generateHeadshotSensitivity(
   userRam?: number,
   userFingers?: 2 | 3 | 4,
   userHz?: number,
+  playstyle?: string,
 ): HeadshotResult {
   // 1. Generar sensibilidad NORMAL (BALANCED, sin calibrar) para comparación
   const baseResult = generateSensitivity({ specs, style: 'BALANCED', userRam, userHz });
@@ -117,8 +128,8 @@ export function generateHeadshotSensitivity(
     gyroFreeView: clampGyro(baseGyro.gyroFreeView * HEADSHOT_GYRO_MODIFIERS.gyroFreeView),
   };
 
-  // 4. Fire button
-  const fireButton = calculateFireButton(specs.screenSize, userFingers);
+  // 4. Fire button (playstyle-aware)
+  const fireButton = calculateFireButton(specs.screenSize, userFingers, playstyle);
 
   // 5. Headshot score
   const headshotScore = calculateHeadshotScore(specs, headshotSens);

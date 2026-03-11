@@ -17,6 +17,7 @@ export {
   generateAllCalibrations,
   calculateDpi,
   calculateButtonSize,
+  calculateFireButtonPercentage,
   calculatePrecisionScore,
   generateHudRecommendation,
 } from './calibration-engine';
@@ -27,6 +28,7 @@ export type {
   FireButtonRecommendation,
   WeaponAdjustmentRow,
   HeadshotFingerResult,
+  FireButtonPlaystyle,
 } from './headshot-finger-engine';
 export { FINGER_PROFILES, getFingerProfile } from './finger-profiles';
 export type { FingerCount, FingerProfile } from './finger-profiles';
