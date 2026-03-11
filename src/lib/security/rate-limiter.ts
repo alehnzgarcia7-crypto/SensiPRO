@@ -5,6 +5,8 @@ import { logger } from '@ares/logger';
 import type { UserTier } from '@prisma/client';
 import { createClient, type RedisClientType } from 'redis';
 
+import { isAdminEmail } from '@/lib/constants/admin';
+
 interface RateLimitResult {
   allowed: boolean;
   remaining: number;
@@ -123,7 +125,13 @@ export async function checkRateLimit(
 export async function enforceRateLimit(
   userId: string,
   tier: UserTier,
+  email?: string | null,
 ): Promise<RateLimitResult> {
+  // Admin override — búsquedas ilimitadas siempre
+  if (isAdminEmail(email)) {
+    return { allowed: true, remaining: 9999, resetAt: new Date(Date.now() + 86400000), limit: 9999 };
+  }
+
   // Bypass rate limit en desarrollo para no bloquear testing local
   if (process.env.NODE_ENV === 'development') {
     return { allowed: true, remaining: 9999, resetAt: new Date(Date.now() + 86400000), limit: 9999 };

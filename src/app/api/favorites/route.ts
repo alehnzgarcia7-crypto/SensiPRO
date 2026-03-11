@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 // ═══════════════════════════════════════════════════════════════
 // GET  /api/favorites — Listar favoritos del usuario autenticado
@@ -75,8 +76,9 @@ export async function POST(request: NextRequest) {
     const { deviceId, style, nickname } = parsed.data;
     const userTier = (session.user as Record<string, unknown>).tier as string;
 
-    // Verificar limite para usuarios FREE
-    if (userTier === 'FREE') {
+    // Admin override — sin límites de favoritos
+    // Verificar limite para usuarios FREE (no admin)
+    if (userTier === 'FREE' && !isAdminEmail(session.user.email)) {
       const count = await prisma.favorite.count({
         where: { userId: session.user.id },
       });

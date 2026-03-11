@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 // ═══════════════════════════════════════════════════════════════
 // GET  /api/comments — Listar comentarios de una guía o config
@@ -175,22 +176,24 @@ export async function POST(request: NextRequest) {
       throw new BusinessError('INAPPROPRIATE', 'Tu comentario contiene contenido no permitido');
     }
 
-    // Rate limit: maximo N comentarios por dia
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // Rate limit: maximo N comentarios por dia (admin bypass)
+    if (!isAdminEmail(session.user.email)) {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-    const todayCount = await prisma.comment.count({
-      where: {
-        userId: session.user.id,
-        createdAt: { gte: startOfDay },
-      },
-    });
+      const todayCount = await prisma.comment.count({
+        where: {
+          userId: session.user.id,
+          createdAt: { gte: startOfDay },
+        },
+      });
 
-    if (todayCount >= DAILY_COMMENT_LIMIT) {
-      throw new BusinessError(
-        'COMMENT_LIMIT',
-        `Has alcanzado el limite de ${DAILY_COMMENT_LIMIT} comentarios por dia`,
-      );
+      if (todayCount >= DAILY_COMMENT_LIMIT) {
+        throw new BusinessError(
+          'COMMENT_LIMIT',
+          `Has alcanzado el limite de ${DAILY_COMMENT_LIMIT} comentarios por dia`,
+        );
+      }
     }
 
     // Si es reply, verificar que el padre existe y pertenece al mismo target

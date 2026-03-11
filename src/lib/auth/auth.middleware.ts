@@ -1,6 +1,7 @@
 import { AuthError, ForbiddenError } from '@ares/errors';
 import type { UserRole, UserTier } from '@prisma/client';
 
+import { isAdminEmail } from '@/lib/constants/admin';
 
 import { auth } from './index';
 
@@ -32,6 +33,12 @@ export async function requireRole(role: UserRole) {
 
 export async function requireTier(requiredTier: UserTier) {
   const session = await getRequiredSession();
+
+  // Admin override — acceso total a cualquier tier
+  if (isAdminEmail(session.user.email)) {
+    return session;
+  }
+
   const userTier = session.user.tier as UserTier;
 
   const tierLevel: Record<UserTier, number> = {

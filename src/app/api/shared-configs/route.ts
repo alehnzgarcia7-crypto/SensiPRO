@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 // ═══════════════════════════════════════════════════════════════
 // GET  /api/shared-configs — Feed de configs compartidas
@@ -161,22 +162,24 @@ export async function POST(request: NextRequest) {
       throw new NotFoundError('Device', deviceId);
     }
 
-    // Rate limit: maximo N configs por dia
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    // Rate limit: maximo N configs por dia (admin bypass)
+    if (!isAdminEmail(session.user.email)) {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-    const todayCount = await prisma.sharedConfig.count({
-      where: {
-        userId: session.user.id,
-        createdAt: { gte: startOfDay },
-      },
-    });
+      const todayCount = await prisma.sharedConfig.count({
+        where: {
+          userId: session.user.id,
+          createdAt: { gte: startOfDay },
+        },
+      });
 
-    if (todayCount >= DAILY_SHARE_LIMIT) {
-      throw new BusinessError(
-        'SHARE_LIMIT',
-        `Has alcanzado el limite de ${DAILY_SHARE_LIMIT} configs compartidas por dia`,
-      );
+      if (todayCount >= DAILY_SHARE_LIMIT) {
+        throw new BusinessError(
+          'SHARE_LIMIT',
+          `Has alcanzado el limite de ${DAILY_SHARE_LIMIT} configs compartidas por dia`,
+        );
+      }
     }
 
     // Verificar duplicado: misma config (user+device+style) no deberia repetirse

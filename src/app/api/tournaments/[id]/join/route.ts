@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 
 import { getRequiredSession } from '@/lib/auth/auth.middleware';
+import { isAdminEmail } from '@/lib/constants/admin';
 import { canAccessTier } from '@/lib/tiers';
 
 
@@ -47,8 +48,8 @@ export async function POST(
       );
     }
 
-    // Verificar tier del usuario
-    if (!canAccessTier(userTier, tournament.entryTier)) {
+    // Verificar tier del usuario (admin bypass)
+    if (!isAdminEmail(session.user.email) && !canAccessTier(userTier, tournament.entryTier)) {
       throw new BusinessError(
         'TIER_REQUIRED',
         `Este torneo requiere ser ${tournament.entryTier}`,

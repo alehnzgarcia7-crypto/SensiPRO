@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
     const userId = user?.id ?? request.headers.get('x-forwarded-for') ?? 'anonymous';
     const tier = user?.tier ?? 'FREE';
 
-    // Verificar rate limit
-    await enforceRateLimit(userId, tier);
+    // Verificar rate limit (admin bypass via email)
+    await enforceRateLimit(userId, tier, user?.email);
 
     // Buscar dispositivo
     const device = await prisma.device.findUnique({
