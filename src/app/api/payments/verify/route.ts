@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { isAdminEmail } from '@/lib/constants/admin';
 import { checkPremiumStatus } from '@/lib/payments/payment-service';
 
 export async function POST(request: NextRequest) {
@@ -17,6 +18,17 @@ export async function POST(request: NextRequest) {
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ isPremium: false }, { status: 200 });
+    }
+
+    // Admin override — respuesta inmediata sin DB
+    if (isAdminEmail(email)) {
+      return NextResponse.json({
+        isPremium: true,
+        isAdmin: true,
+        email: email.toLowerCase().trim(),
+        activatedAt: new Date('2024-01-01'),
+        paymentMethod: 'admin_override',
+      });
     }
 
     const status = await checkPremiumStatus(email);

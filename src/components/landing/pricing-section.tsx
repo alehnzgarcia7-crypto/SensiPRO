@@ -142,14 +142,14 @@ export function PricingSection() {
 
                 <div className="mt-8">
                   <Link
-                    href="/pricing"
+                    href="/generator"
                     className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-white transition-all duration-300 hover:scale-[1.03] min-h-[48px]"
                     style={{
                       background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
                       boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)',
                     }}
                   >
-                    DESBLOQUEAR PRO — $199 MXN
+                    PRUEBA GRATIS → GENERA TU SENSIBILIDAD
                   </Link>
                 </div>
               </div>

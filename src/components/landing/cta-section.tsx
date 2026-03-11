@@ -1,18 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 import { LANDING_DATA, AVATAR_STACK } from '@/lib/landing-data';
-import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════════════
-// CtaSection — Final CTA that mirrors hero design. Gradient mesh
-// blobs, rotating gradient border CTA, 3 overlapping avatars,
-// player count, gradient line separator to footer
+// CtaSection — Final CTA que lleva al generador (flujo correcto)
 // ═══════════════════════════════════════════════════════════════
 
 export function CtaSection() {
-  const { showPaywall } = usePremiumContext();
 
   return (
     <section className="py-24 md:py-32 px-4 relative overflow-hidden">
@@ -82,14 +79,14 @@ export function CtaSection() {
                 animation: 'borderRotate 4s linear infinite',
               }}
             />
-            <button
-              onClick={() => showPaywall({ source: 'landing' })}
-              className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.03] min-h-[56px] cursor-pointer"
+            <Link
+              href="/generator"
+              className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.03] min-h-[56px]"
               style={{ background: 'rgba(10, 15, 30, 0.9)' }}
             >
-              Desbloquea todo por solo $199 MXN
+              GENERA TU SENSIBILIDAD GRATIS
               <span className="text-xl">{'\u2192'}</span>
-            </button>
+            </Link>
           </div>
         </motion.div>
 
@@ -113,7 +110,7 @@ export function CtaSection() {
             ))}
           </div>
           <span className="text-sm text-slate-400">
-            Únete a {LANDING_DATA.playerCount.toLocaleString()} jugadores
+            {LANDING_DATA.playerCount.toLocaleString()} jugadores ya lo usan
           </span>
         </motion.div>
       </div>

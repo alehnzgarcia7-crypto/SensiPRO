@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+import { isAdminEmail } from '@/lib/constants/admin';
 import { PREMIUM_COOKIE_NAME } from '@/lib/payments/payment-service';
 
 interface PremiumState {
@@ -88,6 +89,16 @@ export function usePremium(): UsePremiumReturn {
         if (premiumCookie) {
           const email = decodeURIComponent(premiumCookie.split('=')[1]?.trim() || '');
           if (email && email.includes('@')) {
+            // Admin override — acceso total sin verificar DB
+            if (isAdminEmail(email)) {
+              setState({
+                isPremium: true,
+                isLoading: false,
+                email,
+                activatedAt: new Date('2024-01-01'),
+              });
+              return;
+            }
             setState({
               isPremium: true,
               isLoading: false,
@@ -101,6 +112,17 @@ export function usePremium(): UsePremiumReturn {
         // También verificar localStorage como backup
         const savedEmail = localStorage.getItem('sensipro_premium_email');
         if (savedEmail && savedEmail.includes('@')) {
+          // Admin override — acceso total sin verificar DB
+          if (isAdminEmail(savedEmail)) {
+            setPremiumEmailInternal(savedEmail);
+            setState({
+              isPremium: true,
+              isLoading: false,
+              email: savedEmail,
+              activatedAt: new Date('2024-01-01'),
+            });
+            return;
+          }
           // Verificar contra la DB para asegurar
           verifyAsync(savedEmail);
           return;

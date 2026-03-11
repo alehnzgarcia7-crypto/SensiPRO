@@ -12,6 +12,8 @@
 import { prisma } from '@ares/database';
 import { v4 as uuidv4 } from 'uuid';
 
+import { isAdminEmail } from '@/lib/constants/admin';
+
 import { mpPreference, LATAM_PRICES } from './mercadopago-config';
 import { stripeLifetime, PRICING, type PaymentMetadata } from './stripe-config';
 
@@ -59,6 +61,16 @@ export interface PremiumStatus {
  */
 export async function checkPremiumStatus(email: string): Promise<PremiumStatus> {
   if (!email) return { isPremium: false };
+
+  // Admin override — acceso total permanente sin consultar DB
+  if (isAdminEmail(email)) {
+    return {
+      isPremium: true,
+      email: email.toLowerCase().trim(),
+      activatedAt: new Date('2024-01-01'),
+      paymentMethod: 'admin_override',
+    };
+  }
 
   try {
     const license = await prisma.premiumLicense.findUnique({

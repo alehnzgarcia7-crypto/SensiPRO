@@ -10,6 +10,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 import { usePremium } from '@/hooks/use-premium';
+import { isAdminEmail } from '@/lib/constants/admin';
 
 interface PaywallContext {
   device?: string;
@@ -58,12 +59,16 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  // Admin siempre tiene premium — nunca muestra paywall
+  const isAdmin = isAdminEmail(premium.email);
+  const effectiveIsPremium = premium.isPremium || isAdmin;
+
   const showPaywall = useCallback((context: PaywallContext) => {
-    if (premium.isPremium) return;
+    if (effectiveIsPremium) return;
     setPaywallContext(context);
     setIsPaywallOpen(true);
     document.body.style.overflow = 'hidden';
-  }, [premium.isPremium]);
+  }, [effectiveIsPremium]);
 
   const hidePaywall = useCallback(() => {
     setIsPaywallOpen(false);
@@ -102,7 +107,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   return (
     <PremiumContext.Provider
       value={{
-        isPremium: premium.isPremium,
+        isPremium: effectiveIsPremium,
         isLoading: premium.isLoading,
         email: premium.email,
         isPaywallOpen,
