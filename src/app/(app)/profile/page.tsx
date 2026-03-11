@@ -1,5 +1,5 @@
 import { prisma } from '@ares/database';
-import { Settings, Crown, Users, History, Heart, Trophy } from 'lucide-react';
+import { Settings, Crown, History, Heart, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -31,7 +31,6 @@ async function getProfileData(userId: string) {
       tierExpiresAt: true,
       totalSearches: true,
       totalFavorites: true,
-      referralCount: true,
       createdAt: true,
       _count: { select: { achievements: true, sharedConfigs: true } },
     },
@@ -57,14 +56,12 @@ export default async function ProfilePage() {
   const stats = [
     { icon: History, label: 'Búsquedas', value: user.totalSearches },
     { icon: Heart, label: 'Favoritos', value: user.totalFavorites },
-    { icon: Users, label: 'Referidos', value: user.referralCount },
     { icon: Trophy, label: 'Logros', value: user._count.achievements },
   ];
 
   const menuItems = [
     { href: '/profile/edit', label: 'Editar Perfil', icon: Settings },
     { href: '/profile/subscription', label: 'Suscripción', icon: Crown },
-    { href: '/profile/referrals', label: 'Referidos', icon: Users },
     { href: '/favorites', label: 'Favoritos', icon: Heart },
     { href: '/history', label: 'Historial', icon: History },
     { href: '/achievements', label: 'Logros', icon: Trophy },
@@ -102,7 +99,7 @@ export default async function ProfilePage() {
       </div>
 
       {/* Grid de estadísticas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-3 gap-3 mb-8">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (

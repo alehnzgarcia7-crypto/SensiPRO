@@ -1,15 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { registerUser } from '@/lib/auth/auth.actions';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const referralFromUrl = searchParams.get('ref') ?? '';
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -93,20 +91,6 @@ export default function RegisterPage() {
             placeholder="••••••••"
           />
           <p className="mt-1 text-xs text-slate-500">Minimo 6 caracteres</p>
-        </div>
-
-        <div>
-          <label htmlFor="referralCode" className="block text-sm font-ui font-medium text-slate-300 mb-1.5">
-            Codigo de referido <span className="text-slate-500">(opcional)</span>
-          </label>
-          <input
-            id="referralCode"
-            name="referralCode"
-            type="text"
-            defaultValue={referralFromUrl}
-            className="w-full rounded-gaming bg-background-card border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors focus:border-ice-500/50 focus:outline-none focus:ring-1 focus:ring-ice-500/30 min-h-[44px]"
-            placeholder="Codigo de un amigo"
-          />
         </div>
 
         <button
