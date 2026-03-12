@@ -12,6 +12,7 @@ const VALID_STYLES = new Set<string>(['AGGRESSIVE', 'BALANCED', 'SNIPER']);
 function GeneratorWithDeepLink() {
   const searchParams = useSearchParams();
   const initFromParams = useGeneratorStore((s) => s.initFromParams);
+  const reset = useGeneratorStore((s) => s.reset);
   const selectDevice = useGeneratorStore((s) => s.selectDevice);
   const initialized = useRef(false);
 
@@ -24,6 +25,11 @@ function GeneratorWithDeepLink() {
     const styleParam = searchParams.get('style')?.toUpperCase();
     const source = searchParams.get('source');
     const campaign = searchParams.get('campaign');
+
+    // Sin query params de deep linking → resetear estado para empezar limpio
+    if (!brand && !model && !styleParam) {
+      reset();
+    }
 
     // Guardar tracking en sessionStorage
     if (source) {
@@ -87,7 +93,7 @@ function GeneratorWithDeepLink() {
     } else if (brand || style) {
       initFromParams({ brand: brand ?? undefined, style });
     }
-  }, [searchParams, initFromParams, selectDevice]);
+  }, [searchParams, initFromParams, selectDevice, reset]);
 
   return <GeneratorFlow />;
 }

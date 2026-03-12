@@ -9,7 +9,7 @@
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 import type { SensitivityStyle, DeviceTier } from '@prisma/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge, Crosshair, Eye, Scan } from 'lucide-react';
+import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge, Crosshair, Eye, Scan, Search } from 'lucide-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 
 import { AnimatedBorder } from '@/components/effects/animated-border';
@@ -218,6 +218,19 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
             </p>
           </div>
         </div>
+      </motion.div>
+
+      {/* ═══ NUEVA BÚSQUEDA — CTA prominente ═══ */}
+      <motion.div variants={itemVariants}>
+        <Button
+          variant="primary"
+          size="lg"
+          leftIcon={<Search size={18} />}
+          onClick={onReset}
+          className="w-full min-h-[52px] text-base font-heading font-bold uppercase tracking-[0.1em]"
+        >
+          Generar otra sensibilidad
+        </Button>
       </motion.div>
 
       {/* ═══ RESULTADO PRINCIPAL — Momento de verdad ═══ */}
