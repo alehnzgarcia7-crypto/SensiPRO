@@ -191,7 +191,7 @@ export const FEATURES: LandingFeature[] = [
     icon: 'Gamepad2',
     title: 'Códigos HUD de Pro',
     description:
-      'Códigos HUD REALES para 2, 3, 4 y 5 dedos con layout visual. Copia y pega directo en Free Fire → Ajustes → Usar código compartido.',
+      'Códigos HUD REALES para 2, 3, 4 y 5 dedos con layout visual.',
     color: '#22c55e',
     isNew: true,
     highlight: 'Layouts para 2-5 dedos',

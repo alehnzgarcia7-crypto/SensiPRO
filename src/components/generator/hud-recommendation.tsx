@@ -9,7 +9,7 @@
 
 import type { HudRecommendation } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Gamepad2, Import, Trophy, Zap, Target, Loader2 } from 'lucide-react';
+import { ChevronDown, Check, Gamepad2, Trophy, Zap, Target, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -247,19 +247,13 @@ export function HudRecommendationPanel({ data, screenSize }: HudRecommendationPa
               CUSTOM HUD
             </h3>
             <p className="text-xs text-slate-500">
-              Códigos HUD reales de Free Fire • Copia y pega directo en el juego
+              Códigos HUD reales de Free Fire
             </p>
           </div>
         </div>
 
-        {/* Instrucción de importación */}
-        <div className="flex items-start gap-2.5 p-3 rounded-lg bg-ice-500/[0.04] border border-ice-500/10">
-          <Import size={14} className="text-ice-400 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            <span className="text-ice-300 font-semibold">Copia el código</span>{' '}
-            → Ajustes → En Partida → Usar código compartido → Pegar → Aplicar
-          </p>
-        </div>
+        {/* Espaciador */}
+        <div />
       </div>
 
       {/* ═══ CARDS DE CADA LAYOUT ═══ */}

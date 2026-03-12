@@ -12,7 +12,6 @@ import type { FingerCount } from '@ares/algorithms';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gamepad2,
-  Import,
   Target,
   Zap,
   ChevronDown,
@@ -496,14 +495,8 @@ export function HeadshotHudCodes({ fingers, screenSize }: HeadshotHudCodesProps)
           </div>
         </div>
 
-        {/* Instrucción de importación */}
-        <div className="flex items-start gap-2.5 p-3 rounded-lg bg-ice-500/[0.04] border border-ice-500/10">
-          <Import size={14} className="text-ice-400 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            <span className="text-ice-300 font-semibold">Copia el código</span>{' '}
-            → Ajustes → En Partida → Usar código compartido → Pegar → Aplicar
-          </p>
-        </div>
+        {/* Espaciador */}
+        <div />
       </div>
 
       {/* ═══ VARIANT TABS ═══ */}

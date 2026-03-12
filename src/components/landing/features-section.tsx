@@ -46,7 +46,7 @@ const FEATURES: FeatureDef[] = [
   {
     icon: '📐',
     title: 'Códigos HUD Reales',
-    description: '17 códigos HUD para 2, 3, 4 y 5 dedos. Copia y pega directo en Free Fire. Con screenshots reales del juego.',
+    description: '17 códigos HUD para 2, 3, 4 y 5 dedos con screenshots reales del juego.',
     badge: 'NUEVO',
     stat: '17 códigos',
     color: '#a855f7',

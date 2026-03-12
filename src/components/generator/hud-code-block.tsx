@@ -118,9 +118,7 @@ export function HudCodeBlock({ code, label: _label, playerName }: HudCodeBlockPr
           </span>
         </motion.button>
       </div>
-      <p className="text-[9px] text-slate-600 leading-relaxed">
-        Ajustes &rarr; En Partida &rarr; Usar codigo compartido &rarr; Pegar &rarr; Aplicar
-      </p>
+      <div />
     </div>
   );
 }
