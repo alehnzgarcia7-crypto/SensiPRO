@@ -26,6 +26,17 @@ function tierBadgeVariant(tier: DeviceTier): 'vip' | 'premium' | 'free' {
   return 'free';
 }
 
+function tierLabel(tier: DeviceTier): string {
+  const labels: Record<DeviceTier, string> = {
+    LOW: 'Entrada',
+    MID: 'Gama media',
+    HIGH: 'Alto rendimiento',
+    ULTRA: 'Ultra premium',
+    GAMING: 'Gaming pro',
+  };
+  return labels[tier];
+}
+
 export function DeviceStep() {
   const { selectedBrand, selectDevice } = useGeneratorStore();
   const [devices, setDevices] = useState<DeviceItem[]>([]);
@@ -44,13 +55,47 @@ export function DeviceStep() {
     ? devices.filter((d) => d.model.toLowerCase().includes(search.toLowerCase()))
     : devices;
 
+  const popularDevices = filtered.filter((d) => d.isPopular);
+  const otherDevices = filtered.filter((d) => !d.isPopular);
+
+  const renderDeviceButton = (device: DeviceItem) => (
+    <button
+      key={device.id}
+      onClick={() => selectDevice({
+        id: device.id,
+        brand: device.brand,
+        model: device.model,
+        slug: device.slug,
+        tier: device.tier,
+        screenHz: device.screenHz,
+        ramGb: device.ramGb,
+      })}
+      className={cn(
+        'w-full glass-hover p-4 flex items-center justify-between min-h-[44px]',
+      )}
+    >
+      <div className="text-left">
+        <p className="font-display font-bold text-white text-sm">{device.model}</p>
+        <p className="text-xs text-slate-500">{tierLabel(device.tier)}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        {device.isPopular && (
+          <span className="text-[10px] text-fire-400 font-ui">Popular</span>
+        )}
+        <Badge variant={tierBadgeVariant(device.tier)} size="sm">
+          {device.tier}
+        </Badge>
+      </div>
+    </button>
+  );
+
   return (
     <div>
       <h2 className="text-xl font-display font-bold text-white mb-2">
-        Elige tu {selectedBrand}
+        Selecciona tu modelo
       </h2>
       <p className="text-sm text-slate-400 mb-6">
-        Selecciona tu modelo exacto
+        {selectedBrand} &mdash; {filtered.length} modelos disponibles
       </p>
 
       <Input
@@ -68,36 +113,22 @@ export function DeviceStep() {
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((device) => (
-            <button
-              key={device.id}
-              onClick={() => selectDevice({
-                id: device.id,
-                brand: device.brand,
-                model: device.model,
-                slug: device.slug,
-                tier: device.tier,
-                screenHz: device.screenHz,
-                ramGb: device.ramGb,
-              })}
-              className={cn(
-                'w-full glass-hover p-4 flex items-center justify-between min-h-[44px]',
+          {/* Modelos más buscados */}
+          {popularDevices.length > 0 && (
+            <>
+              <p className="text-xs font-heading uppercase tracking-[0.15em] text-fire-400/70 mb-2 mt-1">
+                Más buscados
+              </p>
+              {popularDevices.map(renderDeviceButton)}
+              {otherDevices.length > 0 && (
+                <div className="divider-gradient my-4" />
               )}
-            >
-              <div className="text-left">
-                <p className="font-display font-bold text-white text-sm">{device.model}</p>
-                <p className="text-xs text-slate-500">{device.tier}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {device.isPopular && (
-                  <span className="text-[10px] text-fire-400 font-ui">Popular</span>
-                )}
-                <Badge variant={tierBadgeVariant(device.tier)} size="sm">
-                  {device.tier}
-                </Badge>
-              </div>
-            </button>
-          ))}
+            </>
+          )}
+
+          {/* Resto de modelos */}
+          {otherDevices.map(renderDeviceButton)}
+
           {filtered.length === 0 && (
             <p className="text-center text-sm text-slate-500 py-8">
               No se encontraron modelos para &quot;{search}&quot;

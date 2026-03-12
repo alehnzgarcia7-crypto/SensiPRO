@@ -152,7 +152,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         setError(data.error?.message ?? 'Error al regenerar');
       }
     } catch {
-      setError('Error de conexion al regenerar.');
+      setError('Error de conexión al regenerar.');
     }
   }, [selectedDevice, selectedStyle, includeGyro, setLoading, setAllCalibrations, setError]);
 
@@ -220,6 +220,28 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         </div>
       </motion.div>
 
+      {/* ═══ RESULTADO PRINCIPAL — Momento de verdad ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-5">
+        <p className="text-xs font-heading uppercase tracking-[0.15em] text-slate-500 mb-2">
+          Resultado principal
+        </p>
+        <p className="text-sm text-slate-400 mb-3">
+          Configuración calculada para tu {selectedDevice.model}
+        </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Badge variant={styleVariant} size="sm">{selectedStyle}</Badge>
+            <span className="text-xs text-slate-600">General</span>
+          </div>
+          <span className="text-4xl font-mono font-black text-gradient-fire-ice" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <CountUp end={sensitivityEntries[0]?.[1] ?? 0} duration={800} />
+          </span>
+        </div>
+        <p className="text-[11px] text-slate-600 mt-3">
+          Ajusta RAM, Hz y calibración para afinar tu configuración
+        </p>
+      </motion.div>
+
       {/* ═══ RAM SELECTOR ═══ */}
       <motion.div variants={itemVariants} className="glass-card p-5">
         <RamSelector
@@ -265,7 +287,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               )}
             </AnimatePresence>
 
-            <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-5">
+            <h3 className="font-heading font-bold uppercase tracking-[0.15em] text-base mb-5 bg-gradient-to-r from-fire-400 via-white to-ice-400 bg-clip-text text-transparent">
               {isLoading ? 'Recalculando...' : 'Sensibilidades'}
             </h3>
             <div className="space-y-4">
@@ -343,7 +365,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target size={14} className="text-ice-400" />
-                  <span className="text-sm font-ui text-slate-400">Precision</span>
+                  <span className="text-sm font-ui text-slate-400">Precisión</span>
                 </div>
                 <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
                   <CountUp end={currentCombo.precisionScore} duration={600} />
@@ -355,7 +377,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2">
                   <Ruler size={14} className="text-fire-400" />
-                  <span className="text-sm font-ui text-slate-400">Boton</span>
+                  <span className="text-sm font-ui text-slate-400">Botón</span>
                 </div>
                 <span className="text-sm font-mono font-bold text-white" style={{ fontVariantNumeric: 'tabular-nums' }}>
                   {currentCombo.buttonSize}mm
@@ -372,7 +394,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                   >
                     <div className="flex items-center gap-2">
                       <Gauge size={14} className="text-ice-400" />
-                      <span className="text-sm font-ui text-slate-400">DPI Optimo</span>
+                      <span className="text-sm font-ui text-slate-400">DPI Óptimo</span>
                     </div>
                     <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
                       <CountUp end={currentCombo.dpiValue} duration={600} />
@@ -447,7 +469,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         <Button variant="ghost" size="sm" leftIcon={<Share2 size={16} />}>Compartir</Button>
         <Button variant="ghost" size="sm" leftIcon={<Download size={16} />}>Exportar</Button>
         <Button variant="secondary" size="sm" leftIcon={<RotateCcw size={16} />} onClick={onReset}>
-          Nueva busqueda
+          Nueva búsqueda
         </Button>
       </motion.div>
     </motion.div>

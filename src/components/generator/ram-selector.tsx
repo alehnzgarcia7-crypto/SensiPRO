@@ -25,7 +25,10 @@ export function RamSelector({ value, onChange, suggestedRam }: RamSelectorProps)
           RAM del dispositivo
         </label>
         <p className="text-[11px] text-slate-600 mt-0.5">
-          Ajustes &rarr; Acerca del telefono &rarr; Memoria
+          Ajustes &rarr; Acerca del teléfono &rarr; Memoria
+        </p>
+        <p className="text-[10px] text-slate-600/70 mt-0.5">
+          Si no sabes tu RAM, usa el valor detectado
         </p>
       </div>
       <div className="flex flex-wrap gap-2">

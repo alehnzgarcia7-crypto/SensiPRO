@@ -159,7 +159,7 @@ export function PremiumBlur({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          CONTENIDO PREMIUM
+          TU CONFIGURACIÓN ESTÁ LISTA
         </motion.h3>
 
         <motion.p
@@ -168,7 +168,7 @@ export function PremiumBlur({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          Tu sensibilidad está calculada. Desbloquéala para ver tus valores personalizados.
+          Los 5 valores restantes están calculados y esperando por ti. Desbloquea para ver tu configuración completa.
         </motion.p>
 
         {/* Valor General revelado (si aplica) */}
@@ -188,7 +188,7 @@ export function PremiumBlur({
               <span className="text-slate-500 text-xs">/ 200</span>
             </div>
             <p className="text-[10px] text-slate-500 mt-1 text-center">
-              Los otros 5 valores están bloqueados
+              5 valores personalizados listos
             </p>
           </motion.div>
         )}
@@ -230,7 +230,7 @@ export function PremiumBlur({
           {/* Contenido del botón */}
           <div className="relative flex items-center gap-2 text-white font-semibold text-sm">
             <Crown className="w-4 h-4 text-yellow-400" />
-            <span>DESBLOQUEAR</span>
+            <span>VER MI CONFIGURACIÓN</span>
             <Sparkles className="w-4 h-4 text-cyan-400 group-hover:text-yellow-400 transition-colors" />
           </div>
         </motion.button>
@@ -275,7 +275,7 @@ export function PremiumBlur({
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
         >
-          {'\u00BF'}Ya compraste? Restaurar acceso
+          ¿Ya compraste? Restaurar acceso
         </motion.button>
       </motion.div>
 

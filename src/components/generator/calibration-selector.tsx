@@ -32,9 +32,9 @@ interface CalibrationOption {
 }
 
 const OPTIONS: CalibrationOption[] = [
-  { key: 'BAJA', label: 'Precision', icon: Crosshair, description: 'Control fino' },
-  { key: 'MEDIA', label: 'Balanceado', icon: Scale, description: 'Equilibrio' },
-  { key: 'ALTA', label: 'Velocidad', icon: Zap, description: 'Rush rapido' },
+  { key: 'BAJA', label: 'Precisión', icon: Crosshair, description: 'Control fino y estable' },
+  { key: 'MEDIA', label: 'Balanceado', icon: Scale, description: 'Equilibrio perfecto' },
+  { key: 'ALTA', label: 'Velocidad', icon: Zap, description: 'Respuesta veloz' },
 ];
 
 function TiltCard({
@@ -87,7 +87,7 @@ export function CalibrationSelector({ value, onChange }: CalibrationSelectorProp
   return (
     <div className="space-y-2.5">
       <p className="text-xs font-heading uppercase tracking-[0.15em] text-white/60">
-        Calibracion
+        Calibración
       </p>
       <div className="grid grid-cols-3 gap-2.5">
         {OPTIONS.map((option) => {
@@ -143,7 +143,7 @@ export function CalibrationSelector({ value, onChange }: CalibrationSelectorProp
               >
                 {option.label}
               </span>
-              <span className="relative z-10 text-[10px] text-slate-600 hidden md:block">
+              <span className="relative z-10 text-[10px] text-slate-600">
                 {option.description}
               </span>
             </TiltCard>

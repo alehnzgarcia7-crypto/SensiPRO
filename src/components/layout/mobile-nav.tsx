@@ -15,9 +15,13 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname();
+  const isGeneratorFunnel = pathname.startsWith('/generator');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden glass border-t border-white/5 safe-bottom">
+    <nav className={cn(
+      'fixed bottom-0 left-0 right-0 z-40 md:hidden glass border-t border-white/5 safe-bottom transition-opacity duration-300',
+      isGeneratorFunnel && 'opacity-60',
+    )}>
       <div className="flex items-center justify-around px-2 py-1">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);

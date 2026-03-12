@@ -3,7 +3,7 @@
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 import type { SensitivityStyle } from '@prisma/client';
 import type { DeviceTier } from '@prisma/client';
-import { Sword, Target, Crosshair } from 'lucide-react';
+import { Sword, Target, Crosshair, Zap } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -25,7 +25,7 @@ const STYLES: StyleOption[] = [
     key: 'AGGRESSIVE',
     name: 'Agresivo',
     icon: Sword,
-    description: 'Giros rapidos, aim agresivo. Para rushers.',
+    description: 'Respuesta rápida y arrastre agresivo. Ideal para rush y combate cercano.',
     color: 'text-style-aggressive',
     border: 'border-style-aggressive/30',
   },
@@ -33,7 +33,7 @@ const STYLES: StyleOption[] = [
     key: 'BALANCED',
     name: 'Balanceado',
     icon: Target,
-    description: 'Buen balance. Para todos.',
+    description: 'Perfil equilibrado para control y consistencia en todas las situaciones.',
     color: 'text-style-balanced',
     border: 'border-style-balanced/30',
   },
@@ -41,7 +41,7 @@ const STYLES: StyleOption[] = [
     key: 'SNIPER',
     name: 'Francotirador',
     icon: Crosshair,
-    description: 'Maxima precision en scopes.',
+    description: 'Máxima precisión en miras y scopes. Domina las distancias largas.',
     color: 'text-style-sniper',
     border: 'border-style-sniper/30',
   },
@@ -123,14 +123,14 @@ export function StyleStep() {
         setError(data.error?.message ?? 'Error al generar');
       }
     } catch {
-      setError('Error de conexion. Intenta de nuevo.');
+      setError('Error de conexión. Intenta de nuevo.');
     }
   };
 
   return (
     <div>
       <h2 className="text-xl font-display font-bold text-white mb-2">
-        Elige tu estilo
+        Elige tu estilo de juego
       </h2>
       <p className="text-sm text-slate-400 mb-6">
         {selectedDevice?.brand} {selectedDevice?.model} — {selectedDevice?.tier}
@@ -188,8 +188,9 @@ export function StyleStep() {
         className="w-full"
         onClick={() => void handleGenerate()}
         isLoading={isLoading}
+        leftIcon={<Zap size={18} />}
       >
-        Generar Sensibilidad
+        CALCULAR MI SENSIBILIDAD
       </Button>
     </div>
   );

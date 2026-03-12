@@ -62,7 +62,18 @@ export function GeneratorFlow() {
           <h1 className="text-xl md:text-2xl font-heading font-black text-white uppercase tracking-[0.1em]">
             Generador
           </h1>
-          <p className="text-xs font-ui text-slate-500 mt-0.5">Paso {step} de 3</p>
+          <div className="flex items-center gap-3 mt-1">
+            {(['Marca', 'Modelo', 'Estilo'] as const).map((label, i) => (
+              <div key={label} className="flex items-center gap-1.5">
+                <span className={`text-xs font-ui font-bold ${step >= i + 1 ? 'text-fire-400' : 'text-slate-600'}`}>
+                  {label}
+                </span>
+                {i < 2 && (
+                  <span className={`text-[10px] ${step > i + 1 ? 'text-fire-400/50' : 'text-slate-700'}`}>&rsaquo;</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </motion.div>
 

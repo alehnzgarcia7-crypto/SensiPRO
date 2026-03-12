@@ -17,7 +17,7 @@ interface HzSelectorProps {
 }
 
 function getHzLabel(hz: number): string {
-  if (hz <= 60) return 'Estandar';
+  if (hz <= 60) return 'Estándar';
   if (hz <= 90) return 'Gama Media';
   return 'Alta gama';
 }

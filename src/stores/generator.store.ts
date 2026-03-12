@@ -86,6 +86,13 @@ interface GeneratorStore {
   reset: () => void;
   goBack: () => void;
 
+  // Deep linking: inicializar desde query params
+  initFromParams: (params: {
+    brand?: string;
+    device?: SelectedDevice;
+    style?: SensitivityStyle;
+  }) => void;
+
   // Computed: combinación activa filtrada de allCalibrations
   getCurrentCombination: () => CalibrationResult | null;
 }
@@ -210,6 +217,27 @@ export const useGeneratorStore = create<GeneratorStore>((set, get) => ({
       };
       return state;
     }),
+
+  initFromParams: (params) => {
+    if (params.device) {
+      set({
+        selectedDevice: params.device,
+        selectedBrand: params.device.brand,
+        step: 3,
+        userRam: params.device.ramGb,
+        userHz: params.device.screenHz,
+        ...(params.style ? { selectedStyle: params.style } : {}),
+      });
+    } else if (params.brand) {
+      set({
+        selectedBrand: params.brand,
+        step: 2,
+        ...(params.style ? { selectedStyle: params.style } : {}),
+      });
+    } else if (params.style) {
+      set({ selectedStyle: params.style });
+    }
+  },
 
   getCurrentCombination: () => {
     const state = get();

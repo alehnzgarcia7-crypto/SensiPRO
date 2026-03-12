@@ -17,9 +17,14 @@ interface DpiToggleProps {
 export function DpiToggle({ enabled, onChange, dpiValue }: DpiToggleProps) {
   return (
     <div className="space-y-2.5">
-      <p className="text-xs font-heading uppercase tracking-[0.15em] text-white/60">
-        Modo DPI
-      </p>
+      <div>
+        <p className="text-xs font-heading uppercase tracking-[0.15em] text-white/60">
+          Modo DPI
+        </p>
+        <p className="text-[10px] text-slate-600 mt-0.5">
+          Ajuste fino para pantallas de alta densidad
+        </p>
+      </div>
       <div className="flex items-center gap-3">
         {/* Toggle track */}
         <button

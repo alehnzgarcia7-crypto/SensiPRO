@@ -1,17 +1,107 @@
-import type { Metadata } from 'next';
+'use client';
+
+import type { SensitivityStyle } from '@prisma/client';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useRef } from 'react';
 
 import { GeneratorFlow } from '@/components/generator/generator-flow';
+import { useGeneratorStore } from '@/stores/generator.store';
 
-export const metadata: Metadata = {
-  title: 'Generador de Sensibilidad | SensiPRO — Free Fire',
-  description: 'Genera la sensibilidad perfecta para Free Fire basada en tu dispositivo. 485+ celulares, calibración por DPI, giroscopio y tamaño de pantalla.',
-  keywords: ['sensibilidad free fire', 'configuración free fire', 'sensibilidad perfecta', 'generador sensibilidad'],
-};
+const VALID_STYLES = new Set<string>(['AGGRESSIVE', 'BALANCED', 'SNIPER']);
+
+function GeneratorWithDeepLink() {
+  const searchParams = useSearchParams();
+  const initFromParams = useGeneratorStore((s) => s.initFromParams);
+  const selectDevice = useGeneratorStore((s) => s.selectDevice);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const brand = searchParams.get('brand');
+    const model = searchParams.get('model');
+    const styleParam = searchParams.get('style')?.toUpperCase();
+    const source = searchParams.get('source');
+    const campaign = searchParams.get('campaign');
+
+    // Guardar tracking en sessionStorage
+    if (source) {
+      sessionStorage.setItem('sensipro_source', source);
+    }
+    if (campaign) {
+      sessionStorage.setItem('sensipro_campaign', campaign);
+    }
+
+    const style = styleParam && VALID_STYLES.has(styleParam)
+      ? (styleParam as SensitivityStyle)
+      : undefined;
+
+    // Si hay model/slug, intentar fetch del device para saltar pasos
+    if (model) {
+      void (async () => {
+        try {
+          const res = await fetch(`/api/devices/${encodeURIComponent(model)}`);
+          const data = await res.json() as {
+            success: boolean;
+            data?: {
+              id: string;
+              brand: string;
+              model: string;
+              slug: string;
+              tier: string;
+              screenHz: number;
+              ramGb: number;
+              screenSize?: number;
+              panelType?: string;
+            };
+          };
+          if (data.success && data.data) {
+            const device = data.data;
+            initFromParams({
+              brand: device.brand,
+              device: {
+                id: device.id,
+                brand: device.brand,
+                model: device.model,
+                slug: device.slug,
+                tier: device.tier as 'LOW' | 'MID' | 'HIGH' | 'ULTRA' | 'GAMING',
+                screenHz: device.screenHz,
+                ramGb: device.ramGb,
+                screenSize: device.screenSize,
+                panelType: device.panelType as 'LCD' | 'IPS' | 'AMOLED' | 'OLED' | 'LTPO' | undefined,
+              },
+              style,
+            });
+          } else if (brand) {
+            // Device no encontrado pero hay marca
+            initFromParams({ brand, style });
+          }
+        } catch {
+          // Fetch falló, intentar con marca si existe
+          if (brand) {
+            initFromParams({ brand, style });
+          }
+        }
+      })();
+    } else if (brand || style) {
+      initFromParams({ brand: brand ?? undefined, style });
+    }
+  }, [searchParams, initFromParams, selectDevice]);
+
+  return <GeneratorFlow />;
+}
 
 export default function GeneratorPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <GeneratorFlow />
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="animate-pulse text-slate-500 text-sm">Cargando generador...</div>
+        </div>
+      }>
+        <GeneratorWithDeepLink />
+      </Suspense>
     </div>
   );
 }
