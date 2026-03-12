@@ -13,9 +13,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Lock, CreditCard, Banknote, Smartphone,
-  Check, Shield, Clock, Zap, Crown,
+  Check, Shield, Clock, Zap,
   ChevronRight, AlertCircle, Loader2,
-  Target, Crosshair, Gamepad2, BookOpen,
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -69,12 +68,12 @@ function useCountdown() {
 // ═══════════════════════════════════════════════════════
 
 const PREMIUM_FEATURES = [
-  { icon: Target, text: '6 valores de sensibilidad calibrada por DPI', color: 'text-cyan-400' },
-  { icon: Crosshair, text: 'Headshot Mode con 24 features exclusivos', color: 'text-red-400' },
-  { icon: Gamepad2, text: '17 códigos HUD reales con capturas de FF', color: 'text-green-400' },
-  { icon: Zap, text: 'Giroscopio calibrado al rango pro (32-39)', color: 'text-yellow-400' },
-  { icon: BookOpen, text: 'Academia completa: 8 guías + 12 tips', color: 'text-purple-400' },
-  { icon: Crown, text: 'Actualizaciones de por vida + soporte', color: 'text-amber-400' },
+  '6 valores de sensibilidad calibrada por DPI',
+  'Headshot Mode con 24 features exclusivos',
+  '17 códigos HUD reales con capturas de FF',
+  'Giroscopio calibrado al rango pro (32-39)',
+  'Academia completa: 8 guías + 12 tips',
+  'Actualizaciones de por vida + soporte',
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -246,7 +245,7 @@ export function PaywallModal() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <Zap className="w-3 h-3" />
-                <span className="font-semibold">43% OFF — LANZAMIENTO</span>
+                <span className="font-semibold">43% OFF — OFERTA ESPECIAL</span>
               </motion.div>
 
               {/* Título */}
@@ -269,22 +268,22 @@ export function PaywallModal() {
             </div>
 
             {/* Countdown */}
-            <div className="mx-6 mb-4 px-4 py-2.5 rounded-xl bg-red-500/5 border border-red-500/15">
+            <div className="mx-6 mb-4 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-red-400">
+                <div className="flex items-center gap-2 text-xs text-slate-400">
                   <Clock className="w-3.5 h-3.5" />
                   <span className="font-medium">Oferta termina en:</span>
                 </div>
                 <div className="flex items-center gap-1 font-[family-name:var(--font-orbitron),sans-serif] text-sm text-white">
-                  <span className="px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 font-bold min-w-[28px] text-center">
+                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
                     {String(countdown.hours).padStart(2, '0')}
                   </span>
-                  <span className="text-red-400/50">:</span>
-                  <span className="px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 font-bold min-w-[28px] text-center">
+                  <span className="text-slate-600">:</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
                     {String(countdown.minutes).padStart(2, '0')}
                   </span>
-                  <span className="text-red-400/50">:</span>
-                  <span className="px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 font-bold min-w-[28px] text-center">
+                  <span className="text-slate-600">:</span>
+                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
                     {String(countdown.seconds).padStart(2, '0')}
                   </span>
                 </div>
@@ -292,19 +291,9 @@ export function PaywallModal() {
             </div>
 
             {/* Social proof */}
-            <div className="mx-6 mb-4 flex items-center gap-2">
-              <div className="flex -space-x-2">
-                {['🎮', '🎯', '🔫', '💎'].map((emoji, i) => (
-                  <div
-                    key={i}
-                    className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border-2 border-slate-950 flex items-center justify-center text-xs"
-                  >
-                    {emoji}
-                  </div>
-                ))}
-              </div>
+            <div className="mx-6 mb-4">
               <p className="text-xs text-slate-400">
-                <span className="text-cyan-400 font-bold">1,860</span> jugadores ya calibraron su sensibilidad
+                Más de <span className="text-cyan-400 font-bold">1,800</span> jugadores confían en SensiPRO
               </p>
             </div>
 
@@ -324,9 +313,9 @@ export function PaywallModal() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <p className="text-sm text-slate-300 mb-3">
-                      Ingresa tu email para guardar tu configuración y recibir tu acceso:
-                    </p>
+                    <label className="text-sm text-slate-300 mb-3 block">
+                      Email de acceso
+                    </label>
 
                     <div className="relative mb-3">
                       <input
@@ -358,8 +347,9 @@ export function PaywallModal() {
                       <ChevronRight className="w-4 h-4" />
                     </motion.button>
 
-                    <p className="text-[10px] text-slate-600 mt-2 text-center">
-                      No spam. Solo tu acceso premium.
+                    <p className="text-[10px] text-slate-600 mt-2 text-center flex items-center justify-center gap-1">
+                      <Lock className="w-2.5 h-2.5" />
+                      Pago seguro con Stripe
                     </p>
                   </motion.div>
                 )}
@@ -378,7 +368,7 @@ export function PaywallModal() {
                       <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-2">
                         Lo que desbloqueas:
                       </p>
-                      {PREMIUM_FEATURES.map((feat, i) => (
+                      {PREMIUM_FEATURES.map((text, i) => (
                         <motion.div
                           key={i}
                           className="flex items-center gap-2.5 text-xs"
@@ -389,7 +379,7 @@ export function PaywallModal() {
                           <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
                             <Check className="w-3 h-3 text-emerald-400" />
                           </div>
-                          <span className="text-slate-300">{feat.text}</span>
+                          <span className="text-slate-300">{text}</span>
                         </motion.div>
                       ))}
                     </div>
