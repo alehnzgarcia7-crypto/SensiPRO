@@ -10,14 +10,23 @@ import { TIKTOK_EVENTS, PRODUCT } from './constants';
 import { generateEventId } from './dedup';
 
 // TikTok Pixel global type
+interface TtqInstance {
+  load: (pixelId: string, options?: Record<string, unknown>) => void;
+  page: () => void;
+  track: (event: string, params?: Record<string, unknown>, options?: { event_id?: string }) => void;
+  identify: (params: Record<string, unknown>) => void;
+  instance: (id: string) => TtqInstance;
+  push: (args: unknown[]) => void;
+  methods: string[];
+  setAndDefer: (target: Record<string, unknown>, method: string) => void;
+  _i: Record<string, unknown[]>;
+  _t: Record<string, number>;
+  _o: Record<string, Record<string, unknown>>;
+}
+
 declare global {
   interface Window {
-    ttq?: {
-      load: (pixelId: string) => void;
-      page: () => void;
-      track: (event: string, params?: Record<string, unknown>, options?: { event_id?: string }) => void;
-      identify: (params: Record<string, unknown>) => void;
-    };
+    ttq?: TtqInstance;
     TiktokAnalyticsObject?: string;
   }
 }
@@ -35,33 +44,49 @@ export function initTikTokPixel(): void {
   if (pixelLoaded) return;
   pixelId = id;
 
-  // Inject TikTok Pixel script tag directly — avoids the IIFE pattern
-  // that requires `any` types for the SDK bootstrap queue
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.async = true;
-  script.src = `https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=${id}&lib=ttq`;
-  const firstScript = document.getElementsByTagName('script')[0];
-  firstScript?.parentNode?.insertBefore(script, firstScript);
-
-  // Initialize ttq queue for commands before script loads
+  // Official TikTok Pixel bootstrap — queue stub + script loader
   window.TiktokAnalyticsObject = 'ttq';
-  if (!window.ttq) {
-    // Minimal queue stub — SDK replaces this on load
-    const queue: Array<unknown[]> = [];
-    const stub = {
-      _i: { [id]: [] },
-      _t: { [id]: +new Date() },
-      _o: { [id]: {} },
-      load: () => { /* handled by script src */ },
-      page: (...args: unknown[]) => { queue.push(['page', ...args]); },
-      track: (...args: unknown[]) => { queue.push(['track', ...args]); },
-      identify: (...args: unknown[]) => { queue.push(['identify', ...args]); },
+  const ttq: TtqInstance = window.ttq = window.ttq || ([] as unknown as TtqInstance);
+  ttq.methods = [
+    'page', 'track', 'identify', 'instances', 'debug', 'on', 'off',
+    'once', 'ready', 'alias', 'group', 'enableCookie', 'disableCookie',
+    'holdConsent', 'revokeConsent', 'grantConsent',
+  ];
+  ttq.setAndDefer = function (target: Record<string, unknown>, method: string) {
+    target[method] = function () {
+      // eslint-disable-next-line prefer-rest-params
+      ttq.push([method].concat(Array.prototype.slice.call(arguments, 0)));
     };
-    window.ttq = stub as unknown as typeof window.ttq;
+  };
+  for (const method of ttq.methods) {
+    ttq.setAndDefer(ttq as unknown as Record<string, unknown>, method);
   }
+  ttq.instance = function (instanceId: string) {
+    const instance = ttq._i[instanceId] || [];
+    for (const method of ttq.methods) {
+      ttq.setAndDefer(instance as unknown as Record<string, unknown>, method);
+    }
+    return instance as unknown as TtqInstance;
+  };
+  ttq.load = function (pixelIdToLoad: string, options?: Record<string, unknown>) {
+    const scriptUrl = 'https://analytics.tiktok.com/i18n/pixel/events.js';
+    ttq._i = ttq._i || {};
+    ttq._i[pixelIdToLoad] = [];
+    (ttq._i[pixelIdToLoad] as unknown as { _u: string })._u = scriptUrl;
+    ttq._t = ttq._t || {};
+    ttq._t[pixelIdToLoad] = +new Date();
+    ttq._o = ttq._o || {};
+    ttq._o[pixelIdToLoad] = options || {};
+    const s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.src = scriptUrl + '?sdkid=' + pixelIdToLoad + '&lib=ttq';
+    const f = document.getElementsByTagName('script')[0];
+    f?.parentNode?.insertBefore(s, f);
+  };
 
-  window.ttq?.page();
+  ttq.load(id);
+  ttq.page();
   pixelLoaded = true;
 }
 
