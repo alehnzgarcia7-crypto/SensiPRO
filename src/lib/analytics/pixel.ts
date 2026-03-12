@@ -124,13 +124,13 @@ export function trackInitiateCheckout(params: {
   }, { event_id: params.eventId });
 }
 
-export function trackCompletePayment(params: {
+export function trackPurchase(params: {
   eventId: string;
   value?: number;
   currency?: string;
   contentId?: string;
 }): void {
-  getPixel()?.track(TIKTOK_EVENTS.COMPLETE_PAYMENT, {
+  getPixel()?.track(TIKTOK_EVENTS.PURCHASE, {
     content_id: params.contentId || PRODUCT.CONTENT_ID,
     content_type: PRODUCT.CONTENT_TYPE,
     value: params.value || PRODUCT.VALUE,

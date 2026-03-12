@@ -9,7 +9,7 @@ export const TIKTOK_EVENTS = {
   SEARCH: 'Search',
   CLICK_BUTTON: 'ClickButton',
   INITIATE_CHECKOUT: 'InitiateCheckout',
-  COMPLETE_PAYMENT: 'CompletePayment',
+  PURCHASE: 'Purchase',
   COMPLETE_REGISTRATION: 'CompleteRegistration',
 } as const;
 

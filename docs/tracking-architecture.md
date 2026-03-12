@@ -49,7 +49,7 @@ TIKTOK_TEST_EVENT_CODE=""       # Optional, for testing
 | `Search` | Brand selected, model selected | Client (pixel) | No |
 | `ClickButton` | Landing CTAs, generator submit, unlock CTA, payment method select | Client (pixel) | No |
 | `InitiateCheckout` | `/api/payments/create` — when checkout session is actually created | Server (Events API) | Yes — `checkout_{sessionId}` |
-| `CompletePayment` | Stripe/MP webhooks — when payment is confirmed | Server (Events API) | Yes — `purchase_{paymentId}` |
+| `Purchase` | Stripe/MP webhooks — when payment is confirmed | Server (Events API) | Yes — `purchase_{paymentId}` |
 
 ## Internal SensiPRO Events
 
@@ -102,7 +102,7 @@ TIKTOK_TEST_EVENT_CODE=""       # Optional, for testing
 - **Server**: Fired in `/api/payments/create` after checkout session is created
 - Result: No duplicate — only one source
 
-### CompletePayment (Purchase)
+### Purchase
 - **ID format**: `purchase_{stripeSessionId|paymentIntentId|mpPaymentId}`
 - **Client**: Not fired (never from success page)
 - **Server**: Fired ONLY in webhook handlers when payment is confirmed
@@ -196,8 +196,8 @@ In development (`NODE_ENV=development`):
 - `src/components/paywall/paywall-modal.tsx` — blur_shown, unlock_cta, payment_method_selected, checkout_created events
 - `src/components/paywall/premium-blur.tsx` — blur_shown, unlock_cta events
 - `src/app/api/payments/create/route.ts` — Server-side InitiateCheckout
-- `src/app/api/webhooks/stripe/route.ts` — Server-side CompletePayment
-- `src/app/api/webhooks/mercadopago/route.ts` — Server-side CompletePayment
+- `src/app/api/webhooks/stripe/route.ts` — Server-side Purchase
+- `src/app/api/webhooks/mercadopago/route.ts` — Server-side Purchase
 - `src/app/(app)/generator/page.tsx` — ttclid capture, attribution persistence
 - `src/components/generator/steps/brand-step.tsx` — brand_selected event
 - `src/components/generator/steps/device-step.tsx` — model_selected event

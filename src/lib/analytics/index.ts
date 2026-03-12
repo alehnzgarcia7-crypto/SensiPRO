@@ -38,7 +38,7 @@ export {
   trackSearch as ttSearch,
   trackClickButton as ttClickButton,
   trackInitiateCheckout as ttInitiateCheckout,
-  trackCompletePayment as ttCompletePayment,
+  trackPurchase as ttPurchase,
   trackCompleteRegistration as ttCompleteRegistration,
   identifyUser as ttIdentifyUser,
 } from './pixel';

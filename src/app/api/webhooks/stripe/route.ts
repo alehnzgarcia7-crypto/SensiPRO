@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
               },
               path: '/api/webhooks/stripe',
               tiktok: {
-                event: TIKTOK_EVENTS.COMPLETE_PAYMENT,
+                event: TIKTOK_EVENTS.PURCHASE,
                 eventId: evtId,
                 email,
                 value: (session.amount_total || 19900) / 100,
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
               },
               path: '/api/webhooks/stripe',
               tiktok: {
-                event: TIKTOK_EVENTS.COMPLETE_PAYMENT,
+                event: TIKTOK_EVENTS.PURCHASE,
                 eventId: evtId,
                 email,
                 value: paymentIntent.amount / 100,

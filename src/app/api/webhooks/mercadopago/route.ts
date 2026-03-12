@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
             },
             path: '/api/webhooks/mercadopago',
             tiktok: {
-              event: TIKTOK_EVENTS.COMPLETE_PAYMENT,
+              event: TIKTOK_EVENTS.PURCHASE,
               eventId: evtId,
               email,
               value: (payment.transaction_amount || 199),
