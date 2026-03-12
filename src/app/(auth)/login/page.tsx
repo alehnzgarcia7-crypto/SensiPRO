@@ -95,6 +95,15 @@ export default function LoginPage() {
           Registrate gratis
         </Link>
       </p>
+
+      <div className="mt-4 pt-4 border-t border-white/5 text-center">
+        <Link
+          href="/recovery"
+          className="text-xs text-slate-500 hover:text-slate-300 underline underline-offset-2 transition-colors"
+        >
+          ¿Ya pagaste? Recupera tu acceso
+        </Link>
+      </div>
     </div>
   );
 }

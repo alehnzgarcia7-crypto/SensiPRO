@@ -16,6 +16,7 @@ import {
   Check, Shield, Clock, Zap,
   ChevronRight, AlertCircle, Loader2,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTrackEvent } from '@/hooks/use-track-event';
@@ -86,6 +87,7 @@ export function PaywallModal() {
   const { isPaywallOpen, hidePaywall, paywallContext, capturedEmail, setCapturedEmail, unlock } = usePremiumContext();
   const countdown = useCountdown();
   const { track } = useTrackEvent();
+  const { data: session } = useSession();
 
   const [step, setStep] = useState<PaymentStep>('email');
   const [email, setEmail] = useState('');
@@ -94,11 +96,20 @@ export function PaywallModal() {
   const [error, setError] = useState<string | null>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  // Si ya tenemos email capturado, ir directo a payment
+  // Si el usuario está logueado, usar su email de sesión automáticamente.
+  // Si ya tenemos email capturado, ir directo a payment.
   useEffect(() => {
     if (isPaywallOpen) {
       track('PAYWALL_SHOWN', { source: paywallContext?.source ?? 'unknown' });
-      if (capturedEmail) {
+
+      const sessionEmail = session?.user?.email;
+
+      if (sessionEmail) {
+        // Usuario logueado — usar su email, saltar paso de email
+        setEmail(sessionEmail);
+        setCapturedEmail(sessionEmail);
+        setStep('payment');
+      } else if (capturedEmail) {
         setEmail(capturedEmail);
         setStep('payment');
       } else {
@@ -107,7 +118,7 @@ export function PaywallModal() {
         setSelectedMethod(null);
       }
     }
-  }, [isPaywallOpen, capturedEmail, track, paywallContext?.source]);
+  }, [isPaywallOpen, capturedEmail, track, paywallContext?.source, session?.user?.email, setCapturedEmail]);
 
   // Focus en el input de email al abrir
   useEffect(() => {

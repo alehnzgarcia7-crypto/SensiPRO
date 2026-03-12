@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, Suspense } from 'react';
 
 import { registerUser } from '@/lib/auth/auth.actions';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefillEmail = searchParams.get('email') || '';
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -71,6 +73,7 @@ export default function RegisterPage() {
             type="email"
             required
             autoComplete="email"
+            defaultValue={prefillEmail}
             className="w-full rounded-gaming bg-background-card border border-white/10 px-4 py-3 text-sm text-white placeholder-slate-500 transition-colors focus:border-fire-500/50 focus:outline-none focus:ring-1 focus:ring-fire-500/30 min-h-[44px]"
             placeholder="tu@email.com"
           />
@@ -116,5 +119,17 @@ export default function RegisterPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="glass p-8 text-center">
+        <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin mx-auto" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }

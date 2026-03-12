@@ -99,12 +99,8 @@ export function usePremium(): UsePremiumReturn {
               });
               return;
             }
-            setState({
-              isPremium: true,
-              isLoading: false,
-              email,
-              activatedAt: null,
-            });
+            // Verificar cookie contra la DB para seguridad
+            verifyAsync(email);
             return;
           }
         }

@@ -3,8 +3,12 @@
  *
  * Verifica una sesión de Stripe Checkout y activa la licencia.
  * Se llama desde la página de success después de pagar.
+ *
+ * Además retorna hasAccount para que la success page sepa
+ * si mostrar formulario de login o de registro.
  */
 
+import { prisma } from '@ares/database';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -35,9 +39,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No email found' }, { status: 400 });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Activar licencia (idempotente)
     await activatePremiumLicense({
-      email,
+      email: normalizedEmail,
       paymentProvider: 'stripe',
       paymentId: session.id,
       paymentMethod: 'card',
@@ -47,12 +53,21 @@ export async function GET(request: NextRequest) {
       fingerCount: session.metadata?.fingerCount ? parseInt(session.metadata.fingerCount) : undefined,
     });
 
+    // Verificar si el email tiene una cuenta de usuario
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+      select: { id: true, username: true },
+    });
+
     return NextResponse.json({
       success: true,
-      email,
+      email: normalizedEmail,
       isPremium: true,
+      hasAccount: !!existingUser,
+      username: existingUser?.username ?? undefined,
     });
   } catch (error: unknown) {
+    // eslint-disable-next-line no-console -- Server-side error logging
     console.error('[SensiPRO] Verify session error:', error);
     return NextResponse.json(
       { error: 'Error verifying session' },
