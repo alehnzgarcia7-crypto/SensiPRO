@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 
 // ═══════════════════════════════════════════════════════════════
 // DeviceShowcase — Horizontal scroll carousel with snap points,
-// 10 popular devices, tier/Hz badges, edge fade masks,
+// 10 popular devices, Hz info, edge fade masks,
 // CTA card at end, stagger entrance from left
 // Device data verified against devices.seed.ts
 // ═══════════════════════════════════════════════════════════════
@@ -96,11 +96,8 @@ function DeviceCard({ device, index }: { device: PopularDevice; index: number })
           {device.model}
         </p>
 
-        {/* Badges: tier + Hz */}
-        <div className="mt-3 flex items-center gap-2">
-          <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${tier.bg} ${tier.text}`}>
-            {device.tier}
-          </span>
+        {/* Hz spec */}
+        <div className="mt-3">
           <span className="text-[11px] text-slate-400 font-mono">
             {device.hz}Hz
           </span>

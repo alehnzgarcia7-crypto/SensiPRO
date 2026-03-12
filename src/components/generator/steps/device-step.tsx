@@ -3,7 +3,6 @@
 import type { DeviceTier } from '@prisma/client';
 import { useState, useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/cn';
@@ -18,23 +17,6 @@ interface DeviceItem {
   screenHz: number;
   ramGb: number;
   isPopular: boolean;
-}
-
-function tierBadgeVariant(tier: DeviceTier): 'vip' | 'premium' | 'free' {
-  if (tier === 'GAMING' || tier === 'ULTRA') return 'vip';
-  if (tier === 'HIGH') return 'premium';
-  return 'free';
-}
-
-function tierLabel(tier: DeviceTier): string {
-  const labels: Record<DeviceTier, string> = {
-    LOW: 'Entrada',
-    MID: 'Gama media',
-    HIGH: 'Alto rendimiento',
-    ULTRA: 'Ultra premium',
-    GAMING: 'Gaming pro',
-  };
-  return labels[tier];
 }
 
 export function DeviceStep() {
@@ -76,16 +58,10 @@ export function DeviceStep() {
     >
       <div className="text-left">
         <p className="font-display font-bold text-white text-sm">{device.model}</p>
-        <p className="text-xs text-slate-500">{tierLabel(device.tier)}</p>
       </div>
-      <div className="flex items-center gap-2">
-        {device.isPopular && (
-          <span className="text-[10px] text-fire-400 font-ui">Popular</span>
-        )}
-        <Badge variant={tierBadgeVariant(device.tier)} size="sm">
-          {device.tier}
-        </Badge>
-      </div>
+      {device.isPopular && (
+        <span className="text-[10px] text-fire-400 font-ui">Popular</span>
+      )}
     </button>
   );
 

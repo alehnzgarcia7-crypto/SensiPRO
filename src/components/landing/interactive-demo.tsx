@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search, Lock, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -47,17 +47,6 @@ const SENSI_LABELS: { key: keyof SensitivityResult; label: string }[] = [
   { key: 'sniperScope', label: 'AWM' },
   { key: 'freeView', label: 'Vista Libre' },
 ];
-
-const DEFAULT_BADGE = { bg: 'bg-slate-500/15', text: 'text-slate-400' };
-
-const TIER_BADGE: Record<string, { bg: string; text: string }> = {
-  GAMING: { bg: 'bg-emerald-500/15', text: 'text-emerald-400' },
-  HIGH: { bg: 'bg-amber-500/15', text: 'text-amber-400' },
-  ULTRA: { bg: 'bg-cyan-500/15', text: 'text-cyan-400' },
-  MID: { bg: 'bg-slate-500/15', text: 'text-slate-400' },
-  LOW: { bg: 'bg-slate-600/15', text: 'text-slate-500' },
-  ENTRY: { bg: 'bg-slate-600/15', text: 'text-slate-500' },
-};
 
 export function InteractiveDemo() {
   const [query, setQuery] = useState('');
@@ -239,37 +228,26 @@ export function InteractiveDemo() {
             {/* Dropdown results */}
             {showDropdown && results.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-[rgba(10,15,30,0.95)] backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-20">
-                {results.map((device) => {
-                  const tier = TIER_BADGE[device.tier] ?? DEFAULT_BADGE;
-                  return (
+                {results.map((device) => (
                     <button
                       key={device.id}
                       onClick={() => handleSelectDevice(device)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-cyan-500/5 transition-colors text-left min-h-[44px]"
+                      className="w-full flex items-center px-4 py-3 hover:bg-cyan-500/5 transition-colors text-left min-h-[44px]"
                     >
                       <span className="text-sm text-white">
                         {device.brand} {device.model}
                       </span>
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${tier.bg} ${tier.text}`}>
-                        {device.tier}
-                      </span>
                     </button>
-                  );
-                })}
+                  ))}
               </div>
             )}
           </div>
 
           {/* Selected device badge */}
           {selectedDevice && (
-            <div className="mt-4 flex items-center gap-2">
+            <div className="mt-4">
               <span className="text-sm text-slate-300">
                 {selectedDevice.brand} {selectedDevice.model}
-              </span>
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                (TIER_BADGE[selectedDevice.tier] ?? DEFAULT_BADGE).bg
-              } ${(TIER_BADGE[selectedDevice.tier] ?? DEFAULT_BADGE).text}`}>
-                {selectedDevice.tier}
               </span>
             </div>
           )}
@@ -325,7 +303,6 @@ export function InteractiveDemo() {
                 href="/generator"
                 className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 min-h-[44px] bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:scale-[1.03] shadow-[0_0_20px_rgba(6,182,212,0.3)]"
               >
-                <Lock size={16} />
                 Ve al Generador para ver tus resultados
                 <ChevronRight size={14} />
               </Link>

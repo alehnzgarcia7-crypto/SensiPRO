@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Monitor, Cpu, MemoryStick } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
 interface DeviceSpecsCardProps {
@@ -35,17 +34,11 @@ function getTierLabel(tier: string): string {
   return 'Basico';
 }
 
-function getTierBadgeVariant(tier: string): 'vip' | 'premium' | 'free' {
-  if (tier === 'GAMING' || tier === 'ULTRA') return 'vip';
-  if (tier === 'HIGH') return 'premium';
-  return 'free';
-}
-
 export function DeviceSpecsCard({ brand, model, tier, screenHz, ramGb, performanceScore }: DeviceSpecsCardProps) {
   const specs: { icon: LucideIcon; label: string; value: string; subtext: string }[] = [
     { icon: Monitor, label: 'Pantalla', value: `${screenHz}Hz`, subtext: getScreenLabel(screenHz) },
     { icon: MemoryStick, label: 'RAM', value: `${ramGb}GB`, subtext: getRamLabel(ramGb) },
-    { icon: Cpu, label: 'Tier', value: tier, subtext: getTierLabel(tier) },
+    { icon: Cpu, label: 'Rendimiento', value: getTierLabel(tier), subtext: '' },
   ];
 
   return (
@@ -55,14 +48,9 @@ export function DeviceSpecsCard({ brand, model, tier, screenHz, ramGb, performan
       transition={{ duration: 0.4 }}
       className="glass p-6"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-xs text-slate-500 font-ui">{brand}</p>
-          <p className="font-display font-bold text-white">{model}</p>
-        </div>
-        <Badge variant={getTierBadgeVariant(tier)}>
-          {tier}
-        </Badge>
+      <div className="mb-4">
+        <p className="text-xs text-slate-500 font-ui">{brand}</p>
+        <p className="font-display font-bold text-white">{model}</p>
       </div>
 
       <div className="mb-4">

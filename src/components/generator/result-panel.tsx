@@ -205,9 +205,6 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
             <h2 className="text-xl md:text-2xl font-heading font-black text-white tracking-wide mt-0.5">{selectedDevice.model}</h2>
             <div className="flex items-center gap-2 mt-2">
               <Badge variant={styleVariant} size="sm">{selectedStyle}</Badge>
-              <Badge variant={selectedDevice.tier === 'GAMING' || selectedDevice.tier === 'ULTRA' ? 'vip' : 'premium'} size="sm">
-                {selectedDevice.tier}
-              </Badge>
             </div>
           </div>
           <div className="text-right">

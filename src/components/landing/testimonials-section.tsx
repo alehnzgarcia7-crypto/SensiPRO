@@ -20,19 +20,9 @@ import {
 
 const DEFAULT_RANK_COLOR = '#94a3b8';
 
-const TIER_BADGE_STYLE: Record<string, { bg: string; text: string }> = {
-  GAMING: { bg: 'bg-red-500/15', text: 'text-red-400' },
-  HIGH: { bg: 'bg-cyan-500/15', text: 'text-cyan-400' },
-  MID: { bg: 'bg-emerald-500/15', text: 'text-emerald-400' },
-  ENTRY: { bg: 'bg-slate-500/15', text: 'text-slate-400' },
-};
-
-const DEFAULT_TIER = { bg: 'bg-slate-500/15', text: 'text-slate-400' };
-
 function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
   const rankColor = RANK_COLORS[t.rank] ?? DEFAULT_RANK_COLOR;
   const featureIcon = FEATURE_ICONS[t.feature] ?? '⚡';
-  const tierBadge = TIER_BADGE_STYLE[t.deviceTier] ?? DEFAULT_TIER;
 
   return (
     <motion.div
@@ -70,12 +60,7 @@ function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-white text-sm truncate">{t.username}</p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">{t.device}</span>
-              <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${tierBadge.bg} ${tierBadge.text}`}>
-                {t.deviceTier}
-              </span>
-            </div>
+            <span className="text-xs text-slate-400">{t.device}</span>
           </div>
           <span className="text-[11px] text-slate-600 shrink-0">{t.date}</span>
         </div>

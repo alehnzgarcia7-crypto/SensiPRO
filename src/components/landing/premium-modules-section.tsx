@@ -27,7 +27,7 @@ const MODULES = [
   },
   {
     icon: BookOpen,
-    title: 'Academia premium',
+    title: 'Academia de mejora',
     description:
       'Guías, tips y configuración aplicada para mejorar aim, HUD, headshots y rendimiento.',
     color: '#3b82f6',
@@ -51,7 +51,7 @@ export function PremiumModulesSection() {
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: 'linear-gradient(135deg, #06b6d4, #3b82f6)' }}
           >
-            Desbloqueas toda la plataforma.
+            Dominas todo el juego.
           </span>
         </motion.h2>
 

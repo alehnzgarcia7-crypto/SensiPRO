@@ -133,7 +133,7 @@ export function StyleStep() {
         Elige tu estilo de juego
       </h2>
       <p className="text-sm text-slate-400 mb-6">
-        {selectedDevice?.brand} {selectedDevice?.model} — {selectedDevice?.tier}
+        {selectedDevice?.brand} {selectedDevice?.model}
       </p>
 
       {/* Estilos de juego */}

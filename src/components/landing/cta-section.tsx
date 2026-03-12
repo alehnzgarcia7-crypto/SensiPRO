@@ -92,7 +92,7 @@ export function CtaSection() {
           transition={{ delay: 0.4 }}
           className="mt-6 text-xs text-slate-500"
         >
-          {LANDING_DATA.deviceCount}+ dispositivos compatibles | Pago único si decides desbloquear
+          {LANDING_DATA.deviceCount}+ dispositivos compatibles | Resultados al instante
         </motion.p>
       </div>
 

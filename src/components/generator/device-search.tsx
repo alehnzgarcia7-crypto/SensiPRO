@@ -4,7 +4,6 @@ import type { DeviceTier } from '@prisma/client';
 import { Search, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDeviceSearch } from '@/hooks/use-device-search';
 import { cn } from '@/lib/cn';
@@ -19,12 +18,6 @@ interface DeviceItem {
   screenHz: number;
   ramGb: number;
   isPopular: boolean;
-}
-
-function getTierBadgeVariant(tier: DeviceTier): 'vip' | 'premium' | 'free' {
-  if (tier === 'GAMING') return 'vip';
-  if (tier === 'HIGH' || tier === 'ULTRA') return 'premium';
-  return 'free';
 }
 
 export function DeviceSearch() {
@@ -123,18 +116,9 @@ export function DeviceSearch() {
                   i < items.length - 1 && 'border-b border-white/5',
                 )}
               >
-                <div>
-                  <p className="text-sm font-display font-bold text-white">
-                    {device.brand} {device.model}
-                  </p>
-                  <p className="text-xs text-slate-500">{device.tier}</p>
-                </div>
-                <Badge
-                  variant={getTierBadgeVariant(device.tier)}
-                  size="sm"
-                >
-                  {device.tier}
-                </Badge>
+                <p className="text-sm font-display font-bold text-white">
+                  {device.brand} {device.model}
+                </p>
               </button>
             ))
           )}
