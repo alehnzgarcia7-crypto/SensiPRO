@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
+import { trackEvent, INTERNAL_EVENTS, ttClickButton, CONTENT_IDS } from '@/lib/analytics';
 import { LANDING_DATA } from '@/lib/landing-data';
 
 // ═══════════════════════════════════════════════════════════════
@@ -77,6 +78,10 @@ export function CtaSection() {
               href="/generator"
               className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.02] min-h-[56px]"
               style={{ background: 'rgba(10, 15, 30, 0.9)' }}
+              onClick={() => {
+                trackEvent({ event: INTERNAL_EVENTS.LANDING_CTA_GENERATE_CLICKED, properties: { section: 'footer_cta' } });
+                ttClickButton({ contentId: CONTENT_IDS.LANDING_SHORT, description: 'footer_cta_generate' });
+              }}
             >
               GENERA TU SENSIBILIDAD GRATIS
               <span className="text-xl">{'\u2192'}</span>

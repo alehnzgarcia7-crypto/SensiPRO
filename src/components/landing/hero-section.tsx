@@ -5,6 +5,7 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
 
+import { trackEvent, INTERNAL_EVENTS, ttClickButton, CONTENT_IDS } from '@/lib/analytics';
 import { LANDING_DATA } from '@/lib/landing-data';
 
 // ═══════════════════════════════════════════════════════════════
@@ -118,7 +119,14 @@ export function HeroSection() {
           transition={{ duration: 0.4, delay: 0.4 }}
           className="mt-10 flex flex-col items-center gap-4"
         >
-          <Link href="/generator" className="relative group">
+          <Link
+            href="/generator"
+            className="relative group"
+            onClick={() => {
+              trackEvent({ event: INTERNAL_EVENTS.LANDING_CTA_GENERATE_CLICKED, properties: { section: 'hero' } });
+              ttClickButton({ contentId: CONTENT_IDS.LANDING_SHORT, description: 'hero_cta_generate' });
+            }}
+          >
             <span
               className="absolute -inset-[2px] rounded-[14px] opacity-75 group-hover:opacity-100 transition-opacity duration-300 blur-[1px]"
               style={{

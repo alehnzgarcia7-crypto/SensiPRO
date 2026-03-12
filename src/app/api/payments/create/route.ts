@@ -13,6 +13,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { TIKTOK_EVENTS, PRODUCT } from '@/lib/analytics/constants';
+import { checkoutEventId } from '@/lib/analytics/dedup';
+import { trackServerEvent } from '@/lib/analytics/track-server';
 import {
   createStripeCardPayment,
   createStripeOxxoPayment,
@@ -87,7 +90,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(result);
+    // Server-side InitiateCheckout event — fires after checkout session is CREATED
+    const checkoutId = result.paymentIntentId || result.preferenceId || `${method}_${Date.now()}`;
+    const eventId = checkoutEventId(checkoutId);
+    const ttclid = typeof body.ttclid === 'string' ? body.ttclid : undefined;
+
+    void trackServerEvent({
+      eventType: 'PAYMENT_STARTED',
+      sessionId: typeof body.sessionId === 'string' ? body.sessionId : undefined,
+      metadata: {
+        method,
+        email: email.toLowerCase().trim(),
+        device,
+        checkoutId,
+        eventId,
+        source: source || 'generator',
+      },
+      path: '/api/payments/create',
+      ipAddress: input.ipAddress,
+      userAgent: input.userAgent,
+      tiktok: {
+        event: TIKTOK_EVENTS.INITIATE_CHECKOUT,
+        eventId,
+        email: email.toLowerCase().trim(),
+        value: PRODUCT.VALUE,
+        currency: PRODUCT.CURRENCY,
+        contentId: PRODUCT.CONTENT_ID,
+        contentType: PRODUCT.CONTENT_TYPE,
+        ttclid,
+      },
+    });
+
+    return NextResponse.json({ ...result, eventId });
   } catch (error: unknown) {
     console.error('[SensiPRO] Payment creation error:', error);
     return NextResponse.json(

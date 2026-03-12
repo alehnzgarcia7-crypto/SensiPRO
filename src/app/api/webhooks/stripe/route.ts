@@ -16,6 +16,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 
+import { TIKTOK_EVENTS, PRODUCT } from '@/lib/analytics/constants';
+import { purchaseEventId } from '@/lib/analytics/dedup';
+import { trackServerEvent } from '@/lib/analytics/track-server';
 import { activatePremiumLicense } from '@/lib/payments/payment-service';
 import { stripeLifetime } from '@/lib/payments/stripe-config';
 
@@ -85,6 +88,31 @@ export async function POST(request: NextRequest) {
               device: session.metadata?.device,
               fingerCount: session.metadata?.fingerCount ? parseInt(session.metadata.fingerCount) : undefined,
             });
+
+            // Server-side Purchase event — ONLY on confirmed payment
+            const evtId = purchaseEventId(session.id);
+            void trackServerEvent({
+              eventType: 'PAYMENT_COMPLETED',
+              metadata: {
+                email,
+                paymentId: session.id,
+                method: 'card',
+                provider: 'stripe',
+                eventId: evtId,
+                amount: session.amount_total || 19900,
+                currency: (session.currency || 'mxn').toUpperCase(),
+              },
+              path: '/api/webhooks/stripe',
+              tiktok: {
+                event: TIKTOK_EVENTS.COMPLETE_PAYMENT,
+                eventId: evtId,
+                email,
+                value: (session.amount_total || 19900) / 100,
+                currency: (session.currency || 'mxn').toUpperCase(),
+                contentId: PRODUCT.CONTENT_ID,
+                contentType: PRODUCT.CONTENT_TYPE,
+              },
+            });
           }
         }
         break;
@@ -98,15 +126,41 @@ export async function POST(request: NextRequest) {
         if (email) {
           // Verificar que es un pago de SensiPRO
           if (paymentIntent.metadata?.product === 'sensipro_premium_lifetime') {
+            const payMethod = paymentIntent.payment_method_types?.[0] === 'oxxo' ? 'oxxo' : 'card';
             await activatePremiumLicense({
               email,
               paymentProvider: 'stripe',
               paymentId: paymentIntent.id,
-              paymentMethod: paymentIntent.payment_method_types?.[0] === 'oxxo' ? 'oxxo' : 'card',
+              paymentMethod: payMethod,
               amountPaid: paymentIntent.amount,
               currency: paymentIntent.currency.toUpperCase(),
               device: paymentIntent.metadata?.device,
               fingerCount: paymentIntent.metadata?.fingerCount ? parseInt(paymentIntent.metadata.fingerCount) : undefined,
+            });
+
+            // Server-side Purchase event
+            const evtId = purchaseEventId(paymentIntent.id);
+            void trackServerEvent({
+              eventType: 'PAYMENT_COMPLETED',
+              metadata: {
+                email,
+                paymentId: paymentIntent.id,
+                method: payMethod,
+                provider: 'stripe',
+                eventId: evtId,
+                amount: paymentIntent.amount,
+                currency: paymentIntent.currency.toUpperCase(),
+              },
+              path: '/api/webhooks/stripe',
+              tiktok: {
+                event: TIKTOK_EVENTS.COMPLETE_PAYMENT,
+                eventId: evtId,
+                email,
+                value: paymentIntent.amount / 100,
+                currency: paymentIntent.currency.toUpperCase(),
+                contentId: PRODUCT.CONTENT_ID,
+                contentType: PRODUCT.CONTENT_TYPE,
+              },
             });
           }
         }

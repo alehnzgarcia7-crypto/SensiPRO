@@ -20,6 +20,10 @@ import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useTrackEvent } from '@/hooks/use-track-event';
+import {
+  trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
+  CONTENT_IDS, hasEventFired, markEventFired,
+} from '@/lib/analytics';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
@@ -123,6 +127,14 @@ export function PaywallModal() {
   useEffect(() => {
     if (isPaywallOpen) {
       track('PAYWALL_SHOWN', { source: paywallContext?.source ?? 'unknown' });
+
+      // Analytics: blur_shown + ViewContent para paywall
+      if (!hasEventFired('blur_shown_modal')) {
+        markEventFired('blur_shown_modal');
+        trackEvent({ event: INTERNAL_EVENTS.BLUR_SHOWN, properties: { source: paywallContext?.source ?? 'unknown' } });
+        ttViewContent({ contentId: CONTENT_IDS.PAYWALL_MODAL, contentType: 'paywall' });
+      }
+
       setModalState('ready');
       setError(null);
       setSelectedMethod(null);
@@ -172,11 +184,25 @@ export function PaywallModal() {
     }
 
     track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown' });
+
+    // Analytics: unlock CTA + payment method selected
+    trackEvent({ event: INTERNAL_EVENTS.UNLOCK_CTA_CLICKED, properties: { method: selectedMethod, source: paywallContext?.source ?? 'unknown' } });
+    trackEvent({ event: INTERNAL_EVENTS.PAYMENT_METHOD_SELECTED, properties: { method: selectedMethod } });
+    ttClickButton({ contentId: CONTENT_IDS.PAYWALL_MODAL, description: `payment_method:${selectedMethod}` });
+
     setIsSubmitting(true);
     setError(null);
     setModalState('processing');
 
     try {
+      // Attach ttclid + sessionId for server-side attribution
+      let ttclid: string | undefined;
+      let sessionId: string | undefined;
+      try {
+        ttclid = sessionStorage.getItem('sensipro_ttclid') || undefined;
+        sessionId = sessionStorage.getItem('sp_session_id') || undefined;
+      } catch { /* ignore */ }
+
       const response = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -187,6 +213,8 @@ export function PaywallModal() {
           fingerCount: paywallContext?.fingerCount,
           style: paywallContext?.style,
           source: paywallContext?.source || 'generator',
+          ttclid,
+          sessionId,
         }),
       });
 
@@ -199,6 +227,16 @@ export function PaywallModal() {
         }
         throw new Error(data.error || 'Error procesando el pago');
       }
+
+      // Track checkout created
+      trackEvent({
+        event: INTERNAL_EVENTS.CHECKOUT_CREATED,
+        properties: {
+          method: selectedMethod,
+          source: paywallContext?.source || 'generator',
+          eventId: data.eventId,
+        },
+      });
 
       // Redirigir al checkout
       if (data.checkoutUrl) {

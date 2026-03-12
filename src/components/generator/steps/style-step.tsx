@@ -8,6 +8,10 @@ import { Sword, Target, Crosshair, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { useTrackEvent } from '@/hooks/use-track-event';
+import {
+  trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
+  CONTENT_IDS,
+} from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { useGeneratorStore } from '@/stores/generator.store';
 
@@ -89,9 +93,29 @@ export function StyleStep() {
   } = useGeneratorStore();
   const { track } = useTrackEvent();
 
+  // Wrap selectStyle with analytics
+  const wrappedSelectStyle = (style: SensitivityStyle) => {
+    trackEvent({ event: INTERNAL_EVENTS.STYLE_SELECTED, properties: { style } });
+    selectStyle(style);
+  };
+
   const handleGenerate = async () => {
     if (!selectedDevice) return;
     setLoading(true);
+
+    // Track submission
+    trackEvent({
+      event: INTERNAL_EVENTS.GENERATOR_SUBMITTED,
+      properties: {
+        brand: selectedDevice.brand,
+        model: selectedDevice.model,
+        style: selectedStyle,
+        includeGyro,
+        userRam: userRam ?? selectedDevice.ramGb,
+        userHz: userHz ?? selectedDevice.screenHz,
+      },
+    });
+    ttClickButton({ contentId: CONTENT_IDS.GENERATOR, description: 'generate_sensitivity' });
 
     try {
       const res = await fetch('/api/generate/all', {
@@ -119,6 +143,18 @@ export function StyleStep() {
           deviceModel: selectedDevice.model,
           style: selectedStyle,
         });
+
+        // Track completion + ViewContent for result
+        trackEvent({
+          event: INTERNAL_EVENTS.GENERATOR_COMPLETED,
+          properties: {
+            brand: selectedDevice.brand,
+            model: selectedDevice.model,
+            style: selectedStyle,
+          },
+        });
+        trackEvent({ event: INTERNAL_EVENTS.RESULT_VIEWED });
+        ttViewContent({ contentId: CONTENT_IDS.GENERATOR_RESULT, contentType: 'result' });
       } else {
         setError(data.error?.message ?? 'Error al generar');
       }
@@ -144,7 +180,7 @@ export function StyleStep() {
           return (
             <button
               key={style.key}
-              onClick={() => selectStyle(style.key)}
+              onClick={() => wrappedSelectStyle(style.key)}
               className={cn(
                 'w-full glass p-5 flex items-center gap-4 transition-all min-h-[44px]',
                 isSelected ? `${style.border} border shadow-lg` : 'hover:border-white/10',

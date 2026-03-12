@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { trackEvent, INTERNAL_EVENTS, ttSearch } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { useGeneratorStore } from '@/stores/generator.store';
 
@@ -20,7 +21,12 @@ interface DeviceItem {
 }
 
 export function DeviceStep() {
-  const { selectedBrand, selectDevice } = useGeneratorStore();
+  const { selectedBrand, selectDevice: rawSelectDevice } = useGeneratorStore();
+  const selectDevice = (device: Parameters<typeof rawSelectDevice>[0]) => {
+    trackEvent({ event: INTERNAL_EVENTS.MODEL_SELECTED, properties: { brand: device.brand, model: device.model } });
+    ttSearch(`${device.brand} ${device.model}`);
+    rawSelectDevice(device);
+  };
   const [devices, setDevices] = useState<DeviceItem[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);

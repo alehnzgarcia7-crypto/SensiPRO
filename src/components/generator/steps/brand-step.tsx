@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { trackEvent, INTERNAL_EVENTS, ttSearch } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 import { useGeneratorStore } from '@/stores/generator.store';
 
@@ -14,7 +15,12 @@ interface Brand {
 }
 
 export function BrandStep() {
-  const { selectBrand } = useGeneratorStore();
+  const { selectBrand: rawSelectBrand } = useGeneratorStore();
+  const selectBrand = (brand: string) => {
+    trackEvent({ event: INTERNAL_EVENTS.BRAND_SELECTED, properties: { brand } });
+    ttSearch(brand);
+    rawSelectBrand(brand);
+  };
   const [brands, setBrands] = useState<Brand[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);

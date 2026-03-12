@@ -10,8 +10,12 @@
 
 import { motion } from 'framer-motion';
 import { Lock, Sparkles, Crown, Zap } from 'lucide-react';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
+import {
+  trackEvent, INTERNAL_EVENTS, ttViewContent, ttClickButton,
+  CONTENT_IDS, hasEventFired, markEventFired,
+} from '@/lib/analytics';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 interface PremiumBlurProps {
@@ -41,6 +45,18 @@ export function PremiumBlur({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
+  // Track blur shown once per source — must be before early returns
+  useEffect(() => {
+    if (!isPremium && !isLoading) {
+      const blurKey = `blur_shown_${source}`;
+      if (!hasEventFired(blurKey)) {
+        markEventFired(blurKey);
+        trackEvent({ event: INTERNAL_EVENTS.BLUR_SHOWN, properties: { source } });
+        ttViewContent({ contentId: CONTENT_IDS.PAYWALL_BLUR, contentType: 'paywall', description: source });
+      }
+    }
+  }, [isPremium, isLoading, source]);
+
   if (isLoading) {
     return (
       <div className={`relative ${className}`}>
@@ -60,6 +76,8 @@ export function PremiumBlur({
   }
 
   const handleUnlockClick = () => {
+    trackEvent({ event: INTERNAL_EVENTS.UNLOCK_CTA_CLICKED, properties: { source } });
+    ttClickButton({ contentId: CONTENT_IDS.PAYWALL_BLUR, description: `unlock:${source}` });
     showPaywall({
       source,
       device,

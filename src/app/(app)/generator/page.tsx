@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
 
 import { GeneratorFlow } from '@/components/generator/generator-flow';
+import { captureAttribution, persistAttribution } from '@/lib/analytics/attribution';
 import { useGeneratorStore } from '@/stores/generator.store';
 
 const VALID_STYLES = new Set<string>(['AGGRESSIVE', 'BALANCED', 'SNIPER']);
@@ -31,12 +32,24 @@ function GeneratorWithDeepLink() {
       reset();
     }
 
+    // Capture ttclid and all attribution params
+    const ttclid = searchParams.get('ttclid');
+
     // Guardar tracking en sessionStorage
     if (source) {
       sessionStorage.setItem('sensipro_source', source);
     }
     if (campaign) {
       sessionStorage.setItem('sensipro_campaign', campaign);
+    }
+    if (ttclid) {
+      sessionStorage.setItem('sensipro_ttclid', ttclid);
+    }
+
+    // Persist full attribution if arriving with ad params
+    if (source || ttclid) {
+      const attr = captureAttribution();
+      persistAttribution(attr);
     }
 
     const style = styleParam && VALID_STYLES.has(styleParam)
