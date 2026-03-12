@@ -25,14 +25,9 @@ function getHzLabel(hz: number): string {
 export function HzSelector({ value, onChange, suggestedHz }: HzSelectorProps) {
   return (
     <div className="space-y-3">
-      <div>
-        <label className="text-xs font-heading uppercase tracking-[0.15em] text-white/80">
-          Tasa de refresco
-        </label>
-        <p className="text-[11px] text-slate-600 mt-0.5">
-          Ajustes &rarr; Pantalla &rarr; Tasa de refresco
-        </p>
-      </div>
+      <label className="text-xs font-heading uppercase tracking-[0.15em] text-white/80">
+        Tasa de refresco
+      </label>
       <div className="flex flex-wrap gap-2">
         {HZ_OPTIONS.map((hz) => {
           const isSelected = value === hz;

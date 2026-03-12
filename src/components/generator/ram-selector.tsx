@@ -24,11 +24,8 @@ export function RamSelector({ value, onChange, suggestedRam }: RamSelectorProps)
         <label className="text-xs font-heading uppercase tracking-[0.15em] text-white/80">
           RAM del dispositivo
         </label>
-        <p className="text-[11px] text-slate-600 mt-0.5">
-          Ajustes &rarr; Acerca del teléfono &rarr; Memoria
-        </p>
-        <p className="text-[10px] text-slate-600/70 mt-0.5">
-          Si no sabes tu RAM, usa el valor detectado
+        <p className="text-[10px] text-slate-500 mt-0.5">
+          Usar RAM detectada
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
