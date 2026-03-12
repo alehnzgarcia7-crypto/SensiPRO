@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// ARES SensiPRO — Landing Page V2.0 — Single Source of Truth
+// ARES SensiPRO — Landing Page V3.0 — Single Source of Truth
 // Todos los datos de la landing centralizados. NUNCA hardcodear
 // un número en un componente — siempre usar LANDING_DATA.
 // ═══════════════════════════════════════════════════════════════
@@ -55,7 +55,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'ENTRY',
     avatar: 'K',
     rating: 5,
-    text: 'Le metí mi Samsung A13 y me dio 187 de general con el tapering bajando -15 perfecto hasta 127 en AWM. Se siente INCREÍBLE bro, cada mira tiene su propio valor calibrado por el DPI de mi pantalla. Subí de Oro III a Diamante en 2 semanas 🔥🔥',
+    text: 'Le metí mi Samsung A13 y me dio 187 de general con el tapering bajando -15 perfecto hasta 127 en AWM. Se siente INCREÍBLE bro, cada mira tiene su propio valor calibrado por el DPI de mi pantalla. Subí de Oro III a Diamante en 2 semanas.',
     rank: 'Diamante',
     feature: 'Generador',
     date: 'hace 5 días',
@@ -67,7 +67,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'MID',
     avatar: 'N',
     rating: 5,
-    text: 'Mi Redmi Note 13 me dio 174 de general y baja perfecto: 159, 144, 129, 114 en AWM. El tapering de -15 se siente súper natural, antes copiaba sensi de YouTube y nunca me quedaba xq el DPI de mi cel es diferente. Ahora todo va donde apunto 🎯',
+    text: 'Mi Redmi Note 13 me dio 174 de general y baja perfecto: 159, 144, 129, 114 en AWM. El tapering de -15 se siente súper natural, antes copiaba sensi de YouTube y nunca me quedaba xq el DPI de mi cel es diferente. Ahora todo va donde apunto.',
     rank: 'Platino',
     feature: 'Generador',
     date: 'hace 1 semana',
@@ -79,7 +79,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'GAMING',
     avatar: 'B',
     rating: 5,
-    text: 'Con mi iPhone 14 Plus me dio 168 de general. Pensé que sería más alto pero me explicaron que con DPI 458 necesitas MENOS sensi porque los pixeles son más finos. Y bro tiene razón, el drag headshot se siente milimétrico, hago one-tap con M1887 como nada 💀🔥',
+    text: 'Con mi iPhone 14 Plus me dio 168 de general. Pensé que sería más alto pero me explicaron que con DPI 458 necesitas MENOS sensi porque los pixeles son más finos. Y bro tiene razón, el drag headshot se siente milimétrico.',
     rank: 'Heroico',
     feature: 'Headshot Mode',
     date: 'hace 3 días',
@@ -91,7 +91,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'GAMING',
     avatar: 'C',
     rating: 5,
-    text: 'iPhone 16 Pro Max: 168 general, 153 punto rojo, y baja -15 hasta 108 en AWM. La calibración forense por DPI es otra cosa, se nota que no son valores random. El Vista Libre en 16 es perfecto, la cámara libre no se descontrola. Mejor app que he usado 💪',
+    text: 'iPhone 16 Pro Max: 168 general, 153 punto rojo, y baja -15 hasta 108 en AWM. La calibración forense por DPI es otra cosa, se nota que no son valores random. El Vista Libre en 16 es perfecto, la cámara libre no se descontrola. Mejor app que he usado.',
     rank: 'Heroico',
     feature: 'Generador',
     date: 'hace 2 semanas',
@@ -103,7 +103,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'ENTRY',
     avatar: 'M',
     rating: 5,
-    text: 'Mi A15 con DPI 270 me dio 185 de general, el tapering baja bonito hasta 125 en AWM. El algoritmo sabe que mi pantalla tiene pixeles más grandes y sube la sensi. Llegué a Heroico por primera vez hermano, la Academia y los tips de crosshair me cambiaron todo 💪🏆',
+    text: 'Mi A15 con DPI 270 me dio 185 de general, el tapering baja bonito hasta 125 en AWM. El algoritmo sabe que mi pantalla tiene pixeles más grandes y sube la sensi. Llegué a Heroico por primera vez hermano.',
     rank: 'Heroico',
     feature: 'Academia',
     date: 'hace 4 días',
@@ -115,7 +115,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'HIGH',
     avatar: 'D',
     rating: 5,
-    text: 'POCO X5 con DPI 395: me dio 174 de general. La diferencia con sensi de YouTube es BRUTAL porque esta está calibrada para el DPI real de MI pantalla. El AWM en 114 con quickscope va perfectísimo, los tiros llegan donde apuntas. 100% recomendado 🎯🔥',
+    text: 'POCO X5 con DPI 395: me dio 174 de general. La diferencia con sensi de YouTube es BRUTAL porque esta está calibrada para el DPI real de MI pantalla. El AWM en 114 con quickscope va perfectísimo, los tiros llegan donde apuntas. 100% recomendado.',
     rank: 'Oro',
     feature: 'Generador',
     date: 'hace 6 días',
@@ -127,7 +127,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'MID',
     avatar: 'C',
     rating: 5,
-    text: 'Moto G54 con DPI 401 me salió 173 de general y el tapering perfecto: 158, 143, 128, 113. Tiene todo: sensi por DPI, giroscopio calibrado, headshot mode, códigos HUD, academia completa... nmms es como tener un coach de FF en el celular 😭🙌',
+    text: 'Moto G54 con DPI 401 me salió 173 de general y el tapering perfecto: 158, 143, 128, 113. Tiene todo: sensi por DPI, giroscopio calibrado, headshot mode, códigos HUD, academia completa... es como tener un coach de FF en el celular.',
     rank: 'Diamante',
     feature: 'Todo',
     date: 'hace 1 semana',
@@ -139,7 +139,7 @@ export const TESTIMONIALS: Testimonial[] = [
     deviceTier: 'HIGH',
     avatar: 'A',
     rating: 5,
-    text: 'Samsung S24 con DPI 416: general 172, punto rojo 157, bajando -15 hasta 112 en AWM. Al principio no creía pero probé en ranked y la diferencia es REAL. Los tiros van donde apuntas porque la sensi está calibrada forense para tu pantalla, no es genérica 🔥',
+    text: 'Samsung S24 con DPI 416: general 172, punto rojo 157, bajando -15 hasta 112 en AWM. Al principio no creía pero probé en ranked y la diferencia es REAL. Los tiros van donde apuntas porque la sensi está calibrada forense para tu pantalla, no es genérica.',
     rank: 'Platino',
     feature: 'Comparador',
     date: 'hace 9 días',
@@ -221,7 +221,7 @@ export const FEATURES: LandingFeature[] = [
       'Compara 2 dispositivos lado a lado: DPI, specs técnicas, sensibilidades generadas, y veredicto de cuál es mejor para Free Fire.',
     color: '#ec4899',
     isNew: false,
-    highlight: 'Side-by-side',
+    highlight: 'Lado a lado',
   },
   {
     icon: 'Shield',
@@ -269,7 +269,7 @@ export const POPULAR_DEVICES: PopularDevice[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// FAQ — 8 preguntas con datos reales
+// FAQ — Preguntas con copy de conversión
 // ═══════════════════════════════════════════════════════════════
 
 export interface FaqItem {
@@ -280,36 +280,36 @@ export interface FaqItem {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: '¿Cómo funciona el generador?',
-    a: `Buscas tu celular entre ${LANDING_DATA.deviceCount}+ dispositivos. El algoritmo calcula tu sensibilidad basándose en el DPI real de tu pantalla, tamaño, tasa de refresco (60/90/120 Hz) y RAM. Te da 6 valores: General, Punto Rojo, Scope 2x, Scope 4x, AWM y Vista Libre, más giroscopio y código HUD. Copias directo a Free Fire.`,
-  },
-  // {
-  //   q: '¿Es realmente gratis?',
-  //   a: `Sí. El plan básico es gratis para siempre. Incluye el generador completo con los 9 estilos, giroscopio, 1 código HUD, y acceso a las ${LANDING_DATA.guideCount} guías de la academia. El plan Pro agrega Headshot Mode completo, todos los códigos HUD, comparador de devices, y ARES AI Coach.`,
-  // },
-  {
-    q: '¿Qué tan preciso es el algoritmo?',
-    a: `Precisión de ±5 puntos (2.5% de la escala 0-200) validada contra FreeFireMania. Para el 80% de dispositivos (DPI 270-460) la precisión es de ±3 puntos. No son valores random — el algoritmo calcula usando el DPI real, el tamaño de pantalla, y la tasa de refresco de tu celular específico.`,
+    a: 'Seleccionas tu celular, ajustas tu configuración y SensiPRO calcula una sensibilidad adaptada a tu dispositivo exacto.',
   },
   {
-    q: '¿Soportan mi dispositivo?',
-    a: `Tenemos ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas: Samsung, Apple, Xiaomi, Redmi, POCO, Motorola, Realme, OPPO, Vivo, OnePlus, Infinix, Tecno, Honor, Nothing, Google, Huawei, y más. Si no encuentras el tuyo, escríbenos y lo agregamos.`,
+    q: '¿Qué tan precisa es la calibración?',
+    a: 'No es una config genérica ni copiada. La sensibilidad se genera tomando en cuenta variables reales del dispositivo y la configuración elegida.',
   },
   {
-    q: '¿Por qué mis valores son diferentes a los de YouTube?',
-    a: 'Porque cada celular tiene diferente DPI, tamaño de pantalla y tasa de refresco. Cuando un YouTuber comparte su sensibilidad, funciona para SU celular. SensiPRO calcula la sensibilidad para TU celular específico, por eso los valores son diferentes y por eso funcionan mejor.',
+    q: '¿Mi celular está soportado?',
+    a: `SensiPRO ya incluye ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas.`,
   },
   {
-    q: '¿Qué es el Headshot Mode?',
-    a: `Un modo dedicado con ${LANDING_DATA.headshotFeatures} features para mejorar tu headshot rate. Incluye: sensibilidad ajustada por 2/3/4 dedos, ${LANDING_DATA.hudCodeCount} códigos HUD reales con screenshots, ${LANDING_DATA.techniqueCount} técnicas de drag shot, tier list de armas, training plan de ${LANDING_DATA.trainingDays} días, y giroscopio calibrado por tipo de agarre.`,
+    q: '¿Por qué mis valores no coinciden con los de YouTube?',
+    a: 'Porque tu celular, tu pantalla y tu respuesta táctil no son iguales a los de otro jugador.',
+  },
+  {
+    q: '¿Qué desbloquea Pro?',
+    a: 'Resultados completos sin blur, configuraciones guardadas, Headshot Mode, HUD codes, Academia premium y más.',
+  },
+  {
+    q: '¿Qué es Headshot Mode?',
+    a: `Un modo dedicado con ${LANDING_DATA.headshotFeatures} features para mejorar tu headshot rate. Incluye ajuste por dedos, técnicas de drag, tier list de armas y plan de entrenamiento.`,
   },
   {
     q: '¿Qué son los códigos HUD?',
-    a: `Son códigos reales de Free Fire que configuran la posición de TODOS tus botones en pantalla. En vez de mover cada botón manualmente, pegas un código en Ajustes → En Partida → Usar código compartido, y tu HUD queda configurado al instante. Tenemos ${LANDING_DATA.hudCodeCount} códigos para 2, 3, 4 y 5 dedos.`,
+    a: `Son códigos reales de Free Fire que configuran la posición de todos tus botones en pantalla. Los pegas en Ajustes y tu HUD queda configurado al instante. Tenemos ${LANDING_DATA.hudCodeCount} códigos para 2, 3, 4 y 5 dedos.`,
   },
-  // {
-  //   q: '¿Puedo cancelar el plan Pro cuando quiera?',
-  //   a: 'Sí. Sin contratos, sin permanencia. Cancelas cuando quieras y sigues con el plan básico. Además tienes 7 días de garantía — si no mejoras tu gameplay en la primera semana, te devolvemos tu dinero.',
-  // },
+  {
+    q: '¿El pago es único o mensual?',
+    a: 'Es un solo pago. Acceso de por vida.',
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -328,16 +328,16 @@ export const ALL_BRANDS: string[] = [
 // ═══════════════════════════════════════════════════════════════
 
 export const SOCIAL_PROOF_ITEMS: string[] = [
-  '🔥 Kevin_xD subió a Diamante con Redmi Note 12',
-  '🎯 BryanElPro hace one-tap con iPhone 14',
-  '💪 MateoSniper_ llegó a Heroico por primera vez',
-  `⭐ ${LANDING_DATA.avgRating}/5 rating promedio`,
-  `🏆 ${LANDING_DATA.playerCount.toLocaleString()} jugadores calibrados`,
-  '💎 NahomiFF_ subió a Platino con Galaxy A14',
-  '🔥 CamiRush22 recomienda SensiPRO a toda su squad',
-  '🎯 AndresGOAT mejoró en ranked con Infinix Hot 40',
-  '📱 ElChema_GG dice que es la mejor app que ha usado',
-  '🎮 XxDiego_FFxX logró headshots consistentes con POCO X5',
+  'Kevin_xD subió a Diamante con Redmi Note 12',
+  'BryanElPro hace one-tap con iPhone 14',
+  'MateoSniper_ llegó a Heroico por primera vez',
+  `${LANDING_DATA.avgRating}/5 rating promedio`,
+  `${LANDING_DATA.playerCount.toLocaleString()} jugadores calibrados`,
+  'NahomiFF_ subió a Platino con Galaxy A14',
+  'CamiRush22 recomienda SensiPRO a toda su squad',
+  'AndresGOAT mejoró en ranked con Infinix Hot 40',
+  'ElChema_GG dice que es la mejor app que ha usado',
+  'XxDiego_FFxX logró headshots consistentes con POCO X5',
 ];
 
 // ═══════════════════════════════════════════════════════════════

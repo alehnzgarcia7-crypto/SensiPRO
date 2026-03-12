@@ -2,10 +2,11 @@
 
 import { motion } from 'framer-motion';
 
+import { LANDING_DATA } from '@/lib/landing-data';
+
 // ═══════════════════════════════════════════════════════════════
-// BrandsSection — 26 brands cloud with stagger entrance,
-// popular brands highlighted, mobile horizontal scroll
-// Brands verified from devices.seed.ts (503 devices, 26 brands)
+// BrandsSection — Sección 7: Eliminar la duda
+// "seguro mi celular no está"
 // ═══════════════════════════════════════════════════════════════
 
 const BRANDS = [
@@ -16,42 +17,20 @@ const BRANDS = [
   'BLU', 'ASUS', 'LG', 'Sony', 'Lava', 'Alcatel',
 ] as const;
 
-const POPULAR = new Set(['Samsung', 'Apple', 'Xiaomi', 'Redmi', 'POCO']);
-
-function BrandPill({ brand, index }: { brand: string; index: number }) {
-  const isPopular = POPULAR.has(brand);
-
-  return (
-    <motion.span
-      initial={{ opacity: 0, scale: 0.8 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.3, delay: index * 0.03 }}
-      className={`inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold
-        bg-white/[0.03] border hover:-translate-y-0.5 transition-all duration-300 cursor-default select-none
-        hover:bg-cyan-500/5 hover:border-cyan-500/20 hover:text-white
-        ${isPopular
-          ? 'border-white/10 text-slate-300'
-          : 'border-white/[0.06] text-slate-500'
-        }`}
-    >
-      {brand}
-    </motion.span>
-  );
-}
+const POPULAR = new Set(['Samsung', 'Apple', 'Xiaomi', 'Redmi', 'POCO', 'Motorola']);
 
 export function BrandsSection() {
   return (
     <section className="py-16 md:py-24 px-4 border-y border-white/5">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-4xl">
         {/* Heading */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-display font-bold text-center text-white"
+          className="text-2xl md:text-3xl font-display font-bold text-center text-white"
         >
-          26 marcas soportadas
+          Tu celular probablemente ya está aquí
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -60,19 +39,33 @@ export function BrandsSection() {
           transition={{ delay: 0.1 }}
           className="mt-2 text-center text-slate-400 text-sm"
         >
-          Tu celular está aquí
+          {LANDING_DATA.deviceCount}+ dispositivos compatibles en {LANDING_DATA.brandCount} marcas.
         </motion.p>
 
         {/* Desktop: flex wrap centered */}
         <div className="hidden sm:flex flex-wrap justify-center gap-3 mt-10">
           {BRANDS.map((brand, i) => (
-            <BrandPill key={brand} brand={brand} index={i} />
+            <motion.span
+              key={brand}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: i * 0.03 }}
+              className={`inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold
+                bg-white/[0.03] border hover:-translate-y-0.5 transition-all duration-300 cursor-default select-none
+                hover:bg-cyan-500/5 hover:border-cyan-500/20 hover:text-white
+                ${POPULAR.has(brand)
+                  ? 'border-white/10 text-slate-300'
+                  : 'border-white/[0.06] text-slate-500'
+                }`}
+            >
+              {brand}
+            </motion.span>
           ))}
         </div>
 
-        {/* Mobile: horizontal scroll with edge fade */}
+        {/* Mobile: horizontal scroll */}
         <div className="sm:hidden mt-8 relative">
-          {/* Fade edges */}
           <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
 
@@ -99,15 +92,15 @@ export function BrandsSection() {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.4 }}
           className="mt-8 text-center text-xs text-slate-500"
         >
-          ¿No encuentras tu celular? Escríbenos y lo agregamos
+          Samsung, Xiaomi, Apple, Redmi, POCO, Motorola y más.
         </motion.p>
       </div>
     </section>

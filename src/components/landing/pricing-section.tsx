@@ -5,22 +5,19 @@ import { Check } from 'lucide-react';
 import Link from 'next/link';
 
 // ═══════════════════════════════════════════════════════════════
-// PricingSection — Single Pro plan, one-time $199 MXN lifetime
+// PricingSection — Sección 8: Un solo pago. Acceso de por vida.
+// Simplificado, limpio, sin "todo lo del plan básico"
 // ═══════════════════════════════════════════════════════════════
 
-const PRO_FEATURES: { text: string; included: boolean; proExclusive?: boolean }[] = [
-  { text: 'Todo lo del plan Básico', included: true },
-  { text: 'Calibración forense completa + DPI custom', included: true, proExclusive: true },
-  { text: 'Resultados DESBLOQUEADOS (sin blur)', included: true, proExclusive: true },
-  { text: 'Configuraciones guardadas ilimitadas', included: true, proExclusive: true },
-  { text: 'Headshot Mode COMPLETO (24 features, 32 armas, 5 técnicas, training 7 días)', included: true, proExclusive: true },
-  { text: 'TODOS los códigos HUD (17 códigos, 2-5 dedos, con screenshots)', included: true, proExclusive: true },
-  { text: 'Academia premium completa', included: true, proExclusive: true },
-  { text: 'ARES AI Coach (cuando salga)', included: true, proExclusive: true },
-  { text: 'Comparador de devices side-by-side', included: true, proExclusive: true },
-  { text: 'Sin publicidad', included: true, proExclusive: true },
-  { text: 'Actualizaciones prioritarias', included: true, proExclusive: true },
-];
+const PRO_FEATURES = [
+  'Resultados desbloqueados (sin blur)',
+  'Configuraciones guardadas ilimitadas',
+  'Headshot Mode completo',
+  'Todos los códigos HUD',
+  'Academia premium',
+  'Sin publicidad',
+  'Actualizaciones prioritarias',
+] as const;
 
 export function PricingSection() {
   return (
@@ -33,7 +30,7 @@ export function PricingSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-display font-bold text-center text-white"
         >
-          Un solo pago, acceso de por vida
+          Un solo pago. Acceso de por vida.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -42,14 +39,14 @@ export function PricingSection() {
           transition={{ delay: 0.1 }}
           className="mt-3 text-center text-slate-400 text-sm"
         >
-          Desbloquea todo SensiPRO con un pago único.
+          Desbloquea SensiPRO completo con un pago único.
         </motion.p>
 
         {/* Card */}
         <div className="mt-12 flex justify-center">
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-full max-w-md"
@@ -74,7 +71,7 @@ export function PricingSection() {
                   boxShadow: '0 0 40px rgba(6, 182, 212, 0.1), 0 0 80px rgba(6, 182, 212, 0.05)',
                 }}
               >
-                {/* POPULAR badge */}
+                {/* Badge */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -93,7 +90,7 @@ export function PricingSection() {
                   </span>
                 </motion.div>
 
-                {/* Shimmer effect */}
+                {/* Shimmer */}
                 <div
                   className="absolute top-0 left-[-100%] w-[50%] h-full pointer-events-none"
                   style={{
@@ -102,20 +99,8 @@ export function PricingSection() {
                   }}
                 />
 
-                <h3 className="text-xl font-bold mt-2">
-                  <span
-                    style={{
-                      background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
-                  >
-                    Pro
-                  </span>
-                </h3>
-
-                <div className="mt-4 flex items-baseline gap-2">
+                {/* Price */}
+                <div className="mt-2 flex items-baseline gap-2">
                   <span className="text-2xl text-slate-600 line-through font-heading">$349</span>
                   <span className="text-5xl md:text-6xl font-heading font-black text-white">
                     $199
@@ -129,21 +114,22 @@ export function PricingSection() {
 
                 <div className="my-6 h-px bg-white/5" />
 
+                {/* Features */}
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-4">Incluye:</p>
                 <ul className="space-y-3 flex-1">
                   {PRO_FEATURES.map((feat) => (
-                    <li key={feat.text} className="flex items-start gap-3 text-sm">
+                    <li key={feat} className="flex items-start gap-3 text-sm">
                       <Check size={15} className="text-cyan-400 shrink-0 mt-0.5" />
-                      <span className={feat.proExclusive ? 'text-white font-semibold' : 'text-slate-300'}>
-                        {feat.text}
-                      </span>
+                      <span className="text-white font-medium">{feat}</span>
                     </li>
                   ))}
                 </ul>
 
+                {/* CTA */}
                 <div className="mt-8">
                   <Link
                     href="/generator"
-                    className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-white transition-all duration-300 hover:scale-[1.03] min-h-[48px]"
+                    className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-white transition-all duration-300 hover:scale-[1.02] min-h-[48px]"
                     style={{
                       background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
                       boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)',
@@ -157,7 +143,7 @@ export function PricingSection() {
           </motion.div>
         </div>
 
-        {/* Guarantee badges */}
+        {/* Guarantee */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -165,14 +151,13 @@ export function PricingSection() {
           transition={{ delay: 0.4 }}
           className="mt-10 flex flex-col items-center gap-2"
         >
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
-            <span className="text-sm text-slate-500">Un solo pago. Acceso de por vida. Sin cargos recurrentes.</span>
-          </div>
+          <span className="text-sm text-slate-500">
+            Un solo pago. Acceso de por vida. Sin cargos recurrentes.
+          </span>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-1">
-            <span className="text-sm text-slate-500">💳 Pago seguro con Stripe</span>
-            <span className="text-sm text-slate-500">↩️ 7 días de garantía de devolución</span>
+            <span className="text-sm text-slate-500">Pago seguro con Stripe</span>
+            <span className="text-sm text-slate-500">7 días de garantía de devolución</span>
           </div>
-          {/* Enlace de comparación eliminado — pricing simplificado */}
         </motion.div>
       </div>
     </section>

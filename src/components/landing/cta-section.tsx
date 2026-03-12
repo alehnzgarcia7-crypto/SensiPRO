@@ -3,17 +3,16 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-import { LANDING_DATA, AVATAR_STACK } from '@/lib/landing-data';
+import { LANDING_DATA } from '@/lib/landing-data';
 
 // ═══════════════════════════════════════════════════════════════
-// CtaSection — Final CTA que lleva al generador (flujo correcto)
+// CtaSection — Sección 10: Cerrar con acción, no con ruido.
 // ═══════════════════════════════════════════════════════════════
 
 export function CtaSection() {
-
   return (
     <section className="py-24 md:py-32 px-4 relative overflow-hidden">
-      {/* Gradient mesh — mirrors hero */}
+      {/* Gradient mesh */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div
           className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[120px] opacity-[0.07]"
@@ -22,10 +21,6 @@ export function CtaSection() {
         <div
           className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] rounded-full blur-[100px] opacity-[0.05]"
           style={{ background: '#3b82f6', animation: 'meshFloat2 18s ease-in-out infinite' }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-[100px] opacity-[0.04]"
-          style={{ background: '#8b5cf6', animation: 'meshFloat3 12s ease-in-out infinite' }}
         />
       </div>
 
@@ -37,7 +32,7 @@ export function CtaSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-tight"
         >
-          <span className="text-white">Deja de perder por</span>
+          <span className="text-white">Deja de adivinar</span>
           <br />
           <span
             style={{
@@ -47,7 +42,7 @@ export function CtaSection() {
               backgroundClip: 'text',
             }}
           >
-            mala configuración
+            tu sensibilidad
           </span>
         </motion.h2>
 
@@ -59,10 +54,10 @@ export function CtaSection() {
           transition={{ delay: 0.1 }}
           className="mt-4 text-base md:text-lg text-slate-400"
         >
-          Genera la sensibilidad calibrada para tu celular en 10 segundos.
+          Prueba el generador y descubre una configuración hecha para tu celular exacto.
         </motion.p>
 
-        {/* CTA — rotating gradient border (matches hero) */}
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -71,7 +66,6 @@ export function CtaSection() {
           className="mt-10 w-full md:inline-block"
         >
           <div className="relative rounded-2xl p-[2px] overflow-hidden group">
-            {/* Rotating border */}
             <div
               className="absolute inset-0 rounded-2xl"
               style={{
@@ -81,7 +75,7 @@ export function CtaSection() {
             />
             <Link
               href="/generator"
-              className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.03] min-h-[56px]"
+              className="relative flex items-center justify-center gap-3 w-full md:w-auto px-8 md:px-12 py-5 rounded-[14px] text-white font-bold text-base md:text-lg uppercase tracking-wider transition-all duration-300 group-hover:scale-[1.02] min-h-[56px]"
               style={{ background: 'rgba(10, 15, 30, 0.9)' }}
             >
               GENERA TU SENSIBILIDAD GRATIS
@@ -90,32 +84,19 @@ export function CtaSection() {
           </div>
         </motion.div>
 
-        {/* Social proof — 3 overlapping avatars + count */}
-        <motion.div
+        {/* Línea final */}
+        <motion.p
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 flex items-center justify-center gap-3"
+          transition={{ delay: 0.4 }}
+          className="mt-6 text-xs text-slate-500"
         >
-          <div className="flex -space-x-2">
-            {AVATAR_STACK.slice(0, 3).map((av) => (
-              <div
-                key={av.initial}
-                className="w-8 h-8 rounded-full border-2 border-background flex items-center justify-center text-[11px] font-bold text-white"
-                style={{ backgroundColor: av.bg }}
-              >
-                {av.initial}
-              </div>
-            ))}
-          </div>
-          <span className="text-sm text-slate-400">
-            {LANDING_DATA.playerCount.toLocaleString()} jugadores ya lo usan
-          </span>
-        </motion.div>
+          {LANDING_DATA.deviceCount}+ dispositivos compatibles | Pago único si decides desbloquear
+        </motion.p>
       </div>
 
-      {/* Gradient line separator */}
+      {/* Gradient line */}
       <div className="mt-20 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
     </section>
   );
