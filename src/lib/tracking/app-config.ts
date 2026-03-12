@@ -7,6 +7,12 @@ export interface SensiProConfig {
   maintenanceMode: boolean;
   announcementBanner: string;
   showDemo: boolean;
+  offerEndDate: string;
+  offerActive: boolean;
+}
+
+function defaultOfferEndDate(): string {
+  return new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString();
 }
 
 const DEFAULTS: SensiProConfig = {
@@ -16,6 +22,8 @@ const DEFAULTS: SensiProConfig = {
   maintenanceMode: false,
   announcementBanner: '',
   showDemo: false,
+  offerEndDate: defaultOfferEndDate(),
+  offerActive: true,
 };
 
 export async function getAppConfig(): Promise<SensiProConfig> {
@@ -41,6 +49,12 @@ export async function getAppConfig(): Promise<SensiProConfig> {
         break;
       case 'showDemo':
         config.showDemo = row.value === 'true';
+        break;
+      case 'offerEndDate':
+        config.offerEndDate = row.value || defaultOfferEndDate();
+        break;
+      case 'offerActive':
+        config.offerActive = row.value === 'true';
         break;
     }
   }

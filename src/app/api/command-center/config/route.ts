@@ -13,6 +13,8 @@ const DEFAULT_CONFIG: Record<string, string> = {
   maintenanceMode: 'false',
   announcementBanner: '',
   showDemo: 'false',
+  offerEndDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+  offerActive: 'true',
 };
 
 async function verifyAccess(req: NextRequest): Promise<string | null> {

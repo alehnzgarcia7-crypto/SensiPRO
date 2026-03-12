@@ -1,11 +1,11 @@
 /**
- * PaywallModal — El modal de compra premium
+ * PaywallModal — Modal de compra premium
  *
- * Flujo:
- * 1. Email capture (si no lo hemos capturado antes)
- * 2. Beneficios + social proof + countdown
- * 3. Selector de método de pago
- * 4. Redirige a Stripe/MP para completar
+ * Flujo SIN FRICCIÓN:
+ * - Si logueado: directo a métodos de pago (0 campos)
+ * - Si no logueado: email + métodos de pago en MISMA vista (1 campo)
+ * - Countdown REAL basado en fecha de AppConfig (no localStorage fake)
+ * - Auto-renovación server-side cada 6 días
  */
 
 'use client';
@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Lock, CreditCard, Banknote, Smartphone,
   Check, Shield, Clock, Zap,
-  ChevronRight, AlertCircle, Loader2,
+  AlertCircle, Loader2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -23,43 +23,62 @@ import { useTrackEvent } from '@/hooks/use-track-event';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
-// COUNTDOWN HOOK — Timer de 48 horas
+// COUNTDOWN HOOK — Timer REAL desde AppConfig en DB
 // ═══════════════════════════════════════════════════════
 
-function useCountdown() {
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+interface CountdownTime {
+  days: number;
+  hours: number;
+  minutes: number;
+  active: boolean;
+  loaded: boolean;
+}
 
+function useOfferCountdown(): CountdownTime {
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [active, setActive] = useState(true);
+  const [timeLeft, setTimeLeft] = useState<CountdownTime>({
+    days: 0, hours: 0, minutes: 0, active: true, loaded: false,
+  });
+
+  // Fetch la fecha del servidor UNA vez
   useEffect(() => {
-    let expiresAt: number;
+    let cancelled = false;
 
-    try {
-      const saved = localStorage.getItem('sensipro_offer_expires');
-      if (saved) {
-        expiresAt = parseInt(saved, 10);
-        if (expiresAt < Date.now()) {
-          expiresAt = Date.now() + 48 * 60 * 60 * 1000;
-          localStorage.setItem('sensipro_offer_expires', String(expiresAt));
-        }
-      } else {
-        expiresAt = Date.now() + 48 * 60 * 60 * 1000;
-        localStorage.setItem('sensipro_offer_expires', String(expiresAt));
+    async function fetchOffer() {
+      try {
+        const res = await fetch('/api/offer-countdown');
+        const data = await res.json();
+        if (cancelled) return;
+        setEndDate(new Date(data.endDate));
+        setActive(data.active);
+      } catch {
+        // Fallback silencioso
+        setEndDate(new Date(Date.now() + 6 * 24 * 60 * 60 * 1000));
+        setActive(true);
       }
-    } catch {
-      expiresAt = Date.now() + 48 * 60 * 60 * 1000;
     }
 
+    fetchOffer();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Actualizar countdown cada minuto
+  useEffect(() => {
+    if (!endDate) return;
+
     const update = () => {
-      const diff = Math.max(0, expiresAt - Date.now());
-      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const diff = Math.max(0, endDate.getTime() - Date.now());
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft({ hours, minutes, seconds });
+      setTimeLeft({ days, hours, minutes, active, loaded: true });
     };
 
     update();
-    const interval = setInterval(update, 1000);
+    const interval = setInterval(update, 60_000); // Cada minuto, no cada segundo
     return () => clearInterval(interval);
-  }, []);
+  }, [endDate, active]);
 
   return timeLeft;
 }
@@ -81,51 +100,49 @@ const PREMIUM_FEATURES = [
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════
 
-type PaymentStep = 'email' | 'payment' | 'processing' | 'error';
+type ModalState = 'ready' | 'processing' | 'error';
 
 export function PaywallModal() {
   const { isPaywallOpen, hidePaywall, paywallContext, capturedEmail, setCapturedEmail, unlock } = usePremiumContext();
-  const countdown = useCountdown();
+  const countdown = useOfferCountdown();
   const { track } = useTrackEvent();
   const { data: session } = useSession();
 
-  const [step, setStep] = useState<PaymentStep>('email');
+  const [modalState, setModalState] = useState<ModalState>('ready');
   const [email, setEmail] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'oxxo' | 'mercadopago' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  // Si el usuario está logueado, usar su email de sesión automáticamente.
-  // Si ya tenemos email capturado, ir directo a payment.
+  // El usuario está logueado → no necesitamos pedir email
+  const isLoggedIn = !!session?.user?.email;
+  const effectiveEmail = isLoggedIn ? session.user.email : email;
+
+  // Al abrir: configurar estado inicial
   useEffect(() => {
     if (isPaywallOpen) {
       track('PAYWALL_SHOWN', { source: paywallContext?.source ?? 'unknown' });
+      setModalState('ready');
+      setError(null);
+      setSelectedMethod(null);
+      setIsSubmitting(false);
 
-      const sessionEmail = session?.user?.email;
-
-      if (sessionEmail) {
-        // Usuario logueado — usar su email, saltar paso de email
-        setEmail(sessionEmail);
-        setCapturedEmail(sessionEmail);
-        setStep('payment');
+      if (isLoggedIn && session.user.email) {
+        setEmail(session.user.email);
+        setCapturedEmail(session.user.email);
       } else if (capturedEmail) {
         setEmail(capturedEmail);
-        setStep('payment');
-      } else {
-        setStep('email');
-        setError(null);
-        setSelectedMethod(null);
       }
     }
-  }, [isPaywallOpen, capturedEmail, track, paywallContext?.source, session?.user?.email, setCapturedEmail]);
+  }, [isPaywallOpen, isLoggedIn, session?.user?.email, capturedEmail, track, paywallContext?.source, setCapturedEmail]);
 
-  // Focus en el input de email al abrir
+  // Focus en el input de email para no-logueados
   useEffect(() => {
-    if (isPaywallOpen && step === 'email') {
+    if (isPaywallOpen && !isLoggedIn && !capturedEmail) {
       setTimeout(() => emailInputRef.current?.focus(), 300);
     }
-  }, [isPaywallOpen, step]);
+  }, [isPaywallOpen, isLoggedIn, capturedEmail]);
 
   // Cerrar con Escape
   useEffect(() => {
@@ -138,33 +155,33 @@ export function PaywallModal() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isPaywallOpen, isSubmitting, hidePaywall]);
 
-  // ─── Email Submit ────────────────────────────────
-  const handleEmailSubmit = useCallback(() => {
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
+  // ─── Iniciar Pago ────────────────────────────────
+  const handlePayment = useCallback(async () => {
+    if (!selectedMethod) return;
+
+    // Validar email si no está logueado
+    const emailToUse = effectiveEmail?.trim().toLowerCase() || '';
+    if (!isLoggedIn && (!emailToUse || !emailToUse.includes('@') || !emailToUse.includes('.'))) {
       setError('Ingresa un email válido');
       return;
     }
-    setError(null);
-    setCapturedEmail(trimmed);
-    setStep('payment');
-  }, [email, setCapturedEmail]);
 
-  // ─── Iniciar Pago ────────────────────────────────
-  const handlePayment = useCallback(async () => {
-    if (!selectedMethod || !email) return;
+    // Capturar email si no lo hemos hecho
+    if (!isLoggedIn && emailToUse && !capturedEmail) {
+      setCapturedEmail(emailToUse);
+    }
 
     track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown' });
     setIsSubmitting(true);
     setError(null);
-    setStep('processing');
+    setModalState('processing');
 
     try {
       const response = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.toLowerCase().trim(),
+          email: emailToUse,
           method: selectedMethod,
           device: paywallContext?.device,
           fingerCount: paywallContext?.fingerCount,
@@ -177,7 +194,7 @@ export function PaywallModal() {
 
       if (!response.ok) {
         if (data.isPremium) {
-          unlock(email);
+          unlock(emailToUse);
           return;
         }
         throw new Error(data.error || 'Error procesando el pago');
@@ -189,9 +206,9 @@ export function PaywallModal() {
         return;
       }
 
-      // Para OXXO con Stripe Elements (clientSecret)
+      // Para OXXO con Stripe Elements
       if (data.clientSecret && selectedMethod === 'oxxo') {
-        window.location.href = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(email)}`;
+        window.location.href = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(emailToUse)}`;
         return;
       }
 
@@ -199,10 +216,10 @@ export function PaywallModal() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Hubo un error. Intenta de nuevo.';
       setError(message);
-      setStep('error');
+      setModalState('error');
       setIsSubmitting(false);
     }
-  }, [selectedMethod, email, paywallContext, unlock, track]);
+  }, [selectedMethod, effectiveEmail, isLoggedIn, capturedEmail, paywallContext, unlock, track, setCapturedEmail]);
 
   // ═══════════════════════════════════════════════════
   // RENDER
@@ -236,7 +253,7 @@ export function PaywallModal() {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header con gradiente */}
+            {/* Header */}
             <div className="relative px-6 pt-6 pb-4">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
 
@@ -250,14 +267,10 @@ export function PaywallModal() {
               )}
 
               {/* Badge de descuento */}
-              <motion.div
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 text-xs text-cyan-400 mb-3"
-                animate={{ scale: [1, 1.03, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 text-xs text-cyan-400 mb-3">
                 <Zap className="w-3 h-3" />
                 <span className="font-semibold">43% OFF — OFERTA ESPECIAL</span>
-              </motion.div>
+              </div>
 
               {/* Título */}
               <h2 className="text-xl sm:text-2xl font-bold text-white font-[family-name:var(--font-orbitron),sans-serif] tracking-wide">
@@ -278,28 +291,26 @@ export function PaywallModal() {
               <p className="text-xs text-slate-500 mt-1">Pago único. Acceso de por vida. Sin suscripción.</p>
             </div>
 
-            {/* Countdown */}
-            <div className="mx-6 mb-4 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/10">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="font-medium">Oferta termina en:</span>
-                </div>
-                <div className="flex items-center gap-1 font-[family-name:var(--font-orbitron),sans-serif] text-sm text-white">
-                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
-                    {String(countdown.hours).padStart(2, '0')}
-                  </span>
-                  <span className="text-slate-600">:</span>
-                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
-                    {String(countdown.minutes).padStart(2, '0')}
-                  </span>
-                  <span className="text-slate-600">:</span>
-                  <span className="px-1.5 py-0.5 rounded bg-white/5 text-amber-400 font-bold min-w-[28px] text-center">
-                    {String(countdown.seconds).padStart(2, '0')}
-                  </span>
+            {/* Countdown REAL — profesional y sutil */}
+            {countdown.loaded && countdown.active && (
+              <div className="mx-6 mb-4 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Oferta válida por:</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-white font-medium">
+                    {countdown.days > 0 && (
+                      <>
+                        <span className="text-slate-200">{countdown.days}<span className="text-slate-500 text-xs ml-0.5">d</span></span>
+                      </>
+                    )}
+                    <span className="text-slate-200">{countdown.hours}<span className="text-slate-500 text-xs ml-0.5">h</span></span>
+                    <span className="text-slate-200">{countdown.minutes}<span className="text-slate-500 text-xs ml-0.5">m</span></span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Social proof */}
             <div className="mx-6 mb-4">
@@ -311,67 +322,17 @@ export function PaywallModal() {
             {/* Separador */}
             <div className="mx-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
 
-            {/* Contenido según step */}
+            {/* Contenido */}
             <div className="px-6 pb-6">
               <AnimatePresence mode="wait">
 
-                {/* STEP: EMAIL */}
-                {step === 'email' && (
+                {/* ESTADO: READY — Todo en una sola vista */}
+                {modalState === 'ready' && (
                   <motion.div
-                    key="email"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <label className="text-sm text-slate-300 mb-3 block">
-                      Email de acceso
-                    </label>
-
-                    <div className="relative mb-3">
-                      <input
-                        ref={emailInputRef}
-                        type="email"
-                        value={email}
-                        onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                        onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
-                        placeholder="tu@email.com"
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-                        autoComplete="email"
-                      />
-                    </div>
-
-                    {error && (
-                      <p className="text-xs text-red-400 mb-3 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {error}
-                      </p>
-                    )}
-
-                    <motion.button
-                      onClick={handleEmailSubmit}
-                      className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-semibold text-sm hover:from-cyan-400 hover:to-cyan-500 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Continuar
-                      <ChevronRight className="w-4 h-4" />
-                    </motion.button>
-
-                    <p className="text-[10px] text-slate-600 mt-2 text-center flex items-center justify-center gap-1">
-                      <Lock className="w-2.5 h-2.5" />
-                      Pago seguro con Stripe
-                    </p>
-                  </motion.div>
-                )}
-
-                {/* STEP: PAYMENT */}
-                {step === 'payment' && (
-                  <motion.div
-                    key="payment"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    key="ready"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
                     {/* Features */}
@@ -380,24 +341,37 @@ export function PaywallModal() {
                         Lo que desbloqueas:
                       </p>
                       {PREMIUM_FEATURES.map((text, i) => (
-                        <motion.div
-                          key={i}
-                          className="flex items-center gap-2.5 text-xs"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.08 }}
-                        >
+                        <div key={i} className="flex items-center gap-2.5 text-xs">
                           <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
                             <Check className="w-3 h-3 text-emerald-400" />
                           </div>
                           <span className="text-slate-300">{text}</span>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
 
                     <div className="h-px bg-white/5 my-4" />
 
-                    {/* Selector de método de pago */}
+                    {/* Email — SOLO si no está logueado, integrado en la misma vista */}
+                    {!isLoggedIn && (
+                      <div className="mb-4">
+                        <label className="text-xs text-slate-500 mb-1.5 block">
+                          Para recibir tu acceso
+                        </label>
+                        <input
+                          ref={emailInputRef}
+                          type="email"
+                          value={email}
+                          onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                          onKeyDown={(e) => e.key === 'Enter' && selectedMethod && handlePayment()}
+                          placeholder="tu@email.com"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
+                          autoComplete="email"
+                        />
+                      </div>
+                    )}
+
+                    {/* Métodos de pago */}
                     <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-3">
                       Método de pago:
                     </p>
@@ -528,8 +502,8 @@ export function PaywallModal() {
                   </motion.div>
                 )}
 
-                {/* STEP: PROCESSING */}
-                {step === 'processing' && (
+                {/* ESTADO: PROCESSING */}
+                {modalState === 'processing' && (
                   <motion.div
                     key="processing"
                     className="py-8 flex flex-col items-center"
@@ -548,8 +522,8 @@ export function PaywallModal() {
                   </motion.div>
                 )}
 
-                {/* STEP: ERROR */}
-                {step === 'error' && (
+                {/* ESTADO: ERROR */}
+                {modalState === 'error' && (
                   <motion.div
                     key="error"
                     className="py-6 flex flex-col items-center"
@@ -564,7 +538,7 @@ export function PaywallModal() {
                     <p className="text-xs text-slate-400 text-center mb-4 max-w-xs">{error || 'Hubo un problema procesando tu pago.'}</p>
 
                     <button
-                      onClick={() => { setStep('payment'); setError(null); }}
+                      onClick={() => { setModalState('ready'); setError(null); }}
                       className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all cursor-pointer"
                     >
                       Intentar de nuevo

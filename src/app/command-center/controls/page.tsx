@@ -13,8 +13,10 @@ import {
   Trash2,
   UserPlus,
   UserMinus,
+  Timer,
+  Power,
 } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -25,6 +27,8 @@ interface AppConfig {
   maintenanceMode: string;
   announcementBanner: string;
   showDemo: string;
+  offerEndDate: string;
+  offerActive: string;
 }
 
 export default function ControlsPage() {
@@ -236,6 +240,50 @@ export default function ControlsPage() {
           </div>
         </ControlCard>
 
+        {/* Offer Countdown */}
+        <ControlCard
+          icon={Timer}
+          title="Fecha Fin de Oferta"
+          description="Contador de urgencia — se auto-renueva cada 6 días"
+        >
+          <div className="flex items-center gap-3">
+            <input
+              type="datetime-local"
+              value={config.offerEndDate ? toLocalDatetimeString(config.offerEndDate) : ''}
+              onChange={(e) => {
+                const dt = new Date(e.target.value);
+                if (!isNaN(dt.getTime())) {
+                  setConfig({ ...config, offerEndDate: dt.toISOString() });
+                }
+              }}
+              className="flex-1 px-4 py-2.5 rounded-lg bg-[#080810] border border-[#1a1a2e] text-white font-mono text-sm focus:border-cyan-500/50 focus:outline-none [color-scheme:dark]"
+            />
+            <SaveButton
+              onClick={() => saveConfig('offerEndDate', config.offerEndDate)}
+              saving={saving === 'offerEndDate'}
+              saved={saved === 'offerEndDate'}
+            />
+          </div>
+          <OfferCountdownPreview endDate={config.offerEndDate} active={config.offerActive === 'true'} />
+          <p className="text-[10px] text-slate-600 mt-2">
+            El contador se auto-renueva cada 6 días automáticamente. Precio siempre $199 MXN.
+          </p>
+        </ControlCard>
+
+        {/* Offer Active Toggle */}
+        <ControlCard
+          icon={Power}
+          title="Oferta Activa"
+          description="Muestra u oculta el contador de oferta en el paywall"
+        >
+          <ToggleSwitch
+            value={config.offerActive === 'true'}
+            onChange={(v) => saveConfig('offerActive', String(v))}
+            labelOn="Oferta visible"
+            labelOff="Oferta oculta"
+          />
+        </ControlCard>
+
         {/* Grant Premium */}
         <ControlCard
           icon={UserPlus}
@@ -369,6 +417,42 @@ function SaveButton({
         <Save className="w-4 h-4" />
       )}
     </button>
+  );
+}
+
+function toLocalDatetimeString(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function OfferCountdownPreview({ endDate, active }: { endDate: string; active: boolean }) {
+  const [remaining, setRemaining] = useState('');
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const calc = () => {
+      if (!active || !endDate) { setRemaining('Oferta desactivada'); return; }
+      const diff = new Date(endDate).getTime() - Date.now();
+      if (diff <= 0) { setRemaining('Expirada — se auto-renovará en el próximo request'); return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      setRemaining(`${d}d ${h}h ${m}m`);
+    };
+    calc();
+    intervalRef.current = setInterval(calc, 60000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [endDate, active]);
+
+  return (
+    <div className="mt-3 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+      <span className="text-[10px] text-slate-500 uppercase tracking-wider">Preview del contador</span>
+      <p className={cn('text-sm font-mono mt-0.5', active ? 'text-slate-200' : 'text-slate-600')}>
+        {remaining}
+      </p>
+    </div>
   );
 }
 
