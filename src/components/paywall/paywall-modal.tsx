@@ -24,6 +24,7 @@ import {
   trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
   CONTENT_IDS, hasEventFired, markEventFired,
 } from '@/lib/analytics';
+import { detectInAppBrowser } from '@/lib/browser-detect';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
@@ -238,15 +239,37 @@ export function PaywallModal() {
         },
       });
 
-      // Redirigir al checkout
+      // Redirigir al checkout — interceptar navegadores in-app
       if (data.checkoutUrl) {
+        const { isInAppBrowser, browserName } = detectInAppBrowser();
+        if (isInAppBrowser) {
+          // Navegador in-app: redirigir a página intermedia
+          trackEvent({
+            event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+            properties: { browser: browserName, context: 'checkout', method: selectedMethod },
+          });
+          const redirectUrl = `/checkout/redirect?url=${encodeURIComponent(data.checkoutUrl)}&method=${selectedMethod}`;
+          window.location.href = redirectUrl;
+          return;
+        }
         window.location.href = data.checkoutUrl;
         return;
       }
 
       // Para OXXO con Stripe Elements
       if (data.clientSecret && selectedMethod === 'oxxo') {
-        window.location.href = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(emailToUse)}`;
+        const oxxoUrl = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(emailToUse)}`;
+        const { isInAppBrowser, browserName } = detectInAppBrowser();
+        if (isInAppBrowser) {
+          trackEvent({
+            event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+            properties: { browser: browserName, context: 'oxxo_checkout' },
+          });
+          const redirectUrl = `/checkout/redirect?url=${encodeURIComponent(oxxoUrl)}&method=oxxo`;
+          window.location.href = redirectUrl;
+          return;
+        }
+        window.location.href = oxxoUrl;
         return;
       }
 

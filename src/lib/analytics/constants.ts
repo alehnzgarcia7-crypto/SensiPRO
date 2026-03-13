@@ -52,6 +52,11 @@ export const INTERNAL_EVENTS = {
   // Post-payment pages
   SUCCESS_VIEWED: 'success_viewed',
   CANCEL_VIEWED: 'cancel_viewed',
+
+  // In-app browser detection
+  INAPP_BROWSER_DETECTED: 'inapp_browser_detected',
+  INAPP_BROWSER_REDIRECT: 'inapp_browser_redirect',
+  INAPP_BROWSER_COPY_LINK: 'inapp_browser_copy_link',
 } as const;
 
 // Content IDs for TikTok
