@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Lock, CreditCard, Banknote, Smartphone,
   Check, Shield, Clock, Zap,
-  AlertCircle, Loader2,
+  AlertCircle, Loader2, Copy, CheckCircle2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -24,7 +24,7 @@ import {
   trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
   CONTENT_IDS, hasEventFired, markEventFired,
 } from '@/lib/analytics';
-import { detectInAppBrowser } from '@/lib/browser-detect';
+import { detectInAppBrowser, copyToClipboard } from '@/lib/browser-detect';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
@@ -105,7 +105,7 @@ const PREMIUM_FEATURES = [
 // COMPONENTE PRINCIPAL
 // ═══════════════════════════════════════════════════════
 
-type ModalState = 'ready' | 'processing' | 'error';
+type ModalState = 'ready' | 'processing' | 'error' | 'copy-link';
 
 export function PaywallModal() {
   const { isPaywallOpen, hidePaywall, paywallContext, capturedEmail, setCapturedEmail, unlock } = usePremiumContext();
@@ -118,6 +118,8 @@ export function PaywallModal() {
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'oxxo' | 'mercadopago' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copyLinkUrl, setCopyLinkUrl] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
   // El usuario está logueado → no necesitamos pedir email
@@ -243,16 +245,15 @@ export function PaywallModal() {
       if (data.checkoutUrl) {
         const { isInAppBrowser, browserName } = detectInAppBrowser();
         if (isInAppBrowser) {
-          // Navegador in-app: guardar URL en sessionStorage y redirigir SIN la URL visible
+          // Navegador in-app: mostrar modal de copiar enlace SIN navegar
           trackEvent({
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'checkout', method: selectedMethod },
           });
-          try {
-            sessionStorage.setItem('sensipro_checkout_url', data.checkoutUrl);
-            sessionStorage.setItem('sensipro_checkout_method', selectedMethod);
-          } catch { /* sessionStorage no disponible */ }
-          window.location.href = '/checkout/redirect';
+          setCopyLinkUrl(data.checkoutUrl);
+          setLinkCopied(false);
+          setModalState('copy-link');
+          setIsSubmitting(false);
           return;
         }
         window.location.href = data.checkoutUrl;
@@ -268,11 +269,10 @@ export function PaywallModal() {
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'oxxo_checkout' },
           });
-          try {
-            sessionStorage.setItem('sensipro_checkout_url', oxxoUrl);
-            sessionStorage.setItem('sensipro_checkout_method', 'oxxo');
-          } catch { /* sessionStorage no disponible */ }
-          window.location.href = '/checkout/redirect';
+          setCopyLinkUrl(oxxoUrl);
+          setLinkCopied(false);
+          setModalState('copy-link');
+          setIsSubmitting(false);
           return;
         }
         window.location.href = oxxoUrl;
@@ -610,6 +610,99 @@ export function PaywallModal() {
                     >
                       Intentar de nuevo
                     </button>
+                  </motion.div>
+                )}
+
+                {/* ESTADO: COPY-LINK — Para navegadores in-app (TikTok, Instagram, etc.) */}
+                {modalState === 'copy-link' && copyLinkUrl && (
+                  <motion.div
+                    key="copy-link"
+                    className="py-6 flex flex-col items-center"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {/* Icono de escudo/candado */}
+                    <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4 6V12C4 16.42 7.4 20.74 12 22C16.6 20.74 20 16.42 20 12V6L12 2Z" stroke="#22D3EE" strokeWidth="1.5" fill="rgba(34,211,238,0.1)" />
+                        <rect x="9" y="10" width="6" height="5" rx="1" stroke="#22D3EE" strokeWidth="1.5" />
+                        <path d="M10 10V8C10 6.9 10.9 6 12 6C13.1 6 14 6.9 14 8V10" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-white text-center mb-2 font-[family-name:var(--font-orbitron),sans-serif]">
+                      Completa tu pago de forma segura
+                    </h3>
+
+                    <p className="text-xs text-slate-400 text-center mb-6 max-w-xs leading-relaxed">
+                      Los navegadores de redes sociales no permiten pagos directos. Copia el enlace y pégalo en <span className="text-white font-medium">Safari</span> o <span className="text-white font-medium">Chrome</span>.
+                    </p>
+
+                    {/* Botón COPIAR ENLACE */}
+                    <motion.button
+                      onClick={async () => {
+                        const success = await copyToClipboard(copyLinkUrl);
+                        if (success) {
+                          setLinkCopied(true);
+                          trackEvent({
+                            event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+                            properties: { action: 'copy_link_modal', method: selectedMethod },
+                          });
+                        }
+                      }}
+                      className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer ${
+                        linkCopied
+                          ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                          : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {linkCopied ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5" />
+                          ENLACE COPIADO ✓
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-5 h-5" />
+                          COPIAR ENLACE DE PAGO
+                        </>
+                      )}
+                    </motion.button>
+
+                    {/* Instrucciones paso a paso */}
+                    {linkCopied && (
+                      <motion.div
+                        className="mt-4 w-full space-y-2"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <p className="text-xs text-slate-400 text-center">
+                          Ahora pega el enlace en tu navegador:
+                        </p>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                          <span className="text-xs text-cyan-400 font-bold">1.</span>
+                          <span className="text-xs text-slate-300">Abre Safari o Chrome</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                          <span className="text-xs text-cyan-400 font-bold">2.</span>
+                          <span className="text-xs text-slate-300">Pega el enlace en la barra de direcciones</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                          <span className="text-xs text-cyan-400 font-bold">3.</span>
+                          <span className="text-xs text-slate-300">Completa tu compra de forma segura</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Badge de seguridad */}
+                    <div className="mt-5 flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06]">
+                      <Lock className="w-3 h-3 text-emerald-400" />
+                      <span className="text-[10px] text-slate-400">Pago seguro con Stripe</span>
+                      <Shield className="w-3 h-3 text-emerald-400" />
+                    </div>
                   </motion.div>
                 )}
 
