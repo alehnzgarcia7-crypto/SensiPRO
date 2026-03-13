@@ -243,13 +243,16 @@ export function PaywallModal() {
       if (data.checkoutUrl) {
         const { isInAppBrowser, browserName } = detectInAppBrowser();
         if (isInAppBrowser) {
-          // Navegador in-app: redirigir a página intermedia
+          // Navegador in-app: guardar URL en sessionStorage y redirigir SIN la URL visible
           trackEvent({
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'checkout', method: selectedMethod },
           });
-          const redirectUrl = `/checkout/redirect?url=${encodeURIComponent(data.checkoutUrl)}&method=${selectedMethod}`;
-          window.location.href = redirectUrl;
+          try {
+            sessionStorage.setItem('sensipro_checkout_url', data.checkoutUrl);
+            sessionStorage.setItem('sensipro_checkout_method', selectedMethod);
+          } catch { /* sessionStorage no disponible */ }
+          window.location.href = '/checkout/redirect';
           return;
         }
         window.location.href = data.checkoutUrl;
@@ -265,8 +268,11 @@ export function PaywallModal() {
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'oxxo_checkout' },
           });
-          const redirectUrl = `/checkout/redirect?url=${encodeURIComponent(oxxoUrl)}&method=oxxo`;
-          window.location.href = redirectUrl;
+          try {
+            sessionStorage.setItem('sensipro_checkout_url', oxxoUrl);
+            sessionStorage.setItem('sensipro_checkout_method', 'oxxo');
+          } catch { /* sessionStorage no disponible */ }
+          window.location.href = '/checkout/redirect';
           return;
         }
         window.location.href = oxxoUrl;
