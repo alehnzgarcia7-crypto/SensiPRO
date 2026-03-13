@@ -25,15 +25,20 @@ export function InstallPrompt() {
       return;
     }
 
+    let delayTimer: ReturnType<typeof setTimeout>;
+
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Mostrar banner después de 30 segundos de engagement
-      setTimeout(() => setShowBanner(true), ENGAGEMENT_DELAY_MS);
+      delayTimer = setTimeout(() => setShowBanner(true), ENGAGEMENT_DELAY_MS);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      clearTimeout(delayTimer);
+    };
   }, []);
 
   const handleInstall = async () => {

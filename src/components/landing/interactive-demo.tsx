@@ -59,6 +59,7 @@ export function InteractiveDemo() {
   const [revealedBars, setRevealedBars] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const revealIntervalRef = useRef<ReturnType<typeof setInterval>>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounced device search
@@ -141,11 +142,15 @@ export function InteractiveDemo() {
   };
 
   const revealBarsSequentially = () => {
+    if (revealIntervalRef.current) clearInterval(revealIntervalRef.current);
     let count = 0;
-    const interval = setInterval(() => {
+    revealIntervalRef.current = setInterval(() => {
       count++;
       setRevealedBars(count);
-      if (count >= 6) clearInterval(interval);
+      if (count >= 6) {
+        clearInterval(revealIntervalRef.current);
+        revealIntervalRef.current = undefined;
+      }
     }, 100);
   };
 
@@ -164,6 +169,7 @@ export function InteractiveDemo() {
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (revealIntervalRef.current) clearInterval(revealIntervalRef.current);
     };
   }, []);
 

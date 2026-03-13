@@ -154,9 +154,9 @@ export function PaywallModal() {
 
   // Focus en el input de email para no-logueados
   useEffect(() => {
-    if (isPaywallOpen && !isLoggedIn && !capturedEmail) {
-      setTimeout(() => emailInputRef.current?.focus(), 300);
-    }
+    if (!isPaywallOpen || isLoggedIn || capturedEmail) return;
+    const timer = setTimeout(() => emailInputRef.current?.focus(), 300);
+    return () => clearTimeout(timer);
   }, [isPaywallOpen, isLoggedIn, capturedEmail]);
 
   // Cerrar con Escape

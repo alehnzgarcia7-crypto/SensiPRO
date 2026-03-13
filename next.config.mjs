@@ -4,14 +4,25 @@ const withPWA = withPWAInit({
   dest: 'public',
   disable: process.env.NODE_ENV === 'development',
   register: true,
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
+  cacheOnFrontEndNav: false,
+  aggressiveFrontEndNavCaching: false,
   reloadOnOnline: true,
   fallbacks: {
     document: '/offline',
   },
   workboxOptions: {
     skipWaiting: true,
+    exclude: [
+      // No precachear chunks de admin/command-center (solo los usa el admin)
+      /command-center/,
+      /\(admin\)/,
+      // No precachear chunks de páginas secundarias
+      /\(main\)\/academy/,
+      /\(main\)\/favorites/,
+      /app\/checkout/,
+      // No precachear source maps
+      /\.map$/,
+    ],
     runtimeCaching: [
       {
         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
@@ -51,6 +62,11 @@ const withPWA = withPWAInit({
 
 const nextConfig = {
   reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
   transpilePackages: [
     '@ares/database',
     '@ares/algorithms',
@@ -61,9 +77,10 @@ const nextConfig = {
     '@ares/config',
   ],
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts'],
+    optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
   },
   images: {
+    minimumCacheTTL: 86400,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'fdn2.gsmarena.com' },
