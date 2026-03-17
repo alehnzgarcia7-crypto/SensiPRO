@@ -201,14 +201,16 @@ export function StyleStep() {
         })}
       </div>
 
-      {/* Gyro toggle */}
-      <div className="glass p-4 mb-8 flex items-center justify-between">
-        <div>
-          <p className="font-ui font-medium text-white text-sm">Giroscopio</p>
-          <p className="text-xs text-slate-500">Incluir valores de giroscopio (Premium)</p>
+      {/* Gyro toggle — oculto temporalmente para simplificar UX */}
+      {false && (
+        <div className="glass p-4 mb-8 flex items-center justify-between">
+          <div>
+            <p className="font-ui font-medium text-white text-sm">Giroscopio</p>
+            <p className="text-xs text-slate-500">Incluir valores de giroscopio (Premium)</p>
+          </div>
+          <Toggle checked={includeGyro} onChange={setIncludeGyro} />
         </div>
-        <Toggle checked={includeGyro} onChange={setIncludeGyro} />
-      </div>
+      )}
 
       {/* Error */}
       {error && (

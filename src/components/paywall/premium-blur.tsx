@@ -28,6 +28,8 @@ interface PremiumBlurProps {
   style?: string;
   revealedGeneral?: number;
   className?: string;
+  /** Posiciona el CTA en la parte superior en vez de centrado (para contenido largo como headshot) */
+  ctaTop?: boolean;
 }
 
 export function PremiumBlur({
@@ -40,6 +42,7 @@ export function PremiumBlur({
   style,
   revealedGeneral,
   className = '',
+  ctaTop = false,
 }: PremiumBlurProps) {
   const { isPremium, isLoading, showPaywall } = usePremiumContext();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,18 +112,23 @@ export function PremiumBlur({
 
       {/* Overlay con gradiente premium */}
       <motion.div
-        className="absolute inset-0 flex flex-col items-center justify-center z-10"
+        className={`absolute inset-0 flex flex-col items-center z-10 ${ctaTop ? 'justify-start pt-8 sm:pt-12' : 'justify-center'}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
         style={{
-          background: `
-            radial-gradient(ellipse at center,
-              rgba(0,0,0,0.3) 0%,
-              rgba(0,0,0,0.6) 50%,
-              rgba(0,0,0,0.8) 100%
-            )
-          `,
+          background: ctaTop
+            ? `linear-gradient(to bottom,
+                rgba(0,0,0,0.5) 0%,
+                rgba(0,0,0,0.85) 30%,
+                rgba(0,0,0,0.95) 60%,
+                rgba(0,0,0,1) 100%
+              )`
+            : `radial-gradient(ellipse at center,
+                rgba(0,0,0,0.3) 0%,
+                rgba(0,0,0,0.6) 50%,
+                rgba(0,0,0,0.8) 100%
+              )`,
         }}
       >
         {/* Partículas flotantes */}
@@ -172,7 +180,7 @@ export function PremiumBlur({
 
         {/* Texto principal */}
         <motion.h3
-          className="text-lg sm:text-xl font-bold text-white text-center mb-1 font-[family-name:var(--font-orbitron),sans-serif] tracking-wide"
+          className="text-lg sm:text-xl font-bold text-white text-center mb-2 font-[family-name:var(--font-orbitron),sans-serif] tracking-wide"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -181,7 +189,7 @@ export function PremiumBlur({
         </motion.h3>
 
         <motion.p
-          className="text-sm text-slate-400 text-center mb-5 max-w-xs px-4"
+          className="text-sm text-slate-400 text-center mb-6 max-w-xs px-4"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -214,7 +222,7 @@ export function PremiumBlur({
         {/* Botón de desbloqueo */}
         <motion.button
           onClick={handleUnlockClick}
-          className="group relative px-6 py-3 rounded-xl overflow-hidden cursor-pointer"
+          className="group relative px-8 py-4 min-h-[52px] rounded-xl overflow-hidden cursor-pointer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           initial={{ y: 10, opacity: 0 }}
@@ -255,7 +263,7 @@ export function PremiumBlur({
 
         {/* Texto de precio */}
         <motion.div
-          className="mt-3 flex items-center gap-2 text-xs"
+          className="mt-4 flex items-center gap-2 text-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
@@ -288,7 +296,6 @@ export function PremiumBlur({
                 .catch(() => alert('Error verificando. Intenta de nuevo.'));
             }
           }}
-          className="mt-2 text-[11px] text-slate-500 hover:text-slate-300 underline underline-offset-2 transition-colors cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}

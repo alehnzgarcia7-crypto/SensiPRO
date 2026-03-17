@@ -160,22 +160,7 @@ export function HeroSection() {
           </p>
         </motion.div>
 
-        {/* Social proof */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.6 }}
-          className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-full"
-          style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <span className="text-sm text-slate-300">
-            {LANDING_DATA.playerCount.toLocaleString()} jugadores ya la usan
-          </span>
-        </motion.div>
+        {/* Social proof removido — sin datos verificables aún */}
       </div>
 
       {/* Scroll indicator */}

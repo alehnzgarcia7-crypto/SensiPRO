@@ -379,12 +379,7 @@ export function PaywallModal() {
               </div>
             )}
 
-            {/* Social proof */}
-            <div className="mx-6 mb-4">
-              <p className="text-xs text-slate-400">
-                Más de <span className="text-cyan-400 font-bold">1,800</span> jugadores confían en SensiPRO
-              </p>
-            </div>
+            {/* Social proof removido — sin datos verificables aún */}
 
             {/* Separador */}
             <div className="mx-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />

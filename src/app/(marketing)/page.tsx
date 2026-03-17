@@ -10,7 +10,8 @@ import { FaqSection } from '@/components/landing/faq-section';
 import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { PremiumModulesSection } from '@/components/landing/premium-modules-section';
-import { PricingSection } from '@/components/landing/pricing-section';
+// PricingSection oculta — el usuario ve el precio solo en el paywall del generador
+// import { PricingSection } from '@/components/landing/pricing-section';
 import { ProblemSection } from '@/components/landing/problem-section';
 
 export const metadata: Metadata = {
@@ -44,8 +45,8 @@ export default function LandingPage() {
       <PremiumModulesSection />
       {/* 7. Compatibilidad — Marcas y dispositivos */}
       <BrandsSection />
-      {/* 8. Pricing — Un solo pago, acceso de por vida */}
-      <PricingSection />
+      {/* 8. Pricing — Oculto en landing para que el usuario vea el precio solo en el paywall */}
+      {/* <PricingSection /> */}
       {/* 9. FAQ — Preguntas frecuentes */}
       <FaqSection />
       {/* ARES AI Coach — Próximamente (pequeño, no protagonista) */}

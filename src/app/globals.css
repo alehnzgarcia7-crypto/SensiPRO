@@ -34,7 +34,13 @@
 
 @layer components {
   .glass {
-    @apply bg-background-card/80 backdrop-blur-xl border border-white/5 rounded-gaming;
+    @apply bg-background-card/90 border border-white/5 rounded-gaming;
+  }
+  /* backdrop-filter solo en desktop — muy costoso en móviles gama baja */
+  @media (min-width: 768px) {
+    .glass {
+      @apply bg-background-card/80 backdrop-blur-xl;
+    }
   }
 
   .glass-hover {
@@ -79,21 +85,27 @@
     animation: shimmer 2s linear infinite;
   }
 
-  /* ═══ Glassmorphism 2.0 ═══ */
+  /* ═══ Glassmorphism 2.0 — optimizado para gama baja ═══ */
   .glass-card {
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(20px) saturate(1.5);
-    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     border-radius: 16px;
-    transition: all 300ms ease;
+    transition: border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  /* backdrop-filter solo en pantallas grandes (desktop) — muy costoso en móviles gama baja */
+  @media (min-width: 768px) {
+    .glass-card {
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    }
   }
 
   .glass-card:hover {
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    transform: translateY(-4px);
   }
 
   /* ═══ Animated Border — Signature Element ═══ */
@@ -592,12 +604,17 @@
   background-clip: text;
 }
 
-/* Glassmorphism strong — opaque glass */
+/* Glassmorphism strong — opaque glass (sin blur en mobile) */
 .glass-strong {
-  background: rgba(10, 15, 30, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(10, 15, 30, 0.9);
   border: 1px solid rgba(6, 182, 212, 0.1);
+}
+@media (min-width: 768px) {
+  .glass-strong {
+    background: rgba(10, 15, 30, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
 }
 
 /* Glow border utilities */

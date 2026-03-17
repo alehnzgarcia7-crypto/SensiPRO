@@ -35,8 +35,8 @@ const SUBJECT_OPTIONS = [
 
 const SOCIAL_LINKS = [
   { name: 'Discord', handle: 'discord.gg/sensipro', href: 'https://discord.gg/sensipro', color: 'text-indigo-400' },
-  { name: 'Instagram', handle: '@sensipro_ff', href: 'https://instagram.com/sensipro_ff', color: 'text-pink-400' },
-  { name: 'TikTok', handle: '@sensipro_ff', href: 'https://tiktok.com/@sensipro_ff', color: 'text-slate-200' },
+  { name: 'Instagram', handle: '@sensipro8', href: 'https://instagram.com/sensipro8', color: 'text-pink-400' },
+  { name: 'TikTok', handle: '@sensipro5', href: 'https://tiktok.com/@sensipro5', color: 'text-slate-200' },
   { name: 'YouTube', handle: 'SensiPRO Oficial', href: 'https://youtube.com/@sensipro', color: 'text-red-400' },
 ] as const;
 

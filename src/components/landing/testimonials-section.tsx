@@ -197,12 +197,11 @@ export function TestimonialsSection() {
           <div className="flex items-center gap-3">
             <RatingStars />
             <span className="text-4xl md:text-5xl font-heading font-black text-white">
-              {LANDING_DATA.avgRating}
+              {LANDING_DATA.deviceCount}+
             </span>
-            <span className="text-xl text-slate-500 font-heading">/5.0</span>
           </div>
           <p className="text-sm text-slate-500">
-            Basado en {LANDING_DATA.reviewCount} reviews
+            Dispositivos calibrados con precisión
           </p>
         </motion.div>
 

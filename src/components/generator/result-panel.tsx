@@ -370,49 +370,56 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
             {/* Separador gradiente */}
             <div className="divider-gradient my-6" />
 
-            {/* Stats adicionales */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Target size={14} className="text-ice-400" />
-                  <span className="text-sm font-ui text-slate-400">Precisión</span>
+            {/* Stats adicionales — PREMIUM (bloqueados para usuarios gratis) */}
+            <PremiumBlur
+              source="generator"
+              device={`${selectedDevice.brand} ${selectedDevice.model}`}
+              style={selectedStyle}
+              intensity={14}
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target size={14} className="text-ice-400" />
+                    <span className="text-sm font-ui text-slate-400">Precisión</span>
+                  </div>
+                  <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <CountUp end={currentCombo.precisionScore} duration={600} />
+                    <span className="text-xs text-slate-600">/100</span>
+                  </span>
                 </div>
-                <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  <CountUp end={currentCombo.precisionScore} duration={600} />
-                  <span className="text-xs text-slate-600">/100</span>
-                </span>
-              </div>
-              <GlowProgressBar value={currentCombo.precisionScore} max={100} />
+                <GlowProgressBar value={currentCombo.precisionScore} max={100} />
 
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-2">
-                  <Ruler size={14} className="text-fire-400" />
-                  <span className="text-sm font-ui text-slate-400">Botón</span>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-2">
+                    <Ruler size={14} className="text-fire-400" />
+                    <span className="text-sm font-ui text-slate-400">Botón</span>
+                  </div>
+                  <span className="text-sm font-mono font-bold text-white" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {currentCombo.buttonSize}mm
+                  </span>
                 </div>
-                <span className="text-sm font-mono font-bold text-white" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {currentCombo.buttonSize}mm
-                </span>
-              </div>
 
-              <AnimatePresence>
-                {currentCombo.dpiValue !== null && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex items-center justify-between mt-3"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Gauge size={14} className="text-ice-400" />
-                      <span className="text-sm font-ui text-slate-400">DPI Óptimo</span>
-                    </div>
-                    <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                      <CountUp end={currentCombo.dpiValue} duration={600} />
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                <AnimatePresence>
+                  {currentCombo.dpiValue !== null && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="flex items-center justify-between mt-3"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Gauge size={14} className="text-ice-400" />
+                        <span className="text-sm font-ui text-slate-400">DPI Óptimo</span>
+                      </div>
+                      <span className="text-sm font-mono font-bold text-ice-300" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        <CountUp end={currentCombo.dpiValue} duration={600} />
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </PremiumBlur>
           </div>
         </AnimatedBorder>
       </motion.div>

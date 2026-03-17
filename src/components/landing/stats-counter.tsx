@@ -16,10 +16,10 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 1680, suffix: '+', label: 'Jugadores calibrados', icon: '🏆' },
   { value: 503, suffix: '+', label: 'Dispositivos soportados', icon: '📱' },
   { value: 26, suffix: '', label: 'Marcas compatibles', icon: '🏷️' },
-  { value: 5, prefix: '±', suffix: ' pts', label: 'Precisión del algoritmo', icon: '🎯' },
+  { value: 9, suffix: '', label: 'Calibraciones por dispositivo', icon: '🎯' },
+  { value: 6, suffix: '', label: 'Valores por configuración', icon: '⚙️' },
 ];
 
 function useCountUp(target: number, duration: number = 2000) {

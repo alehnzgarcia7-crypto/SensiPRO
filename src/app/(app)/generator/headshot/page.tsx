@@ -495,6 +495,7 @@ export default function HeadshotPage() {
               device={selectedDevice ? `${selectedDevice.brand} ${selectedDevice.model}` : undefined}
               fingerCount={fingers}
               intensity={16}
+              ctaTop
             >
               {/* SECTION 4 — SENSIBILIDAD HEADSHOT (with finger diffs) */}
               <motion.div custom={2} variants={sectionVariants}>

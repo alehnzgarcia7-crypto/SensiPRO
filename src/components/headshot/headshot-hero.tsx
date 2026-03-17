@@ -43,14 +43,7 @@ export function HeadshotHero() {
         </span>
       </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="text-xs text-slate-600 mt-3"
-      >
-        Usado por 1,680 jugadores
-      </motion.p>
+      {/* Social proof removido — sin datos verificables aún */}
     </section>
   );
 }
