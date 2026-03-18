@@ -9,7 +9,7 @@
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 import type { SensitivityStyle, DeviceTier } from '@prisma/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Heart, Share2, Download, Ruler, Target, Gauge, Crosshair, Eye, Scan, Search } from 'lucide-react';
+import { RotateCcw, Heart, Share2, Download, Ruler, Target, Crosshair, Eye, Scan, Search } from 'lucide-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 
 import { AnimatedBorder } from '@/components/effects/animated-border';
@@ -393,6 +393,8 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                   </span>
                 </div>
 
+                {/* DPI Óptimo oculto — Free Fire no tiene este setting.
+                   Para reactivar: descomentar el bloque AnimatePresence debajo.
                 <AnimatePresence>
                   {currentCombo.dpiValue !== null && (
                     <motion.div
@@ -411,6 +413,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     </motion.div>
                   )}
                 </AnimatePresence>
+                */}
                 </div>
               </PremiumBlur>
             </div>

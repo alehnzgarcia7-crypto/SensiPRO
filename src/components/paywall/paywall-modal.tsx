@@ -13,7 +13,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Lock, CreditCard, Banknote, Smartphone,
-  Check, Shield, Clock, Zap,
+  Check, Shield, Clock, Zap, ExternalLink,
   AlertCircle, Loader2, Copy, CheckCircle2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -24,7 +24,7 @@ import {
   trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
   CONTENT_IDS, hasEventFired, markEventFired,
 } from '@/lib/analytics';
-import { detectInAppBrowser, copyToClipboard } from '@/lib/browser-detect';
+import { detectInAppBrowser, copyToClipboard, openInSystemBrowser } from '@/lib/browser-detect';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 // ═══════════════════════════════════════════════════════
@@ -245,15 +245,25 @@ export function PaywallModal() {
       if (data.checkoutUrl) {
         const { isInAppBrowser, browserName } = detectInAppBrowser();
         if (isInAppBrowser) {
-          // Navegador in-app: mostrar modal de copiar enlace SIN navegar
+          // Navegador in-app: intentar abrir en browser del sistema, fallback a copy-link
           trackEvent({
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'checkout', method: selectedMethod },
           });
-          setCopyLinkUrl(data.checkoutUrl);
-          setLinkCopied(false);
-          setModalState('copy-link');
-          setIsSubmitting(false);
+          try { sessionStorage.setItem('sensipro_checkout_url', data.checkoutUrl); } catch { /* ignore */ }
+
+          // Intento 1: abrir en navegador del sistema
+          openInSystemBrowser(data.checkoutUrl);
+
+          // Después de 1.5s, si el usuario sigue aquí, mostrar copy-link como fallback
+          setTimeout(() => {
+            if (!document.hidden) {
+              setCopyLinkUrl(data.checkoutUrl);
+              setLinkCopied(false);
+              setModalState('copy-link');
+              setIsSubmitting(false);
+            }
+          }, 1500);
           return;
         }
         window.location.href = data.checkoutUrl;
@@ -263,16 +273,26 @@ export function PaywallModal() {
       // Para OXXO con Stripe Elements
       if (data.clientSecret && selectedMethod === 'oxxo') {
         const oxxoUrl = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(emailToUse)}`;
-        const { isInAppBrowser, browserName } = detectInAppBrowser();
-        if (isInAppBrowser) {
+        const { isInAppBrowser: isInAppOxxo, browserName: oxxoBrowserName } = detectInAppBrowser();
+        if (isInAppOxxo) {
           trackEvent({
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-            properties: { browser: browserName, context: 'oxxo_checkout' },
+            properties: { browser: oxxoBrowserName, context: 'oxxo_checkout' },
           });
-          setCopyLinkUrl(oxxoUrl);
-          setLinkCopied(false);
-          setModalState('copy-link');
-          setIsSubmitting(false);
+          try { sessionStorage.setItem('sensipro_checkout_url', oxxoUrl); } catch { /* ignore */ }
+
+          // Intento 1: abrir en navegador del sistema
+          openInSystemBrowser(oxxoUrl);
+
+          // Fallback a copy-link después de 1.5s
+          setTimeout(() => {
+            if (!document.hidden) {
+              setCopyLinkUrl(oxxoUrl);
+              setLinkCopied(false);
+              setModalState('copy-link');
+              setIsSubmitting(false);
+            }
+          }, 1500);
           return;
         }
         window.location.href = oxxoUrl;
@@ -547,15 +567,6 @@ export function PaywallModal() {
                       }
                     </motion.button>
 
-                    {/* Garantía */}
-                    <div className="mt-4 flex items-start gap-2 px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-                      <Shield className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs text-emerald-400 font-medium">Garantía de 7 días</p>
-                        <p className="text-[10px] text-slate-500">Si no mejoras tu aim en 7 días, te devolvemos tu dinero. Sin preguntas.</p>
-                      </div>
-                    </div>
-
                     {/* Seguridad */}
                     <p className="text-[10px] text-slate-600 mt-3 text-center flex items-center justify-center gap-1">
                       <Lock className="w-2.5 h-2.5" />
@@ -617,24 +628,20 @@ export function PaywallModal() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {/* Icono de escudo/candado */}
+                    {/* Icono de enlace externo */}
                     <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L4 6V12C4 16.42 7.4 20.74 12 22C16.6 20.74 20 16.42 20 12V6L12 2Z" stroke="#22D3EE" strokeWidth="1.5" fill="rgba(34,211,238,0.1)" />
-                        <rect x="9" y="10" width="6" height="5" rx="1" stroke="#22D3EE" strokeWidth="1.5" />
-                        <path d="M10 10V8C10 6.9 10.9 6 12 6C13.1 6 14 6.9 14 8V10" stroke="#22D3EE" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
+                      <ExternalLink className="w-8 h-8 text-cyan-400" />
                     </div>
 
                     <h3 className="text-lg font-bold text-white text-center mb-2 font-[family-name:var(--font-orbitron),sans-serif]">
-                      Completa tu pago de forma segura
+                      Ábrelo en tu navegador
                     </h3>
 
-                    <p className="text-xs text-slate-400 text-center mb-6 max-w-xs leading-relaxed">
-                      Los navegadores de redes sociales no permiten pagos directos. Copia el enlace y pégalo en <span className="text-white font-medium">Safari</span> o <span className="text-white font-medium">Chrome</span>.
+                    <p className="text-xs text-slate-400 text-center mb-5 max-w-xs leading-relaxed">
+                      TikTok no permite pagos directos. Toca el botón para copiar el enlace y pégalo en <span className="text-white font-medium">Safari</span> o <span className="text-white font-medium">Chrome</span>.
                     </p>
 
-                    {/* Botón COPIAR ENLACE */}
+                    {/* Botón principal: COPIAR ENLACE */}
                     <motion.button
                       onClick={async () => {
                         const success = await copyToClipboard(copyLinkUrl);
@@ -657,7 +664,7 @@ export function PaywallModal() {
                       {linkCopied ? (
                         <>
                           <CheckCircle2 className="w-5 h-5" />
-                          ENLACE COPIADO ✓
+                          {'\u2713'} ENLACE COPIADO — Pégalo en tu navegador
                         </>
                       ) : (
                         <>
@@ -667,16 +674,29 @@ export function PaywallModal() {
                       )}
                     </motion.button>
 
-                    {/* Instrucciones paso a paso */}
+                    {/* Botón secundario: Abrir en Safari (segundo intento) */}
+                    <motion.button
+                      onClick={() => {
+                        trackEvent({
+                          event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+                          properties: { action: 'retry_open_browser', method: selectedMethod },
+                        });
+                        openInSystemBrowser(copyLinkUrl);
+                      }}
+                      className="w-full mt-2 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-sm font-medium flex items-center justify-center gap-2 hover:bg-white/[0.06] hover:border-white/20 transition-colors cursor-pointer"
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Abrir en Safari
+                    </motion.button>
+
+                    {/* Instrucciones post-copia */}
                     {linkCopied && (
                       <motion.div
                         className="mt-4 w-full space-y-2"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
-                        <p className="text-xs text-slate-400 text-center">
-                          Ahora pega el enlace en tu navegador:
-                        </p>
                         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
                           <span className="text-xs text-cyan-400 font-bold">1.</span>
                           <span className="text-xs text-slate-300">Abre Safari o Chrome</span>
@@ -692,11 +712,14 @@ export function PaywallModal() {
                       </motion.div>
                     )}
 
-                    {/* Badge de seguridad */}
-                    <div className="mt-5 flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06]">
-                      <Lock className="w-3 h-3 text-emerald-400" />
-                      <span className="text-[10px] text-slate-400">Pago seguro con Stripe</span>
-                      <Shield className="w-3 h-3 text-emerald-400" />
+                    {/* Info de vigencia + seguridad */}
+                    <div className="mt-5 w-full space-y-2">
+                      <p className="text-[10px] text-slate-500 text-center">El enlace es válido por 24 horas</p>
+                      <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06]">
+                        <Lock className="w-3 h-3 text-emerald-400" />
+                        <span className="text-[10px] text-slate-400">Pago seguro con Stripe</span>
+                        <Shield className="w-3 h-3 text-emerald-400" />
+                      </div>
                     </div>
                   </motion.div>
                 )}

@@ -8,9 +8,9 @@
 
 'use client';
 
-import { motion } from 'framer-motion';
-import { Lock, Sparkles, Crown, Zap } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Sparkles, Crown, Zap, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 import {
   trackEvent, INTERNAL_EVENTS, ttViewContent, ttClickButton,
@@ -47,6 +47,35 @@ export function PremiumBlur({
   const { isPremium, isLoading, showPaywall } = usePremiumContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [showRestoreInput, setShowRestoreInput] = useState(false);
+  const [restoreEmail, setRestoreEmail] = useState('');
+  const [restoreState, setRestoreState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRestore = useCallback(async () => {
+    const emailToCheck = restoreEmail.trim().toLowerCase();
+    if (!emailToCheck || !emailToCheck.includes('@') || !emailToCheck.includes('.')) return;
+
+    setRestoreState('loading');
+    try {
+      const res = await fetch('/api/payments/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailToCheck }),
+      });
+      const data = await res.json();
+      if (data.isPremium) {
+        setRestoreState('success');
+        document.cookie = `sensipro_premium=${encodeURIComponent(emailToCheck)}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+        localStorage.setItem('sensipro_premium_email', emailToCheck);
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        setRestoreState('error');
+      }
+    } catch {
+      setRestoreState('error');
+    }
+  }, [restoreEmail]);
 
   // Track blur shown once per source — must be before early returns
   useEffect(() => {
@@ -233,34 +262,82 @@ export function PremiumBlur({
         </motion.div>
 
         {/* Restaurar acceso para usuarios que ya compraron */}
-        <motion.button
-          onClick={() => {
-            const userEmail = prompt('Ingresa el email con el que compraste:');
-            if (userEmail && userEmail.includes('@')) {
-              fetch('/api/payments/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail }),
-              })
-                .then(r => r.json())
-                .then(data => {
-                  if (data.isPremium) {
-                    document.cookie = `sensipro_premium=${encodeURIComponent(userEmail)}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
-                    localStorage.setItem('sensipro_premium_email', userEmail);
-                    window.location.reload();
-                  } else {
-                    alert('No encontramos una licencia premium con ese email.');
-                  }
-                })
-                .catch(() => alert('Error verificando. Intenta de nuevo.'));
-            }
-          }}
+        <motion.div
+          className="mt-3 flex flex-col items-center w-full max-w-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
         >
-          ¿Ya compraste? Restaurar acceso
-        </motion.button>
+          {!showRestoreInput ? (
+            <button
+              onClick={() => {
+                setShowRestoreInput(true);
+                setRestoreState('idle');
+                setRestoreEmail('');
+                setTimeout(() => restoreInputRef.current?.focus(), 200);
+              }}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer underline underline-offset-2"
+            >
+              ¿Ya compraste? Restaurar acceso
+            </button>
+          ) : (
+            <AnimatePresence mode="wait">
+              {restoreState === 'success' ? (
+                <motion.div
+                  key="success"
+                  className="flex items-center gap-2 text-xs text-emerald-400"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Acceso restaurado</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="form"
+                  className="w-full space-y-2"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                >
+                  <div className="flex gap-2">
+                    <input
+                      ref={restoreInputRef}
+                      type="email"
+                      value={restoreEmail}
+                      onChange={(e) => { setRestoreEmail(e.target.value); setRestoreState('idle'); }}
+                      onKeyDown={(e) => e.key === 'Enter' && handleRestore()}
+                      placeholder="tu@email.com"
+                      className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500/50 transition-colors"
+                      disabled={restoreState === 'loading'}
+                    />
+                    <button
+                      onClick={handleRestore}
+                      disabled={restoreState === 'loading' || !restoreEmail.includes('@')}
+                      className="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-medium hover:bg-cyan-500/30 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {restoreState === 'loading' ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        'Restaurar'
+                      )}
+                    </button>
+                  </div>
+                  {restoreState === 'error' && (
+                    <motion.p
+                      className="flex items-center gap-1 text-[10px] text-red-400"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      <XCircle className="w-3 h-3" />
+                      No encontramos una compra con ese email
+                    </motion.p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+        </motion.div>
       </motion.div>
 
     </div>
