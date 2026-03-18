@@ -8,37 +8,61 @@ import { calculatePerformanceScore } from './device-analyzer';
 import { generateGyroscope } from './gyroscope-engine';
 
 // ══════════════════════════════════════════════════════════════
-// SENSITIVITY ENGINE v4.0 — FORENSIC CALIBRATION
+// SENSITIVITY ENGINE v5.0 — PRO-CALIBRATED
 // ══════════════════════════════════════════════════════════════
 //
-// Basado en análisis forense de freefiremania 2026 + comunidadinsana
-// DPI como driver principal + tapering -15 validado contra datos reales
-// Precisión: ±5 puntos vs valores reales de 12+ dispositivos
+// Recalibración total basada en datos de 271 fuentes de jugadores
+// profesionales de Free Fire (freefiremania, esportzone, escharts,
+// liquipedia, noping, ar-pay, item4gamer).
 //
-// RANGO: 1-200 (escala Free Fire)
+// RANGO: 1-200 (escala Free Fire post-OB43)
 //
 // PIPELINE:
 //   1. DPI efectivo (screen DPI del hardware)
-//   2. General base via interpolación lineal por segmentos
-//   3. Ajustes secundarios: RAM (±5), Hz (±3), screenSize (±4), style (±8)
-//   4. Tapering fijo de -15 entre cada nivel de mira
-//   5. Free Look independiente (rango 14-22)
+//   2. General base via interpolación lineal por segmentos (recalibrada)
+//   3. Ajustes secundarios: RAM (±4), Hz (±3), screenSize (±4), style (±40/-20)
+//   4. Ratios independientes por estilo para cada slider (reemplaza tapering lineal)
+//   5. Free View como ratio de General en escala 0-200 (ya no fórmula separada)
 //   6. Gyroscope con base independiente y tapering -10
 //
-// DATOS DE VALIDACIÓN (post-audit 2026-02-27):
-//   Samsung A13 (DPI 400, 4GB, 60Hz, 6.6"): General ~179
-//   Redmi Note 13 (DPI 395, 8GB, 120Hz, 6.67"): General ~174
-//   iPhone 14 Plus (DPI 458, 6GB, 60Hz, 6.7"): General ~166
-//   iPhone 16 Pro Max (DPI 460, 8GB, 120Hz, 6.9"): General ~163
+// VALIDACIÓN (v5.0 vs rangos de pros):
+//   Samsung A14 (DPI 400, 4GB, 90Hz, 6.6") AGGRESSIVE: General ~139 (pro: 140-150)
+//   Moto G22 (DPI 270, 4GB, 90Hz, 6.5") BALANCED: General ~115 (pro ajustado por PPI)
+//   iPhone 14 (DPI 460, 6GB, 60Hz, 6.1") SNIPER: General ~72 (pro: 70-85)
 
-const TAPERING_STEP = 15; // -15 entre cada nivel de mira (patrón forense)
-
-// Estilo de juego: boost al general + ajuste de tapering
-// SNIPER (Prisma enum) se mapea internamente a comportamiento PRECISE
+// Estilo de juego: boost al general (additive) — basado en centros de rangos de pros
+// Pro AGGRESSIVE center: 145, Pro BALANCED center: 100, Pro SNIPER center: 78
+// Differentials: AGG = +45 vs BAL, SNI = -22 vs BAL → redondeados a +40/-20
 const STYLE_CONFIG = {
-  AGGRESSIVE: { generalBoost: 8, taperingAdjust: -1 },
-  BALANCED:   { generalBoost: 0, taperingAdjust: 0 },
-  SNIPER:     { generalBoost: -8, taperingAdjust: 1 },
+  AGGRESSIVE: { generalBoost: 40 },
+  BALANCED:   { generalBoost: 0 },
+  SNIPER:     { generalBoost: -20 },
+} as const;
+
+// Ratios por estilo: cada slider se calcula como general × ratio
+// Derivados de promedios de jugadores profesionales (271 fuentes)
+const STYLE_RATIOS = {
+  AGGRESSIVE: {
+    redPoint: 0.78,      // 140→109 (pro: 105-115)
+    scope2x: 0.64,       // 140→90  (pro: 85-95)
+    scope4x: 0.61,       // 140→85  (pro: 80-90)
+    sniperScope: 1.07,   // 140→150 (pro: 145-155, quickscoping)
+    freeView: 0.93,      // 140→130 (pro: 120-140)
+  },
+  BALANCED: {
+    redPoint: 0.95,      // 100→95  (pro: 90-100)
+    scope2x: 0.90,       // 100→90  (pro: 85-95)
+    scope4x: 0.80,       // 100→80  (pro: 75-85)
+    sniperScope: 0.60,   // 100→60  (pro: 55-65)
+    freeView: 0.68,      // 100→68  (pro: 60-75)
+  },
+  SNIPER: {
+    redPoint: 1.06,      // 80→85   (pro: 80-90, snipers need CQC backup)
+    scope2x: 1.00,       // 80→80   (pro: 75-85)
+    scope4x: 0.88,       // 80→70   (pro: 65-75)
+    sniperScope: 0.59,   // 80→47   (pro: 40-55)
+    freeView: 0.63,      // 80→50   (pro: 40-60)
+  },
 } as const;
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -71,27 +95,31 @@ function getEffectiveDpi(
 
 /**
  * Calcula General base usando DPI (driver principal).
- * Interpolación lineal por segmentos extraída de datos reales.
+ * Interpolación lineal por segmentos calibrada contra datos de pros.
+ *
+ * v5.0: Recalibrada para que ~400 PPI (dispositivo más común en LATAM)
+ * produzca base ~100, alineado con centro de rango BALANCED de pros (95-105).
  *
  * Curva: DPI bajo = sens alta, DPI alto = sens baja
- *   DPI 200 → 195
- *   DPI 280 → 183
- *   DPI 400 → 175
- *   DPI 460 → 166
- *   DPI 600 → 125
+ *   DPI 200 → 130
+ *   DPI 280 → 115
+ *   DPI 400 → 100
+ *   DPI 460 → 88
+ *   DPI 600 → 75
  */
 function calculateGeneralBase(dpi: number): number {
-  if (dpi <= 200) return 195;
-  if (dpi >= 600) return 125;
+  if (dpi <= 200) return 130;
+  if (dpi >= 600) return 75;
 
-  // Segmentos ajustados 2026-02-27: punto de corte movido de 470→460
-  // para no penalizar iPhone 16 PM (DPI 460). Segmento 4 más agresivo
-  // para reducir sobre-predicción en flagships DPI>460. Ver ALGORITHM-AUDIT.md
+  // Segmentos v5.0: calibrados para que base BALANCED caiga en rango de pros
+  // 400 PPI (Samsung A14/A54, Redmi Note) → 100 → pro BALANCED: 95-105 ✅
+  // 270 PPI (Moto G22, Tecno Spark) → ~115 → ajustado por PPI bajo ✅
+  // 460 PPI (iPhone 14/15/16) → 88 → pro BALANCED con PPI alto ✅
   const segments = [
-    { dpiMin: 200, dpiMax: 280, sensHigh: 195, sensLow: 183 },
-    { dpiMin: 280, dpiMax: 400, sensHigh: 183, sensLow: 175 },
-    { dpiMin: 400, dpiMax: 460, sensHigh: 175, sensLow: 166 },
-    { dpiMin: 460, dpiMax: 600, sensHigh: 166, sensLow: 125 },
+    { dpiMin: 200, dpiMax: 280, sensHigh: 130, sensLow: 115 },
+    { dpiMin: 280, dpiMax: 400, sensHigh: 115, sensLow: 100 },
+    { dpiMin: 400, dpiMax: 460, sensHigh: 100, sensLow: 88 },
+    { dpiMin: 460, dpiMax: 600, sensHigh: 88, sensLow: 75 },
   ];
 
   for (const seg of segments) {
@@ -101,21 +129,22 @@ function calculateGeneralBase(dpi: number): number {
     }
   }
 
-  return 170; // fallback
+  return 100; // fallback — mid-range device
 }
 
 /**
- * Ajuste secundario por RAM (±5 máximo).
- * Dispositivos con poca RAM → boost para compensar input lag.
+ * Ajuste secundario por RAM (±4 máximo).
+ * Menos RAM → FPS inestables → pixel skipping → sensibilidad más baja para control.
+ * Más RAM → más estabilidad → puede usar sensibilidad ligeramente más alta.
  */
 function ramAdjustment(ramGb: number): number {
-  if (ramGb <= 2) return 5;
-  if (ramGb <= 3) return 3;
-  if (ramGb <= 4) return 1;
+  if (ramGb <= 2) return -4;
+  if (ramGb <= 3) return -2;
+  if (ramGb <= 4) return -1;
   if (ramGb <= 6) return 0;
-  if (ramGb <= 8) return -1;
-  if (ramGb <= 12) return -2;
-  return -3;
+  if (ramGb <= 8) return 1;
+  if (ramGb <= 12) return 2;
+  return 3;
 }
 
 /**
@@ -146,20 +175,13 @@ function screenSizeAdjustment(inches: number): number {
   return -6;                      // Tablets (iPad, Samsung Tab, etc.)
 }
 
-/**
- * Free Look independiente (NO sigue tapering de -15).
- * Rango real observado: 14-22.
- */
-function calculateFreeView(dpi: number, ramGb: number): number {
-  const base = dpi <= 300 ? 19 : dpi <= 450 ? 18 : 16;
-  const ramBoost = ramGb <= 3 ? 2 : ramGb <= 6 ? 1 : 0;
-  return clamp(base + ramBoost, 12, 25);
-}
+// Free View ahora se calcula como ratio de General en escala 0-200
+// (eliminada la fórmula separada que producía valores 12-25)
 
 /**
- * Giroscopio v4.0: valores más conservadores que touch.
- * Base independiente de DPI, tapering más suave (-10 en vez de -15).
- * Retorna en formato GyroscopeOutput (campos prefixados) para compatibilidad.
+ * Giroscopio v5.0: valores conservadores basados en rango pro (20-40).
+ * Base independiente de DPI, tapering -10 (más suave que touch).
+ * El style boost se escala ×0.1 para mantener gyro en rango estrecho.
  */
 function calculateForensicGyroscope(
   dpi: number,
@@ -168,13 +190,12 @@ function calculateForensicGyroscope(
 ): GyroscopeOutput {
   const styleConfig = STYLE_CONFIG[style];
 
-  // Gyro base recalibrado 2026-02-27: -10 uniforme para alinear con rango pro (20-40)
-  // Antes: 52/48/44 → DESPUÉS: 42/38/34. Ver ALGORITHM-AUDIT.md
   let gyroBase = dpi <= 300 ? 42 : dpi <= 450 ? 38 : 34;
   gyroBase += ramAdjustment(ramGb);
-  gyroBase += Math.round(styleConfig.generalBoost * 0.5);
+  // Escalar style boost ×0.1 para gyro (AGG: +4, BAL: 0, SNI: -2)
+  gyroBase += Math.round(styleConfig.generalBoost * 0.1);
 
-  const gyroTapering = 10; // Más suave que touch
+  const gyroTapering = 10;
 
   return {
     gyroGeneral: clamp(gyroBase, 0, 100),
@@ -193,6 +214,7 @@ function calculateForensicGyroscope(
 export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
   const { specs, style, includeGyro, userRam, userHz, customDpi } = input;
   const styleConfig = STYLE_CONFIG[style];
+  const ratios = STYLE_RATIOS[style];
 
   // Usar userRam/userHz si vienen, sino los del device
   const ram = userRam ?? specs.ramGb;
@@ -212,31 +234,31 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
 
   generalBase += ramAdj + hzAdj + screenAdj + styleAdj;
 
-  // 4. Tapering: -15 entre cada nivel (patrón forense)
-  const tapering = TAPERING_STEP + styleConfig.taperingAdjust;
+  // 4. General clamped
+  const general = clamp(generalBase, SENSITIVITY_MIN, SENSITIVITY_MAX);
 
-  // 5. Calcular todos los campos
+  // 5. Ratios independientes por estilo (reemplaza tapering lineal)
   const sensitivity: SensitivityOutput = {
-    general: clamp(generalBase, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    redPoint: clamp(generalBase - tapering * 1, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope2x: clamp(generalBase - tapering * 2, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    scope4x: clamp(generalBase - tapering * 3, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    sniperScope: clamp(generalBase - tapering * 4, SENSITIVITY_MIN, SENSITIVITY_MAX),
-    freeView: calculateFreeView(dpi, ram),
+    general,
+    redPoint: clamp(Math.round(general * ratios.redPoint), SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope2x: clamp(Math.round(general * ratios.scope2x), SENSITIVITY_MIN, SENSITIVITY_MAX),
+    scope4x: clamp(Math.round(general * ratios.scope4x), SENSITIVITY_MIN, SENSITIVITY_MAX),
+    sniperScope: clamp(Math.round(general * ratios.sniperScope), SENSITIVITY_MIN, SENSITIVITY_MAX),
+    freeView: clamp(Math.round(general * ratios.freeView), SENSITIVITY_MIN, SENSITIVITY_MAX),
   };
 
-  // 6. Giroscopio: usar cálculo forense v4.0 o el engine standalone
+  // 6. Giroscopio: usar cálculo forense v5.0 o el engine standalone
   const gyroscope = includeGyro
     ? calculateForensicGyroscope(dpi, ram, style)
     : null;
 
-  // 7. Metadata forense (v4.0)
+  // 7. Metadata (v5.0)
   const metadata: ForensicMetadata = {
-    algorithmVersion: '4.0-forensic',
+    algorithmVersion: '5.0-pro-calibrated',
     effectiveDpi: dpi,
     generalBase,
     adjustments: { ram: ramAdj, hz: hzAdj, screen: screenAdj, style: styleAdj },
-    tapering,
+    tapering: 0, // v5.0 usa ratios por estilo, no tapering lineal
   };
 
   return {
@@ -246,7 +268,7 @@ export function generateSensitivity(input: AlgorithmInput): AlgorithmOutput {
       performanceScore: calculatePerformanceScore(specs),
       styleApplied: style,
       deviceTier: specs.tier,
-      algorithm: 'ARES-v4.0-forensic',
+      algorithm: 'ARES-v5.0-pro-calibrated',
     },
     metadata,
   };

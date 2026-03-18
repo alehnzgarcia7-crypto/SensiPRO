@@ -6,7 +6,7 @@ import {
 import type { SensitivityOutput, GyroscopeOutput } from './types';
 
 // ═══════════════════════════════════════════════════════════
-// ARES GYROSCOPE ENGINE v4.0
+// ARES GYROSCOPE ENGINE v5.0
 // ═══════════════════════════════════════════════════════════
 //
 // RANGO: 0-100 (giroscopio en Free Fire, pros usan 20-40)
@@ -15,24 +15,24 @@ import type { SensitivityOutput, GyroscopeOutput } from './types';
 //   gyroValue = sensitivityValue × GYRO_FACTOR[field]
 //   clamped a [0, 100]
 //
-// FACTORES v4.0 (recalibrados para sensitivity engine v4.0):
-//   v4.0 produce valores en rango ~120-190 (vs v3.0's ~80-110)
-//   Factores reducidos para mantener gyro en rango pro (20-40)
+// FACTORES v5.0 (recalibrados para sensitivity engine v5.0):
+//   v5.0 produce valores en rango ~70-150 (vs v4.0's ~120-190)
+//   Factores aumentados proporcionalmente para mantener gyro en rango pro (20-40)
 //
-// FreeView: como v4.0 freeView es independiente y bajo (14-22),
-//   gyroFreeView se calcula como fracción de gyroGeneral.
+// FreeView: v5.0 freeView ahora está en escala 0-200 (antes 12-25),
+//   así que gyroFreeView se calcula normalmente con su factor.
 //
 // NOTA: Giroscopio es feature PREMIUM. Los valores se calculan
 // siempre pero solo se muestran a usuarios Premium/VIP.
 
 // Factores de conversión sensitivity → gyroscope por campo
-// Calibrados para v4.0: general ~175 → gyro ~30, sniperScope ~115 → gyro ~23
+// Calibrados para v5.0: general ~100 → gyro ~30, sniperScope ~60 → gyro ~18
 const GYRO_FACTOR: Record<keyof Omit<GyroscopeOutput, 'gyroFreeView'>, { sensField: keyof SensitivityOutput; factor: number }> = {
-  gyroGeneral:  { sensField: 'general',      factor: 0.17 },
-  gyroRedPoint: { sensField: 'redPoint',     factor: 0.19 },
-  gyroScope2x:  { sensField: 'scope2x',      factor: 0.19 },
-  gyroScope4x:  { sensField: 'scope4x',      factor: 0.20 },
-  gyroSniper:   { sensField: 'sniperScope',   factor: 0.20 },
+  gyroGeneral:  { sensField: 'general',      factor: 0.30 },
+  gyroRedPoint: { sensField: 'redPoint',     factor: 0.32 },
+  gyroScope2x:  { sensField: 'scope2x',      factor: 0.32 },
+  gyroScope4x:  { sensField: 'scope4x',      factor: 0.34 },
+  gyroSniper:   { sensField: 'sniperScope',   factor: 0.34 },
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -48,9 +48,8 @@ export function generateGyroscope(sensitivity: SensitivityOutput): GyroscopeOutp
     result[key] = clamp(sensValue * config.factor, GYRO_MIN, GYRO_MAX);
   }
 
-  // FreeView gyro: v4.0 freeView es bajo (14-22), así que derivamos
-  // de gyroGeneral en vez de aplicar factor sobre freeView
-  result.gyroFreeView = clamp(Math.round(result.gyroGeneral * 0.55), 5, 25);
+  // FreeView gyro: v5.0 freeView está en escala 0-200, aplicar factor directo
+  result.gyroFreeView = clamp(Math.round(sensitivity.freeView * 0.30), 5, 50);
 
   return result;
 }

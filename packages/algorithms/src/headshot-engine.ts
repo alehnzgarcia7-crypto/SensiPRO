@@ -72,25 +72,31 @@ function calculateFireButton(
 function calculateHeadshotScore(specs: DeviceSpecs, sensitivity: SensitivityOutput): number {
   let score = 50;
 
-  // Refresh rate: 120Hz+ = mejor para headshots
-  if (specs.screenHz >= 120) score += 15;
-  else if (specs.screenHz >= 90) score += 8;
+  // Refresh rate: 120Hz+ ayuda con headshots (reducido de +15 a +10)
+  if (specs.screenHz >= 120) score += 10;
+  else if (specs.screenHz >= 90) score += 5;
 
   // Panel: AMOLED/OLED/LTPO mejor touch response
-  if (specs.panelType === 'AMOLED' || specs.panelType === 'OLED' || specs.panelType === 'LTPO') score += 10;
+  if (specs.panelType === 'AMOLED' || specs.panelType === 'OLED' || specs.panelType === 'LTPO') score += 8;
 
-  // Red Dot sensitivity en sweet spot (170-195) = +10
-  if (sensitivity.redPoint >= 170 && sensitivity.redPoint <= 195) score += 10;
-  else if (sensitivity.redPoint >= 150) score += 5;
+  // Relación General/RedPoint: la diferencia ideal para headshots es RedPoint ~80-120
+  // Los pros de headshot usan redPoint en rango 85-120 dependiendo del estilo
+  if (sensitivity.redPoint >= 85 && sensitivity.redPoint <= 120) score += 10;
+  else if (sensitivity.redPoint >= 70 && sensitivity.redPoint <= 140) score += 5;
 
-  // General sensitivity alta pero no max = +5
-  if (sensitivity.general >= 180 && sensitivity.general < 200) score += 5;
+  // General en rango competitivo (80-150) = +5
+  if (sensitivity.general >= 80 && sensitivity.general <= 150) score += 5;
 
   // Screen size 6-6.7 = sweet spot para drag
   if (specs.screenSize >= 6.0 && specs.screenSize <= 6.7) score += 5;
 
   // Tier bonus
   if (specs.tier === 'GAMING' || specs.tier === 'ULTRA') score += 5;
+
+  // Style bonus: detectar si es configuración orientada a headshots
+  // (redPoint cercano a general = configuración de headshot)
+  const rpGeneralRatio = sensitivity.redPoint / Math.max(sensitivity.general, 1);
+  if (rpGeneralRatio >= 0.9 && rpGeneralRatio <= 1.1) score += 5;
 
   return Math.min(100, Math.max(0, score));
 }
