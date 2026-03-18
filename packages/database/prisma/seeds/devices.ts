@@ -37,6 +37,10 @@ export const samsungDevices: DeviceSeed[] = [
   { brand: 'Samsung', model: 'Galaxy S24+', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy S24', screenHz: 120, screenSize: 6.2, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 2400', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy S24 FE', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 2400e', releaseYear: 2024, isPopular: true },
+  // Galaxy S25 Series (2025)
+  { brand: 'Samsung', model: 'Galaxy S25 Ultra', screenHz: 120, screenSize: 6.9, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: true },
+  { brand: 'Samsung', model: 'Galaxy S25+', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: true },
+  { brand: 'Samsung', model: 'Galaxy S25', screenHz: 120, screenSize: 6.2, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: true },
   // Galaxy S23 Series (2023)
   { brand: 'Samsung', model: 'Galaxy S23 Ultra', screenHz: 120, screenSize: 6.8, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy S23+', screenHz: 120, screenSize: 6.6, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
@@ -57,6 +61,7 @@ export const samsungDevices: DeviceSeed[] = [
   { brand: 'Samsung', model: 'Galaxy S20', screenHz: 120, screenSize: 6.2, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 990', releaseYear: 2020, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy S20 FE', screenHz: 120, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 865', releaseYear: 2020, isPopular: false },
   // Galaxy A Series (MUY populares en LATAM)
+  { brand: 'Samsung', model: 'Galaxy A56', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1580', releaseYear: 2025, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A55', screenHz: 120, screenSize: 6.6, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1480', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A54', screenHz: 120, screenSize: 6.4, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1380', releaseYear: 2023, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A53', screenHz: 120, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 1280', releaseYear: 2022, isPopular: true },
@@ -72,9 +77,11 @@ export const samsungDevices: DeviceSeed[] = [
   { brand: 'Samsung', model: 'Galaxy A22', screenHz: 90, screenSize: 6.4, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G80', releaseYear: 2021, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A15', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99', releaseYear: 2023, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A15 5G', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 6100+', releaseYear: 2023, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy A16', screenHz: 90, screenSize: 6.7, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A14', screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G80', releaseYear: 2023, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A13', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 850', releaseYear: 2022, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A12', screenHz: 60, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2020, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy A06', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G85', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A05', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G85', releaseYear: 2023, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy A05s', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 680', releaseYear: 2023, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A04', screenHz: 60, screenSize: 6.5, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2022, isPopular: false },
@@ -86,8 +93,10 @@ export const samsungDevices: DeviceSeed[] = [
   { brand: 'Samsung', model: 'Galaxy M55', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 1', releaseYear: 2024, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy M54', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1380', releaseYear: 2023, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy M34', screenHz: 120, screenSize: 6.5, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 1280', releaseYear: 2023, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy M35', screenHz: 120, screenSize: 6.6, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 1380', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy M33', screenHz: 120, screenSize: 6.6, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Exynos 1280', releaseYear: 2022, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy M14', screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 1330', releaseYear: 2023, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy M15', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 6100+', releaseYear: 2024, isPopular: true },
   { brand: 'Samsung', model: 'Galaxy M13', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 850', releaseYear: 2022, isPopular: false },
   // Galaxy F Series (populares en mercados emergentes)
   { brand: 'Samsung', model: 'Galaxy F54', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1380', releaseYear: 2023, isPopular: false },
@@ -101,6 +110,8 @@ export const samsungDevices: DeviceSeed[] = [
   // Galaxy Tab (tablets populares para FF)
   { brand: 'Samsung', model: 'Galaxy Tab S9 FE', screenHz: 90, screenSize: 10.9, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Exynos 1380', releaseYear: 2023, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy Tab A9', screenHz: 90, screenSize: 8.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G99', releaseYear: 2023, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy Tab S9+', screenHz: 120, screenSize: 12.4, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy Tab S9 Ultra', screenHz: 120, screenSize: 14.6, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
   // Galaxy Note (aun usados)
   { brand: 'Samsung', model: 'Galaxy Note 20 Ultra', screenHz: 120, screenSize: 6.9, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 865+', releaseYear: 2020, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy Note 20', screenHz: 60, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 865+', releaseYear: 2020, isPopular: false },
@@ -134,6 +145,8 @@ export const samsungDevices: DeviceSeed[] = [
 // =============================================================================
 export const xiaomiDevices: DeviceSeed[] = [
   // Xiaomi Flagship
+  { brand: 'Xiaomi', model: '15 Pro', screenHz: 120, screenSize: 6.73, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2024, isPopular: false },
+  { brand: 'Xiaomi', model: '15', screenHz: 120, screenSize: 6.36, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
   { brand: 'Xiaomi', model: '14 Ultra', screenHz: 120, screenSize: 6.73, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Xiaomi', model: '14', screenHz: 120, screenSize: 6.36, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Xiaomi', model: '13T Pro', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9200+', releaseYear: 2023, isPopular: false },
@@ -216,6 +229,8 @@ export const pocoDevices: DeviceSeed[] = [
   // POCO F Series (flagship killer)
   { brand: 'POCO', model: 'F6 Pro', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8s Gen 3', releaseYear: 2024, isPopular: true },
   { brand: 'POCO', model: 'F6', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8s Gen 3', releaseYear: 2024, isPopular: true },
+  { brand: 'POCO', model: 'F7 Pro', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2025, isPopular: false },
+  { brand: 'POCO', model: 'F7', screenHz: 120, screenSize: 6.83, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8s Gen 4', releaseYear: 2025, isPopular: false },
   { brand: 'POCO', model: 'F5 Pro', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8+ Gen 1', releaseYear: 2023, isPopular: false },
   { brand: 'POCO', model: 'F5', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7+ Gen 2', releaseYear: 2023, isPopular: true },
   { brand: 'POCO', model: 'F4 GT', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 1', releaseYear: 2022, isPopular: false },
@@ -223,12 +238,15 @@ export const pocoDevices: DeviceSeed[] = [
   { brand: 'POCO', model: 'F3', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 870', releaseYear: 2021, isPopular: false },
   // POCO X Series
   { brand: 'POCO', model: 'X6 Pro', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8300 Ultra', releaseYear: 2024, isPopular: true },
+  { brand: 'POCO', model: 'X7 Pro', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 8400 Ultra', releaseYear: 2025, isPopular: true },
+  { brand: 'POCO', model: 'X7', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7300 Ultra', releaseYear: 2025, isPopular: true },
   { brand: 'POCO', model: 'X6', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 2', releaseYear: 2024, isPopular: false },
   { brand: 'POCO', model: 'X5 Pro', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 778G', releaseYear: 2023, isPopular: false },
   { brand: 'POCO', model: 'X5', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2023, isPopular: false },
   { brand: 'POCO', model: 'X4 Pro', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2022, isPopular: false },
   // POCO M Series
   { brand: 'POCO', model: 'M6 Pro', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99 Ultra', releaseYear: 2023, isPopular: false },
+  { brand: 'POCO', model: 'M7 Pro 5G', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7025 Ultra', releaseYear: 2024, isPopular: false },
   { brand: 'POCO', model: 'M5s', screenHz: 90, screenSize: 6.43, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G95', releaseYear: 2022, isPopular: false },
   { brand: 'POCO', model: 'M5', screenHz: 90, screenSize: 6.58, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G99', releaseYear: 2022, isPopular: false },
   { brand: 'POCO', model: 'M4 Pro', screenHz: 90, screenSize: 6.43, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G96', releaseYear: 2022, isPopular: false },
@@ -298,6 +316,7 @@ export const appleDevices: DeviceSeed[] = [
   { brand: 'Apple', model: 'iPhone 16 Pro', screenHz: 120, screenSize: 6.3, ramGb: 8, panelType: 'OLED', tier: 'GAMING', chipset: 'A18 Pro', releaseYear: 2024, isPopular: true },
   { brand: 'Apple', model: 'iPhone 16 Plus', screenHz: 60, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'A18', releaseYear: 2024, isPopular: false },
   { brand: 'Apple', model: 'iPhone 16', screenHz: 60, screenSize: 6.1, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'A18', releaseYear: 2024, isPopular: true },
+  { brand: 'Apple', model: 'iPhone 16e', screenHz: 60, screenSize: 6.1, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'A18', releaseYear: 2025, isPopular: true },
   // iPhone 15 Series (2023)
   { brand: 'Apple', model: 'iPhone 15 Pro Max', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'GAMING', chipset: 'A17 Pro', releaseYear: 2023, isPopular: true },
   { brand: 'Apple', model: 'iPhone 15 Pro', screenHz: 120, screenSize: 6.1, ramGb: 8, panelType: 'OLED', tier: 'GAMING', chipset: 'A17 Pro', releaseYear: 2023, isPopular: true },
@@ -307,16 +326,21 @@ export const appleDevices: DeviceSeed[] = [
   { brand: 'Apple', model: 'iPhone 14 Pro Max', screenHz: 120, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'GAMING', chipset: 'A16 Bionic', releaseYear: 2022, isPopular: false },
   { brand: 'Apple', model: 'iPhone 14 Pro', screenHz: 120, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'GAMING', chipset: 'A16 Bionic', releaseYear: 2022, isPopular: false },
   { brand: 'Apple', model: 'iPhone 14', screenHz: 60, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'HIGH', chipset: 'A15 Bionic', releaseYear: 2022, isPopular: false },
+  { brand: 'Apple', model: 'iPhone 14 Plus', screenHz: 60, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'HIGH', chipset: 'A15 Bionic', releaseYear: 2022, isPopular: true },
   // iPhone 13 Series (2021)
   { brand: 'Apple', model: 'iPhone 13 Pro Max', screenHz: 120, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'GAMING', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
-  { brand: 'Apple', model: 'iPhone 13 Pro', screenHz: 120, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'HIGH', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
+  { brand: 'Apple', model: 'iPhone 13 Pro', screenHz: 120, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'GAMING', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
   { brand: 'Apple', model: 'iPhone 13', screenHz: 60, screenSize: 6.1, ramGb: 4, panelType: 'OLED', tier: 'HIGH', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
   { brand: 'Apple', model: 'iPhone 13 Mini', screenHz: 60, screenSize: 5.4, ramGb: 4, panelType: 'OLED', tier: 'MID', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
   // iPhone 12 Series (2020)
   { brand: 'Apple', model: 'iPhone 12 Pro Max', screenHz: 60, screenSize: 6.7, ramGb: 6, panelType: 'OLED', tier: 'HIGH', chipset: 'A14 Bionic', releaseYear: 2020, isPopular: false },
   { brand: 'Apple', model: 'iPhone 12', screenHz: 60, screenSize: 6.1, ramGb: 4, panelType: 'OLED', tier: 'MID', chipset: 'A14 Bionic', releaseYear: 2020, isPopular: false },
+  { brand: 'Apple', model: 'iPhone 12 Pro', screenHz: 60, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'HIGH', chipset: 'A14 Bionic', releaseYear: 2020, isPopular: true },
+  { brand: 'Apple', model: 'iPhone 12 Mini', screenHz: 60, screenSize: 5.4, ramGb: 4, panelType: 'OLED', tier: 'MID', chipset: 'A14 Bionic', releaseYear: 2020, isPopular: false },
   // iPhone 11 y SE (aun activos)
   { brand: 'Apple', model: 'iPhone 11', screenHz: 60, screenSize: 6.1, ramGb: 4, panelType: 'LCD', tier: 'MID', chipset: 'A13 Bionic', releaseYear: 2019, isPopular: false },
+  { brand: 'Apple', model: 'iPhone 11 Pro', screenHz: 60, screenSize: 5.8, ramGb: 4, panelType: 'OLED', tier: 'HIGH', chipset: 'A13 Bionic', releaseYear: 2019, isPopular: false },
+  { brand: 'Apple', model: 'iPhone 11 Pro Max', screenHz: 60, screenSize: 6.5, ramGb: 4, panelType: 'OLED', tier: 'HIGH', chipset: 'A13 Bionic', releaseYear: 2019, isPopular: false },
   { brand: 'Apple', model: 'iPhone SE (2022)', screenHz: 60, screenSize: 4.7, ramGb: 4, panelType: 'LCD', tier: 'MID', chipset: 'A15 Bionic', releaseYear: 2022, isPopular: false },
   { brand: 'Apple', model: 'iPhone SE (2020)', screenHz: 60, screenSize: 4.7, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'A13 Bionic', releaseYear: 2020, isPopular: false },
 ];
@@ -327,9 +351,11 @@ export const appleDevices: DeviceSeed[] = [
 export const realmeDevices: DeviceSeed[] = [
   // Realme GT Series
   { brand: 'Realme', model: 'GT5 Pro', screenHz: 144, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
+  { brand: 'Realme', model: 'GT 6', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8s Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Realme', model: 'GT Neo 5', screenHz: 144, screenSize: 6.74, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8+ Gen 1', releaseYear: 2023, isPopular: false },
   { brand: 'Realme', model: 'GT Neo 3', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8100', releaseYear: 2022, isPopular: false },
-  // Realme 12/11/10 Series
+  // Realme 13/12/11/10 Series
+  { brand: 'Realme', model: '13 Pro+', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 2', releaseYear: 2024, isPopular: false },
   { brand: 'Realme', model: '12 Pro+', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 2', releaseYear: 2024, isPopular: false },
   { brand: 'Realme', model: '12 Pro', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 6 Gen 1', releaseYear: 2024, isPopular: false },
   { brand: 'Realme', model: '12', screenHz: 120, screenSize: 6.72, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99 Ultra', releaseYear: 2024, isPopular: false },
@@ -353,6 +379,8 @@ export const realmeDevices: DeviceSeed[] = [
   { brand: 'Realme', model: 'Narzo 60 Pro', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7050', releaseYear: 2023, isPopular: false },
   { brand: 'Realme', model: 'Narzo 60', screenHz: 120, screenSize: 6.4, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 6020', releaseYear: 2023, isPopular: false },
   { brand: 'Realme', model: 'Narzo 50', screenHz: 120, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G96', releaseYear: 2022, isPopular: false },
+  // Realme Note
+  { brand: 'Realme', model: 'Note 50', screenHz: 90, screenSize: 6.74, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc Tiger T612', releaseYear: 2024, isPopular: false },
   // Mas Realme legacy
   { brand: 'Realme', model: '9 Pro+', screenHz: 90, screenSize: 6.4, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 920', releaseYear: 2022, isPopular: false },
   { brand: 'Realme', model: '9 Pro', screenHz: 120, screenSize: 6.6, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2022, isPopular: false },
@@ -446,6 +474,7 @@ export const tecnoDevices: DeviceSeed[] = [
 // =============================================================================
 export const honorDevices: DeviceSeed[] = [
   // Magic Series
+  { brand: 'Honor', model: 'Magic7 Pro', screenHz: 120, screenSize: 6.8, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
   { brand: 'Honor', model: 'Magic6 Pro', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Honor', model: 'Magic5 Pro', screenHz: 120, screenSize: 6.73, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
   // Honor Number Series
@@ -469,6 +498,8 @@ export const honorDevices: DeviceSeed[] = [
 // ONEPLUS (15 dispositivos)
 // =============================================================================
 export const oneplusDevices: DeviceSeed[] = [
+  { brand: 'OnePlus', model: '13', screenHz: 120, screenSize: 6.82, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
+  { brand: 'OnePlus', model: '13R', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2025, isPopular: false },
   { brand: 'OnePlus', model: '12', screenHz: 120, screenSize: 6.82, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'OnePlus', model: '12R', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2024, isPopular: false },
   { brand: 'OnePlus', model: '11', screenHz: 120, screenSize: 6.7, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
@@ -480,6 +511,7 @@ export const oneplusDevices: DeviceSeed[] = [
   { brand: 'OnePlus', model: 'Nord CE3 Lite', screenHz: 120, screenSize: 6.72, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2023, isPopular: false },
   { brand: 'OnePlus', model: 'Nord N30', screenHz: 120, screenSize: 6.72, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2023, isPopular: false },
   { brand: 'OnePlus', model: 'Nord 3', screenHz: 120, screenSize: 6.74, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 9000', releaseYear: 2023, isPopular: false },
+  { brand: 'OnePlus', model: 'Nord 4', screenHz: 120, screenSize: 6.74, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7+ Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'OnePlus', model: 'Nord 2T', screenHz: 90, screenSize: 6.43, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 1300', releaseYear: 2022, isPopular: false },
   { brand: 'OnePlus', model: 'Nord CE 2', screenHz: 90, screenSize: 6.43, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 900', releaseYear: 2022, isPopular: false },
   { brand: 'OnePlus', model: '9 Pro', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 888', releaseYear: 2021, isPopular: false },
@@ -499,6 +531,7 @@ export const vivoDevices: DeviceSeed[] = [
   { brand: 'Vivo', model: 'X90 Pro', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9200', releaseYear: 2023, isPopular: false },
   // V Series
   { brand: 'Vivo', model: 'V30 Pro', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 3', releaseYear: 2024, isPopular: false },
+  { brand: 'Vivo', model: 'V40', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Vivo', model: 'V30', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 7 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'Vivo', model: 'V29', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2023, isPopular: false },
   { brand: 'Vivo', model: 'V27', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7200', releaseYear: 2023, isPopular: false },
@@ -514,6 +547,7 @@ export const vivoDevices: DeviceSeed[] = [
   { brand: 'Vivo', model: 'T2 Pro', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7200', releaseYear: 2023, isPopular: false },
   // iQOO (sub-marca gaming)
   { brand: 'Vivo', model: 'iQOO 12', screenHz: 144, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
+  { brand: 'Vivo', model: 'iQOO 13', screenHz: 144, screenSize: 6.82, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2024, isPopular: false },
   { brand: 'Vivo', model: 'iQOO Neo 9', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2024, isPopular: false },
   { brand: 'Vivo', model: 'iQOO Z9', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7200', releaseYear: 2024, isPopular: false },
   // Mas Vivo budget
@@ -578,6 +612,7 @@ export const googleDevices: DeviceSeed[] = [
   { brand: 'Google', model: 'Pixel 9 Pro XL', screenHz: 120, screenSize: 6.8, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Tensor G4', releaseYear: 2024, isPopular: false },
   { brand: 'Google', model: 'Pixel 9 Pro', screenHz: 120, screenSize: 6.3, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Tensor G4', releaseYear: 2024, isPopular: false },
   { brand: 'Google', model: 'Pixel 9', screenHz: 120, screenSize: 6.3, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Tensor G4', releaseYear: 2024, isPopular: false },
+  { brand: 'Google', model: 'Pixel 9a', screenHz: 120, screenSize: 6.3, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Tensor G4', releaseYear: 2025, isPopular: false },
   { brand: 'Google', model: 'Pixel 8 Pro', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Tensor G3', releaseYear: 2023, isPopular: false },
   { brand: 'Google', model: 'Pixel 8', screenHz: 120, screenSize: 6.2, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Tensor G3', releaseYear: 2023, isPopular: false },
   { brand: 'Google', model: 'Pixel 8a', screenHz: 120, screenSize: 6.1, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Tensor G3', releaseYear: 2024, isPopular: false },
@@ -721,11 +756,12 @@ export const budgetBrandDevices: DeviceSeed[] = [
   { brand: 'Apple', model: 'iPad 10th Gen', screenHz: 60, screenSize: 10.9, ramGb: 4, panelType: 'LCD', tier: 'MID', chipset: 'A14 Bionic', releaseYear: 2022, isPopular: false },
   { brand: 'Apple', model: 'iPad Air M2', screenHz: 60, screenSize: 10.9, ramGb: 8, panelType: 'LCD', tier: 'HIGH', chipset: 'Apple M2', releaseYear: 2024, isPopular: false },
   { brand: 'Apple', model: 'iPad Mini 6th Gen', screenHz: 60, screenSize: 8.3, ramGb: 4, panelType: 'LCD', tier: 'MID', chipset: 'A15 Bionic', releaseYear: 2021, isPopular: false },
+  { brand: 'Apple', model: 'iPad Pro M4 11"', screenHz: 120, screenSize: 11.0, ramGb: 8, panelType: 'OLED', tier: 'GAMING', chipset: 'Apple M4', releaseYear: 2024, isPopular: false },
   // Mas Samsung Galaxy S legacy
   { brand: 'Samsung', model: 'Galaxy S9+', screenHz: 60, screenSize: 6.2, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 9810', releaseYear: 2018, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy S9', screenHz: 60, screenSize: 5.8, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 9810', releaseYear: 2018, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy S8+', screenHz: 60, screenSize: 6.2, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 8895', releaseYear: 2017, isPopular: false },
-  { brand: 'Samsung', model: 'Galaxy S8', screenHz: 60, screenSize: 5.8, ramGb: 4, panelType: 'AMOLED', tier: 'LOW', chipset: 'Exynos 8895', releaseYear: 2017, isPopular: false },
+  { brand: 'Samsung', model: 'Galaxy S8', screenHz: 60, screenSize: 5.8, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 8895', releaseYear: 2017, isPopular: false },
   // Mas Samsung Galaxy Tab
   { brand: 'Samsung', model: 'Galaxy Tab S9', screenHz: 120, screenSize: 11.0, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy Tab S6 Lite (2024)', screenHz: 60, screenSize: 10.4, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 1280', releaseYear: 2024, isPopular: false },

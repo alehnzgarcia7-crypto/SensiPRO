@@ -24,7 +24,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Cómo Funciona SensiPRO | La Ciencia de tu Sensibilidad',
   description:
-    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 503+ dispositivos y 271 fuentes de jugadores profesionales.',
+    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 537+ dispositivos y 271 fuentes de jugadores profesionales.',
   keywords: [
     'como funciona sensipro',
     'algoritmo sensibilidad free fire',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cómo Funciona SensiPRO — La Ciencia de tu Sensibilidad',
     description:
-      'Algoritmo ARES v5.0: 503+ dispositivos, 271 fuentes pro, sensibilidad calibrada para TU celular.',
+      'Algoritmo ARES v5.0: 537+ dispositivos, 271 fuentes pro, sensibilidad calibrada para TU celular.',
   },
 };
 
@@ -42,7 +42,7 @@ const FEATURES = [
   {
     icon: Target,
     title: 'Generador',
-    description: 'Sensibilidad personalizada para 503+ dispositivos con 3 estilos y 3 calibraciones.',
+    description: 'Sensibilidad personalizada para 537+ dispositivos con 3 estilos y 3 calibraciones.',
     color: '#ff6a00',
   },
   {
@@ -78,7 +78,7 @@ const FEATURES = [
 ] as const;
 
 const STATS = [
-  { value: '503+', label: 'Dispositivos en la base de datos', icon: Smartphone },
+  { value: '537+', label: 'Dispositivos en la base de datos', icon: Smartphone },
   { value: '26', label: 'Marcas de celulares', icon: Zap },
   { value: '271', label: 'Fuentes de datos profesionales', icon: Users },
   { value: 'v5.0', label: 'Versión del algoritmo ARES', icon: Cpu },
@@ -146,7 +146,7 @@ export default function ComoFuncionaPage() {
 
         <div className="space-y-3 text-sm text-slate-300 leading-relaxed">
           <p>
-            SensiPRO tiene una base de datos de 503 celulares con las
+            SensiPRO tiene una base de datos de 537 celulares con las
             especificaciones REALES verificadas contra GSMArena: tamaño de
             pantalla, densidad de píxeles, RAM, tasa de refresco, tipo de panel.
           </p>
@@ -160,7 +160,7 @@ export default function ComoFuncionaPage() {
         {/* Mini stats */}
         <div className="mt-5 grid grid-cols-3 gap-3">
           {[
-            { value: '503+', label: 'Dispositivos verificados' },
+            { value: '537+', label: 'Dispositivos verificados' },
             { value: '271', label: 'Fuentes de datos pro' },
             { value: 'v5.0', label: 'Versión del algoritmo' },
           ].map((s) => (

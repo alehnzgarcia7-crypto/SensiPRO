@@ -81,7 +81,7 @@ const SECTION_CARDS = [
 ] as const;
 
 const STATS = [
-  { value: '503+', label: 'Dispositivos', icon: Smartphone },
+  { value: '537+', label: 'Dispositivos', icon: Smartphone },
   { value: '17', label: 'Features Headshot', icon: Crosshair },
   { value: '11', label: 'Guías completas', icon: BookOpen },
   { value: '24', label: 'Tips de pros', icon: Lightbulb },
