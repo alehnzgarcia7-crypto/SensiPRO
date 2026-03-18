@@ -1,25 +1,27 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES-305 — Sitemap dinámico de Academia
-// Genera sitemap XML con todas las guías publicadas + páginas estáticas
+// Genera sitemap XML con guías de guide-content.ts + páginas estáticas
 // ═══════════════════════════════════════════════════════════════
 
-import { prisma } from '@ares/database';
 import type { MetadataRoute } from 'next';
+
+import { ALL_GUIDE_SLUGS } from '@/lib/academy/guide-content';
 
 const BASE_URL = 'https://sensibilidadespro.com';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const guides = await prisma.guide.findMany({
-    where: { isPublished: true },
-    select: { slug: true, updatedAt: true },
-  });
-
+export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${BASE_URL}/academy`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/academy/como-funciona`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/academy/guides`,
@@ -47,9 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const guidePages: MetadataRoute.Sitemap = guides.map((guide) => ({
-    url: `${BASE_URL}/academy/guides/${guide.slug}`,
-    lastModified: guide.updatedAt,
+  const guidePages: MetadataRoute.Sitemap = ALL_GUIDE_SLUGS.map((slug) => ({
+    url: `${BASE_URL}/academy/guides/${slug}`,
+    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
   }));

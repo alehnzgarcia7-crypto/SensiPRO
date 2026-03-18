@@ -263,16 +263,46 @@ const configuracionHud: GuideData = {
       ],
     },
     {
+      id: 'codigos-hud',
+      title: 'Códigos HUD reales para copiar',
+      blocks: [
+        {
+          type: 'text',
+          content: 'Estos son códigos HUD REALES de Free Fire que puedes copiar y pegar directo en el juego. Cada uno está optimizado para diferente cantidad de dedos y estilo de juego.',
+        },
+        {
+          type: 'table',
+          headers: ['Dedos', 'Estilo', 'Código'],
+          rows: [
+            ['2 Dedos', 'Clásico Básico', '#FFHUDT6O3jSJjT59Po7eO'],
+            ['2 Dedos', 'Precisión Alta', '#FFHUDT6O3jqVY6q1Po7eM'],
+            ['3 Dedos', 'Balanceado', '#FFHUDT6O3jqVY6q1Po7eP'],
+            ['3 Dedos', 'Rush Master', '#FFHUDT6O3jldUm9NPo7eP'],
+            ['3 Dedos', 'Competitivo', '#FFHUDT6O3jlCbzSRPo7eM'],
+            ['4 Dedos', 'Garra Estándar', '#FFHUDT6O3jqVY6q1Po7eO'],
+            ['4 Dedos', 'Garra Precisión', '#FFHUDT6O3jlCbzSRPo7eO'],
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'pro-tip',
+          content: 'Si apenas estás empezando con una cantidad de dedos nueva, usa el código marcado como "Básico" o "Estándar". Después de 1-2 semanas, prueba los más competitivos.',
+        },
+      ],
+    },
+    {
       id: 'aplicar-hud',
       title: 'Cómo aplicar un código HUD en Free Fire',
       blocks: [
         {
           type: 'ordered-list',
           items: [
+            'Copia el código completo (incluyendo el #)',
             'Abre Free Fire',
             'Ve a Ajustes (ícono de engranaje)',
             'Selecciona "En Partida" o "Controles"',
-            'Pega el código en la sección de HUD',
+            'Busca la opción "Importar" o "Pegar código"',
+            'Pega el código y confirma',
             'Entra a una partida de entrenamiento para probar',
           ],
         },
@@ -599,21 +629,24 @@ const giroscopioGuia: GuideData = {
           content: 'Modo recomendado: "Scope activado" (solo se activa cuando usas mira, no todo el tiempo)',
         },
         {
+          type: 'text',
+          content: 'Los valores de giroscopio en Free Fire van de 0 a 100. Son MUCHO más bajos que los de sensibilidad de toque. No te asustes si ves números "pequeños" — así es como funciona.',
+        },
+        {
           type: 'table',
-          headers: ['Parámetro', 'Valor sugerido'],
+          headers: ['Parámetro', 'Gama baja (60Hz)', 'Gama media (90Hz)', 'Gama alta (120Hz)'],
           rows: [
-            ['Giroscopio', 'Scope activado'],
-            ['Sensibilidad gyro general', '250-300'],
-            ['Sensibilidad gyro red point', '280-320'],
-            ['Sensibilidad gyro scope 2x', '300-340'],
-            ['Sensibilidad gyro scope 4x', '310-350'],
-            ['Sensibilidad gyro AWM', '320-360'],
+            ['Gyro General', '20-30', '25-35', '30-42'],
+            ['Gyro Punto Rojo', '15-25', '18-28', '22-32'],
+            ['Gyro Mira 2x', '10-18', '12-22', '15-25'],
+            ['Gyro Mira 4x', '5-12', '8-15', '10-18'],
+            ['Gyro AWM', '3-8', '5-10', '8-12'],
           ],
         },
         {
           type: 'callout',
           variant: 'importante',
-          content: 'Estos valores son puntos de partida. El giroscopio es MUY personal — ajusta según cómo se sienta en TU celular. La sensibilidad del gyro es INDEPENDIENTE de tu sensibilidad de toque.',
+          content: 'Estos valores son puntos de partida calculados por ARES v5.0. El giroscopio es MUY personal — ajusta según cómo se sienta en TU celular. Nota: la escala de gyro es 0-100, no 0-200 como la sensibilidad de toque.',
         },
       ],
     },
@@ -978,7 +1011,7 @@ const armasSensibilidad: GuideData = {
     },
     {
       id: 'smgs',
-      title: 'SMGs (MP40, UMP, Vector)',
+      title: 'SMGs (MP40, UMP, MAC10, Thompson-X)',
       blocks: [
         {
           type: 'text',
@@ -988,11 +1021,15 @@ const armasSensibilidad: GuideData = {
           type: 'text',
           content: 'La MP40 es la reina del close range. Con SMGs necesitas sensibilidad general REACTIVA — que te permita girar rápido si el enemigo está a tu lado. Aquí la sensibilidad general alta sí ayuda.',
         },
+        {
+          type: 'text',
+          content: 'La MAC10 recibió buffs de daño y precisión en OB52 — es una alternativa sólida a la MP40 con cargador más grande. La Thompson-X ganó +8% tasa de fuego y +15% alcance, haciéndola más versátil a media distancia.',
+        },
       ],
     },
     {
       id: 'snipers',
-      title: 'Snipers (AWM, Kar98k, M14)',
+      title: 'Snipers y Marksman (AWM, Kar98k, Winchester)',
       blocks: [
         {
           type: 'text',
@@ -1001,6 +1038,10 @@ const armasSensibilidad: GuideData = {
         {
           type: 'text',
           content: 'Con snipers, tu sensibilidad de scope 4x y scope AWM son CRÍTICAS. Deben ser BAJAS — mucho más bajas que tu general. Si tu AWM scope está en 50, cuando zoomas y el enemigo está lejos, un movimiento mínimo de tu dedo mueve la mira un montón. Bájala a 20-35.',
+        },
+        {
+          type: 'text',
+          content: 'La Winchester es nueva en OB52 y entró directamente a S-tier. Es un rifle marksman de ráfagas de 2 disparos. Usa scope 4x y necesita sensibilidad de 4x estable y baja — similar al Kar98k.',
         },
         {
           type: 'callout',
@@ -1036,14 +1077,360 @@ const armasSensibilidad: GuideData = {
             ['MP40', 'Sin scope', 'General alta', 'J-drag', 'Velocidad'],
             ['AWM', 'AWM scope', 'Scope AWM muy baja', 'Rotation', 'Precisión 1 tiro'],
             ['Kar98k', '4x', 'Scope 4x baja', 'Rotation', 'Precisión rápida'],
+            ['Winchester', '4x', 'Scope 4x baja', 'Vertical', 'Ráfagas precisas'],
             ['M1887', 'Sin scope', 'General alta', 'Flick', 'Reacción'],
             ['SCAR', '2x', 'Scope 2x media', 'Vertical', 'Balance'],
+            ['MAC10', 'Sin scope', 'General alta', 'J-drag', 'DPS close range'],
+            ['Thompson-X', 'Red Point', 'Red Point media', 'J-drag', 'Versatilidad'],
+            ['Desert Eagle', 'Sin scope', 'General alta', 'Flick', 'One-tap secondary'],
           ],
         },
       ],
     },
   ],
   relatedSlugs: ['sensibilidad-perfecta', 'headshots-consistentes', 'drag-shot-tecnicas'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// GUÍA 9: Combos de Personajes
+// ═══════════════════════════════════════════════════════════════
+
+const combosPersonajes: GuideData = {
+  slug: 'combos-personajes',
+  title: 'Combos de Personajes: Qué Equipar Según tu Estilo',
+  category: 'Combate',
+  categoryColor: '#ef4444',
+  difficulty: 'Intermedio',
+  readTime: 8,
+  intro: 'En Free Fire tu activa define tu estilo y tus pasivas cubren los huecos. La diferencia entre un jugador bueno y uno que da miedo es saber qué combo usar según la situación.',
+  sections: [
+    {
+      id: 'como-funcionan',
+      title: 'Cómo funcionan los combos en Free Fire',
+      blocks: [
+        {
+          type: 'text',
+          content: 'Puedes equipar 1 habilidad activa + 3 pasivas (o 4 pasivas sin activa). Tu activa define qué haces: Alok para versatilidad, Tatsuya para agresión, Skyler para destruir coberturas. Tus pasivas cubren los huecos.',
+        },
+        {
+          type: 'callout',
+          variant: 'dato-clave',
+          content: 'Tu activa define qué haces. Tus pasivas definen qué tan bien sobrevives haciéndolo. Tu mascota amplifica tu fortaleza principal.',
+        },
+      ],
+    },
+    {
+      id: 'combos-rusher',
+      title: 'Combos para Rusher / Agresivo',
+      blocks: [
+        {
+          type: 'text',
+          content: '<strong>RUSHER IMPARABLE:</strong> Alok (activa) + Jota + D-Bee + Hayato | Mascota: Detective Panda',
+        },
+        {
+          type: 'text',
+          content: 'Activas Alok y te olvidas — cura + velocidad 10 segundos. Jota + Panda te dan ~50 HP por cada kill. D-Bee te da +35% precisión moviéndote. Hayato rompe chalecos cuando te queda poca vida. Ideal para 2 dedos y ranked.',
+        },
+        {
+          type: 'text',
+          content: '<strong>FANTASMA VELOZ:</strong> Tatsuya (activa) + Jota + D-Bee + Dasha | Mascota: Rockie',
+        },
+        {
+          type: 'text',
+          content: 'Dash instantáneo con Tatsuya, eliminar, el dash se resetea, repetir. Dasha sube la cadencia de fuego con cada knock. Rockie reduce el cooldown del dash. Apareces y desapareces como fantasma. Ideal para 3-4 dedos y Clash Squad.',
+        },
+        {
+          type: 'text',
+          content: '<strong>TANQUE DE ASALTO:</strong> Xayne (activa) + Jota + Hayato + D-Bee | Mascota: Detective Panda',
+        },
+        {
+          type: 'text',
+          content: 'Xayne te da +70 HP temporales (buffed OB52) — entras con 270+ HP efectivos. Jota + Panda curan por kills. Hayato penetra chalecos. Entras como tanque y sales con más vida. Ideal para 4 dedos agresivos.',
+        },
+      ],
+    },
+    {
+      id: 'combos-ranked',
+      title: 'Combos para Balanceado / Ranked',
+      blocks: [
+        {
+          type: 'text',
+          content: '<strong>RANKED ESTÁNDAR:</strong> Alok (activa) + Jota + Kelly + Andrew | Mascota: Mr. Waggor',
+        },
+        {
+          type: 'text',
+          content: 'El combo gold-standard para ranked. Alok cura al equipo, Kelly te mueve rápido, Andrew protege tu armadura en peleas largas. Mr. Waggor te salva con Gloo Walls en círculos finales. Simple, efectivo, nunca falla. Ideal para principiantes-intermedios.',
+        },
+        {
+          type: 'text',
+          content: '<strong>ESCUDO PERFECTO:</strong> Chrono (activa) + Jota + D-Bee + Hayato | Mascota: Rockie',
+        },
+        {
+          type: 'text',
+          content: 'Chrono crea un escudo que bloquea 600 de daño — tú disparas desde adentro. Con 4 dedos puedes activar Chrono en el momento exacto que te disparan. La defensa perfecta que también ataca.',
+        },
+        {
+          type: 'callout',
+          variant: 'pro-tip',
+          content: 'Para ranked, el combo Alok + Jota + Kelly + Andrew es el más seguro. Si no sabes qué usar, empieza con ese.',
+        },
+      ],
+    },
+    {
+      id: 'combos-sniper',
+      title: 'Combos para Francotirador / Sniper',
+      blocks: [
+        {
+          type: 'text',
+          content: '<strong>SOMBRA LETAL:</strong> Alok (activa) + Rafael + Laura + Maro | Mascota: Mr. Waggor',
+        },
+        {
+          type: 'text',
+          content: 'Laura +60% precisión con scope. Rafael silencia tu sniper — nadie sabe de dónde disparas. Maro +25% daño a distancia. Un solo disparo letal desde la sombra. Ideal para 2 dedos y jugadores pacientes.',
+        },
+        {
+          type: 'text',
+          content: '<strong>CADENA LETAL:</strong> Skyler (activa) + Maro + Moco + Rafael | Mascota: Mr. Waggor',
+        },
+        {
+          type: 'text',
+          content: 'Moco marca al primer disparo, Maro activa +28% daño contra marcados, Rafael te mantiene invisible, Skyler destruye Gloo Walls para que no se cubran. La cadena letal completa. Ideal para 3-4 dedos experimentados.',
+        },
+        {
+          type: 'text',
+          content: '<strong>ZERO BOTONES (4 pasivas):</strong> Rafael + Moco + Rin Yagami + Maro | Mascota: Mr. Waggor',
+        },
+        {
+          type: 'text',
+          content: 'Cero botones que activar. Todo funciona solo mientras tú solo apuntas y disparas. El combo sniper más elegante del juego. Ideal para 4 dedos que quieren 100% enfoque en aim.',
+        },
+      ],
+    },
+    {
+      id: 'combos-cs',
+      title: 'Combos para Clash Squad',
+      blocks: [
+        {
+          type: 'text',
+          content: '<strong>CS DOMINANTE:</strong> Tatsuya (activa) + Wolfrahh + Luna + D-Bee | Mascota: Rockie',
+        },
+        {
+          type: 'text',
+          content: 'Dash dirigido, Wolfrahh amplifica headshots por cada kill, Luna dispara más rápido, D-Bee precisión moviéndote. En Clash Squad donde cada ronda importa, este combo escala con cada eliminación. Ideal para 4 dedos y alto nivel.',
+        },
+        {
+          type: 'callout',
+          variant: 'importante',
+          content: 'En Clash Squad los combos de alto skill ceiling (Tatsuya, Wolfrahh) brillan más porque las rondas son cortas y cada kill cuenta.',
+        },
+      ],
+    },
+    {
+      id: 'mascotas',
+      title: 'Mascotas: cuál elegir y por qué',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            '<strong>Rockie</strong> — Reduce cooldown de tu activa 15%. Si tu build depende de Alok, Skyler o Tatsuya, Rockie la hace más disponible. El más versátil.',
+            '<strong>Mr. Waggor</strong> — Genera 1 Gloo Wall gratis cada 100s cuando tienes 0. Te salva en círculos finales. El mejor para Battle Royale.',
+            '<strong>Detective Panda</strong> — +10 HP por cada kill. Con Jota = ~50 HP por eliminación. El combo más roto para rushers.',
+            '<strong>Falco</strong> — +50% velocidad de planeo para todo el squad. Domina el early game. Perfecto para squads coordinados.',
+            '<strong>Spirit Fox</strong> — +10 HP extra al usar medkit. Buena para builds de sustain con K o Maxim.',
+          ],
+        },
+      ],
+    },
+  ],
+  relatedSlugs: ['headshots-consistentes', 'transicion-dedos', 'armas-sensibilidad'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// GUÍA 10: Transición de 2 a 3 Dedos
+// ═══════════════════════════════════════════════════════════════
+
+const transicionDedos: GuideData = {
+  slug: 'transicion-dedos',
+  title: 'Cómo Pasar de 2 a 3 Dedos sin Morir en el Intento',
+  category: 'HUD',
+  categoryColor: '#a855f7',
+  difficulty: 'Intermedio',
+  readTime: 7,
+  intro: 'Con 2 dedos solo puedes hacer 2 cosas a la vez. Con 3 puedes mover + apuntar + disparar al mismo tiempo. Es el salto más grande que puedes dar en Free Fire. Aquí te guiamos paso a paso.',
+  sections: [
+    {
+      id: 'por-que-3-dedos',
+      title: 'Por qué 3 dedos cambia todo',
+      blocks: [
+        {
+          type: 'text',
+          content: 'Con 2 dedos solo puedes mover + apuntar O apuntar + disparar. Con 3 dedos puedes mover + apuntar + disparar al mismo tiempo. Eso desbloquea el Peek & Fire (asomarte y disparar simultáneamente) y el J-Drag se vuelve devastador.',
+        },
+        {
+          type: 'text',
+          content: 'El 3 dedos es el estándar competitivo de Free Fire LATAM. No necesitas 4 para ser bueno — 3 es suficiente para llegar a Heroico.',
+        },
+      ],
+    },
+    {
+      id: 'rendimiento-baja',
+      title: 'Tu rendimiento VA A BAJAR las primeras 48-72 horas',
+      blocks: [
+        {
+          type: 'text',
+          content: 'Es NORMAL. Tu cerebro está aprendiendo a coordinar un dedo nuevo. NO vuelvas a 2 dedos — aguanta. En 3-5 días ya se siente natural. En 2 semanas eres mejor que antes con 2 dedos.',
+        },
+        {
+          type: 'callout',
+          variant: 'error',
+          content: 'NO practiques en ranked las primeras 48 horas. Usa Training Ground y partidas casual. Te vas a frustrar y vas a querer volver a 2 dedos — resiste.',
+        },
+      ],
+    },
+    {
+      id: 'plan-transicion',
+      title: 'Plan de transición paso a paso',
+      blocks: [
+        {
+          type: 'ordered-list',
+          items: [
+            '<strong>Día 1-2:</strong> Solo agacharte con el índice. No cambies nada más. Juega normalmente con 2 pulgares pero tu índice derecho solo se agacha. Acostúmbrate a tener el dedo ahí.',
+            '<strong>Día 3-4:</strong> Agacharse + disparar. Coordina: el índice agacha mientras el pulgar dispara. Practica en Training Ground 15 min antes de jugar.',
+            '<strong>Día 5-7:</strong> J-Drag con 3 dedos. El pulgar derecho hace el drag, el índice maneja agacharse y scope. Empieza Clash Squad casual.',
+            '<strong>Semana 2:</strong> Añade cambiar arma al índice. Progresivamente mueve más acciones al tercer dedo hasta que todo sea natural.',
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'pro-tip',
+          content: 'Solo mueve 1 acción a la vez al tercer dedo. Si intentas cambiar todo de golpe, tu cerebro se sobrecarga y abandonas.',
+        },
+      ],
+    },
+    {
+      id: 'hud-3-dedos',
+      title: 'Cómo configurar tu HUD para 3 dedos',
+      blocks: [
+        {
+          type: 'text',
+          content: 'El botón de agacharse va arriba a la derecha — donde tu índice descansa naturalmente. El botón de disparo se queda donde está para el pulgar. El scope va cerca del agacharse para que el índice acceda a ambos.',
+        },
+        {
+          type: 'text',
+          content: 'El tamaño del botón de disparo para 3 dedos debe ser ~52% (SensiPRO lo calcula según tu pantalla). En el Headshot Mode y en la guía de HUD puedes encontrar códigos HUD listos para 3 dedos.',
+        },
+      ],
+    },
+    {
+      id: 'errores-cambio',
+      title: 'Errores comunes al cambiar de dedos',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            '<strong>Volver a 2 dedos después de 1 día malo</strong> — Dale al menos 5 días completos. SIEMPRE.',
+            '<strong>Cambiar todo el HUD de golpe</strong> — Solo mueve 1 botón a la vez. Tu cerebro no puede procesar 5 cambios simultáneos.',
+            '<strong>Practicar en ranked</strong> — Usa Training Ground y casual las primeras 48h. No arruines tu rank por impaciente.',
+            '<strong>Botón de disparo muy arriba</strong> — Debe estar donde el pulgar descansa naturalmente, no donde el índice está.',
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'dato-clave',
+          content: 'El error #1 es rendirse el día 2. El 90% de la gente que lo intenta y falla, falla porque no aguantó la primera semana.',
+        },
+      ],
+    },
+  ],
+  relatedSlugs: ['configuracion-hud', 'combos-personajes', 'drag-shot-tecnicas'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// GUÍA 11: Crosshair Placement
+// ═══════════════════════════════════════════════════════════════
+
+const crosshairPlacement: GuideData = {
+  slug: 'crosshair-placement',
+  title: 'Crosshair Placement: El Secreto que Nadie te Enseña',
+  category: 'Combate',
+  categoryColor: '#ef4444',
+  difficulty: 'Principiante',
+  readTime: 5,
+  intro: 'El 90% de los jugadores caminan mirando al suelo. Esto les cuesta medio segundo en cada fight — y en Free Fire, medio segundo = muerte. La solución es estúpidamente simple.',
+  sections: [
+    {
+      id: 'error-numero-1',
+      title: 'El error #1 de Free Fire',
+      blocks: [
+        {
+          type: 'text',
+          content: 'El 90% de los jugadores caminan con el crosshair apuntando a las rodillas del enemigo. Cuando ven a alguien, tienen que mover la mira desde las rodillas hasta la cabeza — eso tarda medio segundo.',
+        },
+        {
+          type: 'text',
+          content: 'La solución: SIEMPRE mantén el crosshair a la altura de la cabeza del enemigo, incluso cuando caminas. Cuando aparezca alguien, ya estás apuntando.',
+        },
+      ],
+    },
+    {
+      id: 'reglas-oro',
+      title: 'Las 3 reglas de oro',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            '<strong>REGLA 1 — DE PIE:</strong> Tu crosshair va a la altura de los ojos del enemigo. No al pecho, no al cuello — a los OJOS.',
+            '<strong>REGLA 2 — AGACHADO:</strong> Si el enemigo está agachado, baja tu mira al nivel del cuello de un personaje de pie. Esa es la cabeza de alguien agachado.',
+            '<strong>REGLA 3 — GLOO WALL:</strong> Pre-apunta a donde va a salir la cabeza cuando se asome. A la derecha o izquierda de la wall, a la altura correcta. Cuando se asome, solo disparas.',
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'pro-tip',
+          content: 'Camina mirando las esquinas y puertas a la altura de la cabeza. Cuando alguien aparezca, ya estás apuntando correctamente.',
+        },
+      ],
+    },
+    {
+      id: 'pre-aim',
+      title: 'Pre-aim: apuntar antes de ver',
+      blocks: [
+        {
+          type: 'text',
+          content: 'Pre-aim es poner tu crosshair donde CREES que va a estar la cabeza del enemigo ANTES de verlo. En puertas, esquinas, detrás de walls, spots comunes.',
+        },
+        {
+          type: 'text',
+          content: 'Si pre-apuntas a una puerta a la altura de la cabeza y alguien sale corriendo, tu tiempo de reacción pasa de "ver → apuntar → disparar" a solo "ver → disparar". Te ahorras 200-300 milisegundos.',
+        },
+        {
+          type: 'callout',
+          variant: 'dato-clave',
+          content: '200-300 milisegundos no suena a mucho. Pero en Free Fire es la diferencia entre hacer headshot o que TE hagan headshot.',
+        },
+      ],
+    },
+    {
+      id: 'como-practicar',
+      title: 'Cómo practicar crosshair placement',
+      blocks: [
+        {
+          type: 'ordered-list',
+          items: [
+            'En Training Ground, camina por todo el mapa manteniendo el crosshair a la altura de los maniquíes. No dispares — solo camina y mantén la altura.',
+            'En partidas casual, enfócate SOLO en mantener el crosshair alto. No te preocupes por ganar — enfócate en nunca mirar al suelo.',
+            'Después de 3-4 días, se vuelve automático. Tu cerebro lo hace sin pensar.',
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'pro-tip',
+          content: 'Haz esto 5 minutos antes de cada sesión de ranked. Es el warmup más efectivo que existe — y nadie lo hace.',
+        },
+      ],
+    },
+  ],
+  relatedSlugs: ['headshots-consistentes', 'drag-shot-tecnicas', 'sensibilidad-perfecta'],
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1059,6 +1446,9 @@ export const GUIDE_CONTENT: Record<string, GuideData> = {
   'drag-shot-tecnicas': dragShotTecnicas,
   'dpi-sensibilidad': dpiSensibilidad,
   'armas-sensibilidad': armasSensibilidad,
+  'combos-personajes': combosPersonajes,
+  'transicion-dedos': transicionDedos,
+  'crosshair-placement': crosshairPlacement,
 };
 
 export const ALL_GUIDE_SLUGS = Object.keys(GUIDE_CONTENT);

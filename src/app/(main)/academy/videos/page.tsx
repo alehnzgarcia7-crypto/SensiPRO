@@ -1,7 +1,7 @@
 'use client';
 
-import { Video, Play, Clock, Bell, CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Video, Play, Clock, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 // ═══════════════════════════════════════════════════════════════
 // Videos — Coming Soon premium design
@@ -62,17 +62,6 @@ const UPCOMING_VIDEOS: VideoCard[] = [
 ];
 
 export default function VideosPage() {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  function handleSubscribe(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    // Simulated subscription
-    setSubscribed(true);
-    setEmail('');
-  }
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -165,47 +154,26 @@ export default function VideosPage() {
         ))}
       </div>
 
-      {/* Newsletter CTA */}
+      {/* CTA to Guides */}
       <div
         className="glass-card p-6 text-center academy-stagger"
         style={{ animationDelay: '400ms' }}
       >
-        <Bell className="w-6 h-6 text-ice-400 mx-auto mb-3" />
+        <BookOpen className="w-6 h-6 text-ice-400 mx-auto mb-3" />
         <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-lg mb-2">
-          Suscríbete para saber cuando publiquemos el primer video
+          Los video tutoriales están en desarrollo
         </h3>
-
-        {subscribed ? (
-          <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-[family-name:var(--font-rajdhani)] font-medium">
-              Te avisaremos cuando estén listos
-            </span>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubscribe}
-            className="flex flex-col sm:flex-row items-center gap-3 max-w-md mx-auto mt-4"
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Tu email"
-              required
-              className="w-full glass-card !rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-ice-500/40 focus:outline-none focus:ring-1 focus:ring-ice-500/30 transition-colors min-h-[44px]"
-            />
-            <button
-              type="submit"
-              className="flex-shrink-0 px-6 py-3 rounded-xl text-white font-bold text-sm transition-all duration-200 min-h-[44px] hover:shadow-[0_0_20px_rgba(255,106,0,0.3)] hover:-translate-y-0.5"
-              style={{
-                background: 'linear-gradient(135deg, #ff6a00, #06b6d4)',
-              }}
-            >
-              Avisarme
-            </button>
-          </form>
-        )}
+        <p className="text-sm text-slate-400 mb-4">
+          Mientras tanto, explora nuestras guías escritas con contenido detallado.
+        </p>
+        <Link
+          href="/academy/guides"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold text-sm transition-all duration-200 min-h-[44px] hover:shadow-[0_0_20px_rgba(255,106,0,0.3)] hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg, #ff6a00, #06b6d4)' }}
+        >
+          <BookOpen className="w-4 h-4" />
+          Explorar Guías
+        </Link>
       </div>
     </div>
   );

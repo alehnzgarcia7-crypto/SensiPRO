@@ -1,24 +1,27 @@
 'use client';
 
-import { Lightbulb, Crosshair, PersonStanding, Settings } from 'lucide-react';
+import { Lightbulb, Crosshair, PersonStanding, Settings, Swords, Target } from 'lucide-react';
 import { useState } from 'react';
 
 import { PremiumBlur } from '@/components/paywall';
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
-// Tips hardcodeados — contenido REAL y ÚTIL de Free Fire
+// 24 Tips hardcodeados — contenido REAL y ÚTIL de Free Fire
+// 5 categorías: Puntería, Movimiento, Configuración, Armas, Estrategia
 // ═══════════════════════════════════════════════════════════════
+
+type TipCategory = 'Puntería' | 'Movimiento' | 'Configuración' | 'Armas' | 'Estrategia';
 
 interface Tip {
   id: number;
   title: string;
   content: string;
-  category: 'Puntería' | 'Movimiento' | 'Configuración';
+  category: TipCategory;
 }
 
 const TIPS: Tip[] = [
-  // Puntería (4)
+  // ─── Puntería (6) ───
   {
     id: 1,
     title: 'Apunta al pecho, no a la cabeza',
@@ -47,75 +50,163 @@ const TIPS: Tip[] = [
       'Cuando caminas, mantén el crosshair donde estaría la cabeza del enemigo. Así cuando aparece, ya estás apuntando.',
     category: 'Puntería',
   },
-  // Movimiento (4)
   {
     id: 5,
+    title: '10 min de Training Ground antes de ranked',
+    content:
+      'No saltes directo a ranked. 10 min de warmup marca la diferencia. Empieza con Red Dot, luego 4x.',
+    category: 'Puntería',
+  },
+  {
+    id: 6,
+    title: 'Pre-apunta a puertas y esquinas',
+    content:
+      'Antes de llegar a una puerta, pon el crosshair donde va a estar la cabeza del enemigo. Cuando aparezca, solo disparas.',
+    category: 'Puntería',
+  },
+  // ─── Movimiento (6) ───
+  {
+    id: 7,
     title: 'Nunca te quedes quieto en un 1v1',
     content:
       'Agáchate, muévete lateral, salta. Un blanco quieto es un blanco muerto.',
     category: 'Movimiento',
   },
   {
-    id: 6,
-    title: 'Usa gloo walls ofensivamente, no solo defensivamente',
+    id: 8,
+    title: 'Usa gloo walls ofensivamente',
     content:
-      'Pon una gloo y úsala para peekear. Es más útil que solo cubrirte.',
+      'Pon una gloo y úsala para peekear. Es más útil atacando que solo cubriéndote.',
     category: 'Movimiento',
   },
   {
-    id: 7,
+    id: 9,
     title: 'Practica el drop shot',
     content:
       'Agacharte mientras disparas confunde al enemigo. Funciona mejor con 3+ dedos.',
     category: 'Movimiento',
   },
   {
-    id: 8,
+    id: 10,
     title: 'El jiggle peek gana 1v1s',
     content:
       'Asómate y escóndete rápido para ver al enemigo sin que te pegue. Luego peekea y dispara.',
     category: 'Movimiento',
   },
-  // Configuración (4)
   {
-    id: 9,
+    id: 11,
+    title: 'Cambia de posición después de cada kill',
+    content:
+      'Si mataste a alguien desde un spot, su equipo ya sabe dónde estás. Muévete inmediatamente.',
+    category: 'Movimiento',
+  },
+  {
+    id: 12,
+    title: 'En 1v1, el que se agacha primero gana',
+    content:
+      'Agacharte baja tu hitbox y el spray enemigo pasa por encima. Combínalo con disparo y es devastador.',
+    category: 'Movimiento',
+  },
+  // ─── Configuración (6) ───
+  {
+    id: 13,
     title: 'Pon los gráficos en BAJO y el FPS en ALTO',
     content:
       'Más FPS = más suave = mejor puntería. Los gráficos bonitos no ganan partidas.',
     category: 'Configuración',
   },
   {
-    id: 10,
+    id: 14,
     title: 'Tu sensibilidad NO debe ser igual a la de un pro',
     content:
       'Ellos juegan en iPad con 120Hz. Tú en un Redmi con 60Hz. Necesitas TU sensibilidad.',
     category: 'Configuración',
   },
   {
-    id: 11,
+    id: 15,
     title: 'Revisa tu HUD cada mes',
     content:
       'Tus dedos se acostumbran y mejoran. Lo que funcionaba hace 2 meses puede mejorar hoy.',
     category: 'Configuración',
   },
   {
-    id: 12,
+    id: 16,
     title: 'Activa las notificaciones de enemigos cercanos',
     content:
       'En ajustes de sonido. Te avisa cuando hay pasos cerca. Muchos no saben que existe.',
     category: 'Configuración',
   },
+  {
+    id: 17,
+    title: 'El tamaño del botón de disparo importa',
+    content:
+      'Muy chico = fallas el botón. Muy grande = estorba. SensiPRO calcula el tamaño ideal para tu pantalla y dedos.',
+    category: 'Configuración',
+  },
+  {
+    id: 18,
+    title: 'Desactiva notificaciones mientras juegas',
+    content:
+      'Una notificación en medio de un 1v1 = muerte. Pon modo No Molestar antes de entrar a ranked.',
+    category: 'Configuración',
+  },
+  // ─── Armas (3) ───
+  {
+    id: 19,
+    title: 'MP40 + M4A1 es el combo más seguro de ranked',
+    content:
+      'MP40 para close range, M4A1 para mid-long. Cubres todas las distancias. El combo que usan el 70% de los pros LATAM.',
+    category: 'Armas',
+  },
+  {
+    id: 20,
+    title: 'Con M1887 solo tienes 2 disparos',
+    content:
+      'Si fallas los 2, estás muerto. Practica J-Drag en Training Ground hasta que aciertes 8 de 10.',
+    category: 'Armas',
+  },
+  {
+    id: 21,
+    title: 'Desert Eagle es la mejor secondary del juego',
+    content:
+      'One-tap a media distancia, buena cadencia. Si tu primary se queda sin balas, el switch es más rápido que recargar.',
+    category: 'Armas',
+  },
+  // ─── Estrategia (3) ───
+  {
+    id: 22,
+    title: 'En squad, cada quien tiene un rol',
+    content:
+      'No todos deben rushear. 1 rusher, 1 soporte, 1 sniper, 1 utility. Si todos rushean, nadie cubre la espalda.',
+    category: 'Estrategia',
+  },
+  {
+    id: 23,
+    title: 'Controla el centro del círculo',
+    content:
+      'El centro del siguiente círculo es la posición más fuerte. Llega primero, coloca walls, y deja que los demás vengan a ti.',
+    category: 'Estrategia',
+  },
+  {
+    id: 24,
+    title: 'No revivas en campo abierto',
+    content:
+      'Si tu compañero cae en campo abierto, NO vayas inmediatamente. El enemigo está esperando. Primero elimina la amenaza o pon walls.',
+    category: 'Estrategia',
+  },
 ];
 
-const CATEGORIES = ['Todos', 'Puntería', 'Movimiento', 'Configuración'] as const;
+const CATEGORIES = ['Todos', 'Puntería', 'Movimiento', 'Configuración', 'Armas', 'Estrategia'] as const;
 
 const CATEGORY_CONFIG: Record<
-  string,
+  TipCategory,
   { color: string; icon: React.ElementType; label: string }
 > = {
   Puntería: { color: '#06b6d4', icon: Crosshair, label: 'Puntería' },
   Movimiento: { color: '#22c55e', icon: PersonStanding, label: 'Movimiento' },
   Configuración: { color: '#f97316', icon: Settings, label: 'Configuración' },
+  Armas: { color: '#f59e0b', icon: Swords, label: 'Armas' },
+  Estrategia: { color: '#a855f7', icon: Target, label: 'Estrategia' },
 };
 
 export default function TipsPage() {
@@ -157,7 +248,7 @@ export default function TipsPage() {
       >
         {CATEGORIES.map((cat) => {
           const isActive = selectedCategory === cat;
-          const config = cat === 'Todos' ? null : CATEGORY_CONFIG[cat];
+          const config = cat === 'Todos' ? null : CATEGORY_CONFIG[cat as TipCategory];
           const color = config?.color ?? '#ff6a00';
 
           return (
@@ -191,7 +282,7 @@ export default function TipsPage() {
       {/* Tips por categoría — PREMIUM */}
       <PremiumBlur source="academy" intensity={12}>
       {Object.entries(grouped).map(([category, tips]) => {
-        const config = CATEGORY_CONFIG[category];
+        const config = CATEGORY_CONFIG[category as TipCategory];
         if (!config) return null;
         const Icon = config.icon;
 

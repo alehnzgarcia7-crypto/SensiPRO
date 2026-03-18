@@ -36,7 +36,7 @@ const SECTION_CARDS = [
     title: 'Guías Completas',
     description:
       'Guías paso a paso de sensibilidad, HUD, configuración gráfica y más. Desde principiante hasta pro.',
-    badge: '8 guías',
+    badge: '11 guías',
     gradient: 'from-fire-500/20 to-orange-500/10',
     iconBg: 'bg-fire-500/15 border-fire-500/20',
     iconColor: 'text-fire-400',
@@ -81,10 +81,10 @@ const SECTION_CARDS = [
 ] as const;
 
 const STATS = [
-  { value: '485+', label: 'Dispositivos', icon: Smartphone },
-  { value: '24', label: 'Features Headshot', icon: Crosshair },
-  { value: '8', label: 'Guías completas', icon: BookOpen },
-  { value: '12', label: 'Tips de pros', icon: Lightbulb },
+  { value: '503+', label: 'Dispositivos', icon: Smartphone },
+  { value: '17', label: 'Features Headshot', icon: Crosshair },
+  { value: '11', label: 'Guías completas', icon: BookOpen },
+  { value: '24', label: 'Tips de pros', icon: Lightbulb },
 ] as const;
 
 export default function AcademyHubPage() {

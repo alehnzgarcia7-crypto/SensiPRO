@@ -9,6 +9,8 @@ import {
   Smartphone,
   Target,
   ArrowRight,
+  Users,
+  Hand,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -118,6 +120,39 @@ const GUIDES: Guide[] = [
     difficulty: 'Intermedio',
     readTime: 6,
     icon: Target,
+  },
+  {
+    slug: 'combos-personajes',
+    title: 'Combos de Personajes: Qué Equipar Según tu Estilo',
+    description:
+      'Tu activa define qué haces, tus pasivas qué tan bien sobrevives. 10 combos para rusher, ranked, sniper y Clash Squad.',
+    category: 'Combate',
+    categoryLabel: 'Combate',
+    difficulty: 'Intermedio',
+    readTime: 8,
+    icon: Users,
+  },
+  {
+    slug: 'transicion-dedos',
+    title: 'Cómo Pasar de 2 a 3 Dedos sin Morir en el Intento',
+    description:
+      'Plan día por día para hacer la transición. Qué esperar, cómo configurar tu HUD, y errores que evitar.',
+    category: 'HUD',
+    categoryLabel: 'HUD',
+    difficulty: 'Intermedio',
+    readTime: 7,
+    icon: Hand,
+  },
+  {
+    slug: 'crosshair-placement',
+    title: 'Crosshair Placement: El Secreto que Nadie te Enseña',
+    description:
+      'El 90% de jugadores caminan mirando al suelo. Aprende a pre-apuntar y gana 300ms en cada pelea.',
+    category: 'Combate',
+    categoryLabel: 'Combate',
+    difficulty: 'Principiante',
+    readTime: 5,
+    icon: Crosshair,
   },
 ];
 

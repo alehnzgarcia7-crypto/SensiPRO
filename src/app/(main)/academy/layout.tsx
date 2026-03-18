@@ -9,6 +9,7 @@ import {
   ChevronRight,
   GraduationCap,
   Crown,
+  Cpu,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -33,22 +34,28 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     description: 'Inicio de la academia',
   },
   {
+    href: '/academy/como-funciona',
+    label: 'Cómo Funciona',
+    icon: Cpu,
+    description: 'El motor detrás de tu sensi',
+  },
+  {
     href: '/academy/guides',
     label: 'Guías',
     icon: BookOpen,
-    description: '22+ guías por categoría',
+    description: '11 guías por categoría',
   },
   {
     href: '/academy/tips',
     label: 'Tips & Trucos',
     icon: Lightbulb,
-    description: '100+ tips rápidos',
+    description: '24 tips rápidos',
   },
   {
     href: '/academy/meta',
     label: 'Meta Actual',
     icon: Swords,
-    description: 'Parche OB51 — Tier List',
+    description: 'Parche OB52 — Tier List',
   },
   {
     href: '/academy/videos',
