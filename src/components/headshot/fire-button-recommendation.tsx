@@ -95,19 +95,19 @@ export function FireButtonRecommendation({ fireButton, fingers, screenSize }: Fi
         })}
       </div>
 
-      {/* Details */}
-      <div className="space-y-2">
-        <div className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-          <p className="text-[10px] font-ui text-slate-600 uppercase tracking-wider mb-0.5">📍 Posición</p>
-          <p className="text-xs text-slate-300 font-body">{fireButton.positionEs}</p>
+      {/* Details — combined in 1 card */}
+      <div className="px-4 py-3 rounded-lg bg-white/[0.02] border border-white/[0.04] space-y-2">
+        <div className="flex items-start gap-2">
+          <span className="text-xs shrink-0">📍</span>
+          <p className="text-xs text-slate-300 font-body"><span className="text-slate-500">Posición:</span> {fireButton.positionEs}</p>
         </div>
-        <div className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-          <p className="text-[10px] font-ui text-slate-600 uppercase tracking-wider mb-0.5">👆 Drag tip</p>
-          <p className="text-xs text-slate-300 font-body">{fireButton.dragTipEs}</p>
+        <div className="flex items-start gap-2">
+          <span className="text-xs shrink-0">👆</span>
+          <p className="text-xs text-slate-300 font-body"><span className="text-slate-500">Drag:</span> {fireButton.dragTipEs}</p>
         </div>
-        <div className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-          <p className="text-[10px] font-ui text-slate-600 uppercase tracking-wider mb-0.5">👁️ Transparencia</p>
-          <p className="text-xs text-slate-300 font-body">{fireButton.transparency}%</p>
+        <div className="flex items-start gap-2">
+          <span className="text-xs shrink-0">🎨</span>
+          <p className="text-xs text-slate-300 font-body"><span className="text-slate-500">Transparencia:</span> {fireButton.transparency}%</p>
         </div>
       </div>
     </div>

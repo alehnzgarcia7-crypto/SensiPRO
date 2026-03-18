@@ -71,7 +71,7 @@ export interface HeadshotFingerResult {
 
 // --- CLAMP UTILITY ---
 
-function clamp(value: number, min: number = 0, max: number = 200): number {
+function clamp(value: number, min: number = 1, max: number = 200): number {
   return Math.max(min, Math.min(max, Math.round(value)));
 }
 
@@ -98,18 +98,10 @@ export function calculateHeadshotFingerMode(
     freeView: clamp(baseSensitivity.freeView * profile.multipliers.freeView),
   };
 
-  // 2. Re-apply tapering if finger-specific tapering differs from base -15
-  if (profile.tapering !== -15) {
-    adjusted.redPoint = clamp(adjusted.general + profile.tapering);
-    adjusted.scope2x = clamp(adjusted.redPoint + profile.tapering);
-    adjusted.scope4x = clamp(adjusted.scope2x + profile.tapering);
-    adjusted.sniperScope = clamp(adjusted.scope4x + profile.tapering);
-  }
-
-  // 3. Fix FreeLook using forensic formula
-  // FreeLook should be in range 14-22 for 3 fingers, adjusted by finger multiplier
-  const freeLookBase = Math.round(adjusted.general * 0.11);
-  adjusted.freeView = clamp(Math.round(freeLookBase * profile.multipliers.freeView), 8, 50);
+  // 2. Enforce cascade: General ≥ RedPoint ≥ Scope2x ≥ Scope4x (AWM y freeView independientes)
+  adjusted.redPoint = Math.min(adjusted.redPoint, adjusted.general);
+  adjusted.scope2x = Math.min(adjusted.scope2x, adjusted.redPoint);
+  adjusted.scope4x = Math.min(adjusted.scope4x, adjusted.scope2x);
 
   // 4. Calculate gyroscope
   let gyroscope: GyroscopeFingerValues | null = null;
@@ -127,11 +119,11 @@ export function calculateHeadshotFingerMode(
     // Gyroscope tapering is -10 (softer than screen)
     const gyroTaper = -10;
     gyroscope = {
-      general: clamp(gyroBase),
-      redPoint: clamp(gyroBase + gyroTaper),
-      scope2x: clamp(gyroBase + gyroTaper * 2),
-      scope4x: clamp(gyroBase + gyroTaper * 3),
-      sniperScope: clamp(gyroBase + gyroTaper * 4),
+      general: clamp(gyroBase, 1, 100),
+      redPoint: clamp(gyroBase + gyroTaper, 1, 100),
+      scope2x: clamp(gyroBase + gyroTaper * 2, 1, 100),
+      scope4x: clamp(gyroBase + gyroTaper * 3, 1, 100),
+      sniperScope: clamp(gyroBase + gyroTaper * 4, 1, 100),
     };
   }
 
@@ -171,7 +163,7 @@ export function calculateHeadshotFingerMode(
     fireButton,
     fingerProfile: profile,
     meta: {
-      engineVersion: '4.2-headshot',
+      engineVersion: '5.0-headshot',
       fingersUsed: fingers,
       taperingUsed: profile.tapering,
       gyroscopeEnabled: profile.gyroscope.enabled,

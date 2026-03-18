@@ -16,18 +16,19 @@ import { generateGyroscope } from './gyroscope-engine';
 import type { DeviceSpecs, SensitivityOutput, GyroscopeOutput, HeadshotResult, FireButtonResult } from './types';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES HEADSHOT ENGINE v1.0
+// ARES HEADSHOT ENGINE v2.0 (aligned with sensitivity-engine v5.0)
 // ═══════════════════════════════════════════════════════════════
 //
-// Extiende el motor de sensibilidad base con modificadores
+// Extiende el motor de sensibilidad v5.0 con modificadores
 // específicos para tiro a la cabeza (drag headshot).
 //
 // FLUJO:
-//   1. Generar sensibilidad base con BALANCED style
+//   1. Generar sensibilidad base con estilo del usuario (default BALANCED)
 //   2. Aplicar multiplicadores headshot por campo
-//   3. Generar giroscopio sobre valores headshot
-//   4. Aplicar multiplicadores headshot de giroscopio
-//   5. Calcular fire button, headshot score, drag recomendado
+//   3. Enforce cascade: General ≥ RedPoint ≥ Scope2x ≥ Scope4x
+//   4. Generar giroscopio sobre valores headshot
+//   5. Aplicar multiplicadores headshot de giroscopio
+//   6. Calcular fire button, headshot score, drag recomendado
 
 function clampSens(v: number): number {
   return Math.round(Math.max(SENSITIVITY_MIN, Math.min(SENSITIVITY_MAX, v)));
@@ -108,17 +109,25 @@ export function generateHeadshotSensitivity(
   userHz?: number,
   playstyle?: string,
 ): HeadshotResult {
-  // 1. Generar sensibilidad NORMAL (BALANCED, sin calibrar) para comparación
-  const baseResult = generateSensitivity({ specs, style: 'BALANCED', userRam, userHz });
+  // 1. Generar sensibilidad base con v5.0 (estilo del usuario o BALANCED por default)
+  const effectiveStyle: 'AGGRESSIVE' | 'BALANCED' | 'SNIPER' =
+    (playstyle === 'AGGRESSIVE' || playstyle === 'SNIPER') ? playstyle : 'BALANCED';
+  const baseResult = generateSensitivity({ specs, style: effectiveStyle, userRam, userHz });
   const normalSens = baseResult.sensitivity;
   const normalGyro = generateGyroscope(normalSens);
 
-  // 2. Aplicar modificadores headshot sobre la base normal
+  // 2. Aplicar modificadores headshot sobre la base
+  const rawGeneral = clampSens(normalSens.general * HEADSHOT_SENSITIVITY_MODIFIERS.general);
+  const rawRedPoint = clampSens(normalSens.redPoint * HEADSHOT_SENSITIVITY_MODIFIERS.redPoint);
+  const rawScope2x = clampSens(normalSens.scope2x * HEADSHOT_SENSITIVITY_MODIFIERS.scope2x);
+  const rawScope4x = clampSens(normalSens.scope4x * HEADSHOT_SENSITIVITY_MODIFIERS.scope4x);
+
+  // 3. Enforce cascade: General ≥ RedPoint ≥ Scope2x ≥ Scope4x (AWM y freeView independientes)
   const headshotSens: SensitivityOutput = {
-    general: clampSens(normalSens.general * HEADSHOT_SENSITIVITY_MODIFIERS.general),
-    redPoint: clampSens(normalSens.redPoint * HEADSHOT_SENSITIVITY_MODIFIERS.redPoint),
-    scope2x: clampSens(normalSens.scope2x * HEADSHOT_SENSITIVITY_MODIFIERS.scope2x),
-    scope4x: clampSens(normalSens.scope4x * HEADSHOT_SENSITIVITY_MODIFIERS.scope4x),
+    general: rawGeneral,
+    redPoint: Math.min(rawRedPoint, rawGeneral),
+    scope2x: Math.min(rawScope2x, Math.min(rawRedPoint, rawGeneral)),
+    scope4x: Math.min(rawScope4x, Math.min(rawScope2x, Math.min(rawRedPoint, rawGeneral))),
     sniperScope: clampSens(normalSens.sniperScope * HEADSHOT_SENSITIVITY_MODIFIERS.sniperScope),
     freeView: clampSens(normalSens.freeView * HEADSHOT_SENSITIVITY_MODIFIERS.freeView),
   };

@@ -20,6 +20,7 @@ const headshotSchema = z.object({
   userRam: z.number().int().min(1).max(32).optional(),
   userHz: z.number().int().min(30).max(240).optional(),
   fingers: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+  playstyle: z.enum(['AGGRESSIVE', 'BALANCED', 'SNIPER']).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { deviceId, userRam, userHz, fingers } = parsed.data;
+    const { deviceId, userRam, userHz, fingers, playstyle } = parsed.data;
 
     const user = await getOptionalSession();
     const device = await prisma.device.findUnique({
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
       userRam,
       fingers,
       userHz,
+      playstyle,
     );
 
     logger.info('Headshot sensitivity generated', {

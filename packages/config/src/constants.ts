@@ -11,8 +11,8 @@ export const APP_DOMAIN = 'sensibilidadespro.com';
 export const SENSITIVITY_MIN = 1;
 export const SENSITIVITY_MAX = 200;
 
-// Gyroscope range (giroscopio usa escala 0-100, pros usan 20-40)
-export const GYRO_MIN = 0;
+// Gyroscope range (giroscopio usa escala 1-100, pros usan 20-40)
+export const GYRO_MIN = 1;
 export const GYRO_MAX = 100;
 
 // RAM options para UI selector

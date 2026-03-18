@@ -11,11 +11,14 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DpiToggle } from '@/components/generator/dpi-toggle';
 import { HzSelector } from '@/components/generator/hz-selector';
 import { RamSelector } from '@/components/generator/ram-selector';
-import { CopyAllButton } from '@/components/headshot/copy-all-button';
+import { CharacterBuildRecommendation } from '@/components/headshot/character-build-recommendation';
 import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
+import { CrosshairPlacementPro } from '@/components/headshot/crosshair-placement-pro';
+import { DragTechniqueRecommendation } from '@/components/headshot/drag-technique-recommendation';
 import { FingerSelector } from '@/components/headshot/finger-selector';
 import { FingerTrainingPlan } from '@/components/headshot/finger-training-plan';
 import { FireButtonRecommendation } from '@/components/headshot/fire-button-recommendation';
+import { GameSettingsRecommendation } from '@/components/headshot/game-settings-recommendation';
 import { GyroscopeRecommendation } from '@/components/headshot/gyroscope-recommendation';
 import { HeadshotHero } from '@/components/headshot/headshot-hero';
 import { HeadshotScoreGauge } from '@/components/headshot/headshot-score-gauge';
@@ -25,6 +28,7 @@ import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { ProBadge } from '@/components/headshot/pro-badge';
 import { TrainingPlan } from '@/components/headshot/training-plan';
 import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
+import { WeaponConfigSelector } from '@/components/headshot/weapon-config-selector';
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
 import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
 import { PremiumBlur } from '@/components/paywall';
@@ -32,8 +36,14 @@ import { useTrackEvent } from '@/hooks/use-track-event';
 import { useGeneratorStore } from '@/stores/generator.store';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES — Headshot Mode v4.1 — Finger-based sensitivity system
+// ARES — Headshot Mode v5.0 — Style + Finger-based sensitivity
 // ═══════════════════════════════════════════════════════════════
+
+// Feature flags para ocultar secciones sin eliminar código
+const SHOW_GYRO_HEADSHOT = false;
+const SHOW_ACADEMY_CONTENT_IN_HEADSHOT = false;
+
+type HeadshotPlaystyle = 'AGGRESSIVE' | 'BALANCED' | 'SNIPER';
 
 interface HeadshotApiDevice {
   id: string;
@@ -114,7 +124,44 @@ interface HeadshotApiResponse {
   error?: { message: string };
 }
 
-// Brand/device selection step components (inline, reuses store)
+// ═══ STYLE SELECTOR ═══
+
+const STYLE_OPTIONS: { value: HeadshotPlaystyle; label: string; desc: string }[] = [
+  { value: 'AGGRESSIVE', label: 'Agresivo', desc: 'Rush y combate cercano' },
+  { value: 'BALANCED', label: 'Balanceado', desc: 'Un poco de todo' },
+  { value: 'SNIPER', label: 'Francotirador', desc: 'Distancia y precisión' },
+];
+
+function StyleSelector({ value, onChange }: { value: HeadshotPlaystyle; onChange: (v: HeadshotPlaystyle) => void }) {
+  return (
+    <div>
+      <p className="text-xs font-heading uppercase tracking-[0.15em] text-slate-500 mb-3">
+        ¿Cuál es tu estilo?
+      </p>
+      <div className="grid grid-cols-3 gap-2">
+        {STYLE_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={`min-h-[44px] px-2 py-3 rounded-xl text-center transition-all border ${
+              value === opt.value
+                ? 'bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.08)]'
+                : 'bg-white/[0.02] border-white/[0.06] hover:border-white/15'
+            }`}
+          >
+            <p className={`text-sm font-ui font-bold ${value === opt.value ? 'text-white' : 'text-slate-400'}`}>
+              {opt.label}
+            </p>
+            <p className="text-[10px] text-slate-500 font-body mt-0.5">{opt.desc}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══ DEVICE SELECTOR ═══
+
 function DeviceSelector({ onGenerate }: { onGenerate: () => void }) {
   const { selectedBrand, selectedDevice, selectBrand, selectDevice } = useGeneratorStore();
   const [brands, setBrands] = useState<{ name: string; slug: string; count: number }[]>([]);
@@ -123,7 +170,6 @@ function DeviceSelector({ onGenerate }: { onGenerate: () => void }) {
   const [deviceSearch, setDeviceSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch brands
   useEffect(() => {
     void (async () => {
       try {
@@ -134,7 +180,6 @@ function DeviceSelector({ onGenerate }: { onGenerate: () => void }) {
     })();
   }, []);
 
-  // Fetch devices when brand selected
   useEffect(() => {
     if (!selectedBrand) return;
     setLoading(true);
@@ -148,7 +193,6 @@ function DeviceSelector({ onGenerate }: { onGenerate: () => void }) {
     })();
   }, [selectedBrand]);
 
-  // Auto-trigger when device is selected
   useEffect(() => {
     if (selectedDevice) onGenerate();
   }, [selectedDevice, onGenerate]);
@@ -256,18 +300,7 @@ function DeviceSelector({ onGenerate }: { onGenerate: () => void }) {
   );
 }
 
-// Diff indicator component for finger-adjusted values
-function FingerDiffLabel({ current, base, fingers }: { current: number; base: number; fingers: FingerCount }) {
-  if (fingers === 3) return null;
-  const diff = current - base;
-  if (diff === 0) return null;
-  const isUp = diff > 0;
-  return (
-    <span className={`text-[10px] font-mono font-bold ${isUp ? 'text-green-400' : 'text-orange-400'}`}>
-      ({isUp ? '↑' : '↓'}{Math.abs(diff)} vs 3 dedos)
-    </span>
-  );
-}
+// ═══ ANIMATION VARIANTS ═══
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -278,16 +311,18 @@ const sectionVariants = {
   }),
 };
 
+// ═══ MAIN PAGE ═══
+
 export default function HeadshotPage() {
   const { selectedDevice, userRam, setUserRam, userHz, setUserHz } = useGeneratorStore();
   const { track } = useTrackEvent();
   const [fingers, setFingers] = useState<FingerCount>(3);
+  const [playstyle, setPlaystyle] = useState<HeadshotPlaystyle>('BALANCED');
   const [dpiEnabled, setDpiEnabled] = useState(false);
   const [data, setData] = useState<HeadshotApiResponse['data'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Calcula DPI del dispositivo para mostrar en el toggle
   const deviceDpiValue: number | null = useMemo(() => {
     if (!selectedDevice) return null;
     const specs: DeviceSpecs = {
@@ -314,6 +349,7 @@ export default function HeadshotPage() {
           ...(userRam && userRam !== selectedDevice.ramGb ? { userRam } : {}),
           ...(userHz && userHz !== selectedDevice.screenHz ? { userHz } : {}),
           fingers,
+          playstyle,
         }),
       });
 
@@ -325,6 +361,7 @@ export default function HeadshotPage() {
           deviceBrand: selectedDevice.brand,
           deviceModel: selectedDevice.model,
           fingers,
+          playstyle,
         });
       } else {
         setError(json.error?.message ?? 'Error al generar');
@@ -333,17 +370,17 @@ export default function HeadshotPage() {
       setError('Error de conexión');
     }
     setLoading(false);
-  }, [selectedDevice, userRam, userHz, fingers]);
+  }, [selectedDevice, userRam, userHz, fingers, playstyle]);
 
-  // Re-fetch cuando cambia RAM o Hz (solo si ya hay data)
+  // Re-fetch cuando cambia RAM, Hz o estilo (solo si ya hay data)
   useEffect(() => {
     if (data && selectedDevice) {
       void fetchHeadshot();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userRam, userHz]);
+  }, [userRam, userHz, playstyle]);
 
-  // Aplica reducción DPI a la sensibilidad base (resta DPI_OFFSET, freeView intacto)
+  // DPI adjustment client-side
   const dpiAdjustedSensitivity: SensitivityOutput | null = useMemo(() => {
     if (!data) return null;
     const sens = data.sensitivity;
@@ -355,11 +392,11 @@ export default function HeadshotPage() {
       scope2x: c(sens.scope2x),
       scope4x: c(sens.scope4x),
       sniperScope: c(sens.sniperScope),
-      freeView: sens.freeView, // Free Look independiente del DPI
+      freeView: sens.freeView,
     };
   }, [data, dpiEnabled]);
 
-  // Finger-adjusted sensitivity (client-side calculation)
+  // Finger-adjusted sensitivity (client-side)
   const fingerResult: HeadshotFingerResult | null = useMemo(() => {
     if (!dpiAdjustedSensitivity || !data) return null;
     return calculateHeadshotFingerMode(
@@ -367,8 +404,9 @@ export default function HeadshotPage() {
       fingers,
       data.device.screenHz,
       data.device.screenSize,
+      playstyle,
     );
-  }, [dpiAdjustedSensitivity, data, fingers]);
+  }, [dpiAdjustedSensitivity, data, fingers, playstyle]);
 
   // 3-finger baseline for comparison diffs
   const threeFingerBaseline: HeadshotFingerResult | null = useMemo(() => {
@@ -378,38 +416,38 @@ export default function HeadshotPage() {
       3,
       data.device.screenHz,
       data.device.screenSize,
+      playstyle,
     );
-  }, [dpiAdjustedSensitivity, data]);
+  }, [dpiAdjustedSensitivity, data, playstyle]);
 
-  // Gyroscope values mapped to GyroscopeOutput format for the panel
+  // Gyroscope values for panel
   const fingerGyroscope: GyroscopeOutput | null = useMemo(() => {
     if (!fingerResult) return null;
     const gyro = fingerResult.sensitivity.gyroscope;
-    if (!gyro) {
-      // Gyroscope disabled for this finger count (e.g. 2 dedos) — use base values
-      return data?.gyroscope ?? null;
-    }
+    if (!gyro) return data?.gyroscope ?? null;
     return {
       gyroGeneral: gyro.general,
       gyroRedPoint: gyro.redPoint,
       gyroScope2x: gyro.scope2x,
       gyroScope4x: gyro.scope4x,
       gyroSniper: gyro.sniperScope,
-      gyroFreeView: Math.max(0, gyro.sniperScope - 10),
+      gyroFreeView: Math.max(1, gyro.sniperScope - 10),
     };
   }, [fingerResult, data]);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-4 pb-24 space-y-8">
-      {/* SECTION 1 — HERO */}
+      {/* ═══ HERO ═══ */}
       <HeadshotHero />
 
-      {/* SECTION 2 — DEVICE SELECTOR + RAM + FINGERS */}
+      {/* ═══ ZONA DE INPUTS ═══ */}
       <section className="space-y-4">
+        {/* 1. Device Selector */}
         <DeviceSelector onGenerate={fetchHeadshot} />
 
         {selectedDevice && (
           <>
+            {/* 2. RAM */}
             <div className="glass-card p-4">
               <RamSelector
                 value={userRam}
@@ -417,6 +455,7 @@ export default function HeadshotPage() {
                 suggestedRam={selectedDevice.ramGb}
               />
             </div>
+            {/* 3. Hz */}
             <div className="glass-card p-4">
               <HzSelector
                 value={userHz}
@@ -424,6 +463,7 @@ export default function HeadshotPage() {
                 suggestedHz={selectedDevice.screenHz}
               />
             </div>
+            {/* 4. DPI Toggle */}
             <div className="glass-card p-4">
               <DpiToggle
                 enabled={dpiEnabled}
@@ -431,8 +471,13 @@ export default function HeadshotPage() {
                 dpiValue={dpiEnabled ? deviceDpiValue : null}
               />
             </div>
+            {/* 5. Finger Selector */}
             <div className="glass-card p-4">
               <FingerSelector value={fingers} onChange={setFingers} />
+            </div>
+            {/* 6. Style Selector — NUEVO */}
+            <div className="glass-card p-4">
+              <StyleSelector value={playstyle} onChange={setPlaystyle} />
             </div>
           </>
         )}
@@ -453,7 +498,7 @@ export default function HeadshotPage() {
         </div>
       )}
 
-      {/* Results — All sections animate in */}
+      {/* ═══ ZONA DE RESULTADOS ═══ */}
       <AnimatePresence>
         {data && !loading && fingerResult && threeFingerBaseline && (
           <motion.div
@@ -461,35 +506,12 @@ export default function HeadshotPage() {
             animate="visible"
             className="space-y-8"
           >
-            {/* Finger adjustment label */}
-            {fingers !== 3 && (
-              <motion.div custom={0} variants={sectionVariants}>
-                <div className="px-3 py-2 rounded-lg bg-red-500/5 border border-red-500/10 text-center">
-                  <p className="text-xs text-red-400/80 font-ui font-semibold">
-                    Ajustado para {fingers} dedos
-                    {fingers === 2 && ' (Casual)'}
-                    {fingers === 4 && ' (Garra Pro)'}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {fingers === 3 && (
-              <motion.div custom={0} variants={sectionVariants}>
-                <div className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] text-center">
-                  <p className="text-[11px] text-slate-500 font-body">
-                    Estos son tus valores base (3 dedos = estándar competitivo)
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* SECTION 3 — HEADSHOT SCORE */}
-            <motion.div custom={1} variants={sectionVariants}>
+            {/* 7. HEADSHOT SCORE */}
+            <motion.div custom={0} variants={sectionVariants}>
               <HeadshotScoreGauge score={data.headshotScore} />
             </motion.div>
 
-            {/* SECCIONES 4-12 — PREMIUM (todo bloqueado para usuarios gratis) */}
+            {/* SECCIONES PREMIUM */}
             <PremiumBlur
               source="headshot"
               device={selectedDevice ? `${selectedDevice.brand} ${selectedDevice.model}` : undefined}
@@ -497,62 +519,19 @@ export default function HeadshotPage() {
               intensity={16}
               ctaTop
             >
-              {/* SECTION 4 — SENSIBILIDAD HEADSHOT (with finger diffs) */}
-              <motion.div custom={2} variants={sectionVariants}>
+              {/* 8. SENSIBILIDAD HEADSHOT */}
+              <motion.div custom={1} variants={sectionVariants}>
                 <HeadshotSensitivityPanel
                   sensitivity={fingerResult.sensitivity}
                   gyroscope={fingerGyroscope ?? data.gyroscope}
                   normalSensitivity={data.normalSensitivity}
                   normalGyroscope={data.normalGyroscope}
-                />
-
-                {/* Finger diff overlay */}
-                {fingers !== 3 && (
-                  <div className="mt-3 glass-card p-4">
-                    <p className="text-xs font-heading uppercase tracking-[0.15em] text-red-400/70 mb-3">
-                      Diferencia vs 3 dedos (estándar)
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {([
-                        { key: 'general' as const, label: 'General' },
-                        { key: 'redPoint' as const, label: 'P.Rojo' },
-                        { key: 'scope2x' as const, label: '2x' },
-                        { key: 'scope4x' as const, label: '4x' },
-                        { key: 'sniperScope' as const, label: 'AWM' },
-                        { key: 'freeView' as const, label: 'Vista Libre' },
-                      ]).map(({ key, label }) => {
-                        const current = fingerResult.sensitivity[key];
-                        const base = threeFingerBaseline.sensitivity[key];
-                        return (
-                          <div key={key} className="px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-                            <p className="text-[10px] text-slate-600 font-body">{label}</p>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-mono font-bold text-slate-300">{current}</span>
-                              <FingerDiffLabel current={current} base={base} fingers={fingers} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-
-              {/* SECTION 4.5 — WEAPON ADJUSTMENT TABLE */}
-              <motion.div custom={3} variants={sectionVariants}>
-                <WeaponAdjustmentPanel adjustments={fingerResult.weaponAdjustments} />
-              </motion.div>
-
-              {/* SECTION 4.6 — GYROSCOPE RECOMMENDATION */}
-              <motion.div custom={4} variants={sectionVariants}>
-                <GyroscopeRecommendation
-                  gyroscope={fingerResult.sensitivity.gyroscope}
-                  fingerProfile={fingerResult.fingerProfile}
+                  showGyroscope={SHOW_GYRO_HEADSHOT}
                 />
               </motion.div>
 
-              {/* SECTION 5 — FIRE BUTTON */}
-              <motion.div custom={5} variants={sectionVariants}>
+              {/* 9. BOTÓN DE DISPARO */}
+              <motion.div custom={2} variants={sectionVariants}>
                 <FireButtonRecommendation
                   fireButton={fingerResult.fireButton}
                   fingers={fingers}
@@ -560,59 +539,86 @@ export default function HeadshotPage() {
                 />
               </motion.div>
 
-              {/* SECTION 6 — HUD PERSONALIZADO */}
-              <motion.section custom={6} variants={sectionVariants}>
-                <HudRecommendation fingers={fingers} />
-              </motion.section>
-
-              {/* SECTION 6.5 — TÉCNICAS DE HEADSHOT */}
-              <motion.section custom={7} variants={sectionVariants}>
-                <HeadshotTechniques fingers={fingers} />
-              </motion.section>
-
-              {/* SECTION 7 — ARMAS RECOMENDADAS POR TIER */}
-              <motion.section custom={8} variants={sectionVariants}>
-                <WeaponTierDisplay fingers={fingers} />
-              </motion.section>
-
-              {/* SECTION 8 — PLAN DE ENTRENAMIENTO 7 DÍAS */}
-              <motion.section custom={9} variants={sectionVariants}>
-                <FingerTrainingPlan fingers={fingers} />
-              </motion.section>
-
-              {/* SECTION 8.5 — PRO BADGE */}
-              <motion.section custom={10} variants={sectionVariants}>
-                <ProBadge fingers={fingers} />
-              </motion.section>
-
-              {/* SECTION 9 — COPIAR CONFIGURACIÓN */}
-              <motion.section custom={11} variants={sectionVariants}>
-                <CopyAllButton
-                  sensitivity={fingerResult.sensitivity}
-                  gyroscope={fingerResult.sensitivity.gyroscope ?? null}
-                  fingers={fingers}
-                  fireButton={fingerResult.fireButton}
-                  deviceName={`${data.device.brand} ${data.device.model}`}
-                />
-              </motion.section>
-
-              {/* SECTION 10 — ARSENAL HEADSHOT */}
-              <motion.div custom={12} variants={sectionVariants}>
-                <WeaponGrid
-                  weapons={data.weapons}
-                  baseSensitivity={data.sensitivity}
-                />
+              {/* 10. AJUSTE POR ARMA */}
+              <motion.div custom={3} variants={sectionVariants}>
+                <WeaponAdjustmentPanel adjustments={fingerResult.weaponAdjustments} />
               </motion.div>
 
-              {/* SECTION 11 — CROSSHAIR PLACEMENT */}
-              <motion.div custom={13} variants={sectionVariants}>
-                <CrosshairGuide tips={data.tips} />
+              {/* 11. CÓDIGOS HUD CON CAPTURAS REALES — siempre visible */}
+              <motion.section custom={4} variants={sectionVariants}>
+                <HudRecommendation fingers={fingers} showExtras={SHOW_ACADEMY_CONTENT_IN_HEADSHOT} />
+              </motion.section>
+
+              {/* 12. TÉCNICA DE DRAG RECOMENDADA */}
+              <motion.div custom={5} variants={sectionVariants}>
+                <DragTechniqueRecommendation playstyle={playstyle} fingers={fingers} />
               </motion.div>
 
-              {/* SECTION 12 — TRAINING DRILLS */}
-              <motion.div custom={14} variants={sectionVariants}>
-                <TrainingPlan drills={data.drills} />
+              {/* 13. CROSSHAIR PLACEMENT PRO */}
+              <motion.div custom={6} variants={sectionVariants}>
+                <CrosshairPlacementPro />
               </motion.div>
+
+              {/* 14. CONFIG POR ARMA FAVORITA */}
+              <motion.div custom={7} variants={sectionVariants}>
+                <WeaponConfigSelector />
+              </motion.div>
+
+              {/* 15. SETTINGS DE FREE FIRE */}
+              <motion.div custom={8} variants={sectionVariants}>
+                <GameSettingsRecommendation />
+              </motion.div>
+
+              {/* 16. BUILD DE PERSONAJE */}
+              <motion.div custom={9} variants={sectionVariants}>
+                <CharacterBuildRecommendation playstyle={playstyle} fingers={fingers} />
+              </motion.div>
+
+              {/* ═══ SECCIONES OCULTAS — Giroscopio ═══ */}
+              {SHOW_GYRO_HEADSHOT && (
+                <motion.div custom={10} variants={sectionVariants}>
+                  <GyroscopeRecommendation
+                    gyroscope={fingerResult.sensitivity.gyroscope}
+                    fingerProfile={fingerResult.fingerProfile}
+                  />
+                </motion.div>
+              )}
+
+              {/* ═══ SECCIONES OCULTAS — Academia (se mueven a Academia en el futuro) ═══ */}
+              {SHOW_ACADEMY_CONTENT_IN_HEADSHOT && (
+                <>
+                  <motion.section custom={11} variants={sectionVariants}>
+                    <HeadshotTechniques fingers={fingers} />
+                  </motion.section>
+
+                  <motion.section custom={12} variants={sectionVariants}>
+                    <WeaponTierDisplay fingers={fingers} />
+                  </motion.section>
+
+                  <motion.section custom={13} variants={sectionVariants}>
+                    <FingerTrainingPlan fingers={fingers} />
+                  </motion.section>
+
+                  <motion.section custom={14} variants={sectionVariants}>
+                    <ProBadge fingers={fingers} />
+                  </motion.section>
+
+                  <motion.div custom={15} variants={sectionVariants}>
+                    <WeaponGrid
+                      weapons={data.weapons}
+                      baseSensitivity={data.sensitivity}
+                    />
+                  </motion.div>
+
+                  <motion.div custom={16} variants={sectionVariants}>
+                    <CrosshairGuide tips={data.tips} />
+                  </motion.div>
+
+                  <motion.div custom={17} variants={sectionVariants}>
+                    <TrainingPlan drills={data.drills} />
+                  </motion.div>
+                </>
+              )}
             </PremiumBlur>
           </motion.div>
         )}
