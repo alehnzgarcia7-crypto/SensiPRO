@@ -304,7 +304,7 @@ export function PaywallModal() {
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="absolute inset-0 bg-black/90"
             onClick={() => !isSubmitting && hidePaywall()}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -313,7 +313,7 @@ export function PaywallModal() {
 
           {/* Card principal */}
           <motion.div
-            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-[0_0_80px_rgba(0,255,255,0.08)]"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-slate-950 shadow-xl"
             initial={{ scale: 0.9, y: 30, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}
@@ -327,7 +327,7 @@ export function PaywallModal() {
               {!isSubmitting && (
                 <button
                   onClick={hidePaywall}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -427,7 +427,7 @@ export function PaywallModal() {
                           onChange={(e) => { setEmail(e.target.value); setError(null); }}
                           onKeyDown={(e) => e.key === 'Enter' && selectedMethod && handlePayment()}
                           placeholder="tu@email.com"
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-colors"
                           autoComplete="email"
                         />
                       </div>
@@ -442,7 +442,7 @@ export function PaywallModal() {
                       {/* Tarjeta */}
                       <button
                         onClick={() => setSelectedMethod('card')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
                           selectedMethod === 'card'
                             ? 'border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_20px_rgba(0,255,255,0.05)]'
                             : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
@@ -469,7 +469,7 @@ export function PaywallModal() {
                       {/* OXXO */}
                       <button
                         onClick={() => setSelectedMethod('oxxo')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
                           selectedMethod === 'oxxo'
                             ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.05)]'
                             : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
@@ -496,7 +496,7 @@ export function PaywallModal() {
                       {/* Mercado Pago */}
                       <button
                         onClick={() => setSelectedMethod('mercadopago')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
                           selectedMethod === 'mercadopago'
                             ? 'border-blue-500/50 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]'
                             : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
@@ -532,7 +532,7 @@ export function PaywallModal() {
                     <motion.button
                       onClick={handlePayment}
                       disabled={!selectedMethod || isSubmitting}
-                      className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                         selectedMethod
                           ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'
                           : 'bg-white/5 text-slate-500 cursor-not-allowed'
@@ -601,7 +601,7 @@ export function PaywallModal() {
 
                     <button
                       onClick={() => { setModalState('ready'); setError(null); }}
-                      className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all cursor-pointer"
+                      className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors cursor-pointer"
                     >
                       Intentar de nuevo
                     </button>
@@ -646,7 +646,7 @@ export function PaywallModal() {
                           });
                         }
                       }}
-                      className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 transition-all cursor-pointer ${
+                      className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 transition-colors cursor-pointer ${
                         linkCopied
                           ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
                           : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'

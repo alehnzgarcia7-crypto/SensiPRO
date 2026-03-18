@@ -62,11 +62,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ['Orbitron', 'sans-serif'],
-        body: ['Exo 2', 'Chakra Petch', 'sans-serif'],
-        display: ['Exo 2', 'sans-serif'],
-        ui: ['Rajdhani', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Space Mono', 'monospace'],
+        heading: ['var(--font-orbitron)', 'Orbitron', 'sans-serif'],
+        body: ['var(--font-exo2)', 'Exo 2', 'sans-serif'],
+        display: ['var(--font-exo2)', 'Exo 2', 'sans-serif'],
+        ui: ['var(--font-rajdhani)', 'Rajdhani', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'JetBrains Mono', 'monospace'],
       },
       borderRadius: {
         'gaming': '12px',

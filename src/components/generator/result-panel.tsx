@@ -364,20 +364,13 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     );
                   })}
                 </div>
-              </PremiumBlur>
-            </div>
 
-            {/* Separador gradiente */}
-            <div className="divider-gradient my-6" />
 
-            {/* Stats adicionales — PREMIUM (bloqueados para usuarios gratis) */}
-            <PremiumBlur
-              source="generator"
-              device={`${selectedDevice.brand} ${selectedDevice.model}`}
-              style={selectedStyle}
-              intensity={14}
-            >
-              <div className="space-y-3">
+                {/* Separador gradiente */}
+                <div className="divider-gradient my-6" />
+
+                {/* Stats adicionales */}
+                <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Target size={14} className="text-ice-400" />
@@ -418,8 +411,9 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
-            </PremiumBlur>
+                </div>
+              </PremiumBlur>
+            </div>
           </div>
         </AnimatedBorder>
       </motion.div>

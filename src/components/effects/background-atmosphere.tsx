@@ -35,29 +35,19 @@ export function BackgroundAtmosphere() {
         }}
       />
 
-      {/* Orb naranja — top-left */}
-      <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px] animate-atmosphere-float-1">
-        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,106,0,0.12)_0%,_rgba(255,106,0,0.04)_40%,_transparent_70%)] blur-[100px]" />
+      {/* Orb naranja — top-left (estático, sin blur ni animación) */}
+      <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px]">
+        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(255,106,0,0.10)_0%,_rgba(255,106,0,0.03)_40%,_transparent_70%)]" />
       </div>
 
       {/* Orb cyan — bottom-right */}
-      <div className="absolute -bottom-[200px] -right-[200px] w-[600px] h-[600px] animate-atmosphere-float-2">
-        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(0,200,255,0.10)_0%,_rgba(0,200,255,0.03)_40%,_transparent_70%)] blur-[100px]" />
+      <div className="absolute -bottom-[200px] -right-[200px] w-[600px] h-[600px]">
+        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(0,200,255,0.08)_0%,_rgba(0,200,255,0.02)_40%,_transparent_70%)]" />
       </div>
 
-      {/* Orb purpura — center, mas sutil */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] animate-atmosphere-float-3">
-        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(168,85,247,0.06)_0%,_transparent_60%)] blur-[80px]" />
-      </div>
-
-      {/* Partículas flotantes — CSS puro (6 partículas, optimizado para low-end) */}
-      <div className="absolute inset-0">
-        <div className="atmosphere-particle" style={{ left: '10%', top: '20%', animationDuration: '14s', animationDelay: '0s' }} />
-        <div className="atmosphere-particle" style={{ left: '40%', top: '60%', animationDuration: '18s', animationDelay: '3s' }} />
-        <div className="atmosphere-particle" style={{ left: '70%', top: '15%', animationDuration: '16s', animationDelay: '1s' }} />
-        <div className="atmosphere-particle" style={{ left: '85%', top: '45%', animationDuration: '15s', animationDelay: '5s' }} />
-        <div className="atmosphere-particle" style={{ left: '25%', top: '80%', animationDuration: '17s', animationDelay: '2s' }} />
-        <div className="atmosphere-particle" style={{ left: '60%', top: '50%', animationDuration: '19s', animationDelay: '4s' }} />
+      {/* Orb purpura — center */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px]">
+        <div className="w-full h-full rounded-full bg-[radial-gradient(circle,_rgba(168,85,247,0.05)_0%,_transparent_60%)]" />
       </div>
     </div>
   );

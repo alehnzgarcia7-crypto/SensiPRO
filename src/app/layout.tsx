@@ -1,9 +1,38 @@
 import type { Metadata, Viewport } from 'next';
+import { Orbitron, Exo_2, Rajdhani, JetBrains_Mono } from 'next/font/google';
 import Script from 'next/script';
 
 import { BackgroundAtmosphere } from '@/components/effects/background-atmosphere';
 import { Providers } from '@/components/providers';
 import './globals.css';
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['700', '900'],
+  variable: '--font-orbitron',
+  display: 'swap',
+});
+
+const exo2 = Exo_2({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-exo2',
+  display: 'swap',
+});
+
+const rajdhani = Rajdhani({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-rajdhani',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
 
 const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ?? '';
 
@@ -89,7 +118,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark">
-      <body className="min-h-screen bg-[#050810] text-slate-200 antialiased font-body">
+      <body className={`min-h-screen bg-[#050810] text-slate-200 antialiased font-body ${orbitron.variable} ${exo2.variable} ${rajdhani.variable} ${jetbrainsMono.variable}`}>
         {tiktokPixelId && (
           <Script
             id="tiktok-pixel"

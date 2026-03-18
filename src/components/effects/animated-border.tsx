@@ -14,24 +14,15 @@ interface AnimatedBorderProps {
   speed?: 'slow' | 'normal' | 'fast';
 }
 
-const speedMap = {
-  slow: '6s',
-  normal: '4s',
-  fast: '2s',
-};
-
-export function AnimatedBorder({ children, className, active = true, speed = 'normal' }: AnimatedBorderProps) {
+export function AnimatedBorder({ children, className, active = true }: AnimatedBorderProps) {
   if (!active) {
     return <div className={className}>{children}</div>;
   }
 
   return (
     <div className={cn('animated-border-wrapper', className)}>
-      {/* Gradiente rotatorio — conic gradient */}
-      <div
-        className="animated-border-gradient"
-        style={{ animationDuration: speedMap[speed] }}
-      />
+      {/* Gradiente estático — conic gradient sin rotación */}
+      <div className="animated-border-gradient" style={{ animation: 'none' }} />
       {/* Contenido interior con background sólido */}
       <div className="animated-border-content">
         {children}

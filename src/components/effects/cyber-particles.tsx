@@ -17,9 +17,9 @@ interface Particle {
   opacity: number;
 }
 
-const MAX_PARTICLES = 35;
-const CONNECTION_DISTANCE = 150;
-const TARGET_FPS = 30;
+const MAX_PARTICLES = 15;
+const CONNECTION_DISTANCE = 100;
+const TARGET_FPS = 20;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
 const PARTICLE_COLOR = { r: 6, g: 182, b: 212 }; // cyan #06b6d4
 

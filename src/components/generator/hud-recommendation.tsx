@@ -146,9 +146,7 @@ function HudVisualSection({ fingers, screenSize, isRec }: { fingers: 2 | 3 | 4 |
       <div
         className="absolute -top-2 right-3 z-10 px-2 py-0.5 rounded-md"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: 'rgba(8,8,16,0.85)',
           border: '1px solid rgba(255,255,255,0.1)',
         }}
       >
@@ -271,7 +269,7 @@ export function HudRecommendationPanel({ data, screenSize }: HudRecommendationPa
               transition={{ duration: 0.4, delay: cardIdx * 0.12 }}
               className={cn(
                 'relative rounded-xl border overflow-hidden transition-all',
-                'backdrop-blur-sm',
+                '',
                 isRec
                   ? 'bg-white/[0.03] border-transparent'
                   : 'bg-white/[0.015] border-white/5 opacity-[0.85]',

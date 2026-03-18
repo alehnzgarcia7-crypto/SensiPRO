@@ -17,9 +17,15 @@ export function HeroSection() {
   const [scrollOpacity, setScrollOpacity] = useState(1);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const y = window.scrollY;
-      setScrollOpacity(Math.max(0, 1 - y / 300));
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollOpacity(Math.max(0, 1 - window.scrollY / 600));
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -43,28 +49,19 @@ export function HeroSection() {
         <div
           className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-[0.15]"
           style={{
-            background: 'radial-gradient(circle, #06b6d4, transparent 70%)',
-            filter: 'blur(80px)',
-            animation: 'meshFloat1 20s ease-in-out infinite alternate',
-            willChange: 'transform',
+            background: 'radial-gradient(circle, rgba(6,182,212,0.4) 0%, rgba(6,182,212,0.1) 40%, transparent 70%)',
           }}
         />
         <div
           className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full opacity-[0.12]"
           style={{
-            background: 'radial-gradient(circle, #3b82f6, transparent 70%)',
-            filter: 'blur(80px)',
-            animation: 'meshFloat2 22s ease-in-out infinite alternate',
-            willChange: 'transform',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 40%, transparent 70%)',
           }}
         />
         <div
           className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full opacity-[0.08]"
           style={{
-            background: 'radial-gradient(circle, #8b5cf6, transparent 70%)',
-            filter: 'blur(80px)',
-            animation: 'meshFloat3 24s ease-in-out infinite alternate',
-            willChange: 'transform',
+            background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.1) 40%, transparent 70%)',
           }}
         />
       </div>

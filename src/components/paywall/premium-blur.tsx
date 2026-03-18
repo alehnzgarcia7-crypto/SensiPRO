@@ -131,31 +131,6 @@ export function PremiumBlur({
               )`,
         }}
       >
-        {/* Partículas flotantes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-cyan-400/30"
-              style={{
-                left: `${20 + (i * 10) % 60}%`,
-                top: `${20 + (i * 13) % 60}%`,
-              }}
-              animate={{
-                y: [0, -20, 0],
-                opacity: [0.2, 0.6, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 3 + (i % 3),
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
-
         {/* Icono de candado con glow */}
         <motion.div
           className="relative mb-4"
@@ -164,16 +139,14 @@ export function PremiumBlur({
         >
           <div className="absolute inset-0 -m-4 bg-cyan-500/20 rounded-full blur-xl" />
 
-          <motion.div
+          <div
             className="absolute -inset-3 rounded-full"
             style={{
               background: 'conic-gradient(from 0deg, transparent, rgba(0,255,255,0.3), transparent)',
             }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           />
 
-          <div className="relative w-14 h-14 rounded-full bg-black/60 border border-cyan-500/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="relative w-14 h-14 rounded-full bg-black/70 border border-cyan-500/30 flex items-center justify-center">
             <Lock className="w-6 h-6 text-cyan-400" />
           </div>
         </motion.div>
@@ -200,7 +173,7 @@ export function PremiumBlur({
         {/* Valor General revelado (si aplica) */}
         {revealFirst && revealedGeneral && (
           <motion.div
-            className="mb-4 px-4 py-2 rounded-lg bg-white/5 border border-cyan-500/20 backdrop-blur-sm"
+            className="mb-4 px-4 py-2 rounded-lg bg-white/5 border border-cyan-500/20"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.7, type: 'spring' }}
@@ -229,28 +202,14 @@ export function PremiumBlur({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          {/* Borde gradiente animado */}
+          {/* Borde gradiente */}
           <div
             className="absolute inset-0 rounded-xl p-[1px]"
             style={{
               background: 'linear-gradient(135deg, #06b6d4, #8b5cf6, #06b6d4)',
-              backgroundSize: '200% 200%',
-              animation: 'gradient-shift 3s ease infinite',
             }}
           >
-            <div className="w-full h-full rounded-xl bg-black/80 backdrop-blur-sm" />
-          </div>
-
-          {/* Shimmer */}
-          <div className="absolute inset-0 rounded-xl overflow-hidden">
-            <motion.div
-              className="absolute inset-0 -translate-x-full"
-              style={{
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
-              }}
-              animate={{ translateX: ['-100%', '200%'] }}
-              transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-            />
+            <div className="w-full h-full rounded-xl bg-black/80" />
           </div>
 
           {/* Contenido del botón */}
@@ -304,12 +263,6 @@ export function PremiumBlur({
         </motion.button>
       </motion.div>
 
-      <style jsx global>{`
-        @keyframes gradient-shift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
     </div>
   );
 }
