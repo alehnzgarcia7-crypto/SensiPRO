@@ -17,11 +17,11 @@ import { ProblemSection } from '@/components/landing/problem-section';
 export const metadata: Metadata = {
   title: 'Sensibilidades PRO — Generador #1 para Free Fire',
   description:
-    'Genera una sensibilidad calibrada para tu celular exacto. 537+ dispositivos, 26 marcas. No copies configs genéricas de YouTube.',
+    'Genera una sensibilidad calibrada para tu celular exacto. 644+ dispositivos, 26 marcas. No copies configs genéricas de YouTube.',
   openGraph: {
     title: 'Sensibilidades PRO — Generador #1 para Free Fire',
     description:
-      'Genera una sensibilidad calibrada para tu celular exacto. 537+ dispositivos, 26 marcas, ajuste por DPI real.',
+      'Genera una sensibilidad calibrada para tu celular exacto. 644+ dispositivos, 26 marcas, ajuste por DPI real.',
     type: 'website',
   },
 };

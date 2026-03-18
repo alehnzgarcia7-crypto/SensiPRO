@@ -124,7 +124,7 @@ function CtaCard() {
           border: '1px solid rgba(6, 182, 212, 0.15)',
         }}
       >
-        <span className="text-3xl font-bold text-cyan-400 font-heading">537+</span>
+        <span className="text-3xl font-bold text-cyan-400 font-heading">644+</span>
         <span className="mt-2 text-sm text-slate-300 text-center leading-snug">
           Ver todos los dispositivos
         </span>
@@ -173,7 +173,7 @@ export function DeviceShowcase() {
           transition={{ delay: 0.1 }}
           className="mt-3 text-center text-slate-400 text-sm"
         >
-          Algunos de los 537+ celulares que soportamos
+          Algunos de los 644+ celulares que soportamos
         </motion.p>
 
         {/* Carousel container */}

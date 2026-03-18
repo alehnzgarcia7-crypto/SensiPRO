@@ -5,13 +5,13 @@
 // ═══════════════════════════════════════════════════════════════
 
 // --- Counts reales de la DB (actualizados desde seed y componentes) ---
-// 537 devices, 26 brands (de devices.seed.ts — verificado Mar 2026)
+// 644 devices, 26 brands (de devices.seed.ts — verificado Mar 2026)
 // 8 guías reales en academia, 12 tips reales
 // 24 features en headshot mode, 17 HUD codes, 5 técnicas drag
 
 export const LANDING_DATA = {
   // Conteos reales verificados
-  deviceCount: 537,
+  deviceCount: 644,
   brandCount: 26,
   styleCount: 9,
   guideCount: 8,             // 8 guías reales con contenido completo

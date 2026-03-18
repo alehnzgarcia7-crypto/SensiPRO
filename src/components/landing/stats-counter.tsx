@@ -16,7 +16,7 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 537, suffix: '+', label: 'Dispositivos soportados', icon: '📱' },
+  { value: 644, suffix: '+', label: 'Dispositivos soportados', icon: '📱' },
   { value: 26, suffix: '', label: 'Marcas compatibles', icon: '🏷️' },
   { value: 9, suffix: '', label: 'Calibraciones por dispositivo', icon: '🎯' },
   { value: 6, suffix: '', label: 'Valores por configuración', icon: '⚙️' },
