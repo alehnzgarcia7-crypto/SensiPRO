@@ -217,13 +217,6 @@ export default function TipsPage() {
       ? TIPS
       : TIPS.filter((t) => t.category === selectedCategory);
 
-  // Agrupar por categoría para mostrar secciones
-  const grouped = filtered.reduce<Record<string, Tip[]>>((acc, tip) => {
-    if (!acc[tip.category]) acc[tip.category] = [];
-    acc[tip.category]!.push(tip);
-    return acc;
-  }, {});
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -279,63 +272,92 @@ export default function TipsPage() {
         })}
       </div>
 
-      {/* Tips por categoría — PREMIUM */}
-      <PremiumBlur source="academy" intensity={12}>
-      {Object.entries(grouped).map(([category, tips]) => {
-        const config = CATEGORY_CONFIG[category as TipCategory];
-        if (!config) return null;
-        const Icon = config.icon;
+      {/* Tips — primeros 4 gratis, resto premium */}
+      {(() => {
+        const freeTips = filtered.slice(0, 4);
+        const premiumTips = filtered.slice(4);
+
+        // Agrupar tips gratis por categoría
+        const freeGrouped = freeTips.reduce<Record<string, Tip[]>>((acc, tip) => {
+          if (!acc[tip.category]) acc[tip.category] = [];
+          acc[tip.category]!.push(tip);
+          return acc;
+        }, {});
+
+        // Agrupar tips premium por categoría
+        const premiumGrouped = premiumTips.reduce<Record<string, Tip[]>>((acc, tip) => {
+          if (!acc[tip.category]) acc[tip.category] = [];
+          acc[tip.category]!.push(tip);
+          return acc;
+        }, {});
+
+        const renderTipCards = (tips: Tip[], config: { color: string; icon: React.ElementType }) =>
+          tips.map((tip, index) => (
+            <div
+              key={tip.id}
+              className="relative glass-card p-4 pl-6 academy-stagger group"
+              style={{ animationDelay: `${index * 40}ms` }}
+            >
+              <div
+                className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl transition-all duration-200 group-hover:w-[5px]"
+                style={{
+                  background: config.color,
+                  boxShadow: `0 0 8px ${config.color}40`,
+                }}
+              />
+              <div className="flex items-start gap-3">
+                <span className="flex-shrink-0 font-[family-name:var(--font-orbitron)] font-black text-lg text-white/20 mt-[-2px]">
+                  {tip.id}
+                </span>
+                <div>
+                  <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1">
+                    {tip.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {tip.content}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ));
+
+        const renderSection = (category: string, tips: Tip[]) => {
+          const config = CATEGORY_CONFIG[category as TipCategory];
+          if (!config) return null;
+          const Icon = config.icon;
+          return (
+            <section key={category}>
+              <div className="mb-2">
+                <h2 className="font-[family-name:var(--font-orbitron)] text-base font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                  <Icon className="w-5 h-5" style={{ color: config.color }} />
+                  {config.label}
+                  <span className="font-numbers text-xs text-slate-500 font-normal normal-case tracking-normal">
+                    ({tips.length})
+                  </span>
+                </h2>
+              </div>
+              <div className="section-heading-separator mb-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {renderTipCards(tips, config)}
+              </div>
+            </section>
+          );
+        };
 
         return (
-          <section key={category}>
-            <div className="mb-2">
-              <h2 className="font-[family-name:var(--font-orbitron)] text-base font-bold text-white uppercase tracking-wide flex items-center gap-2">
-                <Icon className="w-5 h-5" style={{ color: config.color }} />
-                {config.label}
-                <span className="font-numbers text-xs text-slate-500 font-normal normal-case tracking-normal">
-                  ({tips.length})
-                </span>
-              </h2>
-            </div>
-            <div className="section-heading-separator mb-4" />
+          <>
+            {/* Tips gratis (primeros 4) */}
+            {Object.entries(freeGrouped).map(([cat, tips]) => renderSection(cat, tips))}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {tips.map((tip, index) => (
-                <div
-                  key={tip.id}
-                  className="relative glass-card p-4 pl-6 academy-stagger group"
-                  style={{ animationDelay: `${index * 40}ms` }}
-                >
-                  {/* Category accent bar */}
-                  <div
-                    className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl transition-all duration-200 group-hover:w-[5px]"
-                    style={{
-                      background: config.color,
-                      boxShadow: `0 0 8px ${config.color}40`,
-                    }}
-                  />
-
-                  <div className="flex items-start gap-3">
-                    <span className="flex-shrink-0 font-[family-name:var(--font-orbitron)] font-black text-lg text-white/20 mt-[-2px]">
-                      {tip.id}
-                    </span>
-                    <div>
-                      <h3 className="font-[family-name:var(--font-rajdhani)] font-bold text-white text-sm mb-1">
-                        {tip.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {tip.content}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+            {/* Tips premium (del 5 en adelante) */}
+            {premiumTips.length > 0 && (
+              <PremiumBlur source="academy" intensity={12}>
+                {Object.entries(premiumGrouped).map(([cat, tips]) => renderSection(cat, tips))}
+              </PremiumBlur>
+            )}
+          </>
         );
-      })}
-
-      </PremiumBlur>
+      })()}
 
       {filtered.length === 0 && (
         <div className="text-center py-16 text-slate-500">

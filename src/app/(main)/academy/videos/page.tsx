@@ -3,6 +3,8 @@
 import { Video, Play, Clock, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
+import { PremiumBlur } from '@/components/paywall';
+
 // ═══════════════════════════════════════════════════════════════
 // Videos — Coming Soon premium design
 // 6 video cards placeholder + newsletter signup
@@ -97,7 +99,8 @@ export default function VideosPage() {
         </p>
       </div>
 
-      {/* Video Grid — 6 cards */}
+      {/* Video Grid — 6 cards (Premium) */}
+      <PremiumBlur source="academy" intensity={12}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {UPCOMING_VIDEOS.map((video, index) => (
           <div
@@ -153,6 +156,7 @@ export default function VideosPage() {
           </div>
         ))}
       </div>
+      </PremiumBlur>
 
       {/* CTA to Guides */}
       <div

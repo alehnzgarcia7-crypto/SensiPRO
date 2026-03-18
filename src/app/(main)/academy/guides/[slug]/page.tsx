@@ -111,10 +111,19 @@ export default async function GuidePage({ params }: GuidePageProps) {
       <div className="flex gap-8 lg:gap-10">
         {/* Content — margin derecho implícito via flex para no taparse con sidebar */}
         <div className="flex-1 min-w-0">
-          {/* Guide Content — Premium (bloqueado para usuarios gratis) */}
-          <PremiumGuideContent>
-            <GuideRenderer sections={guide.sections} />
-          </PremiumGuideContent>
+          {/* Primera sección gratis — enganche + SEO */}
+          {guide.sections.length > 0 && (
+            <GuideRenderer sections={[guide.sections[0]!]} />
+          )}
+
+          {/* Resto del contenido — Premium (bloqueado para usuarios gratis) */}
+          {guide.sections.length > 1 && (
+            <div className="mt-10">
+              <PremiumGuideContent>
+                <GuideRenderer sections={guide.sections.slice(1)} />
+              </PremiumGuideContent>
+            </div>
+          )}
 
           {/* Footer: related guides + CTA */}
           <GuideFooter relatedSlugs={guide.relatedSlugs} currentSlug={guide.slug} />

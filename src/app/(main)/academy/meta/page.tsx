@@ -339,9 +339,7 @@ export default function MetaPage() {
         </div>
       </div>
 
-      {/* Contenido premium — bloqueado para usuarios gratis */}
-      <PremiumGuideContent>
-      {/* SECCIÓN 1: Weapon Tier List */}
+      {/* SECCIÓN 1: Weapon Tier List — Tier S gratis, resto premium */}
       <section>
         <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide flex items-center gap-2 mb-1">
           <Target className="w-5 h-5 text-fire-400" />
@@ -349,7 +347,33 @@ export default function MetaPage() {
         </h2>
         <div className="section-heading-separator mb-6" />
 
-        {TIERS.map((tier) => (
+        {/* Tier S — gratis (enganche) */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span
+              className={cn(
+                'px-4 py-1.5 rounded-lg text-sm font-black border',
+                TIERS[0].bg,
+                TIERS[0].text,
+                TIERS[0].border,
+              )}
+              style={{ boxShadow: TIERS[0].glow }}
+            >
+              Tier {TIERS[0].label}
+            </span>
+            <span className="text-xs text-slate-500 font-[family-name:var(--font-rajdhani)]">
+              {TIERS[0].subtitle}
+            </span>
+          </div>
+          <WeaponCards weapons={TIERS[0].weapons} color={TIERS[0].color} />
+        </div>
+      </section>
+
+      {/* Tier A, B + Personajes + Mascotas + Combos + Estrategias — PREMIUM */}
+      <PremiumGuideContent>
+      <section>
+        {/* Tier A y B */}
+        {TIERS.slice(1).map((tier) => (
           <div key={tier.label} className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <span
