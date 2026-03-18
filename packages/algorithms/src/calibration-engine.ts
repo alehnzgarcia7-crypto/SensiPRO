@@ -99,7 +99,7 @@ export function calculateDpi(specs: DeviceSpecs): number {
 
 /** Calcula tamaño de botón recomendado en mm basado en screenSize */
 export function calculateButtonSize(screenSize: number): number {
-  const entry = BUTTON_SIZE_MAP.find((e) => screenSize < e.maxScreen);
+  const entry = BUTTON_SIZE_MAP.find((e) => screenSize <= e.maxScreen);
   return entry?.sizeMm ?? 54;
 }
 
@@ -199,7 +199,7 @@ export function generateCalibration(input: CalibrationInput): CalibrationResult 
     : null;
 
   const dpiValue = dpiMode ? calculateDpi(specs) : null;
-  const buttonSize = calculateButtonSize(specs.screenSize);
+  const buttonSize = calculateFireButtonPercentage(specs.screenSize, input.fingers ?? 2, style);
   const precisionScore = calculatePrecisionScore(finalSensitivity, dpiMode);
 
   return {
@@ -221,13 +221,14 @@ export function generateAllCalibrations(
   includeGyro: boolean,
   userRam?: number,
   userHz?: number,
+  fingers?: 2 | 3 | 4,
 ): GenerateAllOutput {
   const combinations: CalibrationResult[] = [];
 
   for (const calibration of CALIBRATION_LEVELS) {
     for (const dpiMode of DPI_MODES) {
       combinations.push(
-        generateCalibration({ specs, style, calibration, dpiMode, includeGyro, userRam, userHz }),
+        generateCalibration({ specs, style, calibration, dpiMode, includeGyro, fingers, userRam, userHz }),
       );
     }
   }

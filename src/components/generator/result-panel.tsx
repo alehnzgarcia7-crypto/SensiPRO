@@ -389,7 +389,7 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
                     <span className="text-sm font-ui text-slate-400">Botón</span>
                   </div>
                   <span className="text-sm font-mono font-bold text-white" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {currentCombo.buttonSize}mm
+                    {currentCombo.buttonSize}%
                   </span>
                 </div>
 

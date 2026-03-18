@@ -15,6 +15,7 @@ const generateAllSchema = z.object({
     errorMap: () => ({ message: 'Estilo debe ser AGGRESSIVE, BALANCED o SNIPER' }),
   }),
   includeGyro: z.boolean().optional().default(false),
+  fingers: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
   userRam: z.number().int().min(1).max(32).optional(),
   userHz: z.number().int().min(30).max(240).optional(),
 });
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { deviceId, style, includeGyro, userRam, userHz } = parsed.data;
+    const { deviceId, style, includeGyro, fingers, userRam, userHz } = parsed.data;
 
     // Obtener sesión (opcional — usuarios anónimos pueden generar)
     const user = await getOptionalSession();
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       includeGyro,
       userRam,
       userHz,
+      fingers,
     );
 
     // Guardar en historial si el usuario está autenticado

@@ -25,6 +25,7 @@ export interface CalibrationInput {
   calibration: CalibrationLevel;
   dpiMode: boolean;
   includeGyro?: boolean;
+  fingers?: 2 | 3 | 4;
   userRam?: number;
   userHz?: number;
 }
