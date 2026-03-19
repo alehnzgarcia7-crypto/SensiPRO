@@ -19,6 +19,7 @@ import { HeadshotCtaBanner } from '@/components/headshot/headshot-cta-banner';
 import { PremiumBlur } from '@/components/paywall';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/cn';
 import { useGeneratorStore } from '@/stores/generator.store';
 
 import { CalibrationSelector } from './calibration-selector';
@@ -232,9 +233,23 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
 
       {/* ═══ RESULTADO PRINCIPAL — Momento de verdad ═══ */}
       <motion.div variants={itemVariants} className="glass-card p-5">
-        <p className="text-xs font-heading uppercase tracking-[0.15em] text-slate-500 mb-2">
-          Resultado principal
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-heading uppercase tracking-[0.15em] text-slate-500">
+            Resultado principal
+          </p>
+          {/* Tier badge */}
+          <span className={cn(
+            'text-[9px] font-heading font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded-md border',
+            selectedDevice.tier === 'GAMING' ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' :
+            selectedDevice.tier === 'HIGH' ? 'bg-purple-500/15 text-purple-400 border-purple-500/30' :
+            selectedDevice.tier === 'MID' ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' :
+            'bg-slate-500/15 text-slate-400 border-slate-500/30',
+          )}>
+            {selectedDevice.tier === 'GAMING' ? 'Flagship gaming' :
+             selectedDevice.tier === 'HIGH' ? 'Gama alta' :
+             selectedDevice.tier === 'MID' ? 'Gama media' : 'Gama de entrada'}
+          </span>
+        </div>
         <p className="text-sm text-slate-400 mb-3">
           Configuración calculada para tu {selectedDevice.model}
         </p>
@@ -247,8 +262,10 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
             <CountUp end={sensitivityEntries[0]?.[1] ?? 0} duration={800} />
           </span>
         </div>
-        <p className="text-[11px] text-slate-600 mt-3">
-          Ajusta RAM, Hz y calibración para afinar tu configuración
+        <p className="text-[10px] text-slate-500 mt-3 leading-relaxed">
+          {selectedDevice.ramGb}GB RAM · {selectedDevice.screenHz}Hz · {selectedDevice.screenSize}&quot;{selectedDevice.tier === 'LOW' || selectedDevice.tier === 'MID' ? ' · PPI bajo = General más alto' : ' · PPI alto = General más bajo'}
+          {selectedStyle === 'AGGRESSIVE' ? ' · Agresivo +40' : selectedStyle === 'SNIPER' ? ' · Francotirador -20' : ''}
+          {calibration === 'BAJA' ? ' · Calibración -25' : calibration === 'ALTA' ? ' · Calibración +15' : ''}
         </p>
       </motion.div>
 
@@ -272,7 +289,12 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
 
       {/* ═══ CALIBRACION + DPI ═══ */}
       <motion.div variants={itemVariants} className="glass-card p-5 space-y-5">
-        <CalibrationSelector value={calibration} onChange={setCalibration} />
+        <div>
+          <CalibrationSelector value={calibration} onChange={setCalibration} />
+          <p className="text-[9px] text-slate-600 mt-2 px-1">
+            Ajuste fino: Precisión (-25) para control, Velocidad (+15) para reacción rápida
+          </p>
+        </div>
         <DpiToggle
           enabled={dpiMode}
           onChange={setDpiMode}
@@ -475,6 +497,22 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
       {/* ═══ HEADSHOT CTA ═══ */}
       <motion.div variants={itemVariants}>
         <HeadshotCtaBanner />
+      </motion.div>
+
+      {/* ═══ LINK A ACADEMIA ═══ */}
+      <motion.div variants={itemVariants} className="glass-card p-4">
+        <a href="/academy/guides/drag-shot-tecnicas" className="flex items-center gap-3 group">
+          <span className="text-lg">📚</span>
+          <div className="flex-1">
+            <p className="text-xs font-heading font-bold text-white group-hover:text-fire-400 transition-colors">
+              9 Técnicas de Drag para Headshots
+            </p>
+            <p className="text-[10px] text-slate-500">
+              De Drag Vertical (principiante) a Jump-Crouch-Fire (pro) — guía completa
+            </p>
+          </div>
+          <span className="text-slate-600 group-hover:text-fire-400 transition-colors">→</span>
+        </a>
       </motion.div>
 
       {/* ═══ ACCIONES ═══ */}

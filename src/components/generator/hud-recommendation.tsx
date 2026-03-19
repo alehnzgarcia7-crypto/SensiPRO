@@ -35,25 +35,25 @@ const FINGER_META: Record<2 | 3 | 4 | 5, { emoji: string; title: string; subtitl
   2: {
     emoji: '✌️',
     title: '2 DEDOS — CLÁSICO',
-    subtitle: 'Ideal para principiantes y juego casual',
+    subtitle: 'Solo Drag Vertical y Flick Shot. Botón grande (50-70%). El 60% de jugadores casuales usan esta config.',
     icon: Gamepad2,
   },
   3: {
     emoji: '🤟',
-    title: '3 DEDOS — VERSÁTIL',
-    subtitle: 'Buen balance entre control y velocidad',
+    title: '3 DEDOS — PROS LATAM',
+    subtitle: 'Desbloquea J-Drag, Direction Drag y Situp Headshot. El setup más usado por pros de Brasil y LATAM.',
     icon: Zap,
   },
   4: {
     emoji: '🖐️',
-    title: '4 DEDOS — GARRA',
-    subtitle: 'Para jugadores competitivos que quieren todo',
+    title: '4 DEDOS — GARRA COMPETITIVA',
+    subtitle: 'Desbloquea TODAS las técnicas incluido Jump-Crouch-Fire. Aim + disparo + salto simultáneos.',
     icon: Trophy,
   },
   5: {
     emoji: '🖐️',
     title: '5 DEDOS — FULL CONTROL',
-    subtitle: 'Control total. Para los más pro',
+    subtitle: 'Solo el 1% lo domina. Máximo control teórico pero curva de aprendizaje extrema.',
     icon: Target,
   },
 };

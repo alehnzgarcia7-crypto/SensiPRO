@@ -22,7 +22,7 @@ export function DpiToggle({ enabled, onChange, dpiValue }: DpiToggleProps) {
           Modo DPI
         </p>
         <p className="text-[10px] text-slate-600 mt-0.5">
-          Ajuste fino para pantallas de alta densidad
+          Si configuraste DPI en Opciones de Desarrollador de Android, actívalo. Si no sabes qué es, déjalo apagado.
         </p>
       </div>
       <div className="flex items-center gap-3">

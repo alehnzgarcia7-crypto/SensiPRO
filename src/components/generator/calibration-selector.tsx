@@ -32,9 +32,9 @@ interface CalibrationOption {
 }
 
 const OPTIONS: CalibrationOption[] = [
-  { key: 'BAJA', label: 'Precisión', icon: Crosshair, description: 'Control fino y estable' },
-  { key: 'MEDIA', label: 'Balanceado', icon: Scale, description: 'Equilibrio perfecto' },
-  { key: 'ALTA', label: 'Velocidad', icon: Zap, description: 'Respuesta veloz' },
+  { key: 'BAJA', label: 'Precisión', icon: Crosshair, description: '-25 puntos. Snipers y one-tap' },
+  { key: 'MEDIA', label: 'Balanceado', icon: Scale, description: '+0 puntos. Punto medio ideal' },
+  { key: 'ALTA', label: 'Velocidad', icon: Zap, description: '+15 puntos. Rush agresivo' },
 ];
 
 function TiltCard({
