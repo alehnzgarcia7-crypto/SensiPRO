@@ -5,17 +5,20 @@
 // ═══════════════════════════════════════════════════════════════
 
 const RULES = [
-  { emoji: '🧍', situacion: 'De pie', regla: 'Mira a nivel de los OJOS' },
-  { emoji: '🦵', situacion: 'Agachado', regla: 'Baja la mira al cuello' },
-  { emoji: '🧱', situacion: 'Gloo Wall', regla: 'Pre-apunta donde va a salir la cabeza' },
+  { emoji: '🧍', situacion: 'De pie', regla: 'Mira a nivel de los OJOS — reduce tu distancia de drag un 50-70%' },
+  { emoji: '🦵', situacion: 'Agachado', regla: 'Baja la mira al cuello — al levantarse sube natural a la cabeza (Situp Headshot)' },
+  { emoji: '🧱', situacion: 'Gloo Wall', regla: 'Pre-apunta donde va a salir la cabeza — el peek-fire headshot es instantáneo' },
 ];
 
 export function CrosshairPlacementPro() {
   return (
     <div className="glass-card p-6">
-      <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-4">
-        🎯 Dónde Apuntar Siempre
+      <h3 className="font-heading font-bold text-white uppercase tracking-[0.15em] text-sm mb-1">
+        🎯 La Trinidad del Headshot
       </h3>
+      <p className="text-[11px] text-slate-500 font-body mb-4">
+        Sensibilidad correcta + Crosshair Placement + Técnica de Drag = headshots consistentes
+      </p>
 
       <div className="space-y-3 mb-4">
         {RULES.map((rule) => (
@@ -29,9 +32,15 @@ export function CrosshairPlacementPro() {
         ))}
       </div>
 
-      <div className="px-3 py-2.5 rounded-lg bg-orange-500/5 border border-orange-500/10">
+      <div className="px-3 py-2.5 rounded-lg bg-orange-500/5 border border-orange-500/10 mb-3">
         <p className="text-xs text-orange-400/90 font-body">
-          ⚠️ NUNCA apuntes al suelo mientras caminas. Eso es lo que más te hace fallar headshots.
+          ⚠️ NUNCA apuntes al suelo. El aim assist de Free Fire tira al TORSO — si tu crosshair está abajo, te quedas pegado al pecho. El drag compensa subiendo, pero si empiezas a nivel de cabeza, el drag es mínimo.
+        </p>
+      </div>
+
+      <div className="px-3 py-2.5 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
+        <p className="text-xs text-cyan-400/90 font-body">
+          💡 Warmup: camina por Training Ground 5 min con el crosshair a nivel de los maniquíes. No dispares — solo mantén la altura. En 3-4 días se vuelve automático.
         </p>
       </div>
     </div>
