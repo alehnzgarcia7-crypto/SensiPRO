@@ -9,6 +9,7 @@ import { DifferentialSection } from '@/components/landing/differential-section';
 import { FaqSection } from '@/components/landing/faq-section';
 import { HeroSection } from '@/components/landing/hero-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
+import { HowSensiproWorksCta } from '@/components/landing/how-sensipro-works-cta';
 import { PremiumModulesSection } from '@/components/landing/premium-modules-section';
 // PricingSection oculta — el usuario ve el precio solo en el paywall del generador
 // import { PricingSection } from '@/components/landing/pricing-section';
@@ -39,6 +40,8 @@ export default function LandingPage() {
       <HowItWorksSection />
       {/* 4. Diferencial — Calibración real vs genéricas */}
       <DifferentialSection />
+      {/* 4.5. CTA — "¿Quieres saber cómo funciona?" → /academy/como-funciona */}
+      <HowSensiproWorksCta />
       {/* 5. Tensión/Blur — Crear deseo sin regalar */}
       <BlurTensionSection />
       {/* 6. Módulos premium — Headshot, HUD, Academia */}
