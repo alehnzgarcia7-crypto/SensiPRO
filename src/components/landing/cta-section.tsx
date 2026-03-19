@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 import { trackEvent, INTERNAL_EVENTS, ttClickButton, CONTENT_IDS } from '@/lib/analytics';
-import { LANDING_DATA } from '@/lib/landing-data';
+
 
 // ═══════════════════════════════════════════════════════════════
 // CtaSection — Sección 10: Cerrar con acción, no con ruido.
@@ -33,7 +33,7 @@ export function CtaSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-tight"
         >
-          <span className="text-white">Deja de adivinar</span>
+          <span className="text-white">¿Listo para dejar de</span>
           <br />
           <span
             style={{
@@ -43,7 +43,7 @@ export function CtaSection() {
               backgroundClip: 'text',
             }}
           >
-            tu sensibilidad
+            costurar? 🔥
           </span>
         </motion.h2>
 
@@ -55,7 +55,7 @@ export function CtaSection() {
           transition={{ delay: 0.1 }}
           className="mt-4 text-base md:text-lg text-slate-400"
         >
-          Prueba el generador y descubre una configuración hecha para tu celular exacto.
+          644+ dispositivos. 9 calibraciones. Una sensibilidad que por fin calza con tu celular.
         </motion.p>
 
         {/* CTA */}
@@ -83,7 +83,7 @@ export function CtaSection() {
                 ttClickButton({ contentId: CONTENT_IDS.LANDING_SHORT, description: 'footer_cta_generate' });
               }}
             >
-              GENERA TU SENSIBILIDAD GRATIS
+              OBTENER MI CONFIGURACIÓN GRATIS
               <span className="text-xl">{'\u2192'}</span>
             </Link>
           </div>
@@ -97,7 +97,7 @@ export function CtaSection() {
           transition={{ delay: 0.4 }}
           className="mt-6 text-xs text-slate-500"
         >
-          {LANDING_DATA.deviceCount}+ dispositivos compatibles | Resultados al instante
+          ⚡ 10 segundos · Sin hack · Sin ban · Sin anuncios
         </motion.p>
       </div>
 

@@ -13,23 +13,23 @@ const MODULES = [
     icon: Crosshair,
     title: 'Headshot Mode',
     description:
-      'Calibrado para tiro a la cabeza. Ajuste por dedos, giroscopio, categorías de armas y entrenamiento.',
+      '9 técnicas de drag, 18 combos de personajes, 11 armas con daño de headshot real. La cereza del pastel.',
     color: '#ef4444',
     gradient: 'from-red-500/10 to-red-600/5',
   },
   {
     icon: Gamepad2,
-    title: 'Códigos HUD reales',
+    title: '17 Códigos HUD Reales',
     description:
-      'HUDs listos para 2, 3, 4 y 5 dedos con screenshots reales del juego.',
+      'Para 2, 3, 4 y 5 dedos. Con capturas del juego. Copia y pega directo.',
     color: '#22c55e',
     gradient: 'from-green-500/10 to-green-600/5',
   },
   {
     icon: BookOpen,
-    title: 'Academia de mejora',
+    title: 'Academia PRO',
     description:
-      'Guías, tips y configuración aplicada para mejorar aim, HUD, headshots y rendimiento.',
+      '11 guías + 24 tips escritos con datos REALES del algoritmo. No texto genérico de Google.',
     color: '#3b82f6',
     gradient: 'from-blue-500/10 to-blue-600/5',
   },
@@ -46,12 +46,12 @@ export function PremiumModulesSection() {
           viewport={{ once: true }}
           className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-center text-white"
         >
-          No solo generas sensibilidad.{' '}
+          No solo números.{' '}
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: 'linear-gradient(135deg, #06b6d4, #3b82f6)' }}
           >
-            Dominas todo el juego.
+            Todo lo que necesitas para dar capa.
           </span>
         </motion.h2>
 

@@ -6,19 +6,19 @@
 
 // --- Counts reales de la DB (actualizados desde seed y componentes) ---
 // 644 devices, 26 brands (de devices.seed.ts — verificado Mar 2026)
-// 8 guías reales en academia, 12 tips reales
-// 24 features en headshot mode, 17 HUD codes, 5 técnicas drag
+// 11 guías reales en academia, 24 tips reales
+// 24 features en headshot mode, 17 HUD codes, 9 técnicas drag
 
 export const LANDING_DATA = {
   // Conteos reales verificados
   deviceCount: 644,
   brandCount: 26,
   styleCount: 9,
-  guideCount: 8,             // 8 guías reales con contenido completo
-  tipCount: 12,              // 12 tips reales
+  guideCount: 11,            // 11 guías reales con contenido completo
+  tipCount: 24,              // 24 tips reales
   weaponCount: 32,           // armas en weapon-categories
   headshotFeatures: 24,      // 24 features en headshot mode
-  techniqueCount: 5,         // 5 técnicas drag
+  techniqueCount: 9,         // 9 técnicas drag (3 estilos × 3 dedos)
   hudCodeCount: 17,          // 17 códigos HUD reales
   sensitivityValues: 6,
   gyroValues: 6,
@@ -309,6 +309,14 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     q: '¿El pago es único o mensual?',
     a: 'Es un solo pago. Acceso de por vida.',
+  },
+  {
+    q: '¿Cómo es diferente de copiar settings de YouTube?',
+    a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 644+ dispositivos para calcular TU configuración ideal.',
+  },
+  {
+    q: '¿Me van a banear?',
+    a: 'No. SensiPRO no modifica archivos del juego ni accede a tu cuenta. Solo te da números que tú introduces manualmente en Ajustes → Sensibilidad de Free Fire. Es exactamente lo mismo que ajustar la sensi tú mismo.',
   },
 ];
 

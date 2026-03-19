@@ -16,10 +16,10 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 644, suffix: '+', label: 'Dispositivos soportados', icon: '📱' },
-  { value: 26, suffix: '', label: 'Marcas compatibles', icon: '🏷️' },
-  { value: 9, suffix: '', label: 'Calibraciones por dispositivo', icon: '🎯' },
-  { value: 6, suffix: '', label: 'Valores por configuración', icon: '⚙️' },
+  { value: 644, suffix: '+', label: 'Dispositivos analizados', icon: '📱' },
+  { value: 26, suffix: '', label: 'Marcas de celular', icon: '🏷️' },
+  { value: 9, suffix: '', label: 'Combinaciones de calibración', icon: '🎯' },
+  { value: 6, suffix: '', label: 'Sliders optimizados por dispositivo', icon: '⚙️' },
 ];
 
 function useCountUp(target: number, duration: number = 2000) {

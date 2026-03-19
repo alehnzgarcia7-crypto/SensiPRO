@@ -11,17 +11,17 @@ import { Gauge, Monitor, Sliders } from 'lucide-react';
 const BENEFITS = [
   {
     icon: Gauge,
-    text: 'Ajuste por DPI real',
+    text: '🔬 DPI calculado por tu pantalla — Un Galaxy A06 (270 PPI) necesita sensi diferente que un iPhone 16 Pro (460 PPI)',
     color: '#06b6d4',
   },
   {
     icon: Monitor,
-    text: 'Compatibilidad con 60, 90 y 120 Hz',
+    text: '📡 Ajuste por Hz real — 60Hz se siente 15% más lento que 120Hz. ARES compensa automáticamente',
     color: '#3b82f6',
   },
   {
     icon: Sliders,
-    text: 'Configuración personalizada por estilo de juego',
+    text: '🎮 3 estilos × 3 calibraciones = 9 perfiles — Rush (+40), Balanceado (+0), Sniper (-20)',
     color: '#8b5cf6',
   },
 ] as const;
@@ -37,12 +37,12 @@ export function DifferentialSection() {
           viewport={{ once: true }}
           className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-center text-white leading-tight"
         >
-          No son configs genéricas.{' '}
+          No son números al aire.{' '}
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: 'linear-gradient(135deg, #06b6d4, #3b82f6)' }}
           >
-            Es calibración real para tu hardware.
+            Es ciencia de tu dispositivo.
           </span>
         </motion.h2>
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
 
 import { trackEvent, INTERNAL_EVENTS, ttClickButton, CONTENT_IDS } from '@/lib/analytics';
-import { LANDING_DATA } from '@/lib/landing-data';
+
 
 // ═══════════════════════════════════════════════════════════════
 // HeroSection — Sección 1: Detener scroll, activar dolor,
@@ -85,7 +85,7 @@ export function HeroSection() {
           transition={{ duration: 0.5 }}
           className="text-[28px] sm:text-[36px] md:text-[48px] lg:text-[56px] font-display font-black leading-[1.1] tracking-tight"
         >
-          <span className="text-white">Deja de perder por</span>
+          <span className="text-white">Tu celular merece su propia</span>
           <br />
           <span
             className="bg-clip-text text-transparent"
@@ -94,7 +94,7 @@ export function HeroSection() {
               filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.3))',
             }}
           >
-            mala configuración
+            sensibilidad 🎯
           </span>
         </motion.h1>
 
@@ -105,8 +105,8 @@ export function HeroSection() {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="mt-6 text-sm md:text-base lg:text-lg text-slate-400 max-w-2xl mx-auto font-body leading-relaxed"
         >
-          Genera una sensibilidad calibrada para tu celular exacto en segundos.
-          Sin copiar configuraciones genéricas de YouTube.
+          644+ dispositivos. 26 marcas. Una sensibilidad calculada para TU celular
+          exacto — no la del YouTuber que juega en iPhone.
         </motion.p>
 
         {/* CTA principal */}
@@ -138,7 +138,7 @@ export function HeroSection() {
                 boxShadow: '0 0 30px rgba(6, 182, 212, 0.3), 0 0 60px rgba(6, 182, 212, 0.1)',
               }}
             >
-              GENERA TU SENSIBILIDAD GRATIS
+              OBTENER MI CONFIGURACIÓN GRATIS
               <span className="ml-2">{'\u2192'}</span>
               {/* Shimmer */}
               <span
@@ -153,7 +153,7 @@ export function HeroSection() {
 
           {/* Subtexto bajo CTA */}
           <p className="text-xs text-slate-500">
-            {LANDING_DATA.deviceCount}+ dispositivos | {LANDING_DATA.brandCount} marcas | Ajuste por DPI real
+            ⚡ Resultados en 10 segundos · Sin hack · Sin ban · 100% gratis
           </p>
         </motion.div>
 

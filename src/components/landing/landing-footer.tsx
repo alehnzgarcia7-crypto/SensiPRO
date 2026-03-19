@@ -5,21 +5,17 @@ const PRODUCT_LINKS = [
   { label: 'Generador', href: '/generator' },
   { label: 'Headshot Mode', href: '/generator/headshot' },
   { label: 'Academia', href: '/academy' },
-  { label: 'Comparador', href: '#' },
   { label: 'Dispositivos', href: '/devices' },
 ];
 
 const COMMUNITY_LINKS = [
-  { label: 'Rankings', href: '#' },
-  { label: 'Configs compartidas', href: '#' },
-  { label: 'Torneos', href: '#' },
-  { label: 'Discord', href: '#' },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@sensipro5' },
+  { label: 'Instagram', href: 'https://www.instagram.com/sensipro8' },
 ];
 
 const LEGAL_LINKS = [
-  { label: 'Privacidad', href: '#' },
-  { label: 'Términos', href: '#' },
-  { label: 'Contacto', href: '#' },
+  { label: 'Privacidad', href: '/privacy' },
+  { label: 'Términos', href: '/terms' },
 ];
 
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
@@ -56,18 +52,24 @@ export function LandingFooter() {
               <span className="font-heading font-bold text-white text-lg">SensiPRO</span>
             </Link>
             <p className="mt-3 text-xs text-slate-600 leading-relaxed font-body max-w-[220px]">
-              Generador de sensibilidades #1 para Free Fire. Basado en hardware real.
+              Generador de sensibilidad #1 para Free Fire. 644+ dispositivos calibrados por hardware real.
             </p>
 
             {/* Social icons — links pendientes */}
             <div className="mt-4 flex gap-3">
-              {['X', 'IG', 'TT', 'DC'].map((icon) => (
-                <span
-                  key={icon}
-                  className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-ui font-bold text-slate-500 cursor-default"
+              {[
+                { icon: 'TT', href: 'https://www.tiktok.com/@sensipro5' },
+                { icon: 'IG', href: 'https://www.instagram.com/sensipro8' },
+              ].map((s) => (
+                <a
+                  key={s.icon}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-ui font-bold text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
                 >
-                  {icon}
-                </span>
+                  {s.icon}
+                </a>
               ))}
             </div>
           </div>
@@ -82,7 +84,7 @@ export function LandingFooter() {
       <div className="border-t border-white/5">
         <div className="mx-auto max-w-6xl px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-slate-700 text-center sm:text-left">
-            © 2025 SensiPRO. No afiliado con Garena o Free Fire.
+            © 2025-2026 SensiPRO. No afiliado, asociado ni respaldado por Garena o Free Fire®.
           </p>
           <p className="text-xs text-slate-700">
             Hecho con 🔥 para la comunidad de Free Fire

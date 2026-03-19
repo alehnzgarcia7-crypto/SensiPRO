@@ -62,9 +62,9 @@ const FEATURES: FeatureDef[] = [
   {
     icon: '📚',
     title: 'Academia Completa',
-    description: '8 guías de sensibilidad, HUD, headshots, armas y más. 12 tips aplicables hoy. Meta actual y tier list.',
+    description: '11 guías de sensibilidad, HUD, headshots, armas y más. 24 tips aplicables hoy. Meta actual y tier list.',
     badge: 'NUEVO',
-    stat: '8 guías + 12 tips',
+    stat: '11 guías + 24 tips',
     color: '#f59e0b',
   },
   {

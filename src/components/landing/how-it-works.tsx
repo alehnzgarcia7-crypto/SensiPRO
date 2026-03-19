@@ -15,22 +15,22 @@ const STEPS = [
     number: '01',
     icon: Search,
     iconBg: '#06b6d4',
-    title: 'Busca tu celular',
-    description: `Encuentra tu modelo entre ${LANDING_DATA.deviceCount}+ dispositivos de ${LANDING_DATA.brandCount} marcas.`,
+    title: '📱 Busca tu celular',
+    description: `Samsung, Xiaomi, Motorola, iPhone... ${LANDING_DATA.deviceCount}+ modelos. El tuyo está aquí.`,
   },
   {
     number: '02',
     icon: Sliders,
     iconBg: '#3b82f6',
-    title: 'Ajusta tu configuración',
-    description: 'Selecciona Hz, RAM, DPI y estilo de juego para afinar tu calibración.',
+    title: '⚙️ Ajusta tu estilo',
+    description: '¿Rush agresivo? ¿Sniper? ¿Balanceado? + tu RAM, Hz y DPI.',
   },
   {
     number: '03',
     icon: Zap,
     iconBg: '#22c55e',
-    title: 'Genera tus resultados',
-    description: 'SensiPRO calcula una sensibilidad hecha para tu dispositivo exacto.',
+    title: '🎯 Recibe TU sensibilidad',
+    description: '6 valores calibrados por el algoritmo ARES para tu hardware exacto.',
   },
 ] as const;
 

@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     template: '%s | SensiPRO',
   },
   description:
-    'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos, ±5 puntos de precisión.',
+    'Genera la sensibilidad perfecta para Free Fire con calibración por DPI real. 644+ dispositivos de 26 marcas, ajuste por hardware.',
   keywords: [
     'sensibilidades free fire',
     'sensibilidad free fire',
@@ -81,14 +81,14 @@ export const metadata: Metadata = {
     siteName: 'Sensibilidades PRO',
     title: 'Sensibilidades PRO — Generador de Sensibilidad Free Fire',
     description:
-      'Genera la sensibilidad perfecta para Free Fire con calibración forense DPI-first v4.0. 500+ dispositivos.',
+      'Genera la sensibilidad perfecta para Free Fire con calibración por DPI real. 644+ dispositivos de 26 marcas.',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sensibilidades PRO — Free Fire',
     description:
-      'Calibración forense DPI-first v4.0 para Free Fire. 500+ dispositivos.',
+      'Genera la sensibilidad perfecta de Free Fire para TU celular. 644+ dispositivos, 26 marcas.',
     images: ['/og-image.png'],
   },
   robots: {

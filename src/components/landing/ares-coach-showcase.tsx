@@ -22,12 +22,12 @@ export function AresCoachShowcase() {
         </div>
 
         <h3 className="mt-4 text-lg font-display font-bold text-white">
-          Próximamente: ARES AI Coach
+          🤖 ARES AI Coach — Próximamente
         </h3>
 
         <p className="mt-2 text-sm text-slate-400 leading-relaxed max-w-md mx-auto">
-          Tu coach personal de Free Fire con recomendaciones basadas en tu dispositivo,
-          tu configuración y tu estilo de juego.
+          Tu coach personal de Free Fire que aprende de tu gameplay y te da
+          consejos específicos para tu dispositivo.
         </p>
       </motion.div>
     </section>

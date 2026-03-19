@@ -11,17 +11,17 @@ import { Monitor, Copy, Crosshair } from 'lucide-react';
 const PROBLEMS = [
   {
     icon: Monitor,
-    title: 'Tu celular no responde igual que otro',
+    title: 'Tu Samsung A15 NO es un iPhone 16 Pro. Diferente PPI, diferente RAM, diferente panel. La misma sensi se siente distinta.',
     color: '#06b6d4',
   },
   {
     icon: Copy,
-    title: 'Copiar configs genéricas no calibra tu dispositivo',
+    title: '¿Copiaste la sensi de un YouTuber? Él juega en un cel de $20,000 o en emulador. Su config NO funciona en tu hardware.',
     color: '#3b82f6',
   },
   {
     icon: Crosshair,
-    title: 'Una mala sensibilidad te hace perder fights antes de disparar',
+    title: 'Cada fight que pierdes por sobre-arrastrar o no llegar al headshot es culpa de una sensi que no calza con tu cel.',
     color: '#8b5cf6',
   },
 ] as const;
@@ -37,7 +37,7 @@ export function ProblemSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-display font-black text-center text-white"
         >
-          No es tu aim. Es tu configuración.
+          ¿Sigues costurando? No eres tú. Es tu configuración.
         </motion.h2>
 
         {/* Texto */}
