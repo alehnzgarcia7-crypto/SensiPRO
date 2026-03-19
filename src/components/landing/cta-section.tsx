@@ -43,7 +43,7 @@ export function CtaSection() {
               backgroundClip: 'text',
             }}
           >
-            costurar? 🔥
+            pegar amarillo? 🔥
           </span>
         </motion.h2>
 

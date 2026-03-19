@@ -37,7 +37,7 @@ export function ProblemSection() {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-display font-black text-center text-white"
         >
-          ¿Sigues costurando? No eres tú. Es tu configuración.
+          ¿Sigues pegando amarillo? No eres tú. Es tu configuración.
         </motion.h2>
 
         {/* Texto */}
