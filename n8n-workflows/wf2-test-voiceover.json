@@ -1,0 +1,85 @@
+{
+  "name": "SensiPRO V2 - Test Voiceover",
+  "nodes": [
+    {
+      "id": "b2000001-0001-4000-b001-000000000001",
+      "name": "Inicio",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "parameters": {}
+    },
+    {
+      "id": "b2000001-0002-4000-b002-000000000002",
+      "name": "Generar Voz ElevenLabs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/pFZP5JQG7iQjIQuC4Bku",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_0fbf51407ce46ffd82295073ca77b1151c60c4464d96a460"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"text\": \"Esto no es una app de sensibilidad. Esto es un motor de calibración construido con matemáticas reales.\",\n  \"model_id\": \"eleven_multilingual_v2\",\n  \"voice_settings\": {\n    \"stability\": 0.70,\n    \"similarity_boost\": 0.75,\n    \"style\": 0.45,\n    \"use_speaker_boost\": true\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "b2000001-0003-4000-b003-000000000003",
+      "name": "Confirmar Audio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 400],
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    message: \"Audio generado exitosamente con ElevenLabs\",\n    has_binary: Object.keys($input.first().binary || {}).length > 0\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Generar Voz ElevenLabs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Voz ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Confirmar Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

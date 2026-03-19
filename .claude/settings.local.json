@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit 2>&1 | head -80)",
+      "Bash(npx vitest run packages/algorithms/src/__tests__/ 2>&1)",
+      "Bash(npx tsc --noEmit 2>&1 | head -40)",
+      "Bash(npx vitest run 2>&1 | tail -50)",
+      "Bash(npx vitest run 2>&1 | grep -E \"FAIL|✓|×\" | head -30)",
+      "Bash(npx vitest run packages/algorithms 2>&1 | tail -20)",
+      "Bash(grep -r \"version\\\\|v3\\\\|v4\" \"/Users/alex/SensiPRO/packages/algorithms/src/\" --include=\"*.ts\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"v3\\\\.0\\\\|v3 algorithm\\\\|deprecated\\\\|old algorithm\" /Users/alex/SensiPRO/src /Users/alex/SensiPRO/packages --include=\"*.ts\" --include=\"*.tsx\" 2>/dev/null | head -20)",
+      "Bash(ls -1 /Users/alex/SensiPRO/src/components/generator/*.tsx 2>/dev/null | head -20)",
+      "Bash(grep -n \"max.*200\\\\|max.*100\\\\|Progress.*max\" /Users/alex/SensiPRO/src/components/generator/*.tsx 2>/dev/null | head -15)",
+      "Bash(npx tsc --noEmit 2>&1 | tail -20)",
+      "Bash(npx vitest run packages/algorithms 2>&1 | tail -30)",
+      "Bash(npx prisma generate 2>&1 | tail -10)",
+      "Bash(npx prisma generate --schema packages/database/prisma/schema.prisma 2>&1 | tail -10)",
+      "Bash(npx tsc --noEmit 2>&1 | tail -10)",
+      "Bash(git push origin main)",
+      "Bash(npx tsc --noEmit 2>&1 | grep -v \"recalculate-sensitivities\" | grep \"error TS\" | head -20)"
+    ]
+  }
+}

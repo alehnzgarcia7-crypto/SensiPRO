@@ -1,0 +1,346 @@
+{
+  "name": "SensiPRO V2 - Orquestador Maestro",
+  "nodes": [
+    {
+      "id": "c3000001-0001-4000-c001-000000000001",
+      "name": "Inicio",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "parameters": {}
+    },
+    {
+      "id": "c3000001-0002-4000-c002-000000000002",
+      "name": "Configurar Tema",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 400],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tema-001",
+              "name": "tema",
+              "value": "SensiPRO: Motor de calibración de sensibilidad para Free Fire con interpolación polinómica y 8730 valores calibrados",
+              "type": "string"
+            },
+            {
+              "id": "tema-002",
+              "name": "num_escenas",
+              "value": 6,
+              "type": "number"
+            },
+            {
+              "id": "tema-003",
+              "name": "duracion_por_escena",
+              "value": 12,
+              "type": "number"
+            },
+            {
+              "id": "tema-004",
+              "name": "idioma",
+              "value": "es-LA",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c3000001-0003-4000-c003-000000000003",
+      "name": "GPT-4o Generar Script",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres un director creativo de videos de TikTok para productos tech gaming. Generas guiones cinematográficos oscuros y prompts de imagen para Flux Pro AI. Responde SOLO en JSON válido, sin markdown.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Tema: {{ $json.tema }}\\n\\nGenera un JSON con esta estructura exacta:\\n{\\n  \\\"script\\\": \\\"guion completo en español LATAM para narrador masculino autoritario, 50-55 segundos, frases cortas y poderosas\\\",\\n  \\\"scenes\\\": [\\n    {\\n      \\\"scene_number\\\": 1,\\n      \\\"narration\\\": \\\"texto que dice el narrador en esta escena\\\",\\n      \\\"image_prompt\\\": \\\"prompt en inglés de exactamente 200 palabras para generar imagen con Flux Pro, estilo dark cyberpunk, fondo negro #080810, iluminación cyan #00E5FF, 8k, cinematográfico\\\",\\n      \\\"duration_seconds\\\": 12\\n    }\\n  ]\\n}\\n\\nGenera exactamente 6 escenas. Los image_prompt deben ser hiperdescriptivos, con colores hex, estilos de iluminación, ángulos de cámara, y texturas específicas. Cada prompt debe funcionar como imagen standalone sin contexto adicional.\"\n    }\n  ],\n  \"temperature\": 0.8,\n  \"response_format\": {\"type\": \"json_object\"}\n}"
+      }
+    },
+    {
+      "id": "c3000001-0004-4000-c004-000000000004",
+      "name": "Parsear Script y Escenas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 400],
+      "parameters": {
+        "jsCode": "const response = JSON.parse($input.first().json.choices[0].message.content);\nconst scenes = response.scenes.map(scene => ({\n  json: {\n    scene_number: scene.scene_number,\n    narration: scene.narration,\n    image_prompt: scene.image_prompt,\n    duration_seconds: scene.duration_seconds,\n    full_script: response.script\n  }\n}));\nreturn scenes;"
+      }
+    },
+    {
+      "id": "c3000001-0005-4000-c005-000000000005",
+      "name": "Generar Imagen por Escena",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux-pro/v1.1",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Key 73392efb-db09-4dc9-ae1b-f5ed540d6cba:f33cce1c6d1e42cd014b94e014b124bc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.image_prompt }}\",\n  \"image_size\": \"portrait_16_9\",\n  \"num_images\": 1,\n  \"enable_safety_checker\": false\n}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 1000
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "c3000001-0006-4000-c006-000000000006",
+      "name": "Recopilar URLs de Imágenes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 400],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst imageUrls = items.map((item, i) => ({\n  scene_number: i + 1,\n  image_url: item.json.images[0].url,\n  narration: item.json.narration || `Escena ${i+1}`\n}));\nreturn [{ json: { images: imageUrls, total: imageUrls.length } }];"
+      }
+    },
+    {
+      "id": "c3000001-0007-4000-c007-000000000007",
+      "name": "Generar Voz Completa",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/pFZP5JQG7iQjIQuC4Bku",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_0fbf51407ce46ffd82295073ca77b1151c60c4464d96a460"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $json.images.map(s => s.narration).join('. ') }}\",\n  \"model_id\": \"eleven_multilingual_v2\",\n  \"voice_settings\": {\n    \"stability\": 0.70,\n    \"similarity_boost\": 0.75,\n    \"style\": 0.45,\n    \"use_speaker_boost\": true\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "c3000001-0008-4000-c008-000000000008",
+      "name": "Script FFmpeg",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1920, 400],
+      "parameters": {
+        "jsCode": "const images = $input.first().json.images || [];\nconst hasBinary = Object.keys($input.first().binary || {}).length > 0;\n\nconst downloadCmds = images.map((img, i) => \n  `curl -s -o /tmp/n8n-media/scene_${i+1}.jpg \"${img.image_url}\"`\n).join(' && ');\n\nconst ffmpegInputs = images.map((_, i) => \n  `-loop 1 -t 12 -i /tmp/n8n-media/scene_${i+1}.jpg`\n).join(' ');\n\nconst filterParts = images.map((_, i) => \n  `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fade=t=in:st=0:d=0.5,fade=t=out:st=11.5:d=0.5[v${i}]`\n).join(';');\n\nconst concatInputs = images.map((_, i) => `[v${i}]`).join('');\n\nconst ffmpegCmd = `mkdir -p /tmp/n8n-media && ${downloadCmds} && ffmpeg -y ${ffmpegInputs} -filter_complex \"${filterParts};${concatInputs}concat=n=${images.length}:v=1:a=0[outv]\" -map \"[outv]\" -c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p /tmp/n8n-media/video_final.mp4`;\n\nreturn [{\n  json: {\n    ffmpeg_command: ffmpegCmd,\n    total_scenes: images.length,\n    estimated_duration: images.length * 12,\n    status: \"ready_to_assemble\"\n  }\n}];"
+      }
+    },
+    {
+      "id": "c3000001-0009-4000-c009-000000000009",
+      "name": "Ensamblar Video",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [2160, 400],
+      "parameters": {
+        "command": "={{ $json.ffmpeg_command }}"
+      }
+    },
+    {
+      "id": "c3000001-0010-4000-c010-000000000010",
+      "name": "Agregar Audio",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [2400, 400],
+      "parameters": {
+        "command": "ffmpeg -y -i /tmp/n8n-media/video_final.mp4 -i /tmp/n8n-media/audio.mp3 -c:v copy -c:a aac -shortest /tmp/n8n-media/video_con_audio.mp4"
+      }
+    },
+    {
+      "id": "c3000001-0011-4000-c011-000000000011",
+      "name": "Leer Video Final",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [2640, 400],
+      "parameters": {
+        "filePath": "/tmp/n8n-media/video_con_audio.mp4"
+      }
+    },
+    {
+      "id": "c3000001-0012-4000-c012-000000000012",
+      "name": "Resultado Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2880, 400],
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    message: \"Video SensiPRO generado exitosamente\",\n    video_path: \"/tmp/n8n-media/video_con_audio.mp4\",\n    has_video: Object.keys($input.first().binary || {}).length > 0\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Configurar Tema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar Tema": {
+      "main": [
+        [
+          {
+            "node": "GPT-4o Generar Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4o Generar Script": {
+      "main": [
+        [
+          {
+            "node": "Parsear Script y Escenas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Script y Escenas": {
+      "main": [
+        [
+          {
+            "node": "Generar Imagen por Escena",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Imagen por Escena": {
+      "main": [
+        [
+          {
+            "node": "Recopilar URLs de Imágenes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recopilar URLs de Imágenes": {
+      "main": [
+        [
+          {
+            "node": "Generar Voz Completa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Voz Completa": {
+      "main": [
+        [
+          {
+            "node": "Script FFmpeg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Script FFmpeg": {
+      "main": [
+        [
+          {
+            "node": "Ensamblar Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensamblar Video": {
+      "main": [
+        [
+          {
+            "node": "Agregar Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar Audio": {
+      "main": [
+        [
+          {
+            "node": "Leer Video Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Video Final": {
+      "main": [
+        [
+          {
+            "node": "Resultado Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

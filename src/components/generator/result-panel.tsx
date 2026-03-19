@@ -25,8 +25,6 @@ import { useGeneratorStore } from '@/stores/generator.store';
 import { CalibrationSelector } from './calibration-selector';
 import { DpiToggle } from './dpi-toggle';
 import { HudRecommendationPanel } from './hud-recommendation';
-import { HzSelector } from './hz-selector';
-import { RamSelector } from './ram-selector';
 
 
 interface AllCalibrationsApiResponse {
@@ -112,8 +110,6 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
     isLoading,
     setCalibration,
     setDpiMode,
-    setUserRam,
-    setUserHz,
     setLoading,
     setAllCalibrations,
     setError,
@@ -267,24 +263,6 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
           {selectedStyle === 'AGGRESSIVE' ? ' · Agresivo +40' : selectedStyle === 'SNIPER' ? ' · Francotirador -20' : ''}
           {calibration === 'BAJA' ? ' · Calibración -25' : calibration === 'ALTA' ? ' · Calibración +15' : ''}
         </p>
-      </motion.div>
-
-      {/* ═══ RAM SELECTOR ═══ */}
-      <motion.div variants={itemVariants} className="glass-card p-5">
-        <RamSelector
-          value={userRam}
-          onChange={setUserRam}
-          suggestedRam={selectedDevice.ramGb}
-        />
-      </motion.div>
-
-      {/* ═══ HZ SELECTOR ═══ */}
-      <motion.div variants={itemVariants} className="glass-card p-5">
-        <HzSelector
-          value={userHz}
-          onChange={setUserHz}
-          suggestedHz={selectedDevice.screenHz}
-        />
       </motion.div>
 
       {/* ═══ CALIBRACION + DPI ═══ */}

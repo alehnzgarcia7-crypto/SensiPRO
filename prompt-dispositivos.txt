@@ -1,0 +1,233 @@
+ultrathink
+
+ACTUALIZACIÓN MASIVA DE DISPOSITIVOS — AGREGAR TODOS LOS MODELOS FALTANTES 2024-2026
+
+CONTEXTO: SensiPRO tiene 537 dispositivos. Se completaron investigaciones exhaustivas que identificaron ~150+ modelos faltantes de todas las marcas. Este prompt agrega los modelos más importantes verificados contra GSMArena.
+
+FORMATO:
+{ brand: 'Marca', model: 'Modelo', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2025, isPopular: true },
+
+TIERS: LOW (gama baja, LCD, 2-4GB), MID (gama media, 4-6GB), HIGH (gama alta, 8GB+), GAMING (flagship, 120Hz+, 8-12GB+, chipset top)
+
+LEE packages/database/prisma/seeds/devices.ts COMPLETO antes de hacer cambios.
+VERIFICA que cada modelo NO exista ya antes de agregarlo.
+Si un modelo YA existe, NO lo dupliques.
+
+---
+
+REDMI — AGREGAR ESTOS MODELOS (al array de redmiDevices):
+
+{ brand: 'Redmi', model: 'A5', screenHz: 120, screenSize: 6.88, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T7250', releaseYear: 2025, isPopular: true },
+{ brand: 'Redmi', model: 'A4', screenHz: 120, screenSize: 6.88, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 4s Gen 2', releaseYear: 2024, isPopular: true },
+{ brand: 'Redmi', model: 'A3x', screenHz: 90, screenSize: 6.71, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T603', releaseYear: 2024, isPopular: true },
+{ brand: 'Redmi', model: '14C 5G', screenHz: 120, screenSize: 6.88, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 4 Gen 2', releaseYear: 2025, isPopular: false },
+{ brand: 'Redmi', model: '14R', screenHz: 120, screenSize: 6.88, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 4 Gen 2', releaseYear: 2024, isPopular: false },
+{ brand: 'Redmi', model: '13 5G', screenHz: 120, screenSize: 6.79, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 4 Gen 2 AE', releaseYear: 2024, isPopular: false },
+{ brand: 'Redmi', model: '15 5G', screenHz: 144, screenSize: 6.9, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 6s Gen 3', releaseYear: 2025, isPopular: false },
+{ brand: 'Redmi', model: '15 4G', screenHz: 144, screenSize: 6.9, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 685', releaseYear: 2025, isPopular: false },
+{ brand: 'Redmi', model: 'Note 14 4G', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99 Ultra', releaseYear: 2025, isPopular: true },
+{ brand: 'Redmi', model: 'Note 14 5G', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7025 Ultra', releaseYear: 2025, isPopular: true },
+{ brand: 'Redmi', model: 'Note 14 Pro 4G', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Helio G100 Ultra', releaseYear: 2025, isPopular: true },
+{ brand: 'Redmi', model: 'Note 14 Pro 5G', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7300 Ultra', releaseYear: 2025, isPopular: true },
+{ brand: 'Redmi', model: 'Note 15 5G', screenHz: 120, screenSize: 6.77, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 6 Gen 3', releaseYear: 2025, isPopular: false },
+{ brand: 'Redmi', model: 'Note 15 Pro 5G', screenHz: 120, screenSize: 6.83, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7400 Ultra', releaseYear: 2025, isPopular: false },
+{ brand: 'Redmi', model: 'Note 15 Pro+', screenHz: 120, screenSize: 6.83, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 4', releaseYear: 2025, isPopular: false },
+
+SAMSUNG — AGREGAR ESTOS MODELOS (al array de samsungDevices):
+
+{ brand: 'Samsung', model: 'Galaxy A26', screenHz: 120, screenSize: 6.7, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 1280', releaseYear: 2025, isPopular: true },
+{ brand: 'Samsung', model: 'Galaxy A36', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Exynos 1580', releaseYear: 2025, isPopular: true },
+{ brand: 'Samsung', model: 'Galaxy A06 5G', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 6300', releaseYear: 2025, isPopular: true },
+{ brand: 'Samsung', model: 'Galaxy A16 5G', screenHz: 90, screenSize: 6.7, ramGb: 4, panelType: 'AMOLED', tier: 'MID', chipset: 'Exynos 1330', releaseYear: 2024, isPopular: true },
+{ brand: 'Samsung', model: 'Galaxy S25 Edge', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
+{ brand: 'Samsung', model: 'Galaxy Tab A9+', screenHz: 90, screenSize: 11.0, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 695', releaseYear: 2023, isPopular: false },
+
+MOTOROLA — AGREGAR ESTOS MODELOS (al array de motorolaDevices):
+
+{ brand: 'Motorola', model: 'Moto G05', screenHz: 90, screenSize: 6.67, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81 Extreme', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G15', screenHz: 90, screenSize: 6.72, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81 Extreme', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G15 Power', screenHz: 90, screenSize: 6.72, ramGb: 8, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81 Extreme', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G35', screenHz: 120, screenSize: 6.72, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T760', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G45', screenHz: 120, screenSize: 6.5, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 6s Gen 3', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G55', screenHz: 120, screenSize: 6.49, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 7025', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G64', screenHz: 120, screenSize: 6.5, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 7025', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G75', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 6 Gen 3', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto E15', screenHz: 90, screenSize: 6.67, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81 Extreme', releaseYear: 2024, isPopular: true },
+{ brand: 'Motorola', model: 'Moto G Power (2025)', screenHz: 120, screenSize: 6.8, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 6300', releaseYear: 2025, isPopular: true },
+{ brand: 'Motorola', model: 'Edge 50', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 1', releaseYear: 2024, isPopular: false },
+{ brand: 'Motorola', model: 'Edge 50 Neo', screenHz: 120, screenSize: 6.4, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Dimensity 7300', releaseYear: 2024, isPopular: false },
+{ brand: 'Motorola', model: 'Edge 60', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Dimensity 7300', releaseYear: 2025, isPopular: false },
+{ brand: 'Motorola', model: 'Edge 60 Pro', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Dimensity 8350 Extreme', releaseYear: 2025, isPopular: false },
+{ brand: 'Motorola', model: 'Razr 50', screenHz: 120, screenSize: 6.9, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Dimensity 7300X', releaseYear: 2024, isPopular: false },
+
+POCO — AGREGAR ESTOS MODELOS (al array de pocoDevices):
+
+{ brand: 'POCO', model: 'C75', screenHz: 120, screenSize: 6.88, ramGb: 8, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81 Ultra', releaseYear: 2024, isPopular: true },
+{ brand: 'POCO', model: 'C61', screenHz: 90, screenSize: 6.71, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G36', releaseYear: 2024, isPopular: false },
+{ brand: 'POCO', model: 'M6 4G', screenHz: 90, screenSize: 6.79, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G91 Ultra', releaseYear: 2024, isPopular: false },
+{ brand: 'POCO', model: 'M6 Pro 4G', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G99 Ultra', releaseYear: 2024, isPopular: false },
+{ brand: 'POCO', model: 'X6', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 2', releaseYear: 2024, isPopular: true },
+{ brand: 'POCO', model: 'X6 Pro', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8300 Ultra', releaseYear: 2024, isPopular: true },
+{ brand: 'POCO', model: 'X6 Neo', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 6080', releaseYear: 2024, isPopular: false },
+{ brand: 'POCO', model: 'F7 Ultra', screenHz: 120, screenSize: 6.67, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
+
+REALME — AGREGAR ESTOS MODELOS (al array de realmeDevices):
+
+{ brand: 'Realme', model: '14 Pro', screenHz: 120, screenSize: 6.77, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Dimensity 7300 Energy', releaseYear: 2025, isPopular: false },
+{ brand: 'Realme', model: '14 Pro+', screenHz: 120, screenSize: 6.83, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 3', releaseYear: 2025, isPopular: false },
+{ brand: 'Realme', model: '14x', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: false },
+{ brand: 'Realme', model: '14', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7050', releaseYear: 2025, isPopular: false },
+{ brand: 'Realme', model: 'C75', screenHz: 90, screenSize: 6.72, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G92 Max', releaseYear: 2024, isPopular: true },
+{ brand: 'Realme', model: 'C63', screenHz: 90, screenSize: 6.75, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc Tiger T612', releaseYear: 2024, isPopular: false },
+{ brand: 'Realme', model: 'C61', screenHz: 90, screenSize: 6.74, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc Tiger T612', releaseYear: 2024, isPopular: false },
+{ brand: 'Realme', model: 'Note 60', screenHz: 90, screenSize: 6.74, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc Tiger T612', releaseYear: 2024, isPopular: true },
+{ brand: 'Realme', model: 'GT 7 Pro', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2024, isPopular: false },
+{ brand: 'Realme', model: '13 Pro', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 2', releaseYear: 2024, isPopular: false },
+{ brand: 'Realme', model: 'Narzo 70', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7050', releaseYear: 2024, isPopular: false },
+
+INFINIX — AGREGAR ESTOS MODELOS (al array de infinixDevices):
+
+{ brand: 'Infinix', model: 'Hot 50 5G', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: true },
+{ brand: 'Infinix', model: 'Hot 50 4G', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Helio G100', releaseYear: 2024, isPopular: true },
+{ brand: 'Infinix', model: 'Hot 50i', screenHz: 90, screenSize: 6.7, ramGb: 8, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81', releaseYear: 2024, isPopular: true },
+{ brand: 'Infinix', model: 'Hot 50 Pro 4G', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G100', releaseYear: 2024, isPopular: true },
+{ brand: 'Infinix', model: 'Note 50 4G', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G100 Ultimate', releaseYear: 2025, isPopular: false },
+{ brand: 'Infinix', model: 'Note 50 Pro 4G', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Helio G100 Ultimate', releaseYear: 2025, isPopular: false },
+{ brand: 'Infinix', model: 'Zero 40 5G', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8200 Ultimate', releaseYear: 2024, isPopular: false },
+{ brand: 'Infinix', model: 'Smart 9', screenHz: 90, screenSize: 6.7, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81', releaseYear: 2024, isPopular: true },
+{ brand: 'Infinix', model: 'Smart 9 HD', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc', releaseYear: 2024, isPopular: true },
+
+TECNO — AGREGAR ESTOS MODELOS (al array de tecnoDevices):
+
+{ brand: 'Tecno', model: 'Camon 40', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G100 Ultimate', releaseYear: 2025, isPopular: false },
+{ brand: 'Tecno', model: 'Camon 40 Pro 5G', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7300', releaseYear: 2025, isPopular: false },
+{ brand: 'Tecno', model: 'Camon 40 Premier', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 8350', releaseYear: 2025, isPopular: false },
+{ brand: 'Tecno', model: 'Spark 30', screenHz: 90, screenSize: 6.78, ramGb: 8, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G91', releaseYear: 2024, isPopular: true },
+{ brand: 'Tecno', model: 'Spark 30 Pro', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Helio G100', releaseYear: 2024, isPopular: true },
+{ brand: 'Tecno', model: 'Spark 30C', screenHz: 90, screenSize: 6.67, ramGb: 8, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81', releaseYear: 2024, isPopular: true },
+{ brand: 'Tecno', model: 'Spark Go 1', screenHz: 60, screenSize: 6.67, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T615', releaseYear: 2024, isPopular: true },
+{ brand: 'Tecno', model: 'Pop 9 4G', screenHz: 90, screenSize: 6.67, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T615', releaseYear: 2024, isPopular: true },
+{ brand: 'Tecno', model: 'Phantom V Fold 2', screenHz: 120, screenSize: 7.85, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9000+', releaseYear: 2024, isPopular: false },
+
+HONOR — AGREGAR ESTOS MODELOS (al array de honorDevices):
+
+{ brand: 'Honor', model: 'X9c', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 6 Gen 1', releaseYear: 2024, isPopular: true },
+{ brand: 'Honor', model: 'X8c', screenHz: 90, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 685', releaseYear: 2025, isPopular: false },
+{ brand: 'Honor', model: 'X7c 4G', screenHz: 120, screenSize: 6.77, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 685', releaseYear: 2024, isPopular: true },
+{ brand: 'Honor', model: 'X6c', screenHz: 90, screenSize: 6.56, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G36', releaseYear: 2024, isPopular: false },
+{ brand: 'Honor', model: '300', screenHz: 120, screenSize: 6.7, ramGb: 16, panelType: 'OLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 3', releaseYear: 2024, isPopular: false },
+{ brand: 'Honor', model: '300 Pro', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Snapdragon 8s Gen 3', releaseYear: 2024, isPopular: false },
+{ brand: 'Honor', model: 'Magic V3', screenHz: 120, screenSize: 7.92, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
+{ brand: 'Honor', model: 'Magic7 Lite', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 6 Gen 1', releaseYear: 2025, isPopular: true },
+{ brand: 'Honor', model: '200 Lite', screenHz: 90, screenSize: 6.7, ramGb: 12, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 6080', releaseYear: 2024, isPopular: false },
+
+OPPO — AGREGAR ESTOS MODELOS (al array de oppoDevices):
+
+{ brand: 'OPPO', model: 'A60', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: true },
+{ brand: 'OPPO', model: 'A80', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: false },
+{ brand: 'OPPO', model: 'A3x', screenHz: 120, screenSize: 6.67, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: false },
+{ brand: 'OPPO', model: 'Reno 13', screenHz: 120, screenSize: 6.59, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8350', releaseYear: 2025, isPopular: false },
+{ brand: 'OPPO', model: 'Reno 13 Pro', screenHz: 120, screenSize: 6.83, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8350', releaseYear: 2024, isPopular: false },
+{ brand: 'OPPO', model: 'Find X8', screenHz: 120, screenSize: 6.59, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9400', releaseYear: 2024, isPopular: false },
+{ brand: 'OPPO', model: 'Find X8 Pro', screenHz: 120, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9400', releaseYear: 2024, isPopular: false },
+{ brand: 'OPPO', model: 'Reno 13F', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7300 Energy', releaseYear: 2025, isPopular: false },
+
+VIVO — AGREGAR ESTOS MODELOS (al array de vivoDevices):
+
+{ brand: 'Vivo', model: 'Y28', screenHz: 90, screenSize: 6.56, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 6020', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'Y29 5G', screenHz: 120, screenSize: 6.68, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 6300', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'V40 Pro', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 9200+', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'X200', screenHz: 120, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9400', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'X200 Pro', screenHz: 120, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9400', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'iQOO Z9s', screenHz: 120, screenSize: 6.77, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 7300', releaseYear: 2024, isPopular: false },
+{ brand: 'Vivo', model: 'iQOO Neo 10', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9300+', releaseYear: 2024, isPopular: false },
+
+ONEPLUS — AGREGAR ESTOS MODELOS (al array de oneplusDevices):
+
+{ brand: 'OnePlus', model: 'Nord CE 4', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7 Gen 3', releaseYear: 2024, isPopular: false },
+{ brand: 'OnePlus', model: 'Nord CE 4 Lite', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2024, isPopular: false },
+{ brand: 'OnePlus', model: '13T', screenHz: 120, screenSize: 6.32, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Elite', releaseYear: 2025, isPopular: false },
+
+GOOGLE — AGREGAR ESTOS MODELOS (al array de pixelDevices):
+
+{ brand: 'Google', model: 'Pixel 9 Pro Fold', screenHz: 120, screenSize: 8.0, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Google Tensor G4', releaseYear: 2024, isPopular: false },
+
+NOTHING — AGREGAR ESTOS MODELOS (busca el array de Nothing o créalo):
+
+{ brand: 'Nothing', model: 'Phone (3a)', screenHz: 120, screenSize: 6.77, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 3', releaseYear: 2025, isPopular: false },
+{ brand: 'Nothing', model: 'Phone (3a) Pro', screenHz: 120, screenSize: 6.77, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 7s Gen 3', releaseYear: 2025, isPopular: false },
+{ brand: 'Nothing', model: 'CMF Phone 2 Pro', screenHz: 120, screenSize: 6.77, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7300 Pro', releaseYear: 2025, isPopular: false },
+
+HUAWEI — AGREGAR ESTOS MODELOS (al array de huaweiDevices):
+
+{ brand: 'Huawei', model: 'Mate 70', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
+{ brand: 'Huawei', model: 'Mate 70 Pro', screenHz: 120, screenSize: 6.9, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
+{ brand: 'Huawei', model: 'nova 13', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin', releaseYear: 2024, isPopular: false },
+{ brand: 'Huawei', model: 'nova 13 Pro', screenHz: 120, screenSize: 6.76, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin', releaseYear: 2024, isPopular: false },
+{ brand: 'Huawei', model: 'Pura 70', screenHz: 120, screenSize: 6.6, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9000S1', releaseYear: 2024, isPopular: false },
+{ brand: 'Huawei', model: 'Pura 70 Ultra', screenHz: 120, screenSize: 6.8, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9010', releaseYear: 2024, isPopular: false },
+
+---
+
+PASO 2 — VERIFICAR DUPLICADOS
+
+Después de agregar TODOS los dispositivos, verifica que NO haya duplicados. Para cada marca, busca modelos con nombres similares. Si encuentras un duplicado, elimina el que acabas de agregar.
+
+NOTA IMPORTANTE: Algunos modelos pueden ya existir con nombres ligeramente diferentes. Por ejemplo:
+- "Redmi Note 14 Pro+" puede ya existir como "Note 14 Pro+" — verifica antes de agregar
+- "POCO F6" y "POCO F6 Pro" probablemente ya existen del batch anterior
+- Verifica TODOS los Samsung Galaxy S25 — ya se agregaron 3 en el batch anterior
+
+---
+
+PASO 3 — CONTAR TOTAL
+
+Reporta el total de dispositivos después de agregar todos.
+
+---
+
+PASO 4 — ACTUALIZAR STATS
+
+Actualiza el número de dispositivos en TODOS los archivos que lo mencionan:
+- academy/page.tsx (Hub)
+- academy/como-funciona/page.tsx
+- Cualquier otro archivo que diga "537" o "503"
+- Landing pages, pricing, etc.
+
+---
+
+PASO 5 — COMPILAR Y VERIFICAR
+
+1. npx tsc --noEmit — 0 errores
+2. npx next build — exitoso
+
+---
+
+PASO 6 — COMMIT Y PUSH
+
+git add -A
+git commit -m "feat: agregar ~120 dispositivos nuevos (Redmi A5/A4/14C/15, Moto G05-G75/Edge 50-60, POCO C75/X6/F7 Ultra, Samsung A26/A36/S25 Edge, Realme 14 Pro+/C75/Note 60, Infinix Hot 50/Note 50, Tecno Camon 40/Spark 30, Honor X9c/Magic V3, OPPO Find X8/Reno 13, Vivo X200/iQOO Neo 10, Nothing 3a, Huawei Mate 70/Pura 70) — total ~660+ dispositivos"
+git push origin main
+
+---
+
+PROTECCIONES — NO TOCAR:
+- NO tocar sensitivity-engine.ts, calibration-engine.ts, headshot-engine.ts
+- NO tocar el formato de entries existentes
+- NO eliminar dispositivos existentes
+- NO tocar TikTok Pixel, webhooks, pagos, tracking, admin, precios
+- NO tocar el generador, headshot mode, ni la academia (excepto números de dispositivos)
+
+---
+
+ENTREGA:
+
+a) Total de dispositivos agregados por marca
+b) Dispositivos que NO se agregaron porque ya existían
+c) Total final de dispositivos
+d) Stats actualizadas
+e) npx tsc --noEmit resultado
+f) npx next build resultado
+g) Hash del commit
+h) Push exitoso
+i) Cualquier hallazgo inesperado

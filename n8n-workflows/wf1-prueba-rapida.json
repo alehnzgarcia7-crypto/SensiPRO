@@ -1,0 +1,78 @@
+{
+  "name": "SensiPRO V2 - Prueba Rápida (1 imagen)",
+  "nodes": [
+    {
+      "id": "a1000001-0001-4000-a001-000000000001",
+      "name": "Inicio",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "parameters": {}
+    },
+    {
+      "id": "a1000001-0002-4000-a002-000000000002",
+      "name": "Generar Imagen Flux",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux-pro/v1.1",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Key 73392efb-db09-4dc9-ae1b-f5ed540d6cba:f33cce1c6d1e42cd014b94e014b124bc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"prompt\": \"Dark cyberpunk smartphone with electric cyan glow, floating holographic data streams, black background #080810, cinematic lighting, volumetric fog, 8k, hyper detailed, professional photography\",\n  \"image_size\": \"portrait_16_9\",\n  \"num_images\": 1,\n  \"enable_safety_checker\": false\n}"
+      }
+    },
+    {
+      "id": "a1000001-0003-4000-a003-000000000003",
+      "name": "Mostrar Resultado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 400],
+      "parameters": {
+        "jsCode": "const imageUrl = $input.first().json.images[0].url;\nreturn [{\n  json: {\n    success: true,\n    image_url: imageUrl,\n    message: \"Imagen generada exitosamente con Flux Pro\"\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Generar Imagen Flux",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar Imagen Flux": {
+      "main": [
+        [
+          {
+            "node": "Mostrar Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

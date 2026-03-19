@@ -9,8 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { DpiToggle } from '@/components/generator/dpi-toggle';
-import { HzSelector } from '@/components/generator/hz-selector';
-import { RamSelector } from '@/components/generator/ram-selector';
 import { CharacterBuildRecommendation } from '@/components/headshot/character-build-recommendation';
 import { CrosshairGuide } from '@/components/headshot/crosshair-guide';
 import { CrosshairPlacementPro } from '@/components/headshot/crosshair-placement-pro';
@@ -314,7 +312,7 @@ const sectionVariants = {
 // ═══ MAIN PAGE ═══
 
 export default function HeadshotPage() {
-  const { selectedDevice, userRam, setUserRam, userHz, setUserHz } = useGeneratorStore();
+  const { selectedDevice, userRam, userHz } = useGeneratorStore();
   const { track } = useTrackEvent();
   const [fingers, setFingers] = useState<FingerCount>(3);
   const [playstyle, setPlaystyle] = useState<HeadshotPlaystyle>('BALANCED');
@@ -447,23 +445,7 @@ export default function HeadshotPage() {
 
         {selectedDevice && (
           <>
-            {/* 2. RAM */}
-            <div className="glass-card p-4">
-              <RamSelector
-                value={userRam}
-                onChange={setUserRam}
-                suggestedRam={selectedDevice.ramGb}
-              />
-            </div>
-            {/* 3. Hz */}
-            <div className="glass-card p-4">
-              <HzSelector
-                value={userHz}
-                onChange={setUserHz}
-                suggestedHz={selectedDevice.screenHz}
-              />
-            </div>
-            {/* 4. DPI Toggle */}
+            {/* DPI Toggle */}
             <div className="glass-card p-4">
               <DpiToggle
                 enabled={dpiEnabled}
