@@ -138,7 +138,7 @@ export function HeroSection() {
                 boxShadow: '0 0 30px rgba(6, 182, 212, 0.3), 0 0 60px rgba(6, 182, 212, 0.1)',
               }}
             >
-              OBTENER MI CONFIGURACIÓN GRATIS
+              OBTENER MI CONFIGURACIÓN
               <span className="ml-2">{'\u2192'}</span>
               {/* Shimmer */}
               <span
@@ -153,7 +153,7 @@ export function HeroSection() {
 
           {/* Subtexto bajo CTA */}
           <p className="text-xs text-slate-500">
-            ⚡ Resultados en 10 segundos · Sin hack · Sin ban · 100% gratis
+            ⚡ Resultados en 10 segundos · Sin hack · Sin ban
           </p>
         </motion.div>
 

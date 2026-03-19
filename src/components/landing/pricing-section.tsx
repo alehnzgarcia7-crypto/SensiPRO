@@ -135,7 +135,7 @@ export function PricingSection() {
                       boxShadow: '0 0 30px rgba(6, 182, 212, 0.3)',
                     }}
                   >
-                    PRUEBA GRATIS → GENERA TU SENSIBILIDAD
+                    GENERA TU SENSIBILIDAD
                   </Link>
                 </div>
               </div>

@@ -83,7 +83,7 @@ export function CtaSection() {
                 ttClickButton({ contentId: CONTENT_IDS.LANDING_SHORT, description: 'footer_cta_generate' });
               }}
             >
-              OBTENER MI CONFIGURACIÓN GRATIS
+              OBTENER MI CONFIGURACIÓN
               <span className="text-xl">{'\u2192'}</span>
             </Link>
           </div>

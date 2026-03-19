@@ -66,7 +66,7 @@ export function HowSensiproWorksCta() {
             </Link>
 
             <p className="text-slate-500 text-xs mt-3">
-              100% gratis · Sin registro · 3 min de lectura
+              Sin registro · 3 min de lectura
             </p>
           </div>
         </div>

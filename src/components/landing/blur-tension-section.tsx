@@ -99,7 +99,7 @@ export function BlurTensionSection() {
             href="/generator"
             className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors font-semibold"
           >
-            Genera tu sensibilidad gratis
+            Genera tu sensibilidad
             <span>{'\u2192'}</span>
           </Link>
         </motion.div>
