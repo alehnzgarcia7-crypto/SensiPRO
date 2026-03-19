@@ -14,19 +14,12 @@ const PaywallGlobal = dynamic(
   { ssr: false, loading: () => null },
 );
 
-// InAppBrowserBanner solo se muestra en WebViews (TikTok, Instagram)
-const InAppBrowserBanner = dynamic(
-  () => import('@/components/inapp-browser-banner').then((m) => ({ default: m.InAppBrowserBanner })),
-  { ssr: false, loading: () => null },
-);
-
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <ToastProvider>
         <PremiumProvider>
           <AnalyticsProvider />
-          <InAppBrowserBanner />
           {children}
           <PaywallGlobal />
         </PremiumProvider>

@@ -79,7 +79,7 @@ const FEATURES = [
 
 const STATS = [
   { value: '610+', label: 'Dispositivos en la base de datos', icon: Smartphone },
-  { value: '26', label: 'Marcas de celulares', icon: Zap },
+  { value: '21', label: 'Marcas de celulares', icon: Zap },
   { value: '271', label: 'Fuentes de datos profesionales', icon: Users },
   { value: 'v5.0', label: 'Versión del algoritmo ARES', icon: Cpu },
 ] as const;
