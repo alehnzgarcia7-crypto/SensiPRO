@@ -60,7 +60,7 @@ export function getUpgradeFeatures(currentTier: UserTier, targetTier: UserTier):
     tournaments: 'Torneos VIP',
     prioritySupport: 'Soporte prioritario',
     earlyAccess: 'Acceso anticipado',
-    academyFull: 'Academia completa',
+    academyFull: 'Academia PRO',
   };
 
   for (const [key, label] of Object.entries(labels)) {

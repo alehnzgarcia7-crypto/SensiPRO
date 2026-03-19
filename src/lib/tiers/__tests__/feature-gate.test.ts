@@ -146,7 +146,7 @@ describe('getUpgradeFeatures', () => {
     expect(gains).toContain('Estilo Francotirador');
     expect(gains).toContain('Comparador de dispositivos');
     expect(gains).toContain('Exportar imagen');
-    expect(gains).toContain('Academia completa');
+    expect(gains).toContain('Academia PRO');
     expect(gains).not.toContain('Sin anuncios');
   });
   it('PREMIUM→VIP gains VIP-only features', () => {

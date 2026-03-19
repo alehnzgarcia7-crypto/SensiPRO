@@ -17,11 +17,11 @@ import { usePremiumContext } from '@/providers/premium-provider';
    ═══════════════════════════════════════════════════════════ */
 
 const PRO_FEATURES = [
-  '6 valores de sensibilidad calibrada por DPI real',
-  'Headshot Mode completo (24 features, 32 armas, 5 técnicas)',
+  '6 valores de sensibilidad calibrados para TU dispositivo',
+  'Headshot Mode: 9 técnicas de drag + 18 combos de personajes',
   '17 códigos HUD reales con capturas de Free Fire',
   'Giroscopio calibrado al rango pro (32-39)',
-  'Academia completa: 8 guías + 12 tips pro',
+  'Academia PRO: 11 guías + 24 tips con datos del motor ARES',
   '610+ dispositivos soportados de 21 marcas',
   'Training Plans de 7 días para mejorar aim',
   'Armas Tier S/A/B con análisis completo',

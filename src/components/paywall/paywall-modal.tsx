@@ -27,6 +27,8 @@ import {
 import { detectInAppBrowser, copyToClipboard, openInSystemBrowser } from '@/lib/browser-detect';
 import { usePremiumContext } from '@/providers/premium-provider';
 
+import { EmbeddedCardForm } from '../embedded-card-form';
+
 // ═══════════════════════════════════════════════════════
 // COUNTDOWN HOOK — Timer REAL desde AppConfig en DB
 // ═══════════════════════════════════════════════════════
@@ -93,11 +95,11 @@ function useOfferCountdown(): CountdownTime {
 // ═══════════════════════════════════════════════════════
 
 const PREMIUM_FEATURES = [
-  '6 valores de sensibilidad calibrada por DPI',
-  'Headshot Mode con 24 features exclusivos',
-  '17 códigos HUD reales con capturas de FF',
+  '6 valores de sensibilidad calibrados para TU dispositivo',
+  'Headshot Mode: 9 técnicas de drag + 18 combos de personajes',
+  '17 códigos HUD reales con capturas del juego',
   'Giroscopio calibrado al rango pro (32-39)',
-  'Academia completa: 8 guías + 12 tips',
+  'Academia PRO: 11 guías + 24 tips con datos del motor ARES',
   'Actualizaciones de por vida + soporte',
 ];
 
@@ -121,6 +123,8 @@ export function PaywallModal() {
   const [copyLinkUrl, setCopyLinkUrl] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const [isWebView, setIsWebView] = useState(false);
+  const [showEmbeddedForm, setShowEmbeddedForm] = useState(false);
 
   // El usuario está logueado → no necesitamos pedir email
   const isLoggedIn = !!session?.user?.email;
@@ -142,6 +146,11 @@ export function PaywallModal() {
       setError(null);
       setSelectedMethod(null);
       setIsSubmitting(false);
+      setShowEmbeddedForm(false);
+
+      // Detectar WebView (TikTok, Instagram, etc.)
+      const { isInAppBrowser } = detectInAppBrowser();
+      setIsWebView(isInAppBrowser);
 
       if (isLoggedIn && session.user.email) {
         setEmail(session.user.email);
@@ -184,6 +193,17 @@ export function PaywallModal() {
     // Capturar email si no lo hemos hecho
     if (!isLoggedIn && emailToUse && !capturedEmail) {
       setCapturedEmail(emailToUse);
+    }
+
+    // WebView + tarjeta → mostrar formulario embebido en vez de redirigir
+    if (selectedMethod === 'card' && isWebView) {
+      track('PAYWALL_CLICKED', { method: 'card', source: paywallContext?.source ?? 'unknown', embeddedWebView: true });
+      trackEvent({
+        event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+        properties: { context: 'embedded_card_form', method: 'card' },
+      });
+      setShowEmbeddedForm(true);
+      return;
     }
 
     track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown' });
@@ -306,7 +326,7 @@ export function PaywallModal() {
       setModalState('error');
       setIsSubmitting(false);
     }
-  }, [selectedMethod, effectiveEmail, isLoggedIn, capturedEmail, paywallContext, unlock, track, setCapturedEmail]);
+  }, [selectedMethod, effectiveEmail, isLoggedIn, capturedEmail, paywallContext, unlock, track, setCapturedEmail, isWebView]);
 
   // ═══════════════════════════════════════════════════
   // RENDER
@@ -548,30 +568,54 @@ export function PaywallModal() {
                       </p>
                     )}
 
-                    {/* Botón PAGAR */}
-                    <motion.button
-                      onClick={handlePayment}
-                      disabled={!selectedMethod || isSubmitting}
-                      className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                        selectedMethod
-                          ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'
-                          : 'bg-white/5 text-slate-500 cursor-not-allowed'
-                      }`}
-                      whileHover={selectedMethod ? { scale: 1.02 } : {}}
-                      whileTap={selectedMethod ? { scale: 0.98 } : {}}
-                    >
-                      <Lock className="w-4 h-4" />
-                      {selectedMethod
-                        ? `PAGAR $199 MXN${selectedMethod === 'oxxo' ? ' EN OXXO' : ''}`
-                        : 'Selecciona un método de pago'
-                      }
-                    </motion.button>
+                    {/* EMBEDDED CARD FORM — Para WebView (TikTok, Instagram, etc.) */}
+                    {showEmbeddedForm && selectedMethod === 'card' && isWebView && effectiveEmail ? (
+                      <div className="mt-2">
+                        <EmbeddedCardForm
+                          email={effectiveEmail}
+                          device={paywallContext?.device}
+                          fingerCount={paywallContext?.fingerCount}
+                          style={paywallContext?.style}
+                          source={paywallContext?.source || 'generator'}
+                          onSuccess={() => {
+                            trackEvent({
+                              event: INTERNAL_EVENTS.CHECKOUT_CREATED,
+                              properties: { method: 'card', source: paywallContext?.source || 'generator', embeddedWebView: true },
+                            });
+                            if (effectiveEmail) {
+                              unlock(effectiveEmail);
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        {/* Botón PAGAR — Flujo normal (redirect) */}
+                        <motion.button
+                          onClick={handlePayment}
+                          disabled={!selectedMethod || isSubmitting}
+                          className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                            selectedMethod
+                              ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'
+                              : 'bg-white/5 text-slate-500 cursor-not-allowed'
+                          }`}
+                          whileHover={selectedMethod ? { scale: 1.02 } : {}}
+                          whileTap={selectedMethod ? { scale: 0.98 } : {}}
+                        >
+                          <Lock className="w-4 h-4" />
+                          {selectedMethod
+                            ? `PAGAR $199 MXN${selectedMethod === 'oxxo' ? ' EN OXXO' : ''}`
+                            : 'Selecciona un método de pago'
+                          }
+                        </motion.button>
 
-                    {/* Seguridad */}
-                    <p className="text-[10px] text-slate-600 mt-3 text-center flex items-center justify-center gap-1">
-                      <Lock className="w-2.5 h-2.5" />
-                      Pago seguro encriptado con SSL
-                    </p>
+                        {/* Seguridad */}
+                        <p className="text-[10px] text-slate-600 mt-3 text-center flex items-center justify-center gap-1">
+                          <Lock className="w-2.5 h-2.5" />
+                          Pago seguro encriptado con SSL
+                        </p>
+                      </>
+                    )}
                   </motion.div>
                 )}
 
