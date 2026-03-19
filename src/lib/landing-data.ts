@@ -327,8 +327,8 @@ export const FAQ_ITEMS: FaqItem[] = [
 export const ALL_BRANDS: string[] = [
   'Samsung', 'Apple', 'Xiaomi', 'Redmi', 'POCO', 'Motorola',
   'Realme', 'OPPO', 'Vivo', 'OnePlus', 'Infinix', 'Tecno',
-  'Honor', 'Nothing', 'Google', 'Huawei', 'Nokia', 'ZTE',
-  'TCL', 'Lenovo', 'BLU', 'ASUS', 'LG', 'Sony', 'Lava', 'Alcatel',
+  'Honor', 'Nothing', 'Google', 'Huawei', 'ZTE',
+  'TCL', 'Lenovo', 'BLU', 'Alcatel',
 ];
 
 // ═══════════════════════════════════════════════════════════════
