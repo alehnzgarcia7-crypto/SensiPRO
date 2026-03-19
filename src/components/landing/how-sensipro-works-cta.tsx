@@ -65,9 +65,6 @@ export function HowSensiproWorksCta() {
               </motion.span>
             </Link>
 
-            <p className="text-slate-500 text-xs mt-3">
-              Sin registro · 3 min de lectura
-            </p>
           </div>
         </div>
       </motion.div>

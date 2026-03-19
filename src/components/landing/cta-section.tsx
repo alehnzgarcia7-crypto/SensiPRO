@@ -89,16 +89,6 @@ export function CtaSection() {
           </div>
         </motion.div>
 
-        {/* Línea final */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 text-xs text-slate-500"
-        >
-          ⚡ 10 segundos · Sin hack · Sin ban · Sin anuncios
-        </motion.p>
       </div>
 
       {/* Gradient line */}

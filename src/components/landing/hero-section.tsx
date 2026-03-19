@@ -151,10 +151,6 @@ export function HeroSection() {
             </span>
           </Link>
 
-          {/* Subtexto bajo CTA */}
-          <p className="text-xs text-slate-500">
-            ⚡ Resultados en 10 segundos · Sin hack · Sin ban
-          </p>
         </motion.div>
 
         {/* Social proof removido — sin datos verificables aún */}
