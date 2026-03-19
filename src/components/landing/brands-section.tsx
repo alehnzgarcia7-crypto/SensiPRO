@@ -13,8 +13,7 @@ const BRANDS = [
   'Samsung', 'Apple', 'Xiaomi', 'Redmi', 'POCO',
   'Motorola', 'Realme', 'OPPO', 'Vivo', 'OnePlus',
   'Infinix', 'Tecno', 'Honor', 'Nothing', 'Google',
-  'Huawei', 'Nokia', 'ZTE', 'TCL', 'Lenovo',
-  'BLU', 'ASUS', 'LG', 'Sony', 'Lava', 'Alcatel',
+  'Huawei', 'ZTE', 'TCL', 'Lenovo', 'BLU', 'Alcatel',
 ] as const;
 
 const POPULAR = new Set(['Samsung', 'Apple', 'Xiaomi', 'Redmi', 'POCO', 'Motorola']);

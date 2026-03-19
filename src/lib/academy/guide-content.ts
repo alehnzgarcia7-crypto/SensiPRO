@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Contenido completo de las 11 guías de academia
 // Basado en datos REALES del algoritmo ARES v5.0
-// 644 dispositivos, 26 marcas, 271 fuentes de jugadores profesionales
+// 612 dispositivos, 21 marcas, 271 fuentes de jugadores profesionales
 // ═══════════════════════════════════════════════════════════════
 
 export type CalloutVariant = 'pro-tip' | 'error' | 'dato-clave' | 'importante';

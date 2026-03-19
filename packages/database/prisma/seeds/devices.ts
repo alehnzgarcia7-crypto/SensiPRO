@@ -125,7 +125,7 @@ export const samsungDevices: DeviceSeed[] = [
   { brand: 'Samsung', model: 'Galaxy J7 Prime', screenHz: 60, screenSize: 5.5, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 7870', releaseYear: 2016, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy J6+', screenHz: 60, screenSize: 6.0, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 425', releaseYear: 2018, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy J4+', screenHz: 60, screenSize: 6.0, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 425', releaseYear: 2018, isPopular: false },
-  { brand: 'Samsung', model: 'Galaxy J2 Core', screenHz: 60, screenSize: 5.0, ramGb: 1, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 7570', releaseYear: 2018, isPopular: false },
+  // Galaxy J2 Core — ELIMINADO: 1GB RAM no puede correr Free Fire MAX
   { brand: 'Samsung', model: 'Galaxy A10', screenHz: 60, screenSize: 6.2, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Exynos 7884', releaseYear: 2019, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A10s', screenHz: 60, screenSize: 6.2, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P22', releaseYear: 2019, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A20', screenHz: 60, screenSize: 6.4, ramGb: 3, panelType: 'AMOLED', tier: 'LOW', chipset: 'Exynos 7884', releaseYear: 2019, isPopular: false },
@@ -166,8 +166,8 @@ export const xiaomiDevices: DeviceSeed[] = [
   { brand: 'Xiaomi', model: '12T', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8100 Ultra', releaseYear: 2022, isPopular: false },
   { brand: 'Xiaomi', model: '11T Pro', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 888', releaseYear: 2021, isPopular: false },
   { brand: 'Xiaomi', model: '11 Lite 5G NE', screenHz: 90, screenSize: 6.55, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2021, isPopular: false },
-  { brand: 'Xiaomi', model: '14T Pro', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9300+', releaseYear: 2024, isPopular: false },
-  { brand: 'Xiaomi', model: '14T', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8300 Ultra', releaseYear: 2024, isPopular: false },
+  { brand: 'Xiaomi', model: '14T Pro', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Dimensity 9300+', releaseYear: 2024, isPopular: true },
+  { brand: 'Xiaomi', model: '14T', screenHz: 144, screenSize: 6.67, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8300 Ultra', releaseYear: 2024, isPopular: true },
   { brand: 'Xiaomi', model: '12 Pro', screenHz: 120, screenSize: 6.73, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 1', releaseYear: 2022, isPopular: false },
   { brand: 'Xiaomi', model: '12', screenHz: 120, screenSize: 6.28, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 1', releaseYear: 2022, isPopular: false },
   { brand: 'Xiaomi', model: '11T', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 1200 Ultra', releaseYear: 2021, isPopular: false },
@@ -504,7 +504,7 @@ export const infinixDevices: DeviceSeed[] = [
   { brand: 'Infinix', model: 'Note 50 Pro 4G', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Helio G100 Ultimate', releaseYear: 2025, isPopular: false },
   { brand: 'Infinix', model: 'Zero 40 5G', screenHz: 144, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Dimensity 8200 Ultimate', releaseYear: 2024, isPopular: false },
   { brand: 'Infinix', model: 'Smart 9', screenHz: 90, screenSize: 6.7, ramGb: 6, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G81', releaseYear: 2024, isPopular: true },
-  { brand: 'Infinix', model: 'Smart 9 HD', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc', releaseYear: 2024, isPopular: true },
+  { brand: 'Infinix', model: 'Smart 9 HD', screenHz: 60, screenSize: 6.7, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A1', releaseYear: 2024, isPopular: true },
 ];
 
 // =============================================================================
@@ -637,10 +637,10 @@ export const vivoDevices: DeviceSeed[] = [
   { brand: 'Vivo', model: 'V29', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2023, isPopular: false },
   { brand: 'Vivo', model: 'V27', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7200', releaseYear: 2023, isPopular: false },
   // Y Series (budget populares)
-  { brand: 'Vivo', model: 'Y36', screenHz: 90, screenSize: 6.64, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 680', releaseYear: 2023, isPopular: false },
-  { brand: 'Vivo', model: 'Y27', screenHz: 90, screenSize: 6.64, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Helio G85', releaseYear: 2023, isPopular: false },
+  { brand: 'Vivo', model: 'Y36', screenHz: 90, screenSize: 6.64, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 680', releaseYear: 2023, isPopular: true },
+  { brand: 'Vivo', model: 'Y27', screenHz: 90, screenSize: 6.64, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Helio G85', releaseYear: 2023, isPopular: true },
   { brand: 'Vivo', model: 'Y22s', screenHz: 60, screenSize: 6.55, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 680', releaseYear: 2022, isPopular: false },
-  { brand: 'Vivo', model: 'Y17s', screenHz: 60, screenSize: 6.56, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G85', releaseYear: 2023, isPopular: false },
+  { brand: 'Vivo', model: 'Y17s', screenHz: 60, screenSize: 6.56, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G85', releaseYear: 2023, isPopular: true },
   { brand: 'Vivo', model: 'Y16', screenHz: 60, screenSize: 6.51, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2022, isPopular: false },
   { brand: 'Vivo', model: 'Y02', screenHz: 60, screenSize: 6.51, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P22', releaseYear: 2022, isPopular: false },
   // T Series
@@ -755,8 +755,8 @@ export const huaweiDevices: DeviceSeed[] = [
   { brand: 'Huawei', model: 'Mate 60', screenHz: 120, screenSize: 6.69, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin 9000S', releaseYear: 2023, isPopular: false },
   { brand: 'Huawei', model: 'Pura 70 Pro', screenHz: 120, screenSize: 6.8, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9010', releaseYear: 2024, isPopular: false },
   { brand: 'Huawei', model: 'Nova 12 Ultra', screenHz: 120, screenSize: 6.76, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin 9000S', releaseYear: 2024, isPopular: false },
-  { brand: 'Huawei', model: 'Nova 12', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2024, isPopular: false },
-  { brand: 'Huawei', model: 'Nova 11', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2023, isPopular: false },
+  { brand: 'Huawei', model: 'Nova 12', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2024, isPopular: true },
+  { brand: 'Huawei', model: 'Nova 11', screenHz: 120, screenSize: 6.7, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2023, isPopular: true },
   { brand: 'Huawei', model: 'Nova 10', screenHz: 120, screenSize: 6.67, ramGb: 8, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 778G', releaseYear: 2022, isPopular: false },
   { brand: 'Huawei', model: 'Y9a', screenHz: 60, screenSize: 6.63, ramGb: 8, panelType: 'LCD', tier: 'MID', chipset: 'Helio G80', releaseYear: 2020, isPopular: false },
   { brand: 'Huawei', model: 'Y7a', screenHz: 60, screenSize: 6.67, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Kirin 710A', releaseYear: 2020, isPopular: false },
@@ -771,8 +771,8 @@ export const huaweiDevices: DeviceSeed[] = [
   // Huawei 2024 additions
   { brand: 'Huawei', model: 'Mate 70', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
   { brand: 'Huawei', model: 'Mate 70 Pro', screenHz: 120, screenSize: 6.9, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
-  { brand: 'Huawei', model: 'nova 13', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin', releaseYear: 2024, isPopular: false },
-  { brand: 'Huawei', model: 'nova 13 Pro', screenHz: 120, screenSize: 6.76, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin', releaseYear: 2024, isPopular: false },
+  { brand: 'Huawei', model: 'nova 13', screenHz: 120, screenSize: 6.7, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
+  { brand: 'Huawei', model: 'nova 13 Pro', screenHz: 120, screenSize: 6.76, ramGb: 12, panelType: 'OLED', tier: 'HIGH', chipset: 'Kirin 9020', releaseYear: 2024, isPopular: false },
   { brand: 'Huawei', model: 'Pura 70', screenHz: 120, screenSize: 6.6, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9000S1', releaseYear: 2024, isPopular: false },
   { brand: 'Huawei', model: 'Pura 70 Ultra', screenHz: 120, screenSize: 6.8, ramGb: 16, panelType: 'OLED', tier: 'GAMING', chipset: 'Kirin 9010', releaseYear: 2024, isPopular: false },
 ];
@@ -784,62 +784,20 @@ export const zteDevices: DeviceSeed[] = [
   { brand: 'ZTE', model: 'Nubia Red Magic 9 Pro', screenHz: 120, screenSize: 6.8, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
   { brand: 'ZTE', model: 'Nubia Red Magic 8 Pro', screenHz: 120, screenSize: 6.8, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
   { brand: 'ZTE', model: 'Nubia Z60 Ultra', screenHz: 120, screenSize: 6.85, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
-  { brand: 'ZTE', model: 'Blade V50 Vita', screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2024, isPopular: false },
+  { brand: 'ZTE', model: 'Blade V50 Vita', screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2024, isPopular: true },
   { brand: 'ZTE', model: 'Blade A73', screenHz: 90, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2023, isPopular: false },
-  { brand: 'ZTE', model: 'Blade A54', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2023, isPopular: false },
+  { brand: 'ZTE', model: 'Blade A54', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2023, isPopular: true },
   { brand: 'ZTE', model: 'Blade V40', screenHz: 60, screenSize: 6.67, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 700', releaseYear: 2022, isPopular: false },
   { brand: 'ZTE', model: 'Blade A52', screenHz: 60, screenSize: 6.52, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A', releaseYear: 2022, isPopular: false },
 ];
 
-// =============================================================================
-// ASUS ROG / ZENFONE (6 dispositivos — gaming)
-// =============================================================================
-export const asusDevices: DeviceSeed[] = [
-  { brand: 'ASUS', model: 'ROG Phone 8 Pro', screenHz: 165, screenSize: 6.78, ramGb: 24, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
-  { brand: 'ASUS', model: 'ROG Phone 8', screenHz: 165, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
-  { brand: 'ASUS', model: 'ROG Phone 7 Ultimate', screenHz: 165, screenSize: 6.78, ramGb: 16, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
-  { brand: 'ASUS', model: 'ROG Phone 7', screenHz: 165, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
-  { brand: 'ASUS', model: 'Zenfone 11 Ultra', screenHz: 120, screenSize: 6.78, ramGb: 12, panelType: 'AMOLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
-  { brand: 'ASUS', model: 'Zenfone 10', screenHz: 144, screenSize: 5.92, ramGb: 8, panelType: 'AMOLED', tier: 'HIGH', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
-];
+// ASUS — ELIMINADO: Salió del mercado de smartphones en enero 2026
 
-// =============================================================================
-// SONY XPERIA (4 dispositivos)
-// =============================================================================
-export const sonyDevices: DeviceSeed[] = [
-  { brand: 'Sony', model: 'Xperia 1 VI', screenHz: 120, screenSize: 6.5, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 3', releaseYear: 2024, isPopular: false },
-  { brand: 'Sony', model: 'Xperia 1 V', screenHz: 120, screenSize: 6.5, ramGb: 12, panelType: 'OLED', tier: 'GAMING', chipset: 'Snapdragon 8 Gen 2', releaseYear: 2023, isPopular: false },
-  { brand: 'Sony', model: 'Xperia 10 VI', screenHz: 60, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 6 Gen 1', releaseYear: 2024, isPopular: false },
-  { brand: 'Sony', model: 'Xperia 10 V', screenHz: 60, screenSize: 6.1, ramGb: 6, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2023, isPopular: false },
-];
+// Sony — ELIMINADO: Sin distribución oficial en LATAM (solo importación gris)
 
-// =============================================================================
-// LG (dispositivos legacy — aun usados en LATAM)
-// =============================================================================
-export const lgDevices: DeviceSeed[] = [
-  { brand: 'LG', model: 'Velvet', screenHz: 60, screenSize: 6.8, ramGb: 6, panelType: 'OLED', tier: 'MID', chipset: 'Snapdragon 765G', releaseYear: 2020, isPopular: false },
-  { brand: 'LG', model: 'K62', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2020, isPopular: false },
-  { brand: 'LG', model: 'K52', screenHz: 60, screenSize: 6.6, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2021, isPopular: false },
-  { brand: 'LG', model: 'K42', screenHz: 60, screenSize: 6.6, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P22', releaseYear: 2021, isPopular: false },
-  { brand: 'LG', model: 'Stylo 6', screenHz: 60, screenSize: 6.8, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio P35', releaseYear: 2020, isPopular: false },
-];
+// LG — ELIMINADO: Salió del mercado de smartphones en julio 2021
 
-// =============================================================================
-// NOKIA (5 dispositivos — budget)
-// =============================================================================
-export const nokiaDevices: DeviceSeed[] = [
-  { brand: 'Nokia', model: 'G42', screenHz: 90, screenSize: 6.56, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 480+', releaseYear: 2023, isPopular: false },
-  { brand: 'Nokia', model: 'G22', screenHz: 90, screenSize: 6.52, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G37', releaseYear: 2023, isPopular: false },
-  { brand: 'Nokia', model: 'G21', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc T606', releaseYear: 2022, isPopular: false },
-  { brand: 'Nokia', model: 'C32', screenHz: 60, screenSize: 6.5, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A', releaseYear: 2023, isPopular: false },
-  { brand: 'Nokia', model: 'C22', screenHz: 60, screenSize: 6.5, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A', releaseYear: 2023, isPopular: false },
-  { brand: 'Nokia', model: 'X30', screenHz: 90, screenSize: 6.43, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2022, isPopular: false },
-  { brand: 'Nokia', model: 'G60', screenHz: 120, screenSize: 6.58, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Snapdragon 695', releaseYear: 2022, isPopular: false },
-  { brand: 'Nokia', model: 'G50', screenHz: 60, screenSize: 6.82, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 480', releaseYear: 2021, isPopular: false },
-  { brand: 'Nokia', model: 'G20', screenHz: 60, screenSize: 6.52, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G35', releaseYear: 2021, isPopular: false },
-  { brand: 'Nokia', model: 'C31', screenHz: 60, screenSize: 6.74, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A', releaseYear: 2022, isPopular: false },
-  { brand: 'Nokia', model: 'C21 Plus', screenHz: 60, screenSize: 6.52, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Unisoc SC9863A', releaseYear: 2022, isPopular: false },
-];
+// Nokia — ELIMINADO: HMD discontinuó smartphones Nokia en enero 2025
 
 // =============================================================================
 // ALCATEL / TCL (5 dispositivos — budget LATAM)
@@ -871,18 +829,14 @@ export const lenovoDevices: DeviceSeed[] = [
 // MICROMAX / LAVA / CELKON (dispositivos India/LATAM budget — 8 dispositivos)
 // =============================================================================
 export const budgetBrandDevices: DeviceSeed[] = [
-  // Lava (presentes en mercados emergentes)
-  { brand: 'Lava', model: 'Blaze 5G', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Dimensity 700', releaseYear: 2022, isPopular: false },
-  { brand: 'Lava', model: 'Agni 2', screenHz: 120, screenSize: 6.78, ramGb: 8, panelType: 'AMOLED', tier: 'MID', chipset: 'Dimensity 7050', releaseYear: 2023, isPopular: false },
-  { brand: 'Lava', model: 'Yuva 3', screenHz: 90, screenSize: 6.56, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G37', releaseYear: 2023, isPopular: false },
-  { brand: 'Lava', model: 'Storm 5G', screenHz: 90, screenSize: 6.56, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Dimensity 6020', releaseYear: 2024, isPopular: false },
+  // Lava — ELIMINADO: Marca exclusiva de India, sin presencia en LATAM
   // BLU (popular en LATAM/USA budget)
-  { brand: 'BLU', model: 'G91 Pro', screenHz: 90, screenSize: 6.8, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Helio G95', releaseYear: 2022, isPopular: false },
+  { brand: 'BLU', model: 'G91 Pro', screenHz: 90, screenSize: 6.8, ramGb: 6, panelType: 'LCD', tier: 'MID', chipset: 'Helio G95', releaseYear: 2022, isPopular: true },
   { brand: 'BLU', model: 'G71+', screenHz: 60, screenSize: 6.5, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio A25', releaseYear: 2022, isPopular: false },
   { brand: 'BLU', model: 'View 4', screenHz: 60, screenSize: 6.52, ramGb: 3, panelType: 'LCD', tier: 'LOW', chipset: 'Helio A25', releaseYear: 2023, isPopular: false },
   { brand: 'BLU', model: 'F91', screenHz: 60, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G25', releaseYear: 2022, isPopular: false },
   // Mas BLU budget LATAM
-  { brand: 'BLU', model: 'Bold N3', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G37', releaseYear: 2023, isPopular: false },
+  { brand: 'BLU', model: 'Bold N3', screenHz: 90, screenSize: 6.5, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G37', releaseYear: 2023, isPopular: true },
   { brand: 'BLU', model: 'G93', screenHz: 60, screenSize: 6.4, ramGb: 4, panelType: 'LCD', tier: 'LOW', chipset: 'Helio G37', releaseYear: 2023, isPopular: false },
   // iPad (para gamers tablet)
   { brand: 'Apple', model: 'iPad 10th Gen', screenHz: 60, screenSize: 10.9, ramGb: 4, panelType: 'LCD', tier: 'MID', chipset: 'A14 Bionic', releaseYear: 2022, isPopular: false },
@@ -910,7 +864,7 @@ export const budgetBrandDevices: DeviceSeed[] = [
   { brand: 'OnePlus', model: '6T', screenHz: 60, screenSize: 6.41, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 845', releaseYear: 2018, isPopular: false },
   // Mas Samsung Galaxy legacy populares en LATAM
   { brand: 'Samsung', model: 'Galaxy A01', screenHz: 60, screenSize: 5.7, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 439', releaseYear: 2020, isPopular: false },
-  { brand: 'Samsung', model: 'Galaxy A01 Core', screenHz: 60, screenSize: 5.3, ramGb: 1, panelType: 'LCD', tier: 'LOW', chipset: 'Helio A22', releaseYear: 2020, isPopular: false },
+  // Galaxy A01 Core — ELIMINADO: 1GB RAM no puede correr Free Fire MAX
   { brand: 'Samsung', model: 'Galaxy A70', screenHz: 60, screenSize: 6.7, ramGb: 6, panelType: 'AMOLED', tier: 'MID', chipset: 'Snapdragon 675', releaseYear: 2019, isPopular: false },
   { brand: 'Samsung', model: 'Galaxy A11', screenHz: 60, screenSize: 6.4, ramGb: 2, panelType: 'LCD', tier: 'LOW', chipset: 'Snapdragon 450', releaseYear: 2020, isPopular: false },
   // Mas Xiaomi
@@ -939,10 +893,10 @@ export const ALL_DEVICES: DeviceSeed[] = [
   ...googleDevices,
   ...huaweiDevices,
   ...zteDevices,
-  ...asusDevices,
-  ...sonyDevices,
-  ...lgDevices,
-  ...nokiaDevices,
+  // ASUS — eliminado (salió del mercado enero 2026)
+  // Sony — eliminado (sin distribución LATAM)
+  // LG — eliminado (salió del mercado julio 2021)
+  // Nokia — eliminado (HMD discontinuó enero 2025)
   ...tclDevices,
   ...lenovoDevices,
   ...budgetBrandDevices,

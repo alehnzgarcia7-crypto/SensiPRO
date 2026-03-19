@@ -16,8 +16,8 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 644, suffix: '+', label: 'Dispositivos analizados', icon: '📱' },
-  { value: 26, suffix: '', label: 'Marcas de celular', icon: '🏷️' },
+  { value: 610, suffix: '+', label: 'Dispositivos analizados', icon: '📱' },
+  { value: 21, suffix: '', label: 'Marcas de celular', icon: '🏷️' },
   { value: 9, suffix: '', label: 'Combinaciones de calibración', icon: '🎯' },
   { value: 6, suffix: '', label: 'Sliders optimizados por dispositivo', icon: '⚙️' },
 ];

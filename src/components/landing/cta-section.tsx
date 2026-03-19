@@ -55,7 +55,7 @@ export function CtaSection() {
           transition={{ delay: 0.1 }}
           className="mt-4 text-base md:text-lg text-slate-400"
         >
-          644+ dispositivos. 9 calibraciones. Una sensibilidad que por fin calza con tu celular.
+          610+ dispositivos. 9 calibraciones. Una sensibilidad que por fin calza con tu celular.
         </motion.p>
 
         {/* CTA */}

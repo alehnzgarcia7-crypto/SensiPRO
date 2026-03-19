@@ -5,14 +5,14 @@
 // ═══════════════════════════════════════════════════════════════
 
 // --- Counts reales de la DB (actualizados desde seed y componentes) ---
-// 644 devices, 26 brands (de devices.seed.ts — verificado Mar 2026)
+// 612 devices, 21 brands (de devices.seed.ts — limpieza Mar 2026)
 // 11 guías reales en academia, 24 tips reales
 // 24 features en headshot mode, 17 HUD codes, 9 técnicas drag
 
 export const LANDING_DATA = {
   // Conteos reales verificados
-  deviceCount: 644,
-  brandCount: 26,
+  deviceCount: 610,
+  brandCount: 21,
   styleCount: 9,
   guideCount: 11,            // 11 guías reales con contenido completo
   tipCount: 24,              // 24 tips reales
@@ -312,7 +312,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: '¿Cómo es diferente de copiar settings de YouTube?',
-    a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 644+ dispositivos para calcular TU configuración ideal.',
+    a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 610+ dispositivos para calcular TU configuración ideal.',
   },
   {
     q: '¿Me van a banear?',
