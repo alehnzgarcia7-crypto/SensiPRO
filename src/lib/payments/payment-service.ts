@@ -200,13 +200,49 @@ export async function createStripeOxxoPayment(input: CreatePaymentInput): Promis
     if (input.device) metadata['device'] = input.device;
     if (input.fingerCount) metadata['fingerCount'] = String(input.fingerCount);
 
-    const paymentIntent = await stripeLifetime.paymentIntents.create({
-      amount: PRICING.launchPrice,
-      currency: PRICING.currency,
+    // Checkout Session con OXXO — Stripe muestra el voucher en su página hosted.
+    // El webhook payment_intent.succeeded se encarga de activar premium cuando
+    // el usuario paga en OXXO (24-72h después). Pasamos metadata al PaymentIntent
+    // para que el webhook lo identifique como pago de SensiPRO.
+    const session = await stripeLifetime.checkout.sessions.create({
+      mode: 'payment',
       payment_method_types: ['oxxo'],
+      customer_email: input.email.toLowerCase().trim(),
+
+      line_items: [{
+        price_data: {
+          currency: PRICING.currency,
+          unit_amount: PRICING.launchPrice,
+          product_data: {
+            name: 'SensiPRO Premium — Acceso de por vida',
+            description: 'Sensibilidad calibrada + Headshot Mode + HUD Codes + Academia completa. Pago único, acceso para siempre.',
+          },
+        },
+        quantity: 1,
+      }],
+
+      // Metadata en la session (para nuestros registros)
       metadata,
-      receipt_email: input.email.toLowerCase().trim(),
-      description: 'SensiPRO Premium — Acceso de por vida',
+
+      // Metadata en el PaymentIntent subyacente (para que el webhook lo identifique)
+      payment_intent_data: {
+        metadata,
+        receipt_email: input.email.toLowerCase().trim(),
+        description: 'SensiPRO Premium — Acceso de por vida (OXXO)',
+      },
+
+      payment_method_options: {
+        oxxo: {
+          expires_after_days: 3,
+        },
+      },
+
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&method=oxxo`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/failure?reason=cancelled`,
+
+      locale: 'es',
+      // OXXO sessions necesitan más tiempo — el usuario debe ir a la tienda
+      expires_at: Math.floor(Date.now() / 1000) + 86400, // 24 horas
     });
 
     // Registrar intento
@@ -217,7 +253,8 @@ export async function createStripeOxxoPayment(input: CreatePaymentInput): Promis
       status: 'pending',
       amount: PRICING.launchPrice,
       currency: PRICING.currency.toUpperCase(),
-      externalId: paymentIntent.id,
+      externalId: session.id,
+      checkoutUrl: session.url || undefined,
       device: input.device,
       ipAddress: input.ipAddress,
       userAgent: input.userAgent,
@@ -225,8 +262,8 @@ export async function createStripeOxxoPayment(input: CreatePaymentInput): Promis
 
     return {
       success: true,
-      clientSecret: paymentIntent.client_secret || undefined,
-      paymentIntentId: paymentIntent.id,
+      checkoutUrl: session.url || undefined,
+      paymentIntentId: session.id,
     };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al crear el pago OXXO';

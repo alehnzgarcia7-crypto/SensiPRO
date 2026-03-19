@@ -290,35 +290,6 @@ export function PaywallModal() {
         return;
       }
 
-      // Para OXXO con Stripe Elements
-      if (data.clientSecret && selectedMethod === 'oxxo') {
-        const oxxoUrl = `/payment/oxxo?secret=${data.clientSecret}&email=${encodeURIComponent(emailToUse)}`;
-        const { isInAppBrowser: isInAppOxxo, browserName: oxxoBrowserName } = detectInAppBrowser();
-        if (isInAppOxxo) {
-          trackEvent({
-            event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-            properties: { browser: oxxoBrowserName, context: 'oxxo_checkout' },
-          });
-          try { sessionStorage.setItem('sensipro_checkout_url', oxxoUrl); } catch { /* ignore */ }
-
-          // Intento 1: abrir en navegador del sistema
-          openInSystemBrowser(oxxoUrl);
-
-          // Fallback a copy-link después de 1.5s
-          setTimeout(() => {
-            if (!document.hidden) {
-              setCopyLinkUrl(oxxoUrl);
-              setLinkCopied(false);
-              setModalState('copy-link');
-              setIsSubmitting(false);
-            }
-          }, 1500);
-          return;
-        }
-        window.location.href = oxxoUrl;
-        return;
-      }
-
       throw new Error('No se recibió URL de checkout');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Hubo un error. Intenta de nuevo.';
@@ -473,104 +444,27 @@ export function PaywallModal() {
                       </div>
                     )}
 
-                    {/* Métodos de pago */}
-                    <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-3">
-                      Método de pago:
-                    </p>
-
-                    <div className="space-y-2 mb-4">
-                      {/* Tarjeta */}
-                      <button
-                        onClick={() => setSelectedMethod('card')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
-                          selectedMethod === 'card'
-                            ? 'border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_20px_rgba(0,255,255,0.05)]'
-                            : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                          selectedMethod === 'card' ? 'bg-cyan-500/20' : 'bg-white/5'
-                        }`}>
-                          <CreditCard className={`w-4 h-4 ${selectedMethod === 'card' ? 'text-cyan-400' : 'text-slate-400'}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className={`text-sm font-medium ${selectedMethod === 'card' ? 'text-white' : 'text-slate-300'}`}>
-                            Tarjeta de crédito / débito
-                          </p>
-                          <p className="text-[10px] text-slate-500">Visa, Mastercard, Amex</p>
-                        </div>
-                        {selectedMethod === 'card' && (
-                          <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-
-                      {/* OXXO */}
-                      <button
-                        onClick={() => setSelectedMethod('oxxo')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
-                          selectedMethod === 'oxxo'
-                            ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.05)]'
-                            : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                          selectedMethod === 'oxxo' ? 'bg-yellow-500/20' : 'bg-white/5'
-                        }`}>
-                          <Banknote className={`w-4 h-4 ${selectedMethod === 'oxxo' ? 'text-yellow-400' : 'text-slate-400'}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className={`text-sm font-medium ${selectedMethod === 'oxxo' ? 'text-white' : 'text-slate-300'}`}>
-                            OXXO (efectivo)
-                          </p>
-                          <p className="text-[10px] text-slate-500">Paga en cualquier OXXO de México</p>
-                        </div>
-                        {selectedMethod === 'oxxo' && (
-                          <div className="w-5 h-5 rounded-full bg-yellow-500 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-
-                      {/* Mercado Pago */}
-                      <button
-                        onClick={() => setSelectedMethod('mercadopago')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
-                          selectedMethod === 'mercadopago'
-                            ? 'border-blue-500/50 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]'
-                            : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                          selectedMethod === 'mercadopago' ? 'bg-blue-500/20' : 'bg-white/5'
-                        }`}>
-                          <Smartphone className={`w-4 h-4 ${selectedMethod === 'mercadopago' ? 'text-blue-400' : 'text-slate-400'}`} />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p className={`text-sm font-medium ${selectedMethod === 'mercadopago' ? 'text-white' : 'text-slate-300'}`}>
-                            Mercado Pago
-                          </p>
-                          <p className="text-[10px] text-slate-500">Tarjetas locales, transferencia, efectivo</p>
-                        </div>
-                        {selectedMethod === 'mercadopago' && (
-                          <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-                    </div>
-
-                    {error && (
-                      <p className="text-xs text-red-400 mb-3 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {error}
-                      </p>
-                    )}
-
-                    {/* EMBEDDED CARD FORM — Para WebView (TikTok, Instagram, etc.) */}
+                    {/* EMBEDDED CARD FORM — Para WebView con tarjeta */}
                     {showEmbeddedForm && selectedMethod === 'card' && isWebView && effectiveEmail ? (
-                      <div className="mt-2">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {/* Botón Volver */}
+                        <button
+                          onClick={() => setShowEmbeddedForm(false)}
+                          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-4 cursor-pointer"
+                        >
+                          <span>←</span>
+                          <span>Cambiar método de pago</span>
+                        </button>
+
+                        <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
+                          <CreditCard className="w-4 h-4 text-cyan-400" />
+                          <span className="text-xs text-slate-300">Pago con tarjeta</span>
+                        </div>
+
                         <EmbeddedCardForm
                           email={effectiveEmail}
                           device={paywallContext?.device}
@@ -587,9 +481,104 @@ export function PaywallModal() {
                             }
                           }}
                         />
-                      </div>
+                      </motion.div>
                     ) : (
                       <>
+                        {/* Métodos de pago */}
+                        <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-3">
+                          Método de pago:
+                        </p>
+
+                        <div className="space-y-2 mb-4">
+                          {/* Tarjeta */}
+                          <button
+                            onClick={() => setSelectedMethod('card')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
+                              selectedMethod === 'card'
+                                ? 'border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_20px_rgba(0,255,255,0.05)]'
+                                : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
+                            }`}
+                          >
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                              selectedMethod === 'card' ? 'bg-cyan-500/20' : 'bg-white/5'
+                            }`}>
+                              <CreditCard className={`w-4 h-4 ${selectedMethod === 'card' ? 'text-cyan-400' : 'text-slate-400'}`} />
+                            </div>
+                            <div className="text-left flex-1">
+                              <p className={`text-sm font-medium ${selectedMethod === 'card' ? 'text-white' : 'text-slate-300'}`}>
+                                Tarjeta de crédito / débito
+                              </p>
+                              <p className="text-[10px] text-slate-500">Visa, Mastercard, Amex</p>
+                            </div>
+                            {selectedMethod === 'card' && (
+                              <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+
+                          {/* OXXO */}
+                          <button
+                            onClick={() => setSelectedMethod('oxxo')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
+                              selectedMethod === 'oxxo'
+                                ? 'border-yellow-500/50 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.05)]'
+                                : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
+                            }`}
+                          >
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                              selectedMethod === 'oxxo' ? 'bg-yellow-500/20' : 'bg-white/5'
+                            }`}>
+                              <Banknote className={`w-4 h-4 ${selectedMethod === 'oxxo' ? 'text-yellow-400' : 'text-slate-400'}`} />
+                            </div>
+                            <div className="text-left flex-1">
+                              <p className={`text-sm font-medium ${selectedMethod === 'oxxo' ? 'text-white' : 'text-slate-300'}`}>
+                                OXXO (efectivo)
+                              </p>
+                              <p className="text-[10px] text-slate-500">Paga en cualquier OXXO de México</p>
+                            </div>
+                            {selectedMethod === 'oxxo' && (
+                              <div className="w-5 h-5 rounded-full bg-yellow-500 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+
+                          {/* Mercado Pago */}
+                          <button
+                            onClick={() => setSelectedMethod('mercadopago')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
+                              selectedMethod === 'mercadopago'
+                                ? 'border-blue-500/50 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]'
+                                : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
+                            }`}
+                          >
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                              selectedMethod === 'mercadopago' ? 'bg-blue-500/20' : 'bg-white/5'
+                            }`}>
+                              <Smartphone className={`w-4 h-4 ${selectedMethod === 'mercadopago' ? 'text-blue-400' : 'text-slate-400'}`} />
+                            </div>
+                            <div className="text-left flex-1">
+                              <p className={`text-sm font-medium ${selectedMethod === 'mercadopago' ? 'text-white' : 'text-slate-300'}`}>
+                                Mercado Pago
+                              </p>
+                              <p className="text-[10px] text-slate-500">Tarjetas locales, transferencia, efectivo</p>
+                            </div>
+                            {selectedMethod === 'mercadopago' && (
+                              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        </div>
+
+                        {error && (
+                          <p className="text-xs text-red-400 mb-3 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {error}
+                          </p>
+                        )}
+
                         {/* Botón PAGAR — Flujo normal (redirect) */}
                         <motion.button
                           onClick={handlePayment}

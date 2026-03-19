@@ -16,7 +16,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Loader2, AlertCircle, Lock } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
@@ -131,6 +131,11 @@ export function EmbeddedCardForm({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Ref estable para onSuccess — evita re-crear el PaymentIntent en cada render
+  // (onSuccess es un closure inline que se recrea cada render)
+  const onSuccessRef = useRef(onSuccess);
+  onSuccessRef.current = onSuccess;
+
   useEffect(() => {
     let cancelled = false;
 
@@ -148,7 +153,7 @@ export function EmbeddedCardForm({
         if (!res.ok) {
           if (data.isPremium) {
             // Ya es premium — activar directamente
-            onSuccess();
+            onSuccessRef.current();
             return;
           }
           setError(data.error || 'Error al inicializar el pago');
@@ -168,7 +173,7 @@ export function EmbeddedCardForm({
     return () => {
       cancelled = true;
     };
-  }, [email, device, fingerCount, style, source, onSuccess]);
+  }, [email, device, fingerCount, style, source]);
 
   if (error) {
     return (
