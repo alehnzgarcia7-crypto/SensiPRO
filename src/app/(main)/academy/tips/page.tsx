@@ -24,174 +24,174 @@ const TIPS: Tip[] = [
   // ─── Puntería (6) ───
   {
     id: 1,
-    title: 'Apunta al pecho, no a la cabeza',
+    title: 'Apunta al pecho — el recoil hace el headshot por ti',
     content:
-      'El recoil sube natural. Si apuntas al pecho, las balas suben a la cabeza solas. Funciona con M4, SCAR, AK.',
+      'Con M4A1 (1.7× headshot) o SCAR, apunta al pecho y haz drag vertical. El retroceso natural sube las balas a la cabeza. Es la base del Headshot Mode de SensiPRO.',
     category: 'Puntería',
   },
   {
     id: 2,
-    title: 'Practica drag shots en entrenamiento 10 min al día',
+    title: 'Tu Punto Rojo es 0.95× tu General en Balanceado',
     content:
-      'No en ranked. En el campo de entrenamiento. 10 minutos con AWM contra bots. En 2 semanas notas la diferencia.',
+      'ARES v5.0 calcula tu Punto Rojo como el 95% de tu General. Si tu General es 100, tu Punto Rojo es 95. Más bajo = más control al apuntar.',
     category: 'Puntería',
   },
   {
     id: 3,
-    title: 'Baja tu sensibilidad de scope 2x y 4x',
+    title: 'La Mira 4x debe ser 80% de tu General',
     content:
-      'La mayoría de jugadores tienen estas demasiado altas. Bájala 10-15 puntos y verás que controlas mejor el spray.',
+      'En estilo Balanceado, ARES pone tu 4x al 80% de tu General. No la subas a ojo — ese ratio viene de 271 fuentes de pros.',
     category: 'Puntería',
   },
   {
     id: 4,
-    title: 'El crosshair siempre a altura de cabeza',
+    title: 'NUNCA camines mirando al suelo',
     content:
-      'Cuando caminas, mantén el crosshair donde estaría la cabeza del enemigo. Así cuando aparece, ya estás apuntando.',
+      'Mantén el crosshair a altura de cabeza SIEMPRE. Cuando aparece el enemigo, solo disparas. Medio segundo de ventaja que gana 1v1s.',
     category: 'Puntería',
   },
   {
     id: 5,
     title: '10 min de Training Ground antes de ranked',
     content:
-      'No saltes directo a ranked. 10 min de warmup marca la diferencia. Empieza con Red Dot, luego 4x.',
+      'No saltes directo a ranked. 10 min de warmup: 5 min drag vertical con SCAR, 5 min J-Drag con M1887. Tu músculo memoria se activa.',
     category: 'Puntería',
   },
   {
     id: 6,
-    title: 'Pre-apunta a puertas y esquinas',
+    title: 'Pre-apunta a puertas antes de llegar',
     content:
-      'Antes de llegar a una puerta, pon el crosshair donde va a estar la cabeza del enemigo. Cuando aparezca, solo disparas.',
+      'Antes de llegar a una puerta, pon el crosshair donde va a salir la cabeza. Es la regla #3 del crosshair placement de SensiPRO.',
     category: 'Puntería',
   },
   // ─── Movimiento (6) ───
   {
     id: 7,
-    title: 'Nunca te quedes quieto en un 1v1',
+    title: 'Drop shot: agáchate y dispara al mismo tiempo',
     content:
-      'Agáchate, muévete lateral, salta. Un blanco quieto es un blanco muerto.',
+      'Tu hitbox baja y el enemigo falla. Necesitas 3+ dedos para hacerlo fluido — con 2 dedos no puedes agacharte y disparar a la vez.',
     category: 'Movimiento',
   },
   {
     id: 8,
-    title: 'Usa gloo walls ofensivamente',
+    title: 'Peek & Fire gana fights en esquinas',
     content:
-      'Pon una gloo y úsala para peekear. Es más útil atacando que solo cubriéndote.',
+      'Agáchate detrás de cobertura, levántate, dispara, agáchate. Con 3 dedos el índice hace el peek y el pulgar dispara. Es la técnica #1 de 3 dedos.',
     category: 'Movimiento',
   },
   {
     id: 9,
-    title: 'Practica el drop shot',
+    title: 'Jump-Crouch-Fire: la técnica Two9',
     content:
-      'Agacharte mientras disparas confunde al enemigo. Funciona mejor con 3+ dedos.',
+      'Salta → agáchate en el aire → dispara en el pico. Solo con 4 dedos. Es la técnica más respetada del juego. Two9 tiene 98% de headshot rate con ella.',
     category: 'Movimiento',
   },
   {
     id: 10,
     title: 'El jiggle peek gana 1v1s',
     content:
-      'Asómate y escóndete rápido para ver al enemigo sin que te pegue. Luego peekea y dispara.',
+      'Asómate y escóndete rápido para ver al enemigo sin que te pegue. Luego peekea y dispara. Funciona con 2 y 3 dedos.',
     category: 'Movimiento',
   },
   {
     id: 11,
     title: 'Cambia de posición después de cada kill',
     content:
-      'Si mataste a alguien desde un spot, su equipo ya sabe dónde estás. Muévete inmediatamente.',
+      'Si mataste a alguien desde un spot, su equipo ya sabe dónde estás. Muévete inmediatamente. Los pros nunca disparan dos veces desde el mismo ángulo.',
     category: 'Movimiento',
   },
   {
     id: 12,
-    title: 'En 1v1, el que se agacha primero gana',
+    title: 'Skyler destruye Gloo Walls a distancia',
     content:
-      'Agacharte baja tu hitbox y el spray enemigo pasa por encima. Combínalo con disparo y es devastador.',
+      'Si tu combo incluye Skyler como activa, su skill destruye las Gloo Walls enemigas sin acercarte. Perfecto para 3 dedos — activas con el índice sin dejar de apuntar.',
     category: 'Movimiento',
   },
   // ─── Configuración (6) ───
   {
     id: 13,
-    title: 'Pon los gráficos en BAJO y el FPS en ALTO',
+    title: 'Gráficos en Smooth + FPS Máximo — siempre',
     content:
-      'Más FPS = más suave = mejor puntería. Los gráficos bonitos no ganan partidas.',
+      'ARES resta hasta -2 puntos de sensibilidad a dispositivos con 144Hz+ porque son más fluidos. Más FPS = más suave = mejor puntería. Los gráficos bonitos no ganan partidas.',
     category: 'Configuración',
   },
   {
     id: 14,
-    title: 'Tu sensibilidad NO debe ser igual a la de un pro',
+    title: 'Tu DPI define el 70% de tu sensibilidad',
     content:
-      'Ellos juegan en iPad con 120Hz. Tú en un Redmi con 60Hz. Necesitas TU sensibilidad.',
+      'ARES calcula: DPI bajo (270) → General ~117. DPI alto (460) → General ~87. Por eso copiar la sensi de un YouTuber NO funciona — su celular tiene DPI diferente.',
     category: 'Configuración',
   },
   {
     id: 15,
-    title: 'Revisa tu HUD cada mes',
+    title: 'Botón de disparo: 44-70% según tus dedos',
     content:
-      'Tus dedos se acostumbran y mejoran. Lo que funcionaba hace 2 meses puede mejorar hoy.',
+      'SensiPRO calcula el tamaño: 2 dedos necesitan botón grande (55-70%), 4 dedos necesitan botón chico (44-55%). Agresivo +5%, Sniper -5%.',
     category: 'Configuración',
   },
   {
     id: 16,
-    title: 'Activa las notificaciones de enemigos cercanos',
+    title: 'Calibración BAJA para precisión pura',
     content:
-      'En ajustes de sonido. Te avisa cuando hay pasos cerca. Muchos no saben que existe.',
+      'ARES tiene 3 calibraciones: BAJA (-25 puntos), MEDIA (base), ALTA (+15 puntos). Si rusheas mucho, usa ALTA. Si snipeas, usa BAJA.',
     category: 'Configuración',
   },
   {
     id: 17,
-    title: 'El tamaño del botón de disparo importa',
+    title: 'Cierra TODAS las apps antes de jugar',
     content:
-      'Muy chico = fallas el botón. Muy grande = estorba. SensiPRO calcula el tamaño ideal para tu pantalla y dedos.',
+      'Con ≤4GB de RAM, ARES resta -1 a tu sensi porque tu cel va más lento. Cerrar apps libera RAM y mejora los FPS. Más RAM libre = mejores reflejos.',
     category: 'Configuración',
   },
   {
     id: 18,
-    title: 'Desactiva notificaciones mientras juegas',
+    title: 'Modo No Molestar antes de ranked',
     content:
-      'Una notificación en medio de un 1v1 = muerte. Pon modo No Molestar antes de entrar a ranked.',
+      'Una notificación en medio de un 1v1 = muerte. Actívalo antes de entrar a partida. Tu KD te lo va a agradecer.',
     category: 'Configuración',
   },
   // ─── Armas (3) ───
   {
     id: 19,
-    title: 'MP40 + M4A1 es el combo más seguro de ranked',
+    title: 'MP40 (830 RPM) + M4A1: el combo ranked',
     content:
-      'MP40 para close range, M4A1 para mid-long. Cubres todas las distancias. El combo que usan el 70% de los pros LATAM.',
+      'MP40 tiene 1.5× headshot multiplier y 830 RPM — spray al pecho y el recoil sube solo. M4A1 con 1.7× para media distancia. SensiPRO ajusta +4% la sensi para SMGs.',
     category: 'Armas',
   },
   {
     id: 20,
-    title: 'Con M1887 solo tienes 2 disparos',
+    title: 'M1887: 2.0× headshot — one-tap o muerte',
     content:
-      'Si fallas los 2, estás muerto. Practica J-Drag en Training Ground hasta que aciertes 8 de 10.',
+      'Solo tienes 2 disparos. Un headshot = 188 de daño = kill instantánea. Practica el J-Drag: apunta al pecho y curva hacia arriba. SensiPRO ajusta +8% la sensi para escopetas.',
     category: 'Armas',
   },
   {
     id: 21,
-    title: 'Desert Eagle es la mejor secondary del juego',
+    title: 'AWM: 2.5× headshot — one-shot kill garantizada',
     content:
-      'One-tap a media distancia, buena cadencia. Si tu primary se queda sin balas, el switch es más rápido que recargar.',
+      'Mata con headshot a través de CUALQUIER casco incluyendo nivel 3. SensiPRO BAJA la sensi del scope sniper un -6% porque necesitas máxima precisión.',
     category: 'Armas',
   },
   // ─── Estrategia (3) ───
   {
     id: 22,
-    title: 'En squad, cada quien tiene un rol',
+    title: 'Alok + Jota + Kelly + Andrew = ranked estándar',
     content:
-      'No todos deben rushear. 1 rusher, 1 soporte, 1 sniper, 1 utility. Si todos rushean, nadie cubre la espalda.',
+      'El combo balanceado-2-dedos de SensiPRO: Alok cura al equipo, Jota cura por kills, Kelly te mueve rápido, Andrew protege armadura. Mr. Waggor para walls gratis.',
     category: 'Estrategia',
   },
   {
     id: 23,
-    title: 'Controla el centro del círculo',
+    title: 'Moco marca + Maro amplifica = combo sniper letal',
     content:
-      'El centro del siguiente círculo es la posición más fuerte. Llega primero, coloca walls, y deja que los demás vengan a ti.',
+      'Moco marca al primer disparo, Maro activa +28% daño contra marcados. Rafael te mantiene invisible en el minimapa. El combo sniper más devastador del juego.',
     category: 'Estrategia',
   },
   {
     id: 24,
     title: 'No revivas en campo abierto',
     content:
-      'Si tu compañero cae en campo abierto, NO vayas inmediatamente. El enemigo está esperando. Primero elimina la amenaza o pon walls.',
+      'Si tu compañero cae en campo abierto, NO vayas. El enemigo está esperando. Pon Gloo Walls primero (Mr. Waggor te genera 1 gratis cada 100 segundos).',
     category: 'Estrategia',
   },
 ];
