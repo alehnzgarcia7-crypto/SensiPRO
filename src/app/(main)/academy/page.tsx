@@ -90,6 +90,10 @@ const STATS = [
 export default function AcademyHubPage() {
   return (
     <div className="space-y-10">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-6">
+        <span>←</span> Volver al inicio
+      </Link>
+
       {/* Hero */}
       <section className="relative overflow-hidden glass-card p-8 lg:p-12 academy-stagger">
         <div className="relative z-10">

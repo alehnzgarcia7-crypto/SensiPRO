@@ -9,7 +9,6 @@ import {
   LayoutGrid,
   Gauge,
   BookOpen,
-  ArrowRight,
   AlertTriangle,
   Info,
 } from 'lucide-react';
@@ -24,7 +23,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Cómo Funciona SensiPRO | La Ciencia de tu Sensibilidad',
   description:
-    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 610+ dispositivos y 271 fuentes de jugadores profesionales.',
+    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 610+ dispositivos y 271 fuentes de datos.',
   keywords: [
     'como funciona sensipro',
     'algoritmo sensibilidad free fire',
@@ -34,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cómo Funciona SensiPRO — La Ciencia de tu Sensibilidad',
     description:
-      'Algoritmo ARES v5.0: 610+ dispositivos, 271 fuentes pro, sensibilidad calibrada para TU celular.',
+      'Algoritmo ARES v5.0: 610+ dispositivos, 271 fuentes de datos, sensibilidad calibrada para TU celular.',
   },
 };
 
@@ -58,12 +57,6 @@ const FEATURES = [
     color: '#a855f7',
   },
   {
-    icon: Gamepad2,
-    title: 'Ajuste por Arma',
-    description: 'Sensibilidad ajustada por categoría: escopetas, SMGs, rifles, snipers, pistolas.',
-    color: '#f59e0b',
-  },
-  {
     icon: Gauge,
     title: 'Botón de Disparo',
     description: 'Tamaño recomendado según tu pantalla, tus dedos y tu estilo.',
@@ -80,13 +73,17 @@ const FEATURES = [
 const STATS = [
   { value: '610+', label: 'Dispositivos en la base de datos', icon: Smartphone },
   { value: '21', label: 'Marcas de celulares', icon: Zap },
-  { value: '271', label: 'Fuentes de datos profesionales', icon: Users },
+  { value: '271', label: 'Fuentes de datos', icon: Users },
   { value: 'v5.0', label: 'Versión del algoritmo ARES', icon: Cpu },
 ] as const;
 
 export default function ComoFuncionaPage() {
   return (
     <div className="space-y-10">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-6">
+        <span>←</span> Volver al inicio
+      </Link>
+
       {/* Header */}
       <div className="academy-stagger">
         <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2 font-[family-name:var(--font-orbitron)] uppercase tracking-wide">
@@ -105,15 +102,15 @@ export default function ComoFuncionaPage() {
       <section className="glass-card p-6 academy-stagger" style={{ animationDelay: '50ms' }}>
         <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide flex items-center gap-2 mb-1">
           <AlertTriangle className="w-5 h-5 text-amber-400" />
-          Tu celular NO es igual al de Nobru
+          Tu celular NO es igual al de tu creador de contenido favorito
         </h2>
         <div className="section-heading-separator mb-4" />
 
         <div className="space-y-3 text-sm text-slate-300 leading-relaxed">
           <p>
-            Cada video de YouTube te dice &quot;MEJOR SENSIBILIDAD 2026&quot; y te da UN
-            número. Para todos. El problema: tu Samsung A14 tiene una pantalla
-            completamente diferente a su iPad Pro.
+            Cada creador de contenido te dice &quot;con esta sensi vas a pegar
+            todo rojo&quot; y te da UN número. Para todos. El problema: tu Samsung
+            A14 tiene una pantalla completamente diferente a su iPad Pro.
           </p>
           <p>
             La misma sensibilidad se siente distinta en cada celular por una
@@ -121,17 +118,13 @@ export default function ComoFuncionaPage() {
             la de él tiene 460 PPI, cuando tú mueves el dedo 1cm se mueven menos
             píxeles que cuando él hace lo mismo.
           </p>
-          <p>
-            La sensi de Nobru en tu celular se va a sentir completamente
-            diferente.
-          </p>
         </div>
 
         {/* Callout */}
         <div className="mt-4 flex items-start gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
           <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-200">
-            Por eso copiar la sensi de un YouTuber casi NUNCA funciona.
+            Por eso copiar la sensi de un creador de contenido casi NUNCA funciona.
           </p>
         </div>
       </section>
@@ -153,7 +146,7 @@ export default function ComoFuncionaPage() {
           <p>
             El algoritmo ARES v5.0 toma TU celular específico y calcula una
             sensibilidad calibrada para TU hardware. No es un número random —
-            son datos de 271 fuentes de jugadores profesionales de Free Fire.
+            son datos de 271 fuentes de datos de Free Fire.
           </p>
         </div>
 
@@ -161,7 +154,7 @@ export default function ComoFuncionaPage() {
         <div className="mt-5 grid grid-cols-3 gap-3">
           {[
             { value: '610+', label: 'Dispositivos verificados' },
-            { value: '271', label: 'Fuentes de datos pro' },
+            { value: '271', label: 'Fuentes de datos' },
             { value: 'v5.0', label: 'Versión del algoritmo' },
           ].map((s) => (
             <div key={s.label} className="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -287,48 +280,8 @@ export default function ComoFuncionaPage() {
           ))}
         </div>
 
-        <p className="text-sm text-slate-400 leading-relaxed">
-          Cada dispositivo fue verificado manualmente contra GSMArena. No son
-          datos inventados — son las especificaciones reales de tu celular.
-        </p>
       </section>
 
-      {/* SECCIÓN 6: Por qué pagar */}
-      <section className="glass-card p-6 academy-stagger" style={{ animationDelay: '350ms' }}>
-        <h2 className="font-[family-name:var(--font-orbitron)] text-lg font-bold text-white uppercase tracking-wide flex items-center gap-2 mb-1">
-          <Target className="w-5 h-5 text-fire-400" />
-          SensiPRO vs copiar de YouTube
-        </h2>
-        <div className="section-heading-separator mb-4" />
-
-        <div className="space-y-3 text-sm text-slate-300 leading-relaxed">
-          <p>
-            YouTube te da UNA sensibilidad para TODOS los celulares.
-            <br />
-            SensiPRO te da UNA sensibilidad para TU celular.
-          </p>
-          <p>
-            Un video de &quot;MEJOR SENSI 2026&quot; te dice &quot;pon 170 de
-            general&quot;. SensiPRO sabe que TU Samsung A54 de 6.4 pulgadas con
-            403 PPI y 120Hz necesita 102 de general con estilo Balanceado.
-          </p>
-          <p>
-            Y que esos 102 no son lo mismo en un iPhone 15 porque el PPI es
-            diferente.
-          </p>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-6 text-center">
-          <Link
-            href="/generator"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold transition-all duration-200 min-h-[44px] hover:shadow-[0_0_20px_rgba(255,106,0,0.3)] hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #ff6a00, #06b6d4)' }}
-          >
-            Generar mi sensibilidad <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

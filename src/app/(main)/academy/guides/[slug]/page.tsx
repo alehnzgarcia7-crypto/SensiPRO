@@ -50,6 +50,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   return (
     <article className="max-w-5xl mx-auto">
+      <Link href="/academy/guides" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-6">
+        <span>←</span> Volver a Guías
+      </Link>
+
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-500 font-[family-name:var(--font-rajdhani)] mb-6">
         <Link href="/academy" className="hover:text-slate-300 transition-colors">

@@ -194,6 +194,10 @@ export default function GuidesPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/academy" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-6">
+        <span>←</span> Volver a la Academia
+      </Link>
+
       {/* Header */}
       <div className="academy-stagger">
         <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2 font-[family-name:var(--font-orbitron)] uppercase tracking-wide">

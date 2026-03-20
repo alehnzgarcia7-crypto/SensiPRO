@@ -9,6 +9,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { PremiumGuideContent } from '@/components/academy/premium-guide-content';
 import { cn } from '@/lib/cn';
@@ -317,6 +318,10 @@ function CharacterCards({ characters, accentColor }: { characters: Character[]; 
 export default function MetaPage() {
   return (
     <div className="space-y-10">
+      <Link href="/academy" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-6">
+        <span>←</span> Volver a la Academia
+      </Link>
+
       {/* Header */}
       <div className="academy-stagger">
         <h1 className="text-2xl font-black text-white mb-1 flex items-center gap-2 font-[family-name:var(--font-orbitron)] uppercase tracking-wide">

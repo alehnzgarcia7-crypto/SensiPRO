@@ -314,10 +314,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: '¿Cómo es diferente de copiar settings de YouTube?',
     a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 610+ dispositivos para calcular TU configuración ideal.',
   },
-  {
-    q: '¿Me van a banear?',
-    a: 'No. SensiPRO no modifica archivos del juego ni accede a tu cuenta. Solo te da números que tú introduces manualmente en Ajustes → Sensibilidad de Free Fire. Es exactamente lo mismo que ajustar la sensi tú mismo.',
-  },
 ];
 
 // ═══════════════════════════════════════════════════════════════
