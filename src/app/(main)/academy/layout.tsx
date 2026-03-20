@@ -3,7 +3,7 @@
 import {
   BookOpen,
   Lightbulb,
-  Swords,
+  // Swords, — oculto temporalmente (Meta Actual)
   Video,
   ChevronLeft,
   ChevronRight,
@@ -51,12 +51,14 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     icon: Lightbulb,
     description: '24 tips rápidos',
   },
+  /* Meta Actual — oculto temporalmente
   {
     href: '/academy/meta',
     label: 'Meta Actual',
     icon: Swords,
     description: 'Parche OB52 — Tier List',
   },
+  */
   {
     href: '/academy/videos',
     label: 'Videos',

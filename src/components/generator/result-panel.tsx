@@ -9,7 +9,7 @@
 import type { CalibrationResult, HudRecommendation } from '@ares/algorithms';
 import type { SensitivityStyle, DeviceTier } from '@prisma/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Heart, Share2, Download, Ruler, Target, Crosshair, Eye, Scan, Search } from 'lucide-react';
+import { Ruler, Target, Crosshair, Eye, Scan, Search } from 'lucide-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 
 import { AnimatedBorder } from '@/components/effects/animated-border';
@@ -477,31 +477,6 @@ export function ResultPanel({ onReset }: ResultPanelProps) {
         <HeadshotCtaBanner />
       </motion.div>
 
-      {/* ═══ LINK A ACADEMIA ═══ */}
-      <motion.div variants={itemVariants} className="glass-card p-4">
-        <a href="/academy/guides/drag-shot-tecnicas" className="flex items-center gap-3 group">
-          <span className="text-lg">📚</span>
-          <div className="flex-1">
-            <p className="text-xs font-heading font-bold text-white group-hover:text-fire-400 transition-colors">
-              9 Técnicas de Drag para Headshots
-            </p>
-            <p className="text-[10px] text-slate-500">
-              De Drag Vertical (principiante) a Jump-Crouch-Fire (pro) — guía completa
-            </p>
-          </div>
-          <span className="text-slate-600 group-hover:text-fire-400 transition-colors">→</span>
-        </a>
-      </motion.div>
-
-      {/* ═══ ACCIONES ═══ */}
-      <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
-        <Button variant="ghost" size="sm" leftIcon={<Heart size={16} />}>Guardar</Button>
-        <Button variant="ghost" size="sm" leftIcon={<Share2 size={16} />}>Compartir</Button>
-        <Button variant="ghost" size="sm" leftIcon={<Download size={16} />}>Exportar</Button>
-        <Button variant="secondary" size="sm" leftIcon={<RotateCcw size={16} />} onClick={onReset}>
-          Nueva búsqueda
-        </Button>
-      </motion.div>
     </motion.div>
   );
 }

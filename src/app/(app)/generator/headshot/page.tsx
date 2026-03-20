@@ -25,7 +25,6 @@ import { HeadshotTechniques } from '@/components/headshot/headshot-techniques';
 import { HudRecommendation } from '@/components/headshot/hud-recommendation';
 import { ProBadge } from '@/components/headshot/pro-badge';
 import { TrainingPlan } from '@/components/headshot/training-plan';
-import { WeaponAdjustmentPanel } from '@/components/headshot/weapon-adjustment-panel';
 import { WeaponConfigSelector } from '@/components/headshot/weapon-config-selector';
 import { WeaponGrid } from '@/components/headshot/weapon-grid';
 import { WeaponTierDisplay } from '@/components/headshot/weapon-tier-display';
@@ -519,11 +518,6 @@ export default function HeadshotPage() {
                   fingers={fingers}
                   screenSize={data.device.screenSize}
                 />
-              </motion.div>
-
-              {/* 10. AJUSTE POR ARMA */}
-              <motion.div custom={3} variants={sectionVariants}>
-                <WeaponAdjustmentPanel adjustments={fingerResult.weaponAdjustments} />
               </motion.div>
 
               {/* 11. CÓDIGOS HUD CON CAPTURAS REALES — siempre visible */}

@@ -3,7 +3,7 @@ import {
   ArrowRight,
   BookOpen,
   Lightbulb,
-  Swords,
+  // Swords, — oculto temporalmente (Meta Actual)
   Video,
   Crosshair,
   Smartphone,
@@ -54,6 +54,7 @@ const SECTION_CARDS = [
     iconColor: 'text-yellow-400',
     glowColor: 'rgba(234, 179, 8, 0.15)',
   },
+  /* Meta Actual — oculto temporalmente
   {
     href: '/academy/meta',
     icon: Swords,
@@ -66,6 +67,7 @@ const SECTION_CARDS = [
     iconColor: 'text-ice-400',
     glowColor: 'rgba(6, 182, 212, 0.15)',
   },
+  */
   {
     href: '/academy/videos',
     icon: Video,
