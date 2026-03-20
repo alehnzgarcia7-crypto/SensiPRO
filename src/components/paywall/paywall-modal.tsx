@@ -12,13 +12,14 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X, Lock, CreditCard, Banknote, Smartphone,
+  X, Lock,
   Check, Shield, Clock, Zap, ExternalLink,
   AlertCircle, Loader2, Copy, CheckCircle2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
+import { CardLogos, OxxoLogo, MercadoPagoLogo } from '@/components/payment-logos';
 import { useTrackEvent } from '@/hooks/use-track-event';
 import {
   trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
@@ -518,7 +519,7 @@ export function PaywallModal() {
                         </button>
 
                         <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
-                          <CreditCard className="w-4 h-4 text-cyan-400" />
+                          <CardLogos className="opacity-80" />
                           <span className="text-xs text-slate-300">Pago con tarjeta</span>
                         </div>
 
@@ -559,7 +560,7 @@ export function PaywallModal() {
                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                               selectedMethod === 'card' ? 'bg-cyan-500/20' : 'bg-white/5'
                             }`}>
-                              <CreditCard className={`w-4 h-4 ${selectedMethod === 'card' ? 'text-cyan-400' : 'text-slate-400'}`} />
+                              <CardLogos />
                             </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'card' ? 'text-white' : 'text-slate-300'}`}>
@@ -587,7 +588,7 @@ export function PaywallModal() {
                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                               selectedMethod === 'oxxo' ? 'bg-yellow-500/20' : 'bg-white/5'
                             }`}>
-                              <Banknote className={`w-4 h-4 ${selectedMethod === 'oxxo' ? 'text-yellow-400' : 'text-slate-400'}`} />
+                              <OxxoLogo className="h-4" />
                             </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'oxxo' ? 'text-white' : 'text-slate-300'}`}>
@@ -616,7 +617,7 @@ export function PaywallModal() {
                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                               selectedMethod === 'mercadopago' ? 'bg-blue-500/20' : 'bg-white/5'
                             }`}>
-                              <Smartphone className={`w-4 h-4 ${selectedMethod === 'mercadopago' ? 'text-blue-400' : 'text-slate-400'}`} />
+                              <MercadoPagoLogo className="h-4" />
                             </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'mercadopago' ? 'text-white' : 'text-slate-300'}`}>

@@ -14,6 +14,7 @@ import { PremiumModulesSection } from '@/components/landing/premium-modules-sect
 // PricingSection oculta — el usuario ve el precio solo en el paywall del generador
 // import { PricingSection } from '@/components/landing/pricing-section';
 import { ProblemSection } from '@/components/landing/problem-section';
+import { StatsCounter } from '@/components/landing/stats-counter';
 
 export const metadata: Metadata = {
   title: 'SensiPRO — Generador de Sensibilidad #1 para Free Fire 2026',
@@ -34,6 +35,8 @@ export default function LandingPage() {
       <CyberParticles />
       {/* 1. Hero — Dolor + promesa + CTA al generador */}
       <HeroSection />
+      {/* 1.5. Stats — Números reales del proyecto */}
+      <StatsCounter />
       {/* 2. Problema — "No es tu aim. Es tu configuración." */}
       <ProblemSection />
       {/* 3. Cómo funciona — 3 pasos, sin revelar valores */}

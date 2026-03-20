@@ -82,14 +82,14 @@ export const metadata: Metadata = {
     title: 'Sensibilidades PRO — Generador de Sensibilidad Free Fire',
     description:
       'Genera la sensibilidad perfecta para Free Fire con calibración por DPI real. 610+ dispositivos de 21 marcas.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sensibilidades PRO — Free Fire',
     description:
       'Genera la sensibilidad perfecta de Free Fire para TU celular. 610+ dispositivos, 21 marcas.',
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
   },
   robots: {
     index: true,

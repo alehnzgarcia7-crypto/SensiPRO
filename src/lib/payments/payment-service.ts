@@ -138,7 +138,7 @@ export async function createStripeCardPayment(input: CreatePaymentInput): Promis
           product_data: {
             name: 'SensiPRO Premium — Acceso de por vida',
             description: 'Sensibilidad calibrada + Headshot Mode + HUD Codes + Academia completa. Pago único, acceso para siempre.',
-            images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://sensibilidadespro.com'}/images/sensipro-premium.png`],
+            images: [`${process.env.NEXT_PUBLIC_APP_URL || 'https://sensibilidadespro.com'}/images/sensipro-premium.svg`],
           },
         },
         quantity: 1,

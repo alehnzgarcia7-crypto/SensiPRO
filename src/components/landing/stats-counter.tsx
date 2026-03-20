@@ -16,10 +16,9 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 610, suffix: '+', label: 'Dispositivos analizados', icon: '📱' },
-  { value: 21, suffix: '', label: 'Marcas de celular', icon: '🏷️' },
-  { value: 9, suffix: '', label: 'Combinaciones de calibración', icon: '🎯' },
-  { value: 6, suffix: '', label: 'Sliders optimizados por dispositivo', icon: '⚙️' },
+  { value: 612, suffix: '+', label: 'Dispositivos calibrados', icon: '📱' },
+  { value: 21, suffix: '', label: 'Marcas soportadas', icon: '🏷️' },
+  { value: 22, suffix: ',000+', label: 'Valores calibrados', icon: '🎯' },
 ];
 
 function useCountUp(target: number, duration: number = 2000) {
@@ -83,7 +82,7 @@ export function StatsCounter() {
       </div>
 
       <div className="mx-auto max-w-5xl px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 relative">
+        <div className="grid grid-cols-3 gap-6 md:gap-0 relative">
           {STATS.map((stat, i) => (
             <div key={stat.label} className="relative">
               <StatItem stat={stat} />
