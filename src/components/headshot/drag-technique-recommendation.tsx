@@ -119,7 +119,7 @@ export function DragTechniqueRecommendation({ playstyle, fingers }: DragTechniqu
         🎯 Tu Técnica de Drag
       </h3>
       <p className="text-[10px] text-slate-500 font-body mb-4">
-        9 técnicas calibradas por estilo + dedos — datos de fuentes pro
+        9 técnicas calibradas por estilo + dedos — datos de hardware real
       </p>
 
       <div className="flex items-start justify-between gap-3 mb-3">

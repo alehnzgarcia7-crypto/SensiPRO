@@ -16,7 +16,7 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { value: 612, suffix: '+', label: 'Dispositivos calibrados', icon: '📱' },
+  { value: 613, suffix: '+', label: 'Dispositivos calibrados', icon: '📱' },
   { value: 21, suffix: '', label: 'Marcas soportadas', icon: '🏷️' },
   { value: 22, suffix: ',000+', label: 'Valores calibrados', icon: '🎯' },
 ];

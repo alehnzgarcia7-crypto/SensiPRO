@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 // --- Counts reales de la DB (actualizados desde seed y componentes) ---
-// 612 devices, 21 brands (de devices.seed.ts — limpieza Mar 2026)
+// 613 devices, 21 brands (de devices.seed.ts — limpieza Mar 2026)
 // 11 guías reales en academia, 24 tips reales
 // 24 features en headshot mode, 17 HUD codes, 9 técnicas drag
 
@@ -164,7 +164,7 @@ export const FEATURES: LandingFeature[] = [
     icon: 'Cpu',
     title: 'Calibración Forense DPI-First',
     description:
-      'Algoritmo basado en el DPI real de tu pantalla con tapering -15 profesional. Validado contra 12+ dispositivos con ±5 puntos de precisión vs datos reales de freefiremania 2026.',
+      'Algoritmo basado en el DPI real de tu pantalla con tapering -15 profesional. Validado contra 12+ dispositivos con ±5 puntos de precisión vs especificaciones reales de hardware.',
     color: '#f97316',
     isNew: true,
     highlight: `${LANDING_DATA.deviceCount}+ dispositivos`,

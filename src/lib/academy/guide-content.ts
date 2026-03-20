@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Contenido completo de las 11 guías de academia
 // Basado en datos REALES del algoritmo ARES v5.0
-// 612 dispositivos, 21 marcas, datos calibrados de jugadores profesionales
+// 613 dispositivos, 21 marcas, datos calibrados con specs de hardware real
 // ═══════════════════════════════════════════════════════════════
 
 export type CalloutVariant = 'pro-tip' | 'error' | 'dato-clave' | 'importante';
@@ -64,7 +64,7 @@ const sensibilidadPerfecta: GuideData = {
   categoryColor: '#06b6d4',
   difficulty: 'Principiante',
   readTime: 6,
-  intro: 'Copiar la sensibilidad de un pro no funciona. Su celular tiene diferente DPI, diferente tasa de refresco y diferente tamaño de pantalla. ARES v5.0 calcula TU sensibilidad usando datos de jugadores profesionales y las specs exactas de tu dispositivo.',
+  intro: 'Copiar la sensibilidad de un pro no funciona. Su celular tiene diferente DPI, diferente tasa de refresco y diferente tamaño de pantalla. ARES v5.0 calcula TU sensibilidad usando las specs exactas de tu dispositivo: DPI, RAM, tasa de refresco y tipo de panel.',
   sections: [
     {
       id: 'por-que-no-copiar',
@@ -170,7 +170,7 @@ const sensibilidadPerfecta: GuideData = {
       blocks: [
         {
           type: 'text',
-          content: 'Una vez que ARES calcula tu General, los demás valores se generan multiplicando General por ratios calibrados con datos de pros. Cada estilo tiene sus propios ratios.',
+          content: 'Una vez que ARES calcula tu General, los demás valores se generan multiplicando General por ratios calibrados con datos de hardware real. Cada estilo tiene sus propios ratios.',
         },
         {
           type: 'table',

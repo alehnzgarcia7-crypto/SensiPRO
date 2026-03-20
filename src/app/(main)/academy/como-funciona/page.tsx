@@ -194,7 +194,7 @@ export default function ComoFuncionaPage() {
             },
             {
               num: '5',
-              text: 'Cada slider (Punto Rojo, Mira 2x, 4x, AWM, Vista Libre) se calcula con ratios independientes basados en datos de jugadores profesionales.',
+              text: 'Cada slider (Punto Rojo, Mira 2x, 4x, AWM, Vista Libre) se calcula con ratios independientes calibrados con las especificaciones reales de 613+ dispositivos.',
             },
           ].map((step) => (
             <div key={step.num} className="flex items-start gap-3">

@@ -8,7 +8,7 @@ import { GlowProgressBar } from '@/components/effects/glow-progress-bar';
 // ═══════════════════════════════════════════════════════════════
 // BlurTensionSection — Teaser visual del generador estilo REAL
 // Usa GlowProgressBar con gradientes dinámicos, glow y shimmer.
-// Primera barra visible, resto blurreadas. Sin valores numéricos.
+// Las 6 barras visibles. Sin valores numéricos (muestra "???" en cada una).
 // ═══════════════════════════════════════════════════════════════
 
 const DEMO_BARS = [
@@ -64,34 +64,20 @@ export function BlurTensionSection() {
               <span className="text-[10px] text-slate-600 uppercase tracking-wider">Preview</span>
             </div>
 
-            {/* Primera barra — visible */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{DEMO_BARS[0].icon}</span>
-                  <span className="text-xs font-medium text-slate-300">{DEMO_BARS[0].label}</span>
-                </div>
-                <span className="text-xs font-bold text-slate-600 tabular-nums">???</span>
-              </div>
-              <GlowProgressBar value={DEMO_BARS[0].value} max={200} delay={0.3} />
-            </div>
-
-            {/* Barras 2-6 — blur */}
-            <div className="relative">
-              <div className="blur-[6px] select-none pointer-events-none space-y-3.5">
-                {DEMO_BARS.slice(1).map((bar) => (
-                  <div key={bar.label}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{bar.icon}</span>
-                        <span className="text-xs font-medium text-slate-300">{bar.label}</span>
-                      </div>
-                      <span className="text-xs font-bold text-slate-600 tabular-nums">???</span>
+            {/* Las 6 barras — todas visibles, sin blur */}
+            <div className="space-y-3.5">
+              {DEMO_BARS.map((bar) => (
+                <div key={bar.label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{bar.icon}</span>
+                      <span className="text-xs font-medium text-slate-300">{bar.label}</span>
                     </div>
-                    <GlowProgressBar value={bar.value} max={200} delay={bar.delay + 0.3} />
+                    <span className="text-xs font-bold text-slate-600 tabular-nums">???</span>
                   </div>
-                ))}
-              </div>
+                  <GlowProgressBar value={bar.value} max={200} delay={bar.delay + 0.3} />
+                </div>
+              ))}
             </div>
           </div>
 

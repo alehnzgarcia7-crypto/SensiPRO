@@ -41,7 +41,7 @@ export const VIDEO_TUTORIALS: VideoTutorial[] = [
     id: 'vid-sens-02',
     title: 'Sensibilidad PRO: Técnica de los 3 Pasos',
     description:
-      'El método que usan los jugadores profesionales para calibrar su sensibilidad en 15 minutos.',
+      'El método avanzado para calibrar tu sensibilidad en 15 minutos usando las specs de tu dispositivo.',
     youtubeId: '_placeholder_',
     category: 'SENSITIVITY',
     duration: '18:22',
