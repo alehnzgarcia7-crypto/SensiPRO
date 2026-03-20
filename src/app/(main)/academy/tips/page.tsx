@@ -277,10 +277,10 @@ export default function TipsPage() {
         })}
       </div>
 
-      {/* Tips — primeros 4 gratis, resto premium */}
+      {/* Tips — todos premium */}
       {(() => {
-        const freeTips = filtered.slice(0, 4);
-        const premiumTips = filtered.slice(4);
+        const freeTips: Tip[] = [];
+        const premiumTips = filtered;
 
         // Agrupar tips gratis por categoría
         const freeGrouped = freeTips.reduce<Record<string, Tip[]>>((acc, tip) => {

@@ -1,7 +1,6 @@
 import {
   Cpu,
   Smartphone,
-  Users,
   Zap,
   Target,
   Crosshair,
@@ -23,7 +22,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Cómo Funciona SensiPRO | La Ciencia de tu Sensibilidad',
   description:
-    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 610+ dispositivos y 271 fuentes de datos.',
+    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 610+ dispositivos.',
   keywords: [
     'como funciona sensipro',
     'algoritmo sensibilidad free fire',
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cómo Funciona SensiPRO — La Ciencia de tu Sensibilidad',
     description:
-      'Algoritmo ARES v5.0: 610+ dispositivos, 271 fuentes de datos, sensibilidad calibrada para TU celular.',
+      'Algoritmo ARES v5.0: 610+ dispositivos, sensibilidad calibrada para TU celular.',
   },
 };
 
@@ -73,7 +72,6 @@ const FEATURES = [
 const STATS = [
   { value: '610+', label: 'Dispositivos en la base de datos', icon: Smartphone },
   { value: '21', label: 'Marcas de celulares', icon: Zap },
-  { value: '271', label: 'Fuentes de datos', icon: Users },
   { value: 'v5.0', label: 'Versión del algoritmo ARES', icon: Cpu },
 ] as const;
 
@@ -146,15 +144,14 @@ export default function ComoFuncionaPage() {
           <p>
             El algoritmo ARES v5.0 toma TU celular específico y calcula una
             sensibilidad calibrada para TU hardware. No es un número random —
-            son datos de 271 fuentes de datos de Free Fire.
+            son datos reales de Free Fire.
           </p>
         </div>
 
         {/* Mini stats */}
-        <div className="mt-5 grid grid-cols-3 gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {[
             { value: '610+', label: 'Dispositivos verificados' },
-            { value: '271', label: 'Fuentes de datos' },
             { value: 'v5.0', label: 'Versión del algoritmo' },
           ].map((s) => (
             <div key={s.label} className="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -266,7 +263,7 @@ export default function ComoFuncionaPage() {
         </h2>
         <div className="section-heading-separator mb-4" />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 mb-4">
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
               <stat.icon className="w-5 h-5 text-ice-400 mx-auto mb-2" />

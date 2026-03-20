@@ -15,6 +15,7 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { PremiumBlur } from '@/components/paywall';
 import { cn } from '@/lib/cn';
 
 // ═══════════════════════════════════════════════════════════════
@@ -246,9 +247,10 @@ export default function GuidesPage() {
         })}
       </div>
 
-      {/* Guide Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((guide, index) => {
+      {/* Guide Grid — primeras 8 gratis, resto premium */}
+      {(() => {
+        const FREE_LIMIT = 8;
+        const renderCard = (guide: Guide, index: number) => {
           const diffStyle = DIFFICULTY_COLORS[guide.difficulty];
           const catColor = CATEGORY_COLORS[guide.category] ?? '#ff6a00';
           const Icon = guide.icon;
@@ -326,8 +328,26 @@ export default function GuidesPage() {
               </div>
             </Link>
           );
-        })}
-      </div>
+        };
+
+        const freeGuides = filtered.slice(0, FREE_LIMIT);
+        const premiumGuides = filtered.slice(FREE_LIMIT);
+
+        return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {freeGuides.map(renderCard)}
+            </div>
+            {premiumGuides.length > 0 && (
+              <PremiumBlur source="academy" intensity={12}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {premiumGuides.map(renderCard)}
+                </div>
+              </PremiumBlur>
+            )}
+          </>
+        );
+      })()}
 
       {filtered.length === 0 && (
         <div className="text-center py-16 text-slate-500">
