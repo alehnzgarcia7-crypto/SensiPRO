@@ -14,11 +14,13 @@ import { FAQ_ITEMS } from '@/lib/landing-data';
 function FaqItem({
   q,
   a,
+  link,
   isOpen,
   onToggle,
 }: {
   q: string;
   a: string;
+  link?: { text: string; href: string };
   isOpen: boolean;
   onToggle: () => void;
 }) {
@@ -54,7 +56,20 @@ function FaqItem({
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <p className="pb-5 text-sm text-slate-400 leading-[1.7]">{a}</p>
+            <p className="pb-5 text-sm text-slate-400 leading-[1.7]">
+              {a}
+              {link && (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 ml-2 px-3 py-1 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 text-xs font-medium transition-colors"
+                >
+                  <span>💬</span>
+                  {link.text}
+                </a>
+              )}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -95,6 +110,7 @@ export function FaqSection() {
               key={faq.q}
               q={faq.q}
               a={faq.a}
+              link={faq.link}
               isOpen={openIndex === i}
               onToggle={() => handleToggle(i)}
             />

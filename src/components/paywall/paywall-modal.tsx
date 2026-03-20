@@ -29,7 +29,11 @@ import { detectInAppBrowser, copyToClipboard, openInSystemBrowser } from '@/lib/
 import { getPricingForCountry, getCountryList, type CountryPricing } from '@/lib/geo-pricing';
 import { usePremiumContext } from '@/providers/premium-provider';
 
-import { EmbeddedCardForm } from '../embedded-card-form';
+// ═══════════════════════════════════════════════════════
+// WHATSAPP SOPORTE
+// ═══════════════════════════════════════════════════════
+
+const WHATSAPP_NUMBER = '529841182753';
 
 // ═══════════════════════════════════════════════════════
 // COUNTDOWN HOOK — Timer REAL desde AppConfig en DB
@@ -129,7 +133,6 @@ export function PaywallModal() {
   const [linkCopied, setLinkCopied] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [isWebView, setIsWebView] = useState(false);
-  const [showEmbeddedForm, setShowEmbeddedForm] = useState(false);
 
   // El usuario está logueado → no necesitamos pedir email
   const isLoggedIn = !!session?.user?.email;
@@ -151,7 +154,6 @@ export function PaywallModal() {
       setError(null);
       setSelectedMethod(null);
       setIsSubmitting(false);
-      setShowEmbeddedForm(false);
       setShowCountrySelector(false);
 
       // Detectar WebView (TikTok, Instagram, etc.)
@@ -215,18 +217,7 @@ export function PaywallModal() {
       setCapturedEmail(emailToUse);
     }
 
-    // WebView + tarjeta → mostrar formulario embebido en vez de redirigir
-    if (selectedMethod === 'card' && isWebView) {
-      track('PAYWALL_CLICKED', { method: 'card', source: paywallContext?.source ?? 'unknown', embeddedWebView: true });
-      trackEvent({
-        event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-        properties: { context: 'embedded_card_form', method: 'card' },
-      });
-      setShowEmbeddedForm(true);
-      return;
-    }
-
-    track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown' });
+    track('PAYWALL_CLICKED', { method: selectedMethod, source: paywallContext?.source ?? 'unknown', isWebView });
 
     // Analytics: unlock CTA + payment method selected
     trackEvent({ event: INTERNAL_EVENTS.UNLOCK_CTA_CLICKED, properties: { method: selectedMethod, source: paywallContext?.source ?? 'unknown' } });
@@ -260,7 +251,7 @@ export function PaywallModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: emailToUse,
-          method: selectedMethod,
+          method: isWebView ? 'card' : selectedMethod,
           device: paywallContext?.device,
           fingerCount: paywallContext?.fingerCount,
           style: paywallContext?.style,
@@ -294,25 +285,17 @@ export function PaywallModal() {
       if (data.checkoutUrl) {
         const { isInAppBrowser, browserName } = detectInAppBrowser();
         if (isInAppBrowser) {
-          // Navegador in-app: intentar abrir en browser del sistema, fallback a copy-link
+          // WebView detectado: mostrar panel de copiar enlace directamente
           trackEvent({
             event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
             properties: { browser: browserName, context: 'checkout', method: selectedMethod },
           });
           try { sessionStorage.setItem('sensipro_checkout_url', data.checkoutUrl); } catch { /* ignore */ }
 
-          // Intento 1: abrir en navegador del sistema
-          openInSystemBrowser(data.checkoutUrl);
-
-          // Después de 1.5s, si el usuario sigue aquí, mostrar copy-link como fallback
-          setTimeout(() => {
-            if (!document.hidden) {
-              setCopyLinkUrl(data.checkoutUrl);
-              setLinkCopied(false);
-              setModalState('copy-link');
-              setIsSubmitting(false);
-            }
-          }, 1500);
+          setCopyLinkUrl(data.checkoutUrl);
+          setLinkCopied(false);
+          setModalState('copy-link');
+          setIsSubmitting(false);
           return;
         }
         window.location.href = data.checkoutUrl;
@@ -511,46 +494,6 @@ export function PaywallModal() {
                       </div>
                     )}
 
-                    {/* EMBEDDED CARD FORM — Para WebView con tarjeta */}
-                    {showEmbeddedForm && selectedMethod === 'card' && isWebView && effectiveEmail ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {/* Botón Volver */}
-                        <button
-                          onClick={() => setShowEmbeddedForm(false)}
-                          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-4 cursor-pointer"
-                        >
-                          <span>←</span>
-                          <span>Cambiar método de pago</span>
-                        </button>
-
-                        <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10">
-                          <CardLogos className="opacity-80" />
-                          <span className="text-xs text-slate-300">Pago con tarjeta</span>
-                        </div>
-
-                        <EmbeddedCardForm
-                          email={effectiveEmail}
-                          device={paywallContext?.device}
-                          fingerCount={paywallContext?.fingerCount}
-                          style={paywallContext?.style}
-                          source={paywallContext?.source || 'generator'}
-                          onSuccess={() => {
-                            trackEvent({
-                              event: INTERNAL_EVENTS.CHECKOUT_CREATED,
-                              properties: { method: 'card', source: paywallContext?.source || 'generator', embeddedWebView: true },
-                            });
-                            if (effectiveEmail) {
-                              unlock(effectiveEmail);
-                            }
-                          }}
-                        />
-                      </motion.div>
-                    ) : (
-                      <>
                         {/* Métodos de pago */}
                         <p className="text-xs text-slate-400 uppercase tracking-wider font-medium mb-3">
                           Método de pago:
@@ -680,8 +623,6 @@ export function PaywallModal() {
                             Precio aproximado. El monto exacto en {pricing.currency} se muestra al pagar.
                           </p>
                         )}
-                      </>
-                    )}
                   </motion.div>
                 )}
 
@@ -729,105 +670,155 @@ export function PaywallModal() {
                   </motion.div>
                 )}
 
-                {/* ESTADO: COPY-LINK — Para navegadores in-app (TikTok, Instagram, etc.) */}
+                {/* ESTADO: COPY-LINK — Para WebView (TikTok, Instagram, etc.) */}
                 {modalState === 'copy-link' && copyLinkUrl && (
                   <motion.div
                     key="copy-link"
-                    className="py-6 flex flex-col items-center"
+                    className="py-4 flex flex-col items-center"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {/* Icono de enlace externo */}
-                    <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
-                      <ExternalLink className="w-8 h-8 text-cyan-400" />
-                    </div>
-
-                    <h3 className="text-lg font-bold text-white text-center mb-2 font-[family-name:var(--font-orbitron),sans-serif]">
-                      Ábrelo en tu navegador
+                    <h3 className="text-lg font-bold text-white text-center mb-1 font-[family-name:var(--font-orbitron),sans-serif]">
+                      {linkCopied ? '\u2705 \u00a1Enlace copiado!' : '\u00a1Tu pago está casi listo!'}
                     </h3>
 
-                    <p className="text-xs text-slate-400 text-center mb-5 max-w-xs leading-relaxed">
-                      TikTok no permite pagos directos. Toca el botón para copiar el enlace y pégalo en <span className="text-white font-medium">Safari</span> o <span className="text-white font-medium">Chrome</span>.
-                    </p>
-
-                    {/* Botón principal: COPIAR ENLACE */}
-                    <motion.button
-                      onClick={async () => {
-                        const success = await copyToClipboard(copyLinkUrl);
-                        if (success) {
-                          setLinkCopied(true);
-                          trackEvent({
-                            event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-                            properties: { action: 'copy_link_modal', method: selectedMethod },
-                          });
-                        }
-                      }}
-                      className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 transition-colors cursor-pointer ${
-                        linkCopied
-                          ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                          : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20'
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {linkCopied ? (
-                        <>
-                          <CheckCircle2 className="w-5 h-5" />
-                          {'\u2713'} ENLACE COPIADO — Pégalo en tu navegador
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-5 h-5" />
-                          COPIAR ENLACE DE PAGO
-                        </>
-                      )}
-                    </motion.button>
-
-                    {/* Botón secundario: Abrir en Safari (segundo intento) */}
-                    <motion.button
-                      onClick={() => {
-                        trackEvent({
-                          event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-                          properties: { action: 'retry_open_browser', method: selectedMethod },
-                        });
-                        openInSystemBrowser(copyLinkUrl);
-                      }}
-                      className="w-full mt-2 py-3 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-sm font-medium flex items-center justify-center gap-2 hover:bg-white/[0.06] hover:border-white/20 transition-colors cursor-pointer"
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Abrir en Safari
-                    </motion.button>
-
-                    {/* Instrucciones post-copia */}
-                    {linkCopied && (
+                    {linkCopied ? (
                       <motion.div
-                        className="mt-4 w-full space-y-2"
+                        className="w-full mt-3 space-y-3"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                          <span className="text-xs text-cyan-400 font-bold">1.</span>
-                          <span className="text-xs text-slate-300">Abre Safari o Chrome</span>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                          <span className="text-xs text-cyan-400 font-bold">2.</span>
-                          <span className="text-xs text-slate-300">Pega el enlace en la barra de direcciones</span>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                          <span className="text-xs text-cyan-400 font-bold">3.</span>
-                          <span className="text-xs text-slate-300">Completa tu compra de forma segura</span>
+                        <p className="text-sm text-slate-300 text-center leading-relaxed">
+                          Ahora abre <span className="text-white font-medium">Safari</span> o <span className="text-white font-medium">Chrome</span>, pega el enlace en la barra de direcciones y listo.
+                        </p>
+                        <p className="text-xs text-slate-500 text-center">
+                          Tu sensibilidad calibrada te espera
+                        </p>
+
+                        {/* Botón: copiar de nuevo */}
+                        <motion.button
+                          onClick={async () => {
+                            await copyToClipboard(copyLinkUrl);
+                          }}
+                          className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 cursor-pointer hover:bg-emerald-500/20 transition-colors"
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          ENLACE COPIADO — Pégalo en tu navegador
+                        </motion.button>
+
+                        {/* Opciones secundarias */}
+                        <div className="flex gap-2">
+                          <motion.button
+                            onClick={() => {
+                              trackEvent({
+                                event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+                                properties: { action: 'retry_open_browser', method: selectedMethod },
+                              });
+                              openInSystemBrowser(copyLinkUrl);
+                            }}
+                            className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Abrir en navegador
+                          </motion.button>
+                          <a
+                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola SensiPRO, quiero pagar. Mi enlace de pago: ${copyLinkUrl}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 py-2.5 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366] text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-[#25D366]/20 transition-colors cursor-pointer"
+                          >
+                            <span className="text-sm">💬</span>
+                            Enviar a mi WhatsApp
+                          </a>
                         </div>
                       </motion.div>
+                    ) : (
+                      <div className="w-full mt-2 space-y-4">
+                        <p className="text-xs text-slate-400 text-center leading-relaxed">
+                          TikTok no permite pagos dentro de la app, pero es fácil:
+                        </p>
+
+                        {/* Paso 1: Copiar enlace (botón principal GRANDE) */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-[10px] font-bold text-cyan-400 shrink-0">1</span>
+                            <span className="text-xs text-slate-300">Copia el enlace de pago</span>
+                          </div>
+                          <motion.button
+                            onClick={async () => {
+                              const success = await copyToClipboard(copyLinkUrl);
+                              if (success) {
+                                setLinkCopied(true);
+                                trackEvent({
+                                  event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+                                  properties: { action: 'copy_link_modal', method: selectedMethod },
+                                });
+                              }
+                            }}
+                            className="w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-400 hover:to-cyan-500 shadow-lg shadow-cyan-500/20 cursor-pointer"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <Copy className="w-5 h-5" />
+                            COPIAR ENLACE DE PAGO
+                          </motion.button>
+                        </div>
+
+                        {/* Pasos 2 y 3 */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">2</span>
+                            <span className="text-xs text-slate-400">Abre Safari o Chrome</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">3</span>
+                            <span className="text-xs text-slate-400">Pega el enlace y completa tu pago</span>
+                          </div>
+                        </div>
+
+                        {/* Alternativas */}
+                        <div>
+                          <p className="text-[10px] text-slate-500 mb-2">{'\u00bf'}Prefieres otra opción?</p>
+                          <div className="flex gap-2">
+                            <motion.button
+                              onClick={() => {
+                                trackEvent({
+                                  event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
+                                  properties: { action: 'retry_open_browser', method: selectedMethod },
+                                });
+                                openInSystemBrowser(copyLinkUrl);
+                              }}
+                              className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              Abrir en navegador
+                            </motion.button>
+                            <a
+                              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola SensiPRO, quiero pagar. Mi enlace de pago: ${copyLinkUrl}`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 py-2.5 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366] text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-[#25D366]/20 transition-colors cursor-pointer"
+                            >
+                              <span className="text-sm">💬</span>
+                              Enviar a mi WhatsApp
+                            </a>
+                          </div>
+                        </div>
+                      </div>
                     )}
 
-                    {/* Info de vigencia + seguridad */}
-                    <div className="mt-5 w-full space-y-2">
-                      <p className="text-[10px] text-slate-500 text-center">El enlace es válido por 24 horas</p>
+                    {/* Footer: precio + seguridad */}
+                    <div className="mt-5 w-full text-center space-y-1.5">
+                      <p className="text-[10px] text-slate-400">
+                        💳 $199 MXN · Pago único · De por vida
+                      </p>
                       <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06]">
                         <Lock className="w-3 h-3 text-emerald-400" />
-                        <span className="text-[10px] text-slate-400">Pago seguro con Stripe</span>
+                        <span className="text-[10px] text-slate-400">Pago seguro con Stripe · Sin suscripción</span>
                         <Shield className="w-3 h-3 text-emerald-400" />
                       </div>
                     </div>

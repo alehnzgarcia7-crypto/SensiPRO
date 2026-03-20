@@ -275,6 +275,10 @@ export const POPULAR_DEVICES: PopularDevice[] = [
 export interface FaqItem {
   q: string;
   a: string;
+  link?: {
+    text: string;
+    href: string;
+  };
 }
 
 export const FAQ_ITEMS: FaqItem[] = [
@@ -313,6 +317,14 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     q: '¿Cómo es diferente de copiar settings de YouTube?',
     a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 610+ dispositivos para calcular TU configuración ideal.',
+  },
+  {
+    q: '¿Necesitas ayuda o tienes dudas?',
+    a: 'Escríbenos por WhatsApp y te ayudamos al instante.',
+    link: {
+      text: 'Abrir WhatsApp',
+      href: 'https://wa.me/529841182753?text=Hola%2C%20tengo%20una%20duda%20sobre%20SensiPRO',
+    },
   },
 ];
 
