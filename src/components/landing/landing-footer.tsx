@@ -53,7 +53,7 @@ export function LandingFooter() {
               <span className="font-heading font-bold text-white text-lg">SensiPRO</span>
             </Link>
             <p className="mt-3 text-xs text-slate-600 leading-relaxed font-body max-w-[220px]">
-              Generador de sensibilidad #1 para Free Fire. 610+ dispositivos calibrados por hardware real.
+              Generador de sensibilidad #1 para Free Fire. 613+ dispositivos calibrados por hardware real.
             </p>
 
             {/* Social icons */}

@@ -47,7 +47,7 @@ export function HowSensiproWorksCta() {
             </h2>
 
             <p className="mt-3 text-slate-400 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-              610+ dispositivos analizados. PPI, RAM, Hz, tipo de panel — descubre
+              613+ dispositivos analizados. PPI, RAM, Hz, tipo de panel — descubre
               la ciencia detrás de tu sensibilidad perfecta.
             </p>
 

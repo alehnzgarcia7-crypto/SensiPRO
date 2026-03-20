@@ -11,7 +11,7 @@
 
 export const LANDING_DATA = {
   // Conteos reales verificados
-  deviceCount: 610,
+  deviceCount: 613,
   brandCount: 21,
   styleCount: 9,
   guideCount: 11,            // 11 guías reales con contenido completo
@@ -316,7 +316,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: '¿Cómo es diferente de copiar settings de YouTube?',
-    a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 610+ dispositivos para calcular TU configuración ideal.',
+    a: 'Los YouTubers usan celulares de gama alta o emulador con mouse. Su sensibilidad se siente completamente diferente en tu celular porque el PPI, la RAM y el panel son distintos. SensiPRO analiza las specs REALES de tu modelo entre 613+ dispositivos para calcular TU configuración ideal.',
   },
   {
     q: '¿Necesitas ayuda o tienes dudas?',

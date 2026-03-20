@@ -19,11 +19,11 @@ import { StatsCounter } from '@/components/landing/stats-counter';
 export const metadata: Metadata = {
   title: 'SensiPRO — Generador de Sensibilidad #1 para Free Fire 2026',
   description:
-    'Genera la sensibilidad perfecta de Free Fire para TU celular. 610+ dispositivos, 21 marcas, calibración por DPI real. Deja de copiar y empieza a dar todo rojo.',
+    'Genera la sensibilidad perfecta de Free Fire para TU celular. 613+ dispositivos, 21 marcas, calibración por DPI real. Deja de copiar y empieza a dar todo rojo.',
   openGraph: {
     title: 'SensiPRO — Generador de Sensibilidad #1 para Free Fire 2026',
     description:
-      'Genera la sensibilidad perfecta de Free Fire para TU celular. 610+ dispositivos, 21 marcas, calibración por DPI real.',
+      'Genera la sensibilidad perfecta de Free Fire para TU celular. 613+ dispositivos, 21 marcas, calibración por DPI real.',
     type: 'website',
   },
 };

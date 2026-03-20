@@ -83,10 +83,10 @@ const SECTION_CARDS = [
 ] as const;
 
 const STATS = [
-  { value: '610+', label: 'Dispositivos', icon: Smartphone },
+  { value: '613+', label: 'Dispositivos', icon: Smartphone },
   { value: '17', label: 'Features Headshot', icon: Crosshair },
   { value: '11', label: 'Guías completas', icon: BookOpen },
-  { value: '24', label: 'Tips de pros', icon: Lightbulb },
+  { value: '24', label: 'Tips exclusivos', icon: Lightbulb },
 ] as const;
 
 export default function AcademyHubPage() {

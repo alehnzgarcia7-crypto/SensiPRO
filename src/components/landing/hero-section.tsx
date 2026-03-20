@@ -105,7 +105,7 @@ export function HeroSection() {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="mt-6 text-sm md:text-base lg:text-lg text-slate-400 max-w-2xl mx-auto font-body leading-relaxed"
         >
-          610+ dispositivos. 21 marcas. Una sensibilidad calculada para TU celular
+          613+ dispositivos. 21 marcas. Una sensibilidad calculada para TU celular
           exacto — no la del YouTuber que juega en iPhone.
         </motion.p>
 

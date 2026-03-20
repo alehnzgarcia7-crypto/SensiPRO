@@ -22,7 +22,7 @@ const PRO_FEATURES = [
   '17 códigos HUD reales con capturas de Free Fire',
   'Giroscopio calibrado al rango pro (32-39)',
   'Academia PRO: 11 guías + 24 tips con datos del motor ARES',
-  '610+ dispositivos soportados de 21 marcas',
+  '613+ dispositivos soportados de 21 marcas',
   'Training Plans de 7 días para mejorar aim',
   'Armas Tier S/A/B con análisis completo',
   'Comparador de devices side-by-side',
@@ -50,7 +50,7 @@ const faqs = [
   },
   {
     q: '¿Funciona en cualquier celular?',
-    a: 'Sí, tenemos 610+ dispositivos de 21 marcas incluyendo Samsung, iPhone, Xiaomi, Redmi, POCO, Motorola, Infinix, y más.',
+    a: 'Sí, tenemos 613+ dispositivos de 21 marcas incluyendo Samsung, iPhone, Xiaomi, Redmi, POCO, Motorola, Infinix, y más.',
   },
   {
     q: '¿Qué incluye el Headshot Mode?',

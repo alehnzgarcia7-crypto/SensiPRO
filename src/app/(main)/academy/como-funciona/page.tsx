@@ -22,7 +22,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Cómo Funciona SensiPRO | La Ciencia de tu Sensibilidad',
   description:
-    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 610+ dispositivos.',
+    'Descubre cómo SensiPRO calcula tu sensibilidad perfecta usando datos reales de 613+ dispositivos.',
   keywords: [
     'como funciona sensipro',
     'algoritmo sensibilidad free fire',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cómo Funciona SensiPRO — La Ciencia de tu Sensibilidad',
     description:
-      'Algoritmo ARES v5.0: 610+ dispositivos, sensibilidad calibrada para TU celular.',
+      'Algoritmo ARES v5.0: 613+ dispositivos, sensibilidad calibrada para TU celular.',
   },
 };
 
@@ -40,7 +40,7 @@ const FEATURES = [
   {
     icon: Target,
     title: 'Generador',
-    description: 'Sensibilidad personalizada para 610+ dispositivos con 3 estilos y 3 calibraciones.',
+    description: 'Sensibilidad personalizada para 613+ dispositivos con 3 estilos y 3 calibraciones.',
     color: '#ff6a00',
   },
   {
@@ -70,7 +70,7 @@ const FEATURES = [
 ] as const;
 
 const STATS = [
-  { value: '610+', label: 'Dispositivos en la base de datos', icon: Smartphone },
+  { value: '613+', label: 'Dispositivos en la base de datos', icon: Smartphone },
   { value: '21', label: 'Marcas de celulares', icon: Zap },
   { value: 'v5.0', label: 'Versión del algoritmo ARES', icon: Cpu },
 ] as const;
@@ -137,7 +137,7 @@ export default function ComoFuncionaPage() {
 
         <div className="space-y-3 text-sm text-slate-300 leading-relaxed">
           <p>
-            SensiPRO tiene una base de datos de 610+ celulares con las
+            SensiPRO tiene una base de datos de 613+ celulares con las
             especificaciones REALES verificadas contra GSMArena: tamaño de
             pantalla, densidad de píxeles, RAM, tasa de refresco, tipo de panel.
           </p>
@@ -151,7 +151,7 @@ export default function ComoFuncionaPage() {
         {/* Mini stats */}
         <div className="mt-5 grid grid-cols-2 gap-3">
           {[
-            { value: '610+', label: 'Dispositivos verificados' },
+            { value: '613+', label: 'Dispositivos verificados' },
             { value: 'v5.0', label: 'Versión del algoritmo' },
           ].map((s) => (
             <div key={s.label} className="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">

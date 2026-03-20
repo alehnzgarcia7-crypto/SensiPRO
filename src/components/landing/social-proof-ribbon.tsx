@@ -9,7 +9,7 @@ const SOCIAL_PROOF_ITEMS = [
   { emoji: '🔥', text: 'Kevin_xD subió a Diamante con Redmi Note 12', tag: 'Generador' },
   { emoji: '🎯', text: 'BryanElPro hace one-tap con iPhone 14', tag: 'Headshot Mode' },
   { emoji: '💪', text: 'MateoSniper_ llegó a Heroico por primera vez', tag: 'Academia' },
-  { emoji: '⭐', text: '610+ dispositivos soportados', tag: '' },
+  { emoji: '⭐', text: '613+ dispositivos soportados', tag: '' },
   { emoji: '🏆', text: '21 marcas compatibles', tag: '' },
   { emoji: '💎', text: 'NahomiFF_ subió a Platino con Galaxy A14', tag: 'Generador' },
   { emoji: '🔥', text: 'CamiRush22 recomienda SensiPRO a toda su squad', tag: 'Todo' },
