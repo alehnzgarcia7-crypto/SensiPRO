@@ -13,27 +13,20 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Lock,
-  Check, Shield, Clock, Zap, ExternalLink,
+  Check, Clock, Zap,
   AlertCircle, Loader2, Copy, CheckCircle2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-import { CardLogos, OxxoLogo, MercadoPagoLogo } from '@/components/payment-logos';
 import { useTrackEvent } from '@/hooks/use-track-event';
 import {
   trackEvent, INTERNAL_EVENTS, ttClickButton, ttViewContent,
   CONTENT_IDS, hasEventFired, markEventFired,
 } from '@/lib/analytics';
-import { detectInAppBrowser, copyToClipboard, openInSystemBrowser } from '@/lib/browser-detect';
+import { detectInAppBrowser, copyToClipboard } from '@/lib/browser-detect';
 import { getPricingForCountry, getCountryList, type CountryPricing } from '@/lib/geo-pricing';
 import { usePremiumContext } from '@/providers/premium-provider';
-
-// ═══════════════════════════════════════════════════════
-// WHATSAPP SOPORTE
-// ═══════════════════════════════════════════════════════
-
-const WHATSAPP_NUMBER = '529841182753';
 
 // ═══════════════════════════════════════════════════════
 // COUNTDOWN HOOK — Timer REAL desde AppConfig en DB
@@ -509,11 +502,6 @@ export function PaywallModal() {
                                 : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
                             }`}
                           >
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                              selectedMethod === 'card' ? 'bg-cyan-500/20' : 'bg-white/5'
-                            }`}>
-                              <CardLogos />
-                            </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'card' ? 'text-white' : 'text-slate-300'}`}>
                                 Tarjeta de crédito / débito
@@ -537,11 +525,6 @@ export function PaywallModal() {
                                 : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
                             }`}
                           >
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                              selectedMethod === 'oxxo' ? 'bg-yellow-500/20' : 'bg-white/5'
-                            }`}>
-                              <OxxoLogo className="h-4" />
-                            </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'oxxo' ? 'text-white' : 'text-slate-300'}`}>
                                 OXXO (efectivo)
@@ -566,11 +549,6 @@ export function PaywallModal() {
                                 : 'border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-white/20'
                             }`}
                           >
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                              selectedMethod === 'mercadopago' ? 'bg-blue-500/20' : 'bg-white/5'
-                            }`}>
-                              <MercadoPagoLogo className="h-4" />
-                            </div>
                             <div className="text-left flex-1">
                               <p className={`text-sm font-medium ${selectedMethod === 'mercadopago' ? 'text-white' : 'text-slate-300'}`}>
                                 Mercado Pago
@@ -615,7 +593,7 @@ export function PaywallModal() {
                         {/* Seguridad */}
                         <p className="text-[10px] text-slate-600 mt-3 text-center flex items-center justify-center gap-1">
                           <Lock className="w-2.5 h-2.5" />
-                          Pago seguro encriptado con SSL
+                          Pago seguro con Stripe
                         </p>
 
                         {pricing.countryCode !== 'MX' && (
@@ -708,31 +686,14 @@ export function PaywallModal() {
                           ENLACE COPIADO — Pégalo en tu navegador
                         </motion.button>
 
-                        {/* Opciones secundarias */}
-                        <div className="flex gap-2">
-                          <motion.button
-                            onClick={() => {
-                              trackEvent({
-                                event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-                                properties: { action: 'retry_open_browser', method: selectedMethod },
-                              });
-                              openInSystemBrowser(copyLinkUrl);
-                            }}
-                            className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-white/[0.06] transition-colors cursor-pointer"
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            Abrir en navegador
-                          </motion.button>
-                          <a
-                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola SensiPRO, quiero pagar. Mi enlace de pago: ${copyLinkUrl}`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 py-2.5 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366] text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-[#25D366]/20 transition-colors cursor-pointer"
-                          >
-                            <span className="text-sm">💬</span>
-                            Enviar a mi WhatsApp
-                          </a>
+                        {/* Instrucciones */}
+                        <div className="space-y-1.5 mt-1">
+                          {['Abre Safari o Chrome', 'Pega el enlace en la barra de direcciones', 'Completa tu compra de forma segura'].map((step, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">{i + 1}</span>
+                              <span className="text-xs text-slate-400">{step}</span>
+                            </div>
+                          ))}
                         </div>
                       </motion.div>
                     ) : (
@@ -779,49 +740,18 @@ export function PaywallModal() {
                           </div>
                         </div>
 
-                        {/* Alternativas */}
-                        <div>
-                          <p className="text-[10px] text-slate-500 mb-2">{'\u00bf'}Prefieres otra opción?</p>
-                          <div className="flex gap-2">
-                            <motion.button
-                              onClick={() => {
-                                trackEvent({
-                                  event: INTERNAL_EVENTS.INAPP_BROWSER_DETECTED,
-                                  properties: { action: 'retry_open_browser', method: selectedMethod },
-                                });
-                                openInSystemBrowser(copyLinkUrl);
-                              }}
-                              className="flex-1 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-white/[0.06] transition-colors cursor-pointer"
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              Abrir en navegador
-                            </motion.button>
-                            <a
-                              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola SensiPRO, quiero pagar. Mi enlace de pago: ${copyLinkUrl}`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 py-2.5 rounded-xl border border-[#25D366]/20 bg-[#25D366]/10 text-[#25D366] text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-[#25D366]/20 transition-colors cursor-pointer"
-                            >
-                              <span className="text-sm">💬</span>
-                              Enviar a mi WhatsApp
-                            </a>
-                          </div>
-                        </div>
+                        {/* Nota de validez */}
+                        <p className="text-[10px] text-slate-500 text-center">
+                          El enlace es válido por 24 horas
+                        </p>
                       </div>
                     )}
 
-                    {/* Footer: precio + seguridad */}
-                    <div className="mt-5 w-full text-center space-y-1.5">
-                      <p className="text-[10px] text-slate-400">
-                        💳 $199 MXN · Pago único · De por vida
-                      </p>
-                      <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06]">
-                        <Lock className="w-3 h-3 text-emerald-400" />
-                        <span className="text-[10px] text-slate-400">Pago seguro con Stripe · Sin suscripción</span>
-                        <Shield className="w-3 h-3 text-emerald-400" />
-                      </div>
-                    </div>
+                    {/* Footer: seguridad */}
+                    <p className="mt-5 text-[10px] text-slate-600 text-center flex items-center justify-center gap-1">
+                      <Lock className="w-2.5 h-2.5" />
+                      Pago seguro con Stripe
+                    </p>
                   </motion.div>
                 )}
 

@@ -11,7 +11,6 @@ const PRODUCT_LINKS = [
 const COMMUNITY_LINKS = [
   { label: 'TikTok', href: 'https://www.tiktok.com/@sensipro5' },
   { label: 'Instagram', href: 'https://www.instagram.com/sensipro8' },
-  { label: 'WhatsApp', href: 'https://wa.me/529841182753?text=Hola%2C%20tengo%20una%20pregunta%20sobre%20SensiPRO' },
 ];
 
 const LEGAL_LINKS = [
@@ -61,19 +60,13 @@ export function LandingFooter() {
               {[
                 { icon: 'TT', href: 'https://www.tiktok.com/@sensipro5' },
                 { icon: 'IG', href: 'https://www.instagram.com/sensipro8' },
-                { icon: 'WA', href: 'https://wa.me/529841182753?text=Hola%2C%20tengo%20una%20pregunta%20sobre%20SensiPRO' },
               ].map((s) => (
                 <a
                   key={s.icon}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={s.icon === 'WA' ? 'Soporte por WhatsApp' : undefined}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-ui font-bold transition-colors ${
-                    s.icon === 'WA'
-                      ? 'bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20'
-                      : 'bg-white/5 text-slate-500 hover:text-white hover:bg-white/10'
-                  }`}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-ui font-bold bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   {s.icon}
                 </a>
