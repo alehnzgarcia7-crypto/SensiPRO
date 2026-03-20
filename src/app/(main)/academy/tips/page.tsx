@@ -41,7 +41,7 @@ const TIPS: Tip[] = [
     id: 3,
     title: 'La Mira 4x debe ser 80% de tu General',
     content:
-      'En estilo Balanceado, ARES pone tu 4x al 80% de tu General. No la subas a ojo — ese ratio viene de 271 fuentes de pros.',
+      'En estilo Balanceado, ARES pone tu 4x al 80% de tu General. No la subas a ojo — ese ratio viene de datos calibrados de pros.',
     category: 'Puntería',
   },
   {

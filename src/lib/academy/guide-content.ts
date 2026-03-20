@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // ARES — Contenido completo de las 11 guías de academia
 // Basado en datos REALES del algoritmo ARES v5.0
-// 612 dispositivos, 21 marcas, 271 fuentes de jugadores profesionales
+// 612 dispositivos, 21 marcas, datos calibrados de jugadores profesionales
 // ═══════════════════════════════════════════════════════════════
 
 export type CalloutVariant = 'pro-tip' | 'error' | 'dato-clave' | 'importante';
@@ -64,7 +64,7 @@ const sensibilidadPerfecta: GuideData = {
   categoryColor: '#06b6d4',
   difficulty: 'Principiante',
   readTime: 6,
-  intro: 'Copiar la sensibilidad de un pro no funciona. Su celular tiene diferente DPI, diferente tasa de refresco y diferente tamaño de pantalla. ARES v5.0 calcula TU sensibilidad usando datos de 271 jugadores profesionales y las specs exactas de tu dispositivo.',
+  intro: 'Copiar la sensibilidad de un pro no funciona. Su celular tiene diferente DPI, diferente tasa de refresco y diferente tamaño de pantalla. ARES v5.0 calcula TU sensibilidad usando datos de jugadores profesionales y las specs exactas de tu dispositivo.',
   sections: [
     {
       id: 'por-que-no-copiar',
@@ -170,7 +170,7 @@ const sensibilidadPerfecta: GuideData = {
       blocks: [
         {
           type: 'text',
-          content: 'Una vez que ARES calcula tu General, los demás valores se generan multiplicando General por ratios calibrados con datos de 271 pros. Cada estilo tiene sus propios ratios.',
+          content: 'Una vez que ARES calcula tu General, los demás valores se generan multiplicando General por ratios calibrados con datos de pros. Cada estilo tiene sus propios ratios.',
         },
         {
           type: 'table',
@@ -1426,7 +1426,7 @@ const transicionDedos: GuideData = {
   categoryColor: '#a855f7',
   difficulty: 'Intermedio',
   readTime: 8,
-  intro: 'Pasar de 2 a 3 dedos cambia tus multiplicadores de sensibilidad, tu tamaño de botón, tu giroscopio, y desbloquea técnicas de drag nuevas. ARES tiene perfiles completos por cantidad de dedos con datos verificados de 271 pros.',
+  intro: 'Pasar de 2 a 3 dedos cambia tus multiplicadores de sensibilidad, tu tamaño de botón, tu giroscopio, y desbloquea técnicas de drag nuevas. ARES tiene perfiles completos por cantidad de dedos con datos verificados de pros.',
   sections: [
     {
       id: 'multiplicadores-dedos',

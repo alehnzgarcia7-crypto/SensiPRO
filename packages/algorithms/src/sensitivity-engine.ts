@@ -11,7 +11,7 @@ import { generateGyroscope } from './gyroscope-engine';
 // SENSITIVITY ENGINE v5.0 — PRO-CALIBRATED
 // ══════════════════════════════════════════════════════════════
 //
-// Recalibración total basada en datos de 271 fuentes de jugadores
+// Recalibración total basada en datos de fuentes de jugadores
 // profesionales de Free Fire (freefiremania, esportzone, escharts,
 // liquipedia, noping, ar-pay, item4gamer).
 //
@@ -40,7 +40,7 @@ const STYLE_CONFIG = {
 } as const;
 
 // Ratios por estilo: cada slider se calcula como general × ratio
-// Derivados de promedios de jugadores profesionales (271 fuentes)
+// Derivados de promedios de jugadores profesionales
 const STYLE_RATIOS = {
   AGGRESSIVE: {
     redPoint: 0.78,      // 140→109 (pro: 105-115)
