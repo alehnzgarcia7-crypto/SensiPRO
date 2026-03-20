@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { ttIdentifyUser } from '@/lib/analytics';
 import { loginUser } from '@/lib/auth/auth.actions';
 
 export default function LoginPage() {
@@ -16,6 +17,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await loginUser(formData);
+      // TikTok: Advanced Matching — identifica al usuario por email
+      const email = formData.get('email') as string;
+      ttIdentifyUser({ email });
       router.push('/generator');
       router.refresh();
     } catch (err) {

@@ -42,10 +42,6 @@ function GeneratorWithDeepLink() {
     if (campaign) {
       sessionStorage.setItem('sensipro_campaign', campaign);
     }
-    if (ttclid) {
-      sessionStorage.setItem('sensipro_ttclid', ttclid);
-    }
-
     // Persist full attribution if arriving with ad params
     if (source || ttclid) {
       const attr = captureAttribution();

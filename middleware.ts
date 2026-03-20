@@ -4,7 +4,6 @@ import { getToken } from 'next-auth/jwt';
 
 // Rutas que requieren autenticacion
 const protectedRoutes = [
-  '/generator',
   '/results',
   '/compare',
   '/favorites',

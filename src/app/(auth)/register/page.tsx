@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 
+import { ttCompleteRegistration, ttIdentifyUser } from '@/lib/analytics';
 import { registerUser } from '@/lib/auth/auth.actions';
 
 function RegisterForm() {
@@ -18,6 +19,10 @@ function RegisterForm() {
     setLoading(true);
     try {
       await registerUser(formData);
+      // TikTok: CompleteRegistration + Advanced Matching
+      const email = formData.get('email') as string;
+      ttCompleteRegistration();
+      ttIdentifyUser({ email });
       router.push('/generator');
       router.refresh();
     } catch (err) {

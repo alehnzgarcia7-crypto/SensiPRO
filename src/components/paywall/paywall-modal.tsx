@@ -242,7 +242,16 @@ export function PaywallModal() {
       let ttclid: string | undefined;
       let sessionId: string | undefined;
       try {
-        ttclid = sessionStorage.getItem('sensipro_ttclid') || undefined;
+        // Leer ttclid del store unificado de atribución (sp_attribution)
+        const attrRaw = sessionStorage.getItem('sp_attribution');
+        if (attrRaw) {
+          const attr = JSON.parse(attrRaw) as { ttclid?: string };
+          ttclid = attr.ttclid || undefined;
+        }
+        // Fallback al key legacy por si el generador lo guardó directamente
+        if (!ttclid) {
+          ttclid = sessionStorage.getItem('sensipro_ttclid') || undefined;
+        }
         sessionId = sessionStorage.getItem('sp_session_id') || undefined;
       } catch { /* ignore */ }
 
