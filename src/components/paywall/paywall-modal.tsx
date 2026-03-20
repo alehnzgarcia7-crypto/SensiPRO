@@ -25,6 +25,7 @@ import {
   CONTENT_IDS, hasEventFired, markEventFired,
 } from '@/lib/analytics';
 import { detectInAppBrowser, copyToClipboard, openInSystemBrowser } from '@/lib/browser-detect';
+import { getPricingForCountry, getCountryList, type CountryPricing } from '@/lib/geo-pricing';
 import { usePremiumContext } from '@/providers/premium-provider';
 
 import { EmbeddedCardForm } from '../embedded-card-form';
@@ -118,6 +119,9 @@ export function PaywallModal() {
   const [modalState, setModalState] = useState<ModalState>('ready');
   const [email, setEmail] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'oxxo' | 'mercadopago' | null>(null);
+  const [userCountry, setUserCountry] = useState<string>('MX');
+  const [pricing, setPricing] = useState<CountryPricing>(getPricingForCountry('MX'));
+  const [showCountrySelector, setShowCountrySelector] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copyLinkUrl, setCopyLinkUrl] = useState<string | null>(null);
@@ -147,10 +151,25 @@ export function PaywallModal() {
       setSelectedMethod(null);
       setIsSubmitting(false);
       setShowEmbeddedForm(false);
+      setShowCountrySelector(false);
 
       // Detectar WebView (TikTok, Instagram, etc.)
       const { isInAppBrowser } = detectInAppBrowser();
       setIsWebView(isInAppBrowser);
+
+      // Detectar país del usuario por IP
+      fetch('/api/geo')
+        .then(r => r.json())
+        .then(data => {
+          if (data.countryCode) {
+            setUserCountry(data.countryCode);
+            setPricing(getPricingForCountry(data.countryCode));
+          }
+        })
+        .catch(() => {
+          setUserCountry('MX');
+          setPricing(getPricingForCountry('MX'));
+        });
 
       if (isLoggedIn && session.user.email) {
         setEmail(session.user.email);
@@ -356,17 +375,55 @@ export function PaywallModal() {
               </h2>
 
               {/* Precio */}
-              <div className="flex items-baseline gap-3 mt-2">
+              <div className="flex items-baseline gap-3 mt-2 flex-wrap">
                 <span className="text-3xl sm:text-4xl font-bold text-white font-[family-name:var(--font-orbitron),sans-serif]">
                   $199
                 </span>
                 <span className="text-sm text-slate-400">MXN</span>
+                {pricing.countryCode !== 'MX' && (
+                  <span className="text-sm text-cyan-400/80">
+                    (~{pricing.symbol}{pricing.approximateAmount} {pricing.currency})
+                  </span>
+                )}
                 <span className="text-lg text-slate-500 line-through">$349</span>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">
                   -43%
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">Pago único. Acceso de por vida. Sin suscripción.</p>
+
+              {/* Selector de país */}
+              <button
+                onClick={() => setShowCountrySelector(!showCountrySelector)}
+                className="text-[10px] text-slate-500 hover:text-cyan-400 transition-colors flex items-center gap-1 mt-1 cursor-pointer"
+              >
+                {pricing.flag} {pricing.countryName}
+                <span className="text-slate-600">· Cambiar país</span>
+              </button>
+
+              {showCountrySelector && (
+                <div className="mt-2 max-h-40 overflow-y-auto rounded-xl border border-white/10 bg-slate-900">
+                  {getCountryList().map(country => (
+                    <button
+                      key={country.countryCode}
+                      onClick={() => {
+                        setUserCountry(country.countryCode);
+                        setPricing(country);
+                        setShowCountrySelector(false);
+                        if (selectedMethod === 'oxxo' && !country.hasOxxo) setSelectedMethod(null);
+                        if (selectedMethod === 'mercadopago' && !country.hasMercadoPago) setSelectedMethod(null);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/5 transition-colors cursor-pointer ${
+                        userCountry === country.countryCode ? 'bg-cyan-500/10 text-cyan-400' : 'text-slate-300'
+                      }`}
+                    >
+                      <span>{country.flag}</span>
+                      <span>{country.countryName}</span>
+                      <span className="ml-auto text-slate-500">{country.symbol}{country.approximateAmount}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Countdown REAL — profesional y sutil */}
@@ -517,7 +574,8 @@ export function PaywallModal() {
                             )}
                           </button>
 
-                          {/* OXXO */}
+                          {/* OXXO — Solo México */}
+                          {pricing.hasOxxo && (
                           <button
                             onClick={() => setSelectedMethod('oxxo')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
@@ -543,8 +601,10 @@ export function PaywallModal() {
                               </div>
                             )}
                           </button>
+                          )}
 
-                          {/* Mercado Pago */}
+                          {/* Mercado Pago — Solo México */}
+                          {pricing.hasMercadoPago && (
                           <button
                             onClick={() => setSelectedMethod('mercadopago')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${
@@ -570,6 +630,7 @@ export function PaywallModal() {
                               </div>
                             )}
                           </button>
+                          )}
                         </div>
 
                         {error && (
@@ -603,6 +664,12 @@ export function PaywallModal() {
                           <Lock className="w-2.5 h-2.5" />
                           Pago seguro encriptado con SSL
                         </p>
+
+                        {pricing.countryCode !== 'MX' && (
+                          <p className="text-[10px] text-slate-500 mt-2 text-center">
+                            Precio aproximado. El monto exacto en {pricing.currency} se muestra al pagar.
+                          </p>
+                        )}
                       </>
                     )}
                   </motion.div>
