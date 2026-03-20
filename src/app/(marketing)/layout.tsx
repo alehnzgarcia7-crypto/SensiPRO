@@ -1,4 +1,3 @@
-import { LandingFooter } from '@/components/landing/landing-footer';
 import { LandingNavbar } from '@/components/landing/landing-navbar';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
@@ -6,7 +5,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <>
       <LandingNavbar />
       <main>{children}</main>
-      <LandingFooter />
     </>
   );
 }
