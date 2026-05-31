@@ -28,3 +28,4 @@ export {
   getAresV6CalibrationFixture,
 } from './fixtures';
 export type { AresV6CalibrationFixture } from './fixtures';
+export { generateAresV6 } from './generate';
