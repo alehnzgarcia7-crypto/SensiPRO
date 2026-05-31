@@ -109,8 +109,6 @@ function getDragZone(category?: AresV6WeaponCategory): AresV6FireButtonRecommend
       return 'ROTATION_J';
     case 'DIRECTIONAL':
       return 'DIRECTIONAL';
-    case 'HYBRID':
-      return 'HYBRID';
     case 'VERTICAL':
     default:
       return 'VERTICAL';
