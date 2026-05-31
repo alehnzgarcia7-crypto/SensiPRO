@@ -1,11 +1,4 @@
-import type { AresV6Symptom, AresV6SensitivityVector, AresV6WeaponCategory } from './types';
-
-// ═══════════════════════════════════════════════════════════════
-// ARES ENGINE V6 — Research Matrix
-//
-// This is not yet the final calculator. It is the calibration atlas
-// used by Phase 1 to build the deterministic v6 engine.
-// ═══════════════════════════════════════════════════════════════
+import type { AresV6SensitivityVector, AresV6Symptom, AresV6WeaponCategory } from './types';
 
 export interface PpiCalibrationBand {
   minInclusive: number;
@@ -20,13 +13,19 @@ export interface PpiCalibrationBand {
   notes: string;
 }
 
-/**
- * Modern Free Fire scale reference: 1-200.
- *
- * These bands are the v6 calibration north-star:
- * lower PPI/HD+ panels need more touch sensitivity; high-PPI/OLED devices
- * need less raw sensitivity and more controlled scope values.
- */
+export const ARES_V6_DEFAULT_PPI_BAND: PpiCalibrationBand = {
+  minInclusive: 390,
+  maxInclusive: 449,
+  label: 'FHD+ mainstream sweet spot',
+  general: [168, 182],
+  redPoint: [153, 167],
+  scope2x: [142, 165],
+  scope4x: [122, 148],
+  sniperScope: [108, 122],
+  freeView: [62, 84],
+  notes: 'Core calibration band for mainstream LATAM FHD+ phones.',
+};
+
 export const ARES_V6_PPI_CALIBRATION_BANDS = [
   {
     minInclusive: 0,
@@ -38,7 +37,7 @@ export const ARES_V6_PPI_CALIBRATION_BANDS = [
     scope4x: [138, 165],
     sniperScope: [118, 145],
     freeView: [72, 95],
-    notes: 'Very low density or missing PPI. Aggressive values compensate heavy-feeling touch, but confidence must be lowered if PPI is inferred.',
+    notes: 'Low-density screens need higher touch sensitivity and careful scope protection.',
   },
   {
     minInclusive: 320,
@@ -50,7 +49,7 @@ export const ARES_V6_PPI_CALIBRATION_BANDS = [
     scope4x: [135, 160],
     sniperScope: [125, 140],
     freeView: [70, 92],
-    notes: 'Common older iPhones and HD+/LCD Androids. Good for drag if red point is tuned carefully.',
+    notes: 'Good for drag if Red Point is tuned carefully.',
   },
   {
     minInclusive: 360,
@@ -62,20 +61,9 @@ export const ARES_V6_PPI_CALIBRATION_BANDS = [
     scope4x: [130, 155],
     sniperScope: [117, 132],
     freeView: [66, 88],
-    notes: 'Very common in LATAM mid-range devices. Should feel fast without being chaotic.',
+    notes: 'Fast without being chaotic.',
   },
-  {
-    minInclusive: 390,
-    maxInclusive: 449,
-    label: 'FHD+ mainstream sweet spot',
-    general: [168, 182],
-    redPoint: [153, 167],
-    scope2x: [142, 165],
-    scope4x: [122, 148],
-    sniperScope: [108, 122],
-    freeView: [62, 84],
-    notes: 'Core calibration band for Samsung A-series, Redmi Note, Moto G, POCO, Realme and many 2023-2026 Androids.',
-  },
+  ARES_V6_DEFAULT_PPI_BAND,
   {
     minInclusive: 450,
     maxInclusive: 519,
@@ -86,7 +74,7 @@ export const ARES_V6_PPI_CALIBRATION_BANDS = [
     scope4x: [112, 138],
     sniperScope: [95, 112],
     freeView: [58, 78],
-    notes: 'iPhones, premium OLED Androids and flagships. Lower raw values reduce jitter and overshoot.',
+    notes: 'Lower raw values reduce jitter and overshoot.',
   },
   {
     minInclusive: 520,
@@ -98,7 +86,7 @@ export const ARES_V6_PPI_CALIBRATION_BANDS = [
     scope4x: [98, 122],
     sniperScope: [80, 92],
     freeView: [50, 70],
-    notes: 'QHD/ultra flagships. High PPI punishes over-sensitivity; scope values must stay controlled.',
+    notes: 'Ultra high density requires controlled scope values.',
   },
 ] as const satisfies readonly PpiCalibrationBand[];
 
@@ -110,48 +98,13 @@ export interface SignalAdjustmentRule {
 }
 
 export const ARES_V6_DEVICE_SIGNAL_RULES = [
-  {
-    signal: 'RAM',
-    when: 'ramGb <= 2',
-    delta: { general: 8, redPoint: 6, scope4x: -4, sniperScope: -5 },
-    explanation: 'Very low RAM feels heavy and unstable; boost close-range response but protect long scopes.',
-  },
-  {
-    signal: 'RAM',
-    when: 'ramGb <= 4',
-    delta: { general: 3, redPoint: 2, scope4x: -2, sniperScope: -3 },
-    explanation: 'Budget RAM needs a small close-range boost with scope protection.',
-  },
-  {
-    signal: 'Hz',
-    when: 'screenHz <= 60',
-    delta: { general: 4, redPoint: 3, freeView: 2 },
-    explanation: '60Hz feels less responsive, so the player needs slightly faster camera response.',
-  },
-  {
-    signal: 'Hz',
-    when: 'screenHz >= 120',
-    delta: { general: -2, redPoint: -1, scope4x: -2 },
-    explanation: 'High refresh devices can run lower raw sensitivity with better stability.',
-  },
-  {
-    signal: 'Panel',
-    when: 'panelType is AMOLED/OLED/LTPO',
-    delta: { general: -1, redPoint: -1, scope4x: -1 },
-    explanation: 'Premium panels feel more precise; slightly lower values avoid overflick.',
-  },
-  {
-    signal: 'Screen size',
-    when: 'screenSize >= 6.8',
-    delta: { general: -3, redPoint: -2, freeView: 2 },
-    explanation: 'Large screens need less raw drag sensitivity but benefit from more camera awareness.',
-  },
-  {
-    signal: 'Thermal',
-    when: 'thermalState is HOT/THROTTLING',
-    delta: { general: 3, redPoint: 2, scope4x: -4, sniperScope: -4 },
-    explanation: 'Thermal throttling creates unstable fights; boost close-range while protecting zoom.',
-  },
+  { signal: 'RAM', when: 'ramGb <= 2', delta: { general: 8, redPoint: 6, scope4x: -4, sniperScope: -5 }, explanation: 'Very low RAM needs close-range compensation.' },
+  { signal: 'RAM', when: 'ramGb <= 4', delta: { general: 3, redPoint: 2, scope4x: -2, sniperScope: -3 }, explanation: 'Budget RAM needs a small boost with scope protection.' },
+  { signal: 'Hz', when: 'screenHz <= 60', delta: { general: 4, redPoint: 3, freeView: 2 }, explanation: '60Hz feels less responsive.' },
+  { signal: 'Hz', when: 'screenHz >= 120', delta: { general: -2, redPoint: -1, scope4x: -2 }, explanation: 'High refresh allows lower raw sensitivity.' },
+  { signal: 'Panel', when: 'panelType is AMOLED/OLED/LTPO', delta: { general: -1, redPoint: -1, scope4x: -1 }, explanation: 'Premium panels can run slightly lower values.' },
+  { signal: 'Screen size', when: 'screenSize >= 6.8', delta: { general: -3, redPoint: -2, freeView: 2 }, explanation: 'Large screens need less raw drag sensitivity.' },
+  { signal: 'Thermal', when: 'thermalState is HOT/THROTTLING', delta: { general: 3, redPoint: 2, scope4x: -4, sniperScope: -4 }, explanation: 'Unstable performance needs close-range compensation.' },
 ] as const satisfies readonly SignalAdjustmentRule[];
 
 export interface SymptomTuningRule {
@@ -163,76 +116,16 @@ export interface SymptomTuningRule {
 }
 
 export const ARES_V6_SYMPTOM_TUNING_RULES = [
-  {
-    symptom: 'CROSSHAIR_DOES_NOT_REACH_HEAD',
-    priority: 'CRITICAL',
-    delta: { redPoint: 5, general: 2 },
-    testProtocol: 'Training Ground: 30 drags with red dot only. Do not touch 2x/4x until red dot lands consistently.',
-    warning: 'Never raise every slider at once; Punto Rojo is the primary headshot correction.',
-  },
-  {
-    symptom: 'CROSSHAIR_OVERSHOOTS_HEAD',
-    priority: 'CRITICAL',
-    delta: { redPoint: -5, general: -2 },
-    testProtocol: 'Training Ground: 30 drags at chest-to-head height. If overshoot remains, repeat once only.',
-    warning: 'Do not over-correct below the PPI band floor or close-range will feel dead.',
-  },
-  {
-    symptom: 'AIM_SHAKES',
-    priority: 'HIGH',
-    delta: { general: -4, redPoint: -4, scope2x: -3, scope4x: -6 },
-    testProtocol: 'Shoot a wall with AR bursts at 15m and 30m. Evaluate recoil before changing AWM.',
-    warning: 'Shake can be caused by high sensitivity, heat, weak FPS or too-small fire button.',
-  },
-  {
-    symptom: 'SCOPE_4X_UNCONTROLLABLE',
-    priority: 'HIGH',
-    delta: { scope4x: -8, sniperScope: -4 },
-    testProtocol: 'Use 4x at 30m with AR. Fire 5 short bursts, not full spray.',
-    warning: '4x tuning must not reduce Punto Rojo; close-range headshot and 4x are different systems.',
-  },
-  {
-    symptom: 'AWM_TOO_SLOW',
-    priority: 'MEDIUM',
-    delta: { sniperScope: 5 },
-    testProtocol: 'Run 20 quickscopes. If it starts overshooting, revert half the change.',
-    warning: 'AWM is intentionally lower than red dot. Do not force AWM to red-dot levels.',
-  },
-  {
-    symptom: 'AWM_OVERSHOOTS',
-    priority: 'MEDIUM',
-    delta: { sniperScope: -5 },
-    testProtocol: 'Run 20 quickscopes at static targets, then 10 moving targets.',
-    warning: 'If moving targets fail but static is fine, use Direction Drag training instead of lowering too much.',
-  },
-  {
-    symptom: 'CANNOT_TURN_FAST',
-    priority: 'MEDIUM',
-    delta: { general: 6, freeView: 8 },
-    testProtocol: 'Do ten 180-degree turns in training. Camera should turn without losing target level.',
-    warning: 'If headshot starts overshooting after this, lower only redPoint by 2-3.',
-  },
-  {
-    symptom: 'FIRE_BUTTON_TOO_BIG',
-    priority: 'MEDIUM',
-    delta: { fireButtonDelta: -4 },
-    testProtocol: 'Play one CS round. Confirm you can drag without blocking enemy visibility.',
-    warning: 'Button size affects aim as much as sensitivity. Do not ignore HUD ergonomics.',
-  },
-  {
-    symptom: 'FIRE_BUTTON_TOO_SMALL',
-    priority: 'MEDIUM',
-    delta: { fireButtonDelta: 4 },
-    testProtocol: 'Do 30 drags while moving. If mis-taps disappear, keep the change.',
-    warning: 'Large buttons help budget devices but can block vision on small screens.',
-  },
-  {
-    symptom: 'DEVICE_LAGS',
-    priority: 'HIGH',
-    delta: { general: 4, redPoint: 3, scope4x: -5, sniperScope: -5, fireButtonDelta: 3 },
-    testProtocol: 'Test in a real CS match after closing background apps. Training Ground is not enough for lag validation.',
-    warning: 'Do not recommend external GFX tools or APKs. Keep all advice inside legal/manual settings.',
-  },
+  { symptom: 'CROSSHAIR_DOES_NOT_REACH_HEAD', priority: 'CRITICAL', delta: { redPoint: 5, general: 2 }, testProtocol: 'Training: 30 red-dot drags before touching other sliders.', warning: 'Adjust Red Point first; never move all sliders at once.' },
+  { symptom: 'CROSSHAIR_OVERSHOOTS_HEAD', priority: 'CRITICAL', delta: { redPoint: -5, general: -2 }, testProtocol: 'Training: 30 chest-to-head drags and re-check.', warning: 'Do not over-correct below the PPI band floor.' },
+  { symptom: 'AIM_SHAKES', priority: 'HIGH', delta: { general: -4, redPoint: -4, scope2x: -3, scope4x: -6 }, testProtocol: 'Test AR bursts at 15m and 30m.', warning: 'Shake can come from sensitivity, heat, FPS or button size.' },
+  { symptom: 'SCOPE_4X_UNCONTROLLABLE', priority: 'HIGH', delta: { scope4x: -8, sniperScope: -4 }, testProtocol: 'Test 4x short bursts at 30m.', warning: 'Do not reduce Red Point for a 4x-only issue.' },
+  { symptom: 'AWM_TOO_SLOW', priority: 'MEDIUM', delta: { sniperScope: 5 }, testProtocol: 'Run 20 quickscopes and keep half-change if needed.', warning: 'AWM should stay lower than Red Point.' },
+  { symptom: 'AWM_OVERSHOOTS', priority: 'MEDIUM', delta: { sniperScope: -5 }, testProtocol: 'Run static and moving quickscope checks.', warning: 'Do not over-lower if static shots are fine.' },
+  { symptom: 'CANNOT_TURN_FAST', priority: 'MEDIUM', delta: { general: 6, freeView: 8 }, testProtocol: 'Do ten 180-degree turns in training.', warning: 'If headshot overshoots, lower only Red Point slightly.' },
+  { symptom: 'FIRE_BUTTON_TOO_BIG', priority: 'MEDIUM', delta: { fireButtonDelta: -4 }, testProtocol: 'Play one CS round and check visibility.', warning: 'Button size affects aim as much as sensitivity.' },
+  { symptom: 'FIRE_BUTTON_TOO_SMALL', priority: 'MEDIUM', delta: { fireButtonDelta: 4 }, testProtocol: 'Do 30 moving drags and check mis-taps.', warning: 'Large buttons help touch reliability but can block vision.' },
+  { symptom: 'DEVICE_LAGS', priority: 'HIGH', delta: { general: 4, redPoint: 3, scope4x: -5, sniperScope: -5, fireButtonDelta: 3 }, testProtocol: 'Validate in a real CS match, not only training.', warning: 'Keep recommendations inside manual in-game settings.' },
 ] as const satisfies readonly SymptomTuningRule[];
 
 export interface WeaponCalibrationRule {
@@ -245,46 +138,11 @@ export interface WeaponCalibrationRule {
 }
 
 export const ARES_V6_WEAPON_CALIBRATION_RULES = [
-  {
-    category: 'SHOTGUN',
-    role: 'One-tap close-range burst',
-    sensitivityBias: { general: 4, redPoint: 7, scope4x: -6, sniperScope: -8 },
-    fireButtonDelta: 4,
-    preferredDrag: 'ROTATION_J',
-    trainingFocus: 'J-drag at 3m, 5m and 8m with M1887/M1014.',
-  },
-  {
-    category: 'SMG',
-    role: 'Close/mid tracking',
-    sensitivityBias: { general: 3, redPoint: 4, scope2x: 3, scope4x: -3 },
-    fireButtonDelta: 2,
-    preferredDrag: 'VERTICAL',
-    trainingFocus: 'MP40/UMP tracking while strafing; avoid full panic drag.',
-  },
-  {
-    category: 'AR_HEAVY',
-    role: 'High damage recoil control',
-    sensitivityBias: { general: -1, scope2x: -2, scope4x: -8, sniperScope: -4 },
-    fireButtonDelta: -2,
-    preferredDrag: 'VERTICAL',
-    trainingFocus: 'Short bursts at 25m and 35m. Never full spray first.',
-  },
-  {
-    category: 'SNIPER',
-    role: 'Quickscope and long-range precision',
-    sensitivityBias: { general: -6, redPoint: -2, scope4x: -6, sniperScope: -12 },
-    fireButtonDelta: -4,
-    preferredDrag: 'DIRECTIONAL',
-    trainingFocus: '20 static quickscopes + 10 moving target direction drags.',
-  },
-  {
-    category: 'PISTOL',
-    role: 'Sidearm one-tap reaction',
-    sensitivityBias: { general: 4, redPoint: 6, scope2x: 2 },
-    fireButtonDelta: 1,
-    preferredDrag: 'ROTATION_J',
-    trainingFocus: 'Desert Eagle one-tap from chest to head at 8m-15m.',
-  },
+  { category: 'SHOTGUN', role: 'One-tap close-range burst', sensitivityBias: { general: 4, redPoint: 7, scope4x: -6, sniperScope: -8 }, fireButtonDelta: 4, preferredDrag: 'ROTATION_J', trainingFocus: 'J-drag at close range.' },
+  { category: 'SMG', role: 'Close/mid tracking', sensitivityBias: { general: 3, redPoint: 4, scope2x: 3, scope4x: -3 }, fireButtonDelta: 2, preferredDrag: 'VERTICAL', trainingFocus: 'Tracking while strafing.' },
+  { category: 'AR_HEAVY', role: 'High damage recoil control', sensitivityBias: { general: -1, scope2x: -2, scope4x: -8, sniperScope: -4 }, fireButtonDelta: -2, preferredDrag: 'VERTICAL', trainingFocus: 'Short bursts at mid range.' },
+  { category: 'SNIPER', role: 'Quickscope and long-range precision', sensitivityBias: { general: -6, redPoint: -2, scope4x: -6, sniperScope: -12 }, fireButtonDelta: -4, preferredDrag: 'DIRECTIONAL', trainingFocus: 'Static and moving quickscope checks.' },
+  { category: 'PISTOL', role: 'Sidearm one-tap reaction', sensitivityBias: { general: 4, redPoint: 6, scope2x: 2 }, fireButtonDelta: 1, preferredDrag: 'ROTATION_J', trainingFocus: 'One-tap chest-to-head drills.' },
 ] as const satisfies readonly WeaponCalibrationRule[];
 
 export function getPpiCalibrationBand(ppi: number): PpiCalibrationBand {
@@ -293,5 +151,5 @@ export function getPpiCalibrationBand(ppi: number): PpiCalibrationBand {
     return ppi >= item.minInclusive && ppi <= max;
   });
 
-  return band ?? ARES_V6_PPI_CALIBRATION_BANDS[2];
+  return band ?? ARES_V6_DEFAULT_PPI_BAND;
 }
