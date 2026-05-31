@@ -58,6 +58,7 @@ export { TRAINING_PLANS, getTrainingPlan } from './training-plans';
 export type { TrainingExercise, TrainingDay, TrainingPlanData } from './training-plans';
 export { WEAPON_RECOMMENDATIONS, getWeaponRecommendation } from './weapon-tiers';
 export type { WeaponTierEntry, WeaponTier, WeaponRecommendation } from './weapon-tiers';
+export * from './engine-v6';
 export type {
   AlgorithmInput,
   AlgorithmOutput,
