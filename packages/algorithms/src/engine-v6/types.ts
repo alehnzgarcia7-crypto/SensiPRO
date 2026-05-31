@@ -138,7 +138,7 @@ export interface AresV6PlayerSignal {
     | 'HEROIC'
     | 'GRANDMASTER'
     | 'PRO';
-  symptoms?: AresV6Symptom[];
+  symptoms?: readonly AresV6Symptom[];
 }
 
 export interface AresV6SensitivityVector {
@@ -178,22 +178,22 @@ export interface AresV6DpiRecommendation {
 
 export interface AresV6HudRecommendation {
   layoutFamily: 'TWO_FINGER' | 'THREE_FINGER' | 'FOUR_FINGER' | 'FIVE_FINGER' | 'TABLET';
-  priorityButtons: string[];
-  riskNotes: string[];
+  priorityButtons: readonly string[];
+  riskNotes: readonly string[];
   nextUpgradePath?: string;
 }
 
 export interface AresV6ConfidenceScore {
   score: number;
   grade: 'LOW' | 'MEDIUM' | 'HIGH' | 'LAB_VERIFIED';
-  missingSignals: string[];
-  warnings: string[];
+  missingSignals: readonly string[];
+  warnings: readonly string[];
 }
 
 export interface AresV6Explanation {
   headline: string;
-  bullets: string[];
-  technicalNotes: string[];
+  bullets: readonly string[];
+  technicalNotes: readonly string[];
 }
 
 export interface AresV6TuningStep {
@@ -222,7 +222,7 @@ export interface AresV6GenerationOutput {
   hud: AresV6HudRecommendation;
   confidence: AresV6ConfidenceScore;
   explanation: AresV6Explanation;
-  firstTuningSteps: AresV6TuningStep[];
+  firstTuningSteps: readonly AresV6TuningStep[];
 }
 
 export interface AresV6Preset {
@@ -231,7 +231,7 @@ export interface AresV6Preset {
   internalName: string;
   category: 'CORE' | 'HEADSHOT' | 'MODE' | 'DEVICE' | 'FINGERS' | 'GYRO' | 'WEAPON' | 'LAB';
   description: string;
-  intendedFor: string[];
+  intendedFor: readonly string[];
   sensitivityBias: {
     general: number;
     redPoint: number;
@@ -242,8 +242,8 @@ export interface AresV6Preset {
   };
   fireButtonBias: number;
   gyroBias: number;
-  recommendedModes: AresV6GameMode[];
-  recommendedWeapons: AresV6WeaponCategory[];
+  recommendedModes: readonly AresV6GameMode[];
+  recommendedWeapons: readonly AresV6WeaponCategory[];
   riskLevel: 'SAFE' | 'MEDIUM' | 'ADVANCED';
   validationStatus: 'RESEARCH_BACKED' | 'NEEDS_LAB_DATA' | 'EXPERIMENTAL';
 }
