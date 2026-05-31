@@ -1,12 +1,5 @@
-import type { AresV6DeviceSignal, AresV6SensitivityVector } from './types';
 import { getPpiCalibrationBand } from './research-matrix';
-
-// ═══════════════════════════════════════════════════════════════
-// ARES ENGINE V6 — DPI Curve Scaffold
-//
-// Phase 0 purpose: define the v6 calibration curve as executable,
-// testable code without connecting it to production APIs yet.
-// ═══════════════════════════════════════════════════════════════
+import type { AresV6DeviceSignal, AresV6SensitivityVector } from './types';
 
 const FALLBACK_PPI_BY_TIER: Record<AresV6DeviceSignal['tier'], number> = {
   LOW: 330,
@@ -21,7 +14,8 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function midpoint(range: readonly [number, number]): number {
-  return Math.round((range[0] + range[1]) / 2);
+  const [low, high] = range;
+  return Math.round((low + high) / 2);
 }
 
 function inverseInterpolateInBand(
@@ -30,7 +24,6 @@ function inverseInterpolateInBand(
   maxInclusive: number | null,
 ): number {
   if (maxInclusive === null) {
-    // Ultra-high PPI band: keep a soft 520-620 interpolation window.
     return Math.max(0, Math.min(1, (ppi - minInclusive) / 100));
   }
 
@@ -40,7 +33,6 @@ function inverseInterpolateInBand(
 
 function valueFromRange(range: readonly [number, number], progress: number): number {
   const [low, high] = range;
-  // Lower PPI should land near the high end of the range.
   return clamp(high - (high - low) * progress, low, high);
 }
 
@@ -61,10 +53,10 @@ export function resolveEffectivePpi(device: AresV6DeviceSignal): AresV6Effective
   }
 
   return {
-    ppi: FALLBACK_PPI_BY_TIER[device.tier] ?? 410,
+    ppi: FALLBACK_PPI_BY_TIER[device.tier],
     source: 'TIER_FALLBACK',
     confidencePenalty: 18,
-    warning: 'PPI/DPI real ausente. Resultado usable, pero no lab-verified hasta confirmar densidad de pantalla.',
+    warning: 'PPI/DPI no confirmado; confirma el dispositivo para subir precisión.',
   };
 }
 
