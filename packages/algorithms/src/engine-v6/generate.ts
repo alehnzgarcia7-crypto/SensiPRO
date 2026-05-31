@@ -1,10 +1,11 @@
+import { calculateBaseSensitivityFromPpi, resolveEffectivePpi } from './dpi-curve';
 import { getAresV6Preset } from './presets';
 import {
-  ARES_V6_DEVICE_SIGNAL_RULES,
   ARES_V6_SYMPTOM_TUNING_RULES,
   ARES_V6_WEAPON_CALIBRATION_RULES,
 } from './research-matrix';
 import type {
+  AresV6ConfidenceScore,
   AresV6DeviceSignal,
   AresV6FireButtonRecommendation,
   AresV6GenerationInput,
@@ -15,19 +16,13 @@ import type {
   AresV6TuningStep,
   AresV6WeaponCategory,
 } from './types';
-import { calculateBaseSensitivityFromPpi, resolveEffectivePpi } from './dpi-curve';
-
-// ═══════════════════════════════════════════════════════════════
-// ARES ENGINE V6 — First Deterministic Scaffold
-//
-// This is intentionally pure and isolated. Phase 0 exposes the shape
-// of the new engine without replacing legacy production routes.
-// ═══════════════════════════════════════════════════════════════
 
 const SENS_MIN = 1;
 const SENS_MAX = 200;
 const GYRO_MIN = 1;
 const GYRO_MAX = 100;
+
+type SensDelta = Partial<AresV6SensitivityVector>;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.round(Math.max(min, Math.min(max, value)));
@@ -37,10 +32,7 @@ function clampSensitivity(value: number): number {
   return clamp(value, SENS_MIN, SENS_MAX);
 }
 
-function applyDelta(
-  base: AresV6SensitivityVector,
-  delta: Partial<AresV6SensitivityVector>,
-): AresV6SensitivityVector {
+function applyDelta(base: AresV6SensitivityVector, delta: SensDelta): AresV6SensitivityVector {
   return {
     general: clampSensitivity(base.general + (delta.general ?? 0)),
     redPoint: clampSensitivity(base.redPoint + (delta.redPoint ?? 0)),
@@ -51,62 +43,74 @@ function applyDelta(
   };
 }
 
-function getDeviceSignalDelta(device: AresV6DeviceSignal): Partial<AresV6SensitivityVector> {
-  let delta: Partial<AresV6SensitivityVector> = {};
-
-  const add = (next: Partial<AresV6SensitivityVector>) => {
-    delta = {
-      general: (delta.general ?? 0) + (next.general ?? 0),
-      redPoint: (delta.redPoint ?? 0) + (next.redPoint ?? 0),
-      scope2x: (delta.scope2x ?? 0) + (next.scope2x ?? 0),
-      scope4x: (delta.scope4x ?? 0) + (next.scope4x ?? 0),
-      sniperScope: (delta.sniperScope ?? 0) + (next.sniperScope ?? 0),
-      freeView: (delta.freeView ?? 0) + (next.freeView ?? 0),
-    };
+function mergeDelta(base: SensDelta, next: SensDelta): SensDelta {
+  return {
+    general: (base.general ?? 0) + (next.general ?? 0),
+    redPoint: (base.redPoint ?? 0) + (next.redPoint ?? 0),
+    scope2x: (base.scope2x ?? 0) + (next.scope2x ?? 0),
+    scope4x: (base.scope4x ?? 0) + (next.scope4x ?? 0),
+    sniperScope: (base.sniperScope ?? 0) + (next.sniperScope ?? 0),
+    freeView: (base.freeView ?? 0) + (next.freeView ?? 0),
   };
+}
 
-  if (device.ramGb <= 2) add(ARES_V6_DEVICE_SIGNAL_RULES[0].delta);
-  else if (device.ramGb <= 4) add(ARES_V6_DEVICE_SIGNAL_RULES[1].delta);
+function getDeviceSignalDelta(device: AresV6DeviceSignal): SensDelta {
+  let delta: SensDelta = {};
 
-  if (device.screenHz <= 60) add(ARES_V6_DEVICE_SIGNAL_RULES[2].delta);
-  else if (device.screenHz >= 120) add(ARES_V6_DEVICE_SIGNAL_RULES[3].delta);
-
-  if (['AMOLED', 'OLED', 'LTPO'].includes(device.panelType)) {
-    add(ARES_V6_DEVICE_SIGNAL_RULES[4].delta);
+  if (device.ramGb <= 2) {
+    delta = mergeDelta(delta, { general: 8, redPoint: 6, scope4x: -4, sniperScope: -5 });
+  } else if (device.ramGb <= 4) {
+    delta = mergeDelta(delta, { general: 3, redPoint: 2, scope4x: -2, sniperScope: -3 });
   }
 
-  if (device.screenSize >= 6.8) add(ARES_V6_DEVICE_SIGNAL_RULES[5].delta);
+  if (device.screenHz <= 60) {
+    delta = mergeDelta(delta, { general: 4, redPoint: 3, freeView: 2 });
+  } else if (device.screenHz >= 120) {
+    delta = mergeDelta(delta, { general: -2, redPoint: -1, scope4x: -2 });
+  }
+
+  if (['AMOLED', 'OLED', 'LTPO'].includes(device.panelType)) {
+    delta = mergeDelta(delta, { general: -1, redPoint: -1, scope4x: -1 });
+  }
+
+  if (device.screenSize >= 6.8) {
+    delta = mergeDelta(delta, { general: -3, redPoint: -2, freeView: 2 });
+  }
 
   if (device.thermalState === 'HOT' || device.thermalState === 'THROTTLING') {
-    add(ARES_V6_DEVICE_SIGNAL_RULES[6].delta);
+    delta = mergeDelta(delta, { general: 3, redPoint: 2, scope4x: -4, sniperScope: -4 });
   }
 
   if (device.client === 'FREE_FIRE_MAX') {
-    add({ general: -2, redPoint: -1, scope4x: -2, sniperScope: -2 });
+    delta = mergeDelta(delta, { general: -2, redPoint: -1, scope4x: -2, sniperScope: -2 });
   }
 
   if (device.frameBoostEnabled) {
-    add({ general: -1, redPoint: -1, scope4x: -1 });
+    delta = mergeDelta(delta, { general: -1, redPoint: -1, scope4x: -1 });
   }
 
   if (device.pingMs && device.pingMs >= 120) {
-    add({ general: 2, redPoint: 2, scope4x: -3 });
+    delta = mergeDelta(delta, { general: 2, redPoint: 2, scope4x: -3 });
   }
 
   return delta;
 }
 
-function getWeaponDelta(category?: AresV6WeaponCategory): Partial<AresV6SensitivityVector> {
+function getWeaponDelta(category?: AresV6WeaponCategory): SensDelta {
   if (!category) return {};
   return ARES_V6_WEAPON_CALIBRATION_RULES.find((rule) => rule.category === category)?.sensitivityBias ?? {};
 }
 
 function getDragZone(category?: AresV6WeaponCategory): AresV6FireButtonRecommendation['dragZone'] {
   const preferred = ARES_V6_WEAPON_CALIBRATION_RULES.find((rule) => rule.category === category)?.preferredDrag;
+
   switch (preferred) {
-    case 'ROTATION_J': return 'ROTATION_J';
-    case 'DIRECTIONAL': return 'DIRECTIONAL';
-    case 'HYBRID': return 'HYBRID';
+    case 'ROTATION_J':
+      return 'ROTATION_J';
+    case 'DIRECTIONAL':
+      return 'DIRECTIONAL';
+    case 'HYBRID':
+      return 'HYBRID';
     case 'VERTICAL':
     default:
       return 'VERTICAL';
@@ -140,7 +144,6 @@ function buildFireButton(input: AresV6GenerationInput): AresV6FireButtonRecommen
   );
   const base = getFireButtonBase(input.player.fingers, input.device.screenSize);
   const sizePercent = clamp(base + preset.fireButtonBias + (weaponRule?.fireButtonDelta ?? 0), 35, 80);
-
   const placement = input.player.fingers >= 4
     ? 'TOP_RIGHT'
     : input.player.fingers === 3
@@ -168,14 +171,13 @@ function buildHud(input: AresV6GenerationInput): AresV6HudRecommendation {
         : fingers === 3
           ? 'THREE_FINGER'
           : 'TWO_FINGER';
-
   const priorityButtons = fingers >= 4
     ? ['Disparo', 'Mira', 'Agacharse', 'Saltar', 'Gloo Wall', 'Cambio de arma']
     : fingers === 3
       ? ['Disparo', 'Mira', 'Gloo Wall', 'Cambio de arma']
       : ['Disparo', 'Gloo Wall', 'Saltar'];
-
   const riskNotes: string[] = [];
+
   if (input.device.screenSize < 6.0) riskNotes.push('Pantalla pequeña: evita botón demasiado grande o tapa enemigos.');
   if (input.player.fingers === 2) riskNotes.push('2 dedos limita acciones simultáneas; considera transición progresiva a 3 dedos.');
   if (input.player.fingers >= 4 && input.device.screenSize < 6.3) riskNotes.push('4 dedos en pantalla pequeña puede causar fatiga y mis-taps.');
@@ -194,25 +196,28 @@ function buildHud(input: AresV6GenerationInput): AresV6HudRecommendation {
 
 function buildGyro(input: AresV6GenerationInput, sensitivity: AresV6SensitivityVector): AresV6GyroscopeVector | null {
   if (!input.player.usesGyroscope) return null;
+
   const preset = getAresV6Preset(input.presetId);
-  const baseBias = preset.gyroBias;
   const hardwareBias = input.device.screenHz >= 120 ? 2 : input.device.screenHz <= 60 ? -2 : 0;
   const fingerBias = input.player.fingers >= 4 ? 4 : input.player.fingers === 3 ? 0 : -8;
+  const sharedBias = preset.gyroBias;
 
   return {
-    gyroGeneral: clamp(sensitivity.general * 0.18 + baseBias + hardwareBias + fingerBias, GYRO_MIN, GYRO_MAX),
-    gyroRedPoint: clamp(sensitivity.redPoint * 0.18 + baseBias + fingerBias, GYRO_MIN, GYRO_MAX),
-    gyroScope2x: clamp(sensitivity.scope2x * 0.18 + baseBias, GYRO_MIN, GYRO_MAX),
-    gyroScope4x: clamp(sensitivity.scope4x * 0.17 + baseBias, GYRO_MIN, GYRO_MAX),
-    gyroSniper: clamp(sensitivity.sniperScope * 0.16 + baseBias, GYRO_MIN, GYRO_MAX),
-    gyroFreeView: clamp(sensitivity.freeView * 0.12 + baseBias, 5, 50),
+    gyroGeneral: clamp(sensitivity.general * 0.18 + sharedBias + hardwareBias + fingerBias, GYRO_MIN, GYRO_MAX),
+    gyroRedPoint: clamp(sensitivity.redPoint * 0.18 + sharedBias + fingerBias, GYRO_MIN, GYRO_MAX),
+    gyroScope2x: clamp(sensitivity.scope2x * 0.18 + sharedBias, GYRO_MIN, GYRO_MAX),
+    gyroScope4x: clamp(sensitivity.scope4x * 0.17 + sharedBias, GYRO_MIN, GYRO_MAX),
+    gyroSniper: clamp(sensitivity.sniperScope * 0.16 + sharedBias, GYRO_MIN, GYRO_MAX),
+    gyroFreeView: clamp(sensitivity.freeView * 0.12 + sharedBias, 5, 50),
   };
 }
 
 function buildTuningSteps(input: AresV6GenerationInput): AresV6TuningStep[] {
   const symptoms = input.player.symptoms ?? [];
+
   return symptoms.slice(0, 3).map((symptom) => {
     const rule = ARES_V6_SYMPTOM_TUNING_RULES.find((item) => item.symptom === symptom);
+
     return {
       symptom,
       adjustment: rule?.delta ?? {},
@@ -224,7 +229,7 @@ function buildTuningSteps(input: AresV6GenerationInput): AresV6TuningStep[] {
   });
 }
 
-function buildConfidence(input: AresV6GenerationInput, ppiPenalty: number, ppiWarning: string | null) {
+function buildConfidence(input: AresV6GenerationInput, ppiPenalty: number, ppiWarning: string | null): AresV6ConfidenceScore {
   const missingSignals: string[] = [];
   const warnings: string[] = [];
   let score = 100 - ppiPenalty;
@@ -244,7 +249,7 @@ function buildConfidence(input: AresV6GenerationInput, ppiPenalty: number, ppiWa
   }
 
   const clampedScore = clamp(score, 0, 100);
-  const grade = clampedScore >= 90
+  const grade: AresV6ConfidenceScore['grade'] = clampedScore >= 90
     ? 'LAB_VERIFIED'
     : clampedScore >= 75
       ? 'HIGH'
@@ -263,9 +268,6 @@ export function generateAresV6(input: AresV6GenerationInput): AresV6GenerationOu
   sensitivity = applyDelta(sensitivity, getDeviceSignalDelta(input.device));
   sensitivity = applyDelta(sensitivity, preset.sensitivityBias);
   sensitivity = applyDelta(sensitivity, getWeaponDelta(input.player.primaryWeaponCategory));
-
-  // Preserve a sane cascade for scoped values while allowing headshot presets
-  // to keep Red Point high. Free View remains independent.
   sensitivity = {
     ...sensitivity,
     scope2x: Math.min(sensitivity.scope2x, sensitivity.redPoint + 6),
@@ -273,17 +275,11 @@ export function generateAresV6(input: AresV6GenerationInput): AresV6GenerationOu
     sniperScope: Math.min(sensitivity.sniperScope, sensitivity.scope4x),
   };
 
-  const fireButton = buildFireButton(input);
-  const hud = buildHud(input);
-  const gyroscope = buildGyro(input, sensitivity);
-  const confidence = buildConfidence(input, effectivePpi.confidencePenalty, effectivePpi.warning);
-  const firstTuningSteps = buildTuningSteps(input);
-
   return {
     algorithmVersion: 'ARES-v6-refoundation',
     presetId: input.presetId,
     sensitivity,
-    gyroscope,
+    gyroscope: buildGyro(input, sensitivity),
     dpi: {
       mode: 'NO_DPI',
       detectedPpi: effectivePpi.source === 'TIER_FALLBACK' ? null : effectivePpi.ppi,
@@ -292,9 +288,9 @@ export function generateAresV6(input: AresV6GenerationInput): AresV6GenerationOu
         ? 'Se usó fallback por tier porque no llegó PPI/DPI real. Confirma el modelo para subir precisión.'
         : `Se usó ${effectivePpi.ppi} PPI/DPI como driver principal del motor v6.`,
     },
-    fireButton,
-    hud,
-    confidence,
+    fireButton: buildFireButton(input),
+    hud: buildHud(input),
+    confidence: buildConfidence(input, effectivePpi.confidencePenalty, effectivePpi.warning),
     explanation: {
       headline: `${preset.publicName} para ${input.device.brand} ${input.device.model}`,
       bullets: [
@@ -311,6 +307,6 @@ export function generateAresV6(input: AresV6GenerationInput): AresV6GenerationOu
         'El resultado debe validarse en entrenamiento y 3 partidas reales antes de guardarse como final.',
       ],
     },
-    firstTuningSteps,
+    firstTuningSteps: buildTuningSteps(input),
   };
 }
