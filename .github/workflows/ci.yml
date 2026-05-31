@@ -19,8 +19,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
+      - run: node scripts/ci-runner.mjs ci-logs/lint-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/lint.log npm run lint
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-lint
+          path: ci-logs/
+          if-no-files-found: ignore
 
   typecheck:
     name: Type Check
@@ -31,8 +37,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npx tsc --noEmit
+      - run: node scripts/ci-runner.mjs ci-logs/typecheck-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/typecheck.log npx tsc --noEmit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-typecheck
+          path: ci-logs/
+          if-no-files-found: ignore
 
   unit-tests:
     name: Unit Tests
@@ -43,12 +55,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npx vitest run --coverage
+      - run: node scripts/ci-runner.mjs ci-logs/unit-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/unit-tests.log npx vitest run --coverage
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: coverage
           path: coverage/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-unit-tests
+          path: ci-logs/
+          if-no-files-found: ignore
 
   e2e-tests:
     name: E2E Tests
@@ -60,9 +80,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - run: node scripts/ci-runner.mjs ci-logs/e2e-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/playwright-install.log npx playwright install --with-deps chromium
+      - run: node scripts/ci-runner.mjs ci-logs/e2e.log npx playwright test
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
       - uses: actions/upload-artifact@v4
@@ -70,6 +90,13 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-e2e
+          path: ci-logs/
+          if-no-files-found: ignore
 
   deploy-staging:
     name: Deploy Staging
