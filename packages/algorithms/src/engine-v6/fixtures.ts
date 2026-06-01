@@ -320,3 +320,27 @@ export const ARES_V6_LATAM_CALIBRATION_FIXTURES = [
 export function getAresV6CalibrationFixture(id: string): AresV6CalibrationFixture | undefined {
   return ARES_V6_LATAM_CALIBRATION_FIXTURES.find((fixture) => fixture.id === id);
 }
+
+/**
+ * Find the calibration fixture that matches a device by brand + model
+ * (case-insensitive). Used to gate LAB_VERIFIED confidence to devices the
+ * engine has actually been calibrated against.
+ */
+export function findAresV6FixtureForDevice(
+  brand: string,
+  model: string,
+): AresV6CalibrationFixture | undefined {
+  const normalizedBrand = brand.trim().toLowerCase();
+  const normalizedModel = model.trim().toLowerCase();
+
+  return ARES_V6_LATAM_CALIBRATION_FIXTURES.find(
+    (fixture) =>
+      fixture.device.brand.toLowerCase() === normalizedBrand &&
+      fixture.device.model.toLowerCase() === normalizedModel,
+  );
+}
+
+/** Convenience predicate over {@link findAresV6FixtureForDevice}. */
+export function isAresV6FixtureDevice(brand: string, model: string): boolean {
+  return findAresV6FixtureForDevice(brand, model) !== undefined;
+}
