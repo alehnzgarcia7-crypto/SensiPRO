@@ -15,11 +15,14 @@ import {
 } from '@ares/algorithms/engine-v6';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Request schema (Zod)
+// ARES v6 — Request schema (Zod, STRICT)
 //
-// Validates the POST /api/generate/v6 body. Enums are kept exhaustive: the
-// preset list is derived from the engine's source of truth, and the rest use
-// a Record-keyed helper so a missing union member is a compile error.
+// Validates the POST /api/generate/v6 body. Phase 3A hardening:
+//   • root / player / overrides are strict objects → unknown keys are a 400,
+//     never silently stripped.
+//   • enums stay exhaustive (a missing union member is a compile error).
+//   • symptoms are capped at 5 and deduplicated (order-preserving) so the
+//     engine never produces duplicate tuning steps.
 // ═══════════════════════════════════════════════════════════════
 
 const MAX_SYMPTOMS_PER_REQUEST = 5;
@@ -28,6 +31,11 @@ const MAX_SYMPTOMS_PER_REQUEST = 5;
 function zEnumFromUnion<T extends string>(values: Record<T, true>): z.ZodEnum<[T, ...T[]]> {
   const keys = Object.keys(values) as [T, ...T[]];
   return z.enum(keys);
+}
+
+/** Remove duplicate symptoms while preserving first-seen order. */
+function dedupeSymptoms(symptoms: readonly AresV6Symptom[]): AresV6Symptom[] {
+  return [...new Set(symptoms)];
 }
 
 const presetIds = ARES_V6_PRESETS.map((preset) => preset.id) as [AresV6PresetId, ...AresV6PresetId[]];
@@ -133,38 +141,48 @@ const inputLagHintSchema = z.enum(['LOW', 'MEDIUM', 'HIGH']);
 
 const fingersSchema = z.union([z.literal(2), z.literal(3), z.literal(4), z.literal(5)]);
 
-const playerSchema = z.object({
-  fingers: fingersSchema,
-  handDominance: handDominanceSchema.optional(),
-  playstyle: playstyleSchema,
-  mode: gameModeSchema,
-  preferredRange: rangeProfileSchema.optional(),
-  primaryWeaponCategory: weaponCategorySchema.optional(),
-  secondaryWeaponCategory: weaponCategorySchema.optional(),
-  usesGyroscope: z.boolean().optional(),
-  currentRank: currentRankSchema.optional(),
-  symptoms: z.array(symptomSchema).max(MAX_SYMPTOMS_PER_REQUEST).optional(),
-});
+const playerSchema = z
+  .object({
+    fingers: fingersSchema,
+    handDominance: handDominanceSchema.optional(),
+    playstyle: playstyleSchema,
+    mode: gameModeSchema,
+    preferredRange: rangeProfileSchema.optional(),
+    primaryWeaponCategory: weaponCategorySchema.optional(),
+    secondaryWeaponCategory: weaponCategorySchema.optional(),
+    usesGyroscope: z.boolean().optional(),
+    currentRank: currentRankSchema.optional(),
+    symptoms: z
+      .array(symptomSchema)
+      .max(MAX_SYMPTOMS_PER_REQUEST, `Máximo ${MAX_SYMPTOMS_PER_REQUEST} síntomas por solicitud`)
+      .transform(dedupeSymptoms)
+      .optional(),
+  })
+  .strict();
 
-const overridesSchema = z.object({
-  ramGb: z.number().int().min(1).max(32).optional(),
-  screenHz: z.number().int().min(30).max(240).optional(),
-  ppi: z.number().int().min(200).max(700).optional(),
-  client: clientSchema.optional(),
-  graphicsQuality: graphicsQualitySchema.optional(),
-  highFpsMode: z.boolean().optional(),
-  frameBoostEnabled: z.boolean().optional(),
-  thermalState: thermalStateSchema.optional(),
-  pingMs: z.number().int().min(0).max(999).optional(),
-  hasScreenProtector: z.boolean().optional(),
-  inputLagHint: inputLagHintSchema.optional(),
-});
+const overridesSchema = z
+  .object({
+    ramGb: z.number().int().min(1).max(32).optional(),
+    screenHz: z.number().int().min(30).max(240).optional(),
+    ppi: z.number().int().min(200).max(700).optional(),
+    client: clientSchema.optional(),
+    graphicsQuality: graphicsQualitySchema.optional(),
+    highFpsMode: z.boolean().optional(),
+    frameBoostEnabled: z.boolean().optional(),
+    thermalState: thermalStateSchema.optional(),
+    pingMs: z.number().int().min(0).max(999).optional(),
+    hasScreenProtector: z.boolean().optional(),
+    inputLagHint: inputLagHintSchema.optional(),
+  })
+  .strict();
 
-export const aresV6GenerateRequestSchema = z.object({
-  deviceId: z.string().cuid('deviceId inválido'),
-  presetId: z.enum(presetIds),
-  player: playerSchema,
-  overrides: overridesSchema.optional(),
-});
+export const aresV6GenerateRequestSchema = z
+  .object({
+    deviceId: z.string().cuid('deviceId inválido'),
+    presetId: z.enum(presetIds),
+    player: playerSchema,
+    overrides: overridesSchema.optional(),
+  })
+  .strict();
 
 export type AresV6GenerateRequest = z.infer<typeof aresV6GenerateRequestSchema>;

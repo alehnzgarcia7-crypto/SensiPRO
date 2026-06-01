@@ -7,6 +7,7 @@ import {
   type AresV6PresetId,
 } from '@ares/algorithms/engine-v6';
 
+import { assertCanGenerateForDevice } from './access-policy';
 import {
   toAresV6DeviceSignalWithOverrides,
   type AresV6AdaptableDevice,
@@ -33,6 +34,8 @@ export interface AresV6GenerateServiceInput {
 export interface AresV6ServiceDevice extends AresV6AdaptableDevice {
   id: string;
   slug: string;
+  /** Maps to Prisma `Device.isActive`; gates the access policy. */
+  isActive?: boolean | null;
 }
 
 export interface AresV6GenerateServiceResult {
@@ -61,6 +64,7 @@ async function defaultFindDevice(id: string): Promise<AresV6ServiceDevice | null
       screenDpi: true,
       chipset: true,
       releaseYear: true,
+      isActive: true,
     },
   });
 }
@@ -79,6 +83,10 @@ export async function generateAresV6ForDeviceId(
   if (!device) {
     throw new NotFoundError('Device', input.deviceId);
   }
+
+  // Authorization boundary: inactive/unpublished devices are denied as if they
+  // did not exist (anti-enumeration). Public/active devices pass through.
+  assertCanGenerateForDevice({ device });
 
   const signal = toAresV6DeviceSignalWithOverrides(device, input.overrides);
   const generation = generateAresV6({

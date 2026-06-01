@@ -22,6 +22,15 @@ function getRedis(): Redis | null {
 }
 
 /**
+ * Expose the shared ioredis client for modules that need raw commands
+ * (e.g. the ARES v6 rate limiter). Returns null when REDIS_URL is unset so
+ * callers can decide their own degraded behaviour. Never opens a new pool.
+ */
+export function getRedisClient(): Redis | null {
+  return getRedis();
+}
+
+/**
  * Cache-aside pattern: get from cache, compute if miss, store
  */
 export async function cached<T>(

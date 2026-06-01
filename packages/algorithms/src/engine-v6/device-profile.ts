@@ -155,6 +155,7 @@ export function buildDpiRecommendation(effective: AresV6EffectivePpiResult): Are
   return {
     mode: 'NO_DPI',
     detectedPpi: isFallback ? null : effective.ppi,
+    source: effective.source,
     confidence: 100 - effective.confidencePenalty,
     explanation: isFallback
       ? 'Se usó fallback por tier porque no llegó PPI/DPI real. Confirma el modelo para subir precisión.'

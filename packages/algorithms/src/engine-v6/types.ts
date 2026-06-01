@@ -171,6 +171,8 @@ export interface AresV6FireButtonRecommendation {
 export interface AresV6DpiRecommendation {
   mode: 'NO_DPI' | 'DPI_SUGGESTED';
   detectedPpi: number | null;
+  /** Provenance of the PPI that drove the calculation (for observability + trust). */
+  source: 'PPI' | 'SCREEN_DPI' | 'TIER_FALLBACK';
   suggestedSmallestWidth?: number;
   confidence: number;
   explanation: string;
