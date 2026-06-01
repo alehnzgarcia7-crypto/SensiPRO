@@ -20,6 +20,13 @@ const HIGH_MIN_SCORE = 75;
 const MEDIUM_MIN_SCORE = 55;
 const LAB_VERIFIED_MAX_MISSING = 1;
 
+/**
+ * Max distance (in PPI) allowed between the request's effective PPI and the
+ * calibration fixture's PPI for a LAB_VERIFIED grade. Defends against a faked
+ * manual PPI override inflating confidence for a known fixture model.
+ */
+export const ARES_V6_LAB_VERIFIED_PPI_TOLERANCE = 15;
+
 type Grade = AresV6ConfidenceScore['grade'];
 
 function collectMissingSignals(input: AresV6GenerationInput): string[] {
@@ -56,11 +63,18 @@ function deriveGrade(
   missingCount: number,
 ): Grade {
   const hasConfirmedPpi = effective.source === 'PPI';
-  const isCalibratedFixture = findAresV6FixtureForDevice(device.brand, device.model) !== undefined;
+  const fixture = findAresV6FixtureForDevice(device.brand, device.model);
+  const fixturePpi = fixture ? fixture.device.ppi ?? fixture.device.screenDpi : undefined;
+  // LAB_VERIFIED requires the effective PPI to actually match the calibrated
+  // fixture; a manual PPI far from the fixture's value cannot reach it.
+  const ppiMatchesFixture =
+    fixturePpi !== undefined &&
+    Math.abs(effective.ppi - fixturePpi) <= ARES_V6_LAB_VERIFIED_PPI_TOLERANCE;
 
   if (
     hasConfirmedPpi &&
-    isCalibratedFixture &&
+    fixture !== undefined &&
+    ppiMatchesFixture &&
     score >= LAB_VERIFIED_MIN_SCORE &&
     missingCount <= LAB_VERIFIED_MAX_MISSING
   ) {

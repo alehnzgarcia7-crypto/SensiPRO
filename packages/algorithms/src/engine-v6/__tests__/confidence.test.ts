@@ -108,4 +108,26 @@ describe('ARES v6 — confidence scoring', () => {
     });
     expect(result.confidence.grade).toBe('LAB_VERIFIED');
   });
+
+  it('denies LAB_VERIFIED when a manual PPI is far from the fixture PPI', () => {
+    const fixture = getAresV6CalibrationFixture('samsung-galaxy-a54')!.device;
+    // Real A54 PPI is 401; a manual 431 is >15 away from the calibrated value.
+    const result = generateAresV6({
+      device: { ...fixture, ppi: 431, thermalState: 'NORMAL' },
+      presetId: 'STANDARD_PRO',
+      player: PLAYER,
+    });
+    expect(result.confidence.grade).not.toBe('LAB_VERIFIED');
+  });
+
+  it('still reaches LAB_VERIFIED when a manual PPI is within tolerance of the fixture', () => {
+    const fixture = getAresV6CalibrationFixture('samsung-galaxy-a54')!.device;
+    // 401 → 410 is within the 15-PPI tolerance.
+    const result = generateAresV6({
+      device: { ...fixture, ppi: 410, thermalState: 'NORMAL' },
+      presetId: 'STANDARD_PRO',
+      player: PLAYER,
+    });
+    expect(result.confidence.grade).toBe('LAB_VERIFIED');
+  });
 });

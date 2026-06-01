@@ -293,7 +293,10 @@ export const ARES_V6_LATAM_CALIBRATION_FIXTURES = [
     id: 'galaxy-s24-ultra',
     priority: 'P1',
     marketReason: 'Ultra high-end Android/QHD fixture; protects against high-PPI overshoot.',
-    expectedPpiBand: '520+',
+    // Fixture ppi 505 falls in the 450-519 band; device signals (QHD large
+    // screen, 120Hz, LTPO, FF MAX, frame boost) pull Standard down to a
+    // controlled flagship output (~149), inside the expected range below.
+    expectedPpiBand: '450-519',
     expectedStandardGeneralRange: [140, 152],
     primaryPresets: ['STANDARD_PRO', 'GYRO_PRO', 'SNIPER_AWM', 'AR_RECOIL_CONTROL'],
     device: {

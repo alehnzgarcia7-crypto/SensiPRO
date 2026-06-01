@@ -113,6 +113,30 @@ El gate `Phase 0.1B ARES v6 Gate` se actualizó (manteniéndolo bloqueante):
 
 ---
 
+## 7.5 Adenda Fase 1.5 — Quality Gate Patch
+
+Endurecimientos aplicados después del cierre de Fase 1:
+
+1. **`tsconfig.ares-v6.json`**: config dedicada que typechequea el motor **y sus
+   tests** (antes el gate solo typechequeaba los archivos fuente por lista). El
+   gate ahora corre `npx tsc -p tsconfig.ares-v6.json`.
+2. **`fixtures.test.ts` typecheck**: helper tipado `getFixturePpi(fixture)` para
+   evitar la narrowing a `never` del `ppi ?? screenDpi` sobre el literal `as const`.
+3. **LAB_VERIFIED con tolerancia de PPI**: nueva constante
+   `ARES_V6_LAB_VERIFIED_PPI_TOLERANCE = 15`. Ahora LAB_VERIFIED exige que el PPI
+   efectivo esté a ≤15 del PPI del fixture; un PPI manual falso ya no infla la
+   confianza (tests nuevos en `confidence.test.ts`).
+4. **S24 Ultra coherente**: `expectedPpiBand` corregido de `'520+'` a `'450-519'`
+   (ppi 505 cae en esa banda). Las señales de dispositivo (QHD, 120Hz, LTPO, FF
+   MAX, frame boost) lo llevan a un General controlado de **149**, dentro de su
+   `expectedStandardGeneralRange [140,152]`.
+5. **Test "10 mandatory P0 devices"**: renombrado a "mandatory P0 devices" y se
+   bloquea el set P0 en exactamente 9 con `toHaveLength`.
+6. **Gate v6 ampliado**: lint + tests ahora incluyen `src/lib/ares-v6` y
+   `src/app/api/generate/v6` (ver `docs/phase-2/`).
+
+---
+
 ## 8. Lo que NO se tocó (confirmado)
 
 Pagos, auth, NextAuth, Stripe, MercadoPago, middleware, Prisma schema, rutas API legacy, UI, landing, pricing, academy, command-center, deployment, webhooks, env vars, y el motor legacy (`sensitivity-engine.ts` y compañía siguen intactos). El gate legacy permanece no bloqueante.

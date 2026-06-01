@@ -5,7 +5,7 @@ import {
   generateAresV6,
   getAresV6CalibrationFixture,
 } from '..';
-import type { AresV6GenerationInput } from '..';
+import type { AresV6CalibrationFixture, AresV6GenerationInput } from '..';
 
 // ═══════════════════════════════════════════════════════════════
 // ARES ENGINE V6 — LATAM calibration fixtures
@@ -17,6 +17,12 @@ import type { AresV6GenerationInput } from '..';
 
 const DEVICE_SIGNAL_TOLERANCE = 6;
 const MODERN_GENERAL_FLOOR = 130;
+
+// Typed against the widened interface so `ppi ?? screenDpi` is not narrowed to
+// `never` by the `as const` literal fixture data.
+function getFixturePpi(fixture: AresV6CalibrationFixture): number {
+  return fixture.device.ppi ?? fixture.device.screenDpi ?? 0;
+}
 
 function standardInput(fixtureId: string): AresV6GenerationInput {
   const fixture = getAresV6CalibrationFixture(fixtureId);
@@ -31,15 +37,15 @@ function standardInput(fixtureId: string): AresV6GenerationInput {
 describe('ARES v6 — fixture metadata integrity', () => {
   it('covers every required P0/P1 device with confirmed PPI and at least one preset', () => {
     for (const fixture of ARES_V6_LATAM_CALIBRATION_FIXTURES) {
-      expect(fixture.device.ppi ?? fixture.device.screenDpi).toBeGreaterThan(0);
+      expect(getFixturePpi(fixture)).toBeGreaterThan(0);
       expect(fixture.primaryPresets.length).toBeGreaterThan(0);
       expect(fixture.expectedStandardGeneralRange[0]).toBeLessThan(fixture.expectedStandardGeneralRange[1]);
     }
   });
 
-  it('includes the 10 mandatory P0 devices', () => {
+  it('includes the mandatory P0 devices', () => {
     const ids = ARES_V6_LATAM_CALIBRATION_FIXTURES.filter((f) => f.priority === 'P0').map((f) => f.id);
-    for (const required of [
+    const mandatory = [
       'samsung-galaxy-a14',
       'samsung-galaxy-a15',
       'samsung-galaxy-a24',
@@ -49,9 +55,12 @@ describe('ARES v6 — fixture metadata integrity', () => {
       'moto-g54',
       'iphone-11',
       'iphone-14',
-    ]) {
+    ];
+    for (const required of mandatory) {
       expect(ids).toContain(required);
     }
+    // Lock the P0 set so adding/removing a P0 device forces updating this list.
+    expect(ids).toHaveLength(mandatory.length);
   });
 });
 

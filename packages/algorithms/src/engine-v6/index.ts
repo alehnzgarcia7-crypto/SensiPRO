@@ -90,7 +90,7 @@ export { buildGyroscope } from './gyro';
 export { buildFireButton, getDragZone, getFireButtonBase } from './fire-button';
 export { buildHud } from './hud';
 export { buildTuningSteps, getTuningStepForSymptom } from './tuning';
-export { buildConfidence } from './confidence';
+export { ARES_V6_LAB_VERIFIED_PPI_TOLERANCE, buildConfidence } from './confidence';
 export { buildExplanation } from './explain';
 export type { AresV6ExplanationContext } from './explain';
 

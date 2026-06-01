@@ -29,6 +29,7 @@
     "docker:up": "docker compose -f infrastructure/docker/docker-compose.dev.yml up -d",
     "docker:down": "docker compose -f infrastructure/docker/docker-compose.dev.yml down",
     "setup": "bash scripts/setup.sh",
+    "ares:v6:fixtures": "npx tsx scripts/ares-v6-compare-fixtures.ts",
     "db:reset:safe": "bash scripts/db-reset.sh",
     "clean": "rm -rf .next node_modules packages/*/node_modules packages/*/dist"
   },

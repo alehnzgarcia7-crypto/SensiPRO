@@ -20,6 +20,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
       '@ares/database': path.resolve(__dirname, 'packages/database/src'),
+      '@ares/algorithms/engine-v6': path.resolve(__dirname, 'packages/algorithms/src/engine-v6'),
       '@ares/algorithms': path.resolve(__dirname, 'packages/algorithms/src'),
       '@ares/types': path.resolve(__dirname, 'packages/types/src'),
       '@ares/utils': path.resolve(__dirname, 'packages/utils/src'),
