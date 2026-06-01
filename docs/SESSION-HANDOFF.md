@@ -3,61 +3,60 @@
 **Fecha:** 2026-06-01
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** `56fe7ce`
+**HEAD:** `8eaf95e` (+ commit de este handoff)
 
 ---
 
 ## Estado
 
-- Working tree limpio, al día con `origin` (ahead=0, behind=0).
-- Salud verde: `npx tsc -p tsconfig.ares-v6.json` → exit 0.
-- Tests: **114 passed (11 files)** — `npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 --coverage=false`.
-- CI: GitHub Actions run **26745234633** → conclusión **success**
-  ([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26745234633)).
-  `Phase 0.1B ARES v6 Gate` = success (bloqueante); `legacy-audit` = success (no bloqueante, `|| true`); `E2E Tests` = skipped.
+- Working tree limpio, al día con `origin`.
+- Salud verde: `npx eslint … v6` → 0, `npx tsc -p tsconfig.ares-v6.json` → 0.
+- Tests: **158 passed (15 files)** — `npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 --coverage=false` (91 motor + 67 backend).
+- CI: GitHub Actions run **26784031211** → conclusión **success**
+  ([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26784031211)).
+  `Phase 0.1B ARES v6 Gate` = success (bloqueante); `legacy-audit` = success (no bloqueante); `E2E Tests` = skipped.
 
 ---
 
 ## Fases completas
 
-- **Fase 0** — Refundación nuclear: `docs/phase-0/*` (research, legacy-freeze-map, phase-1 spec, API-migration, rollback/governance) + contratos del motor v6 (`types`, `presets`, `research-matrix`, `dpi-curve`, `fixtures`) + `index`.
-- **Fase 0.1** — Infra CI: `scripts/ci-runner.mjs` (logs determinísticos) + captura de artifacts por job.
-- **Fase 0.1B** — Gate v6 verde: split del job bloqueante `Phase 0.1B ARES v6 Gate` vs `legacy-audit` no bloqueante; tsc estricto sobre engine-v6.
-- **Fase 1** — Motor modular: monolito `generate.ts` → orquestador delgado + 10 módulos (`math`, `device-profile`, `sensitivity`, `weapons`, `gyro`, `fire-button`, `hud`, `tuning`, `confidence`, `explain`) + 7 suites de test.
-- **Fase 1.5** — Quality gate patch: `tsconfig.ares-v6.json` (typecheck del motor **y sus tests**); `LAB_VERIFIED` exige PPI dentro de tolerancia (`ARES_V6_LAB_VERIFIED_PPI_TOLERANCE = 15`) vs el fixture; fix banda Galaxy S24 Ultra (`'520+'` → `'450-519'`); helper tipado `getFixturePpi`.
-- **Fase 2 Foundation** — Backend aislado: `src/lib/ares-v6/` (`feature-flags`, `device-adapter` que nunca pierde `screenDpi`, `request-schema` Zod, `generate-service` con finder inyectable) + endpoint `POST /api/generate/v6`; alias `@ares/algorithms/engine-v6`; script `npm run ares:v6:fixtures`.
+- **Fase 0** — Refundación nuclear: docs + contratos del motor v6.
+- **Fase 0.1 / 0.1B** — Infra CI (`scripts/ci-runner.mjs`) + gate v6 bloqueante.
+- **Fase 1 / 1.5** — Motor modular (orquestador + 10 módulos) + quality gate (`tsconfig.ares-v6.json`, LAB_VERIFIED con tolerancia PPI, fix S24 Ultra).
+- **Fase 2 Foundation** — Backend aislado: `src/lib/ares-v6/` + endpoint `POST /api/generate/v6` (OFF por defecto, adapter que nunca pierde `screenDpi`).
+- **Fase 3A — Lab Hardening** — `docs/phase-3/*`. Endurece el endpoint (sigue OFF):
+  - **Strict Zod** (root/player/overrides `.strict()`) + dedupe de síntomas.
+  - **Rate limit** `src/lib/ares-v6/rate-limit.ts` por IP+deviceId sobre **Redis** (reusa el ioredis de `src/lib/cache/redis.ts` vía `getRedisClient()`), 60s, 20/8, 429 + `Retry-After`, **fail-open** en lab, corre **antes** de Prisma.
+  - **Payload guard** (`Content-Length > 20KB ⇒ 413`).
+  - **Observabilidad** `observability.ts` (requestId + hashes, eventos, métricas, redacción) — **cero PII**.
+  - **Access policy** `access-policy.ts` (device activo=público; inactivo⇒NotFound; `user` reservado).
+  - **api-errors.ts** (envelopes + headers). **lab mode** en `meta`. **dpi.source** expuesto en el motor.
+  - **Harness** `scripts/ares-v6-compare-fixtures.ts` con flags (`--json/--preset/--all-presets/--fixture/--output`).
 
 ---
 
 ## Endpoint v6
 
-- `POST /api/generate/v6` — **apagado por defecto**: si `ARES_V6_API_ENABLED !== 'true'` responde **404** (invisible en producción).
-- No toca rutas legacy (`/api/generate`, `/api/generate/all`, `/api/generate/headshot`, `/api/export`) ni pagos/auth/middleware/UI/schema Prisma.
-- **No escribe feedback** (Fase 2 es solo lectura/generación; `ARES_V6_WRITE_FEEDBACK` reservado para más adelante).
+- `POST /api/generate/v6` — **apagado por defecto** (`ARES_V6_API_ENABLED !== 'true'` ⇒ 404).
+- Pipeline: flag → 413 (payload) → 400 (JSON) → 400 (strict Zod) → 429 (rate limit, pre-Prisma) → generate.
+- No toca legacy ni pagos/auth/middleware/UI/schema. No escribe feedback.
 
 ---
 
-## SIGUIENTE: Fase 3A — Lab Hardening
+## SIGUIENTE: Fase 3B (propuesta)
 
-Endurecer el endpoint antes de exponerlo (sigue apagado/lab). Prompt ya escrito, **pendiente de pegar**. Cubre:
-
-- **Strict Zod** (`z.strictObject` / `.strict()`) para rechazar campos desconocidos en body/player/overrides.
-- **Rate limit** por IP/identidad.
-- **Payload guard** (límite de tamaño del body / símbolos / profundidad).
-- **Observabilidad sin PII** (logs/metrics estructurados, nada sensible).
-- **Access policy** (quién puede llamar; lab vs público).
-- **Lab mode** (`ARES_V6_LAB_MODE`) para resultados experimentales a internos.
+- Smoke test contra **DB real + Redis real** (validar el path no-mockeado del limiter).
+- Feedback loop `/api/feedback/v6` detrás de `ARES_V6_WRITE_FEEDBACK`.
+- UI experimental detrás de `NEXT_PUBLIC_ARES_V6_ENABLED`.
+- Throttle por IP a nivel edge/middleware + decisión fail-open vs fail-closed.
+- Comparativa legacy vs v6 + rollout gradual.
 
 ---
 
 ## Riesgos abiertos
 
-- **(a) Rate limiter:** el de Fase 3A **DEBE** reutilizar el Redis existente
-  (`src/lib/security/rate-limiter.ts` + `src/lib/cache/redis.ts`), **no** un `Map`
-  en memoria (no escala entre instancias serverless ni sobrevive reinicios).
-- **(b) Formato del id de Device:** `schema.prisma` declara `id String @id @default(cuid())`
-  (cuid v1), consistente con el `z.string().cuid()` actual. Confirmar contra ids
-  reales en DB antes de fijarlo (zod `.cuid()` valida cuid v1, no cuid2).
-- **(c) Solo mock-tested:** el endpoint está probado con Prisma mockeado; falta un
-  **smoke test contra DB real** (el bug original era `screenDpi` perdido en el adapter
-  de rutas) — a más tardar en **Fase 3B**.
+- **(a) Rate limit post-validación** (no pre-parse): un flood fuerza parse+Zod (barato, ≤20KB) pero nunca DB/engine. Throttle edge → 3B.
+- **(b) `x-forwarded-for` spoofeable:** en exposición real confiar sólo en el header del proxy/CDN.
+- **(c) Fail-open si Redis cae:** decisión de lab; revisar fail-closed en producción.
+- **(d) Sólo mock-tested:** falta smoke contra DB/Redis reales (3B).
+- **(e) Hook Semgrep local** falla por falta de `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).

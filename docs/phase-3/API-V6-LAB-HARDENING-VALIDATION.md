@@ -57,7 +57,13 @@ npm run ares:v6:fixtures -- --fixture redmi-note-13                  → tabla (
 
 ## 4. Resultado del gate CI
 
-> **Pendiente de registrar tras el push.** Se actualiza en este mismo documento con el run id y la conclusión una vez ejecutado el workflow sobre el HEAD de Fase 3A.
+Commit `8eaf95e` · GitHub Actions run **26784031211** → conclusión **success**
+([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26784031211)).
+
+- `Phase 0.1B ARES v6 Gate`: **success** (npm ci → db:generate → eslint → `tsc -p tsconfig.ares-v6.json` → vitest **158** → artifact `ci-logs-phase-0-v6-gate`).
+- `Legacy Audit non-blocking debt report`: **success** (no bloqueante).
+- `E2E Tests`: **skipped** (sólo en push a `main`).
+- PR #1: OPEN · DRAFT · **MERGEABLE**.
 
 El gate v6 no cambió de forma: ya lintea + typechequea (`tsconfig.ares-v6.json`) + testea los tres directorios v6, que ahora incluyen automáticamente todos los módulos nuevos. `legacy-audit` sigue **no bloqueante**; `E2E` sigue sólo en push a `main`.
 
