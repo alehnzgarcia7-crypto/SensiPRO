@@ -106,3 +106,26 @@ Pagos, Stripe, MercadoPago, webhooks, auth, NextAuth, middleware, command-center
 admin APIs, pricing, landing, academy, UI del generador, schema Prisma,
 migrations, y las rutas legacy `/api/generate`, `/api/generate/all`,
 `/api/generate/headshot`, `/api/export`.
+
+---
+
+## 10. Fase 3A Hardening Addendum
+
+Fase 3A endureció este mismo endpoint (sigue OFF por defecto). Detalle completo en
+`docs/phase-3/API-V6-LAB-HARDENING-ARCHITECTURE.md` y `…-VALIDATION.md`. Resumen:
+
+- **Strict schemas:** root/player/overrides son `z.object().strict()` (unknown keys ⇒ 400)
+  y `symptoms` se deduplica preservando orden (máx 5).
+- **Rate limit:** abuse guard por IP+deviceId sobre **Redis** (ioredis reusado de
+  `src/lib/cache/redis.ts`, sin tercera conexión), ventana 60s, 20/IP+device y
+  8/unknown-ip, 429 con `Retry-After` + headers `X-RateLimit-*`, fail-open en lab.
+  Corre **antes** de Prisma → un bloqueo nunca consulta la DB.
+- **Payload guard:** `Content-Length > 20KB ⇒ 413`.
+- **Observabilidad:** `requestId` + `ipHash`/`uaHash` salteados, eventos y métricas
+  estructuradas, redacción recursiva — **cero PII**.
+- **Access policy:** `access-policy.ts` (device activo = público; inactivo ⇒ NotFound
+  anti-enumeración; `user` reservado para 3B).
+- **Lab mode:** `meta` con `engine/labMode/requestId/rateLimit` siempre y `warnings`
+  cuando `ARES_V6_LAB_MODE=true`.
+- **Engine:** se expuso `dpi.source` (provenance) para trust + observabilidad.
+- **Tests:** 114 → **158** (15 archivos). Gate v6 verde, sin cambios de forma en `ci.yml`.
