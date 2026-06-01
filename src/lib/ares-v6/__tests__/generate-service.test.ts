@@ -59,6 +59,11 @@ describe('generateAresV6ForDeviceId', () => {
     await expect(generateAresV6ForDeviceId(input(), depsReturning(null))).rejects.toThrow(NotFoundError);
   });
 
+  it('denies an inactive device as NotFound (anti-enumeration access policy)', async () => {
+    const inactive = { ...sampleServiceDevice(), isActive: false };
+    await expect(generateAresV6ForDeviceId(input(), depsReturning(inactive))).rejects.toThrow(NotFoundError);
+  });
+
   it('returns a complete generation package with the resolved device', async () => {
     const result = await generateAresV6ForDeviceId(input(), depsReturning(sampleServiceDevice()));
     const g = result.generation;

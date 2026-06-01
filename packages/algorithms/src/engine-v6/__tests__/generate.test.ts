@@ -231,3 +231,29 @@ describe('ARES v6 — output completeness', () => {
     expect(text).toContain('395');
   });
 });
+
+describe('ARES v6 — dpi source provenance', () => {
+  it('reports PPI as the dpi source when a confirmed PPI drives the result', () => {
+    const result = gen('redmi-note-13', 'STANDARD_PRO');
+    expect(result.dpi.source).toBe('PPI');
+    expect(result.dpi.detectedPpi).toBe(395);
+  });
+
+  it('falls back to TIER_FALLBACK with null detectedPpi when no PPI/DPI is given', () => {
+    const result = generateAresV6({
+      device: {
+        brand: 'Generic',
+        model: 'Unknown Phone',
+        screenSize: 6.5,
+        ramGb: 4,
+        screenHz: 60,
+        panelType: 'LCD',
+        tier: 'LOW',
+      },
+      presetId: 'STANDARD_PRO',
+      player: { fingers: 3, playstyle: 'STANDARD', mode: 'BATTLE_ROYALE', usesGyroscope: false },
+    });
+    expect(result.dpi.source).toBe('TIER_FALLBACK');
+    expect(result.dpi.detectedPpi).toBeNull();
+  });
+});
