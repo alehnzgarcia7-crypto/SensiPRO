@@ -45,9 +45,12 @@ npx tsx scripts/ares-v6-compare-fixtures.ts                          → tabla d
 
 ## 4. Resultado del gate CI
 
-Gate `Phase 0.1B ARES v6 Gate` actualizado y verde tras el push de Fase 1.5 + 2.
-Run, conclusión y artifacts confirmados en la entrega del PR (#1). `legacy-audit`
-permanece **no bloqueante** (`|| true`).
+Commit `5c1acb8` · GitHub Actions run **26745125558** → conclusión **success**.
+
+- `Phase 0.1B ARES v6 Gate`: **success** (npm ci → db:generate → eslint → `tsc -p tsconfig.ares-v6.json` → vitest → artifact `ci-logs-phase-0-v6-gate`).
+- `Legacy Audit non-blocking debt report`: success (no bloqueante, `|| true`).
+- `E2E Tests`: skipped (solo en push a main).
+- PR #1: **MERGEABLE**.
 
 ---
 
