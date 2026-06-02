@@ -93,3 +93,17 @@ Commit `6c99302` · GitHub Actions run **26795777050** → conclusión **success
 ## 7. Lo que NO se tocó (confirmado)
 
 Pagos, Stripe, MercadoPago, webhooks, auth, NextAuth, middleware, command-center, admin APIs, pricing, landing, academy, UI del generador, schema Prisma productivo, migraciones productivas, y las rutas legacy `/api/generate`, `/api/generate/all`, `/api/generate/headshot`, `/api/export`.
+
+---
+
+## 8. Fase 3C Next Layer (implementada)
+
+Fase 3C ya implementó la activación interna controlada sobre esta base (sigue OFF por defecto). Detalle en `docs/phase-3C/`:
+
+- **Internal access guard** (token SHA-256 timing-safe; stealth 404 / 403 lab).
+- **Persistencia controlada** de generaciones (flag-gated, sin PII) + política required/degraded.
+- **Feedback v0** (`POST /api/feedback/v6`, OFF por defecto): strict Zod, 409 duplicado, anti-PII, anti-poisoning (TRUSTED/SUSPICIOUS). Evidencia, no verdad.
+- **Lab metrics** (`GET /api/lab/v6/metrics`, OFF por defecto) + agregador puro.
+- **Lab runner + cleanup** CLIs y **workflow manual** `ares-v6-internal-lab.yml` (environment protegido).
+- **3 modelos Prisma aditivos** + migración aditiva `20260602000000_ares_v6_lab`.
+- Tests v6: 190 → **239** (228 unit + 11 real-infra smoke).

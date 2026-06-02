@@ -1,56 +1,57 @@
 # SensiPRO ARES v6 — Session Handoff
 
-**Fecha:** 2026-06-01
+**Fecha:** 2026-06-02
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** `6c99302` (+ commit de este handoff)
+**HEAD:** (Fase 3C + commit de este handoff)
 
 ---
 
 ## Estado
 
 - Working tree limpio, al día con `origin`.
-- Salud verde: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **190** = 181 unit (18 archivos; smoke saltado en el gate) + **9 real-infra smoke** (Redis + Postgres reales).
-- CI: run **26795777050** → **success** ([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26795777050)).
-  `Phase 0.1B ARES v6 Gate` = success (bloqueante); **`ARES v6 Real-Infra Smoke` = success** (Postgres 16 + Redis 7 service containers); `legacy-audit` = success (no bloqueante); `E2E` = skipped.
+- Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
+- Tests: **239** = **228 unit** (28 archivos; smoke saltado en el gate) + **11 real-infra smoke** (Redis + Postgres reales, validado local).
+- CI: ver run id en `docs/phase-3C/INTERNAL-CONTROLLED-ACTIVATION-VALIDATION.md` (§4).
 
 ---
 
 ## Fases completas
 
-- **Fase 0 / 0.1 / 0.1B** — Refundación, contratos, CI gate.
-- **Fase 1 / 1.5** — Motor modular + quality gate.
-- **Fase 2 Foundation** — Backend aislado + endpoint OFF por defecto.
-- **Fase 3A — Lab Hardening** — strict Zod, rate limit (single bucket), payload guard, observabilidad sin PII, access policy, lab mode (`docs/phase-3/`).
-- **Fase 3B — Real-Infra Validation** — `docs/phase-3B/`:
-  - **Dual bucket** (cierra bypass por rotación de deviceId): IP_GLOBAL + IP_DEVICE / UNKNOWN_GLOBAL + UNKNOWN_DEVICE.
-  - **Redis atómico** (Lua EVAL, TTL garantizado; reusa ioredis de `src/lib/cache/redis.ts`).
-  - **Proxy trust** (`proxy-trust.ts`): vercel/strict/lab; XFF no se confía a ciegas.
-  - **Fail mode** (`rate-limit-policy.ts`): open (lab) / closed (beta-prod → 503).
-  - **Log salt policy** (`observability-policy.ts`): salt ≥16 requerido en prod con API on, o 503.
-  - **Real-infra smoke** (`__tests__/real-infra.smoke.test.ts`, gated por `ARES_V6_REAL_INFRA_SMOKE`) + job CI con service containers + seed (`testing/seed-real-infra.ts`, `scripts/ares-v6-seed-smoke.ts`, `npm run db:push:test`).
+- **0 / 0.1 / 0.1B** — Refundación, contratos, CI gate.
+- **1 / 1.5** — Motor modular + quality gate.
+- **2 Foundation** — Backend aislado + endpoint OFF por defecto.
+- **3A — Lab Hardening** — strict Zod, rate limit, payload guard, observabilidad sin PII, access policy, lab mode (`docs/phase-3/`).
+- **3B — Real-Infra Validation** — dual bucket, Redis atómico Lua, proxy trust, fail-open/closed, log salt, real-infra smoke (`docs/phase-3B/`).
+- **3C — Internal Controlled Activation** — `docs/phase-3C/`:
+  - **Internal access guard** (`internal-access.ts`): token SHA-256 timing-safe, modos off/header/lab, stealth 404.
+  - **Persistencia controlada** (`generation-persistence.ts`): flag `ARES_V6_PERSIST_GENERATIONS` (+ `_REQUIRED`); `AresV6Generation` sin PII.
+  - **Feedback v0** (`POST /api/feedback/v6`, `feedback-schema/quality/service.ts`): OFF por defecto (`ARES_V6_WRITE_FEEDBACK`), strict, 409 duplicado, anti-PII, anti-poisoning. **No recalibra el motor.**
+  - **Lab metrics** (`GET /api/lab/v6/metrics`, `lab-metrics.ts`): OFF por defecto (`ARES_V6_LAB_METRICS_ENABLED`).
+  - **Lab runner + cleanup** (`scripts/ares-v6-internal-lab-runner.ts`, `…-lab-cleanup.ts`; `lab-runner.ts`, `lab-cleanup.ts`).
+  - **Workflow manual** `.github/workflows/ares-v6-internal-lab.yml` (workflow_dispatch + environment `ares-v6-internal-lab`).
+  - **Prisma**: 3 modelos aditivos (`AresV6Generation`, `AresV6Feedback`, `AresV6LabRun`) + migración `20260602000000_ares_v6_lab` (sólo CREATE).
 
 ---
 
-## Endpoint v6 (OFF por defecto)
+## Endpoints v6 (todos OFF por defecto)
 
-- `POST /api/generate/v6` — 404 si `ARES_V6_API_ENABLED !== 'true'`.
-- Pipeline: flag → config gate (503 si falta salt en prod) → 413 → 400 (JSON) → 400 (strict Zod) → rate limit (429 / fail-closed 503, **antes** de Prisma) → generate.
-- Flags: `ARES_V6_API_ENABLED`, `ARES_V6_LAB_MODE`, `ARES_V6_PROXY_TRUST_MODE` (vercel/strict/lab), `ARES_V6_RATE_LIMIT_FAIL_MODE` (open/closed), `ARES_V6_RATE_LIMIT_*` (límites), `ARES_V6_LOG_SALT`, `ARES_V6_REAL_INFRA_SMOKE`.
+- `POST /api/generate/v6` — flag → internal access → config gate → 413 → 400 → rate limit → generate → (opcional) persist.
+- `POST /api/feedback/v6` — flag `ARES_V6_WRITE_FEEDBACK` → internal access → rate limit (ns `fb`) → service (404/409) → 201.
+- `GET /api/lab/v6/metrics` — flag `ARES_V6_LAB_METRICS_ENABLED` → internal access → métricas agregadas.
+
+Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256`, `ARES_V6_PERSIST_GENERATIONS(_REQUIRED)`, `ARES_V6_WRITE_FEEDBACK`, `ARES_V6_LAB_METRICS_ENABLED`. Runbook: `docs/phase-3C/INTERNAL-CONTROLLED-ACTIVATION-RUNBOOK.md`.
 
 ---
 
-## SIGUIENTE: Fase 3C (propuesta) — Internal Controlled Activation
+## SIGUIENTE: Fase 3D (propuesta)
 
-Activar `ARES_V6_API_ENABLED=true` SÓLO en interno/preview (no prod pública) con `FAIL_MODE=closed`, `PROXY_TRUST_MODE=strict`, `LOG_SALT` fuerte; dashboards sobre los eventos/métricas existentes; feedback loop `/api/feedback/v6` tras `ARES_V6_WRITE_FEEDBACK`; primeras muestras por fixture antes de exposición pública.
+Comparativa controlada **legacy vs v6** sobre evidencia TRUSTED + decisión de calibración **asistida por humano** (nunca automática), usando los umbrales go/no-go del runbook. Sólo entonces evaluar UI experimental tras `NEXT_PUBLIC_ARES_V6_ENABLED`.
 
 ---
 
 ## Riesgos abiertos
 
-- **UNKNOWN_GLOBAL** es un cap compartido para todo el tráfico no confiable (posible ruido bajo carga real).
-- **Proxy trust** en prod (Cloudflare→Vercel): usar `strict` o header confiable configurado.
-- **Fail-closed** hace de Redis una dependencia dura (503 si cae) → health-checks/alertas.
-- Smoke usa `prisma db push` contra DB efímera (no migraciones productivas).
+- Activación real necesita secrets del environment `ares-v6-internal-lab` (token hash, salt, DB/Redis URLs) — código + workflow listos, secrets pendientes del operador.
+- `UNKNOWN_GLOBAL` cap compartido (3B). Cleanup sin cron (manual). Runner http depende de devices en la DB del target.
 - Hook Semgrep local falla por falta de `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).
