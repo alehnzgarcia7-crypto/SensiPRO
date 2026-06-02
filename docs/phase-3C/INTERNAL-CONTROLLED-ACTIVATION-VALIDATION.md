@@ -141,4 +141,9 @@ npm run ares:v6:verify-env -- --strict --target preview    → exit 1 (correcto:
 ```
 
 ### CI
-Run **<pendiente>** — actualizar con el id de GitHub Actions cuando cierre verde tras el push.
+Commit `bfeec7c` · GitHub Actions run **26806471800** → conclusión **success**
+([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26806471800)).
+
+- `Phase 0.1B ARES v6 Gate`: **success** · `ARES v6 Real-Infra Smoke`: **success** · `Legacy Audit non-blocking debt report`: **success** (no bloqueante) · `E2E Tests`: **skipped**.
+- PR #1: OPEN · DRAFT · **MERGEABLE** (`mergeStateStatus: CLEAN`).
+- `ares-v6-internal-lab.yml`: `workflow_dispatch` únicamente (no corre en push/PR); YAML válido (parse OK). Se registra como dispatchable en la rama default al hacer merge (404 esperado vía API contra default hasta entonces).
