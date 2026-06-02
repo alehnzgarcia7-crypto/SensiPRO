@@ -1,0 +1,97 @@
+name: ARES v6 Internal Lab
+
+# Manual, controlled internal activation ONLY. Never runs on push/PR.
+# Uses the protected `ares-v6-internal-lab` environment for secrets/vars.
+on:
+  workflow_dispatch:
+    inputs:
+      preset:
+        description: 'Preset id (e.g. STANDARD_PRO)'
+        required: false
+        default: 'STANDARD_PRO'
+      fixture:
+        description: 'Single fixture id (optional)'
+        required: false
+        default: ''
+      allFixtures:
+        description: 'Run all fixtures (local-service mode)'
+        type: boolean
+        required: false
+        default: true
+      dryRun:
+        description: 'Dry run (no DB persistence)'
+        type: boolean
+        required: false
+        default: true
+      targetUrl:
+        description: 'Deployed endpoint URL for http mode (optional)'
+        required: false
+        default: ''
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  internal-lab:
+    name: ARES v6 Internal Lab (manual)
+    runs-on: ubuntu-latest
+    environment: ares-v6-internal-lab
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sensipro_ares_v6_lab
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sensipro_ares_v6_lab?schema=public
+      REDIS_URL: redis://localhost:6379
+      ARES_V6_LAB_ENVIRONMENT: ares-v6-internal-lab
+      ARES_V6_LOG_SALT: ${{ secrets.ARES_V6_LOG_SALT }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN }}
+      ARES_V6_PERSIST_GENERATIONS: ${{ inputs.dryRun && 'false' || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/lab-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/lab-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/lab-db-push.log npm run db:push:test
+      - name: Run internal lab
+        env:
+          INPUT_PRESET: ${{ inputs.preset }}
+          INPUT_FIXTURE: ${{ inputs.fixture }}
+          INPUT_ALL_FIXTURES: ${{ inputs.allFixtures }}
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        run: |
+          ARGS="--preset $INPUT_PRESET --json --output ares-v6-internal-lab-report.json --label ci-internal-lab"
+          if [ "$INPUT_ALL_FIXTURES" = "true" ]; then ARGS="$ARGS --all-fixtures"; fi
+          if [ -n "$INPUT_FIXTURE" ]; then ARGS="$ARGS --fixture $INPUT_FIXTURE"; fi
+          if [ -n "$INPUT_TARGET_URL" ]; then ARGS="$ARGS --url $INPUT_TARGET_URL"; fi
+          node scripts/ci-runner.mjs ci-logs/internal-lab.log npm run ares:v6:lab:run -- $ARGS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ares-v6-internal-lab-report
+          path: |
+            ares-v6-internal-lab-report.json
+            ci-logs/
+          if-no-files-found: ignore

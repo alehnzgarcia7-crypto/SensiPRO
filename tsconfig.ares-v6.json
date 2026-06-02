@@ -6,7 +6,9 @@
   "include": [
     "packages/algorithms/src/engine-v6/**/*.ts",
     "src/lib/ares-v6/**/*.ts",
-    "src/app/api/generate/v6/**/*.ts"
+    "src/app/api/generate/v6/**/*.ts",
+    "src/app/api/feedback/v6/**/*.ts",
+    "src/app/api/lab/v6/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", ".next"]
 }
