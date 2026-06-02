@@ -65,11 +65,12 @@ Verificado en los logs: generaciones persistidas con PPI real (no fallback), fee
 
 ## 4. Resultado de CI
 
-- Commit: _(ver §4 actualizado tras push)_.
-- Run de Actions: **PENDIENTE** — se registra el id tras `gh run watch`.
-- `Phase 0.1B ARES v6 Gate`: **PENDIENTE**.
-- `ARES v6 Real-Infra Smoke`: **PENDIENTE**.
-- PR #1: OPEN · DRAFT · esperado **MERGEABLE**.
+- Commit: `2a206fb` (rama `refactor/phase-0-nuclear-refoundation`).
+- Run de Actions: **26845969669** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success**.
+- `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7).
+- `Legacy Audit`: success (no bloqueante). `E2E Tests`: skipped (solo en push a main).
+- PR #1: OPEN · DRAFT · **MERGEABLE**.
 
 ---
 
