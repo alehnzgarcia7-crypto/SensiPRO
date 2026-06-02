@@ -3,15 +3,15 @@ import { createHash, timingSafeEqual } from 'crypto';
 import { isAresV6LabMode } from './feature-flags';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Internal access guard (Fase 3C)
+// ARES v6 — Internal access guard (Fase 3C + 3C.1 P0 fix)
 //
-// Prevents ARES_V6_API_ENABLED=true from accidentally making the endpoint
-// public. When required (production with the API on, or explicitly enabled),
-// a strong bearer/header token is mandatory; it is compared against a SHA-256
-// hash with timingSafeEqual. The raw token is NEVER stored or logged. Denials
-// are stealth 404 by default, 403 in lab mode.
-//
-// No session / NextAuth — this is a transport-level lab gate, not user auth.
+// P0: ANY active v6 surface (API, feedback, metrics, persistence, internal
+// access) must require an internal token in production — not just
+// ARES_V6_API_ENABLED. An explicit 'off'/'lab' mode is IGNORED (forced to
+// 'header') when a surface is active in production, so a single mis-set flag
+// can never expose a surface publicly. Token compared via SHA-256 +
+// timingSafeEqual; NEVER stored or logged. Denials: stealth 404 (403 in lab).
+// No session / NextAuth — transport-level lab gate, not user auth.
 // ═══════════════════════════════════════════════════════════════
 
 export type AresV6InternalAccessMode = 'off' | 'header' | 'lab';
@@ -23,18 +23,46 @@ export interface AresV6InternalAccessResult {
   code?: string;
   /** Non-sensitive reason for logs. Never contains the token. */
   reason?: string;
+  /** Set when an explicit off/lab mode was overridden to header for safety. */
+  unsafeModeIgnored?: 'off' | 'lab';
 }
 
 const TOKEN_HEADER = 'x-ares-v6-lab-token';
 const SHA256_HEX_LENGTH = 64;
 
-export function getAresV6InternalAccessMode(): AresV6InternalAccessMode {
-  const explicit = process.env.ARES_V6_INTERNAL_ACCESS_MODE;
-  if (explicit === 'off' || explicit === 'header' || explicit === 'lab') return explicit;
-  if (process.env.ARES_V6_INTERNAL_ACCESS_ENABLED === 'true') return 'header';
+/** Flags whose activation makes an ARES v6 surface reachable. */
+const ARES_V6_SURFACE_FLAGS = [
+  'ARES_V6_API_ENABLED',
+  'ARES_V6_WRITE_FEEDBACK',
+  'ARES_V6_LAB_METRICS_ENABLED',
+  'ARES_V6_PERSIST_GENERATIONS',
+  'ARES_V6_INTERNAL_ACCESS_ENABLED',
+] as const;
+
+/** Names of the currently-enabled surfaces (for diagnostics; no secrets). */
+export function getAresV6EnabledSurfaces(): string[] {
+  return ARES_V6_SURFACE_FLAGS.filter((flag) => process.env[flag] === 'true');
+}
+
+export function isAresV6SurfaceEnabled(): boolean {
+  return getAresV6EnabledSurfaces().length > 0;
+}
+
+/**
+ * Internal access is REQUIRED when mode is explicitly 'header', internal access
+ * is explicitly enabled, OR (the P0 fix) any surface is active in production.
+ */
+export function shouldRequireAresV6InternalAccess(): boolean {
+  if (process.env.ARES_V6_INTERNAL_ACCESS_MODE === 'header') return true;
+  if (process.env.ARES_V6_INTERNAL_ACCESS_ENABLED === 'true') return true;
   const isProduction = process.env.NODE_ENV === 'production';
-  const apiEnabled = process.env.ARES_V6_API_ENABLED === 'true';
-  return isProduction && apiEnabled ? 'header' : 'lab';
+  return isProduction && isAresV6SurfaceEnabled();
+}
+
+/** Effective mode: 'header' whenever a token is required; else explicit 'off' or 'lab'. */
+export function getAresV6InternalAccessMode(): AresV6InternalAccessMode {
+  if (shouldRequireAresV6InternalAccess()) return 'header';
+  return process.env.ARES_V6_INTERNAL_ACCESS_MODE === 'off' ? 'off' : 'lab';
 }
 
 function extractToken(request: Request): string | null {
@@ -62,20 +90,24 @@ function timingSafeHexEqual(a: string, b: string): boolean {
 }
 
 export function checkAresV6InternalAccess(request: Request): AresV6InternalAccessResult {
-  const mode = getAresV6InternalAccessMode();
+  const explicitMode = process.env.ARES_V6_INTERNAL_ACCESS_MODE;
+  const requireToken = shouldRequireAresV6InternalAccess();
+  const unsafeModeIgnored =
+    requireToken && (explicitMode === 'off' || explicitMode === 'lab') ? explicitMode : undefined;
 
-  if (mode === 'off' || mode === 'lab') {
-    return { ok: true, mode };
+  if (!requireToken) {
+    return { ok: true, mode: explicitMode === 'off' ? 'off' : 'lab' };
   }
 
-  // mode === 'header': require a valid token. Stealth 404 by default; 403 in lab mode.
+  // Token required. Stealth 404 by default; 403 in lab mode.
   const deniedStatus = isAresV6LabMode() ? 403 : 404;
   const deny = (reason: string): AresV6InternalAccessResult => ({
     ok: false,
-    mode,
+    mode: 'header',
     status: deniedStatus,
     code: deniedStatus === 404 ? 'NOT_FOUND' : 'FORBIDDEN',
     reason,
+    ...(unsafeModeIgnored ? { unsafeModeIgnored } : {}),
   });
 
   const expectedHash = process.env.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256;
@@ -91,5 +123,5 @@ export function checkAresV6InternalAccess(request: Request): AresV6InternalAcces
     return deny('token_mismatch');
   }
 
-  return { ok: true, mode };
+  return { ok: true, mode: 'header', ...(unsafeModeIgnored ? { unsafeModeIgnored } : {}) };
 }
