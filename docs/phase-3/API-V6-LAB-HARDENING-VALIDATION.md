@@ -98,6 +98,22 @@ El gate v6 no cambió de forma: ya lintea + typechequea (`tsconfig.ares-v6.json`
 
 ---
 
+## 7.6 Fase 3B Addendum
+
+Fase 3B validó este endpoint contra infraestructura real (sigue OFF por defecto).
+Detalle en `docs/phase-3B/`. Resumen:
+
+- **Dual bucket** (cierra el bypass por rotación de deviceId): IP_GLOBAL + IP_DEVICE
+  (trusted) / UNKNOWN_GLOBAL + UNKNOWN_DEVICE (untrusted).
+- **Redis atómico** vía Lua EVAL (INCR + EXPIRE + TTL en una operación; TTL garantizado).
+- **Proxy trust policy** (`proxy-trust.ts`): vercel/strict/lab; `x-forwarded-for` no se
+  confía a ciegas; IP no confiable → buckets unknown, sin hash/log.
+- **Fail mode** (`rate-limit-policy.ts`): open (lab) / closed (beta-prod → 503 si Redis cae).
+- **Log salt policy** (`observability-policy.ts`): salt ≥16 requerido en prod con API on
+  o 503 config error.
+- **Real-infra smoke** (Redis 7 + Postgres 16): job CI `ares-v6-real-infra-smoke` +
+  validación local. Tests v6: 158 → **190** (181 unit + 9 smoke real).
+
 ## 8. Lo que NO se tocó (confirmado)
 
 Pagos, Stripe, MercadoPago, webhooks, auth, NextAuth, middleware, command-center, admin APIs, pricing, landing, academy, UI del generador, schema Prisma, migrations, y las rutas legacy `/api/generate`, `/api/generate/all`, `/api/generate/headshot`, `/api/export`. El motor legacy sigue intacto y el gate legacy permanece no bloqueante.
