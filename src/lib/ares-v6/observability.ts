@@ -120,6 +120,7 @@ export function redactAresV6LogPayload(payload: Record<string, unknown>): Record
 
 export type AresV6EventType =
   | 'ares_v6.request_blocked_flag_off'
+  | 'ares_v6.internal_access_denied'
   | 'ares_v6.config_error'
   | 'ares_v6.validation_failed'
   | 'ares_v6.rate_limited'
@@ -127,6 +128,10 @@ export type AresV6EventType =
   | 'ares_v6.device_not_found'
   | 'ares_v6.generated'
   | 'ares_v6.real_infra_smoke_generated'
+  | 'ares_v6.persistence_failed'
+  | 'ares_v6.feedback_received'
+  | 'ares_v6.feedback_rejected'
+  | 'ares_v6.lab_metrics_served'
   | 'ares_v6.failed';
 
 export interface AresV6Event {
@@ -148,12 +153,18 @@ export interface AresV6LogRecord {
 }
 
 const WARN_EVENTS: ReadonlySet<AresV6EventType> = new Set([
+  'ares_v6.internal_access_denied',
   'ares_v6.validation_failed',
   'ares_v6.rate_limited',
   'ares_v6.rate_limit_store_unavailable',
   'ares_v6.device_not_found',
+  'ares_v6.feedback_rejected',
 ]);
-const ERROR_EVENTS: ReadonlySet<AresV6EventType> = new Set(['ares_v6.failed', 'ares_v6.config_error']);
+const ERROR_EVENTS: ReadonlySet<AresV6EventType> = new Set([
+  'ares_v6.failed',
+  'ares_v6.config_error',
+  'ares_v6.persistence_failed',
+]);
 
 /** Emit a structured, redacted event. Returns the exact record that was logged. */
 export function logAresV6Event(event: AresV6Event): AresV6LogRecord {

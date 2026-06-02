@@ -186,3 +186,8 @@ export const aresV6GenerateRequestSchema = z
   .strict();
 
 export type AresV6GenerateRequest = z.infer<typeof aresV6GenerateRequestSchema>;
+
+// Reusable building blocks for other v6 schemas (e.g. feedback) — keep the
+// symptom enum + dedupe single-sourced.
+export const aresV6SymptomSchema = symptomSchema;
+export { dedupeSymptoms };

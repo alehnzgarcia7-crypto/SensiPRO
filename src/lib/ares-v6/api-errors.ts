@@ -75,8 +75,9 @@ export function aresV6SuccessResponse(params: {
   labMode: boolean;
   device: AresV6ResponseDevice;
   generation: AresV6GenerationOutput;
+  extraMeta?: Record<string, unknown>;
 }): NextResponse {
-  const { ctx, rate, labMode, device, generation } = params;
+  const { ctx, rate, labMode, device, generation, extraMeta } = params;
 
   const meta: Record<string, unknown> = {
     engine: generation.algorithmVersion,
@@ -87,6 +88,7 @@ export function aresV6SuccessResponse(params: {
       remaining: rate.remaining,
       resetAt: rate.resetAt.toISOString(),
     },
+    ...(extraMeta ?? {}),
   };
 
   if (labMode) {

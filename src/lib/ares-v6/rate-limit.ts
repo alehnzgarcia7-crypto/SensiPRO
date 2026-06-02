@@ -65,6 +65,8 @@ export interface AresV6RateLimitOptions {
   now?: number;
   clientIp?: AresV6ClientIpResult;
   config?: AresV6RateLimitConfig;
+  /** Optional key namespace (e.g. 'fb') to isolate buckets per flow. */
+  keyNamespace?: string;
 }
 
 const KEY_PREFIX = 'ares:v6:rl';
@@ -81,26 +83,28 @@ export function planAresV6RateLimitBuckets(
   clientIp: AresV6ClientIpResult,
   deviceId: string | null,
   config: AresV6RateLimitConfig,
+  namespace?: string,
 ): { ipHash: string; buckets: PlannedBucket[] } {
   const hasTrustedIp = clientIp.trusted && clientIp.ip !== null;
   const ipHash = hasTrustedIp && clientIp.ip ? hashAresV6Ip(clientIp.ip) : 'unknown';
+  const ns = namespace ? `${namespace}:` : '';
   const buckets: PlannedBucket[] = [];
 
   if (hasTrustedIp) {
-    buckets.push({ scope: 'IP_GLOBAL', key: `${KEY_PREFIX}:ip:${ipHash}`, limit: config.ipGlobalLimit });
+    buckets.push({ scope: 'IP_GLOBAL', key: `${KEY_PREFIX}:${ns}ip:${ipHash}`, limit: config.ipGlobalLimit });
     if (deviceId) {
       buckets.push({
         scope: 'IP_DEVICE',
-        key: `${KEY_PREFIX}:ip-device:${ipHash}:${deviceId}`,
+        key: `${KEY_PREFIX}:${ns}ip-device:${ipHash}:${deviceId}`,
         limit: config.ipDeviceLimit,
       });
     }
   } else {
-    buckets.push({ scope: 'UNKNOWN_GLOBAL', key: `${KEY_PREFIX}:unknown`, limit: config.unknownGlobalLimit });
+    buckets.push({ scope: 'UNKNOWN_GLOBAL', key: `${KEY_PREFIX}:${ns}unknown`, limit: config.unknownGlobalLimit });
     if (deviceId) {
       buckets.push({
         scope: 'UNKNOWN_DEVICE',
-        key: `${KEY_PREFIX}:unknown-device:${deviceId}`,
+        key: `${KEY_PREFIX}:${ns}unknown-device:${deviceId}`,
         limit: config.unknownDeviceLimit,
       });
     }
@@ -147,7 +151,7 @@ export async function checkAresV6RateLimit(
   const config = options?.config ?? getAresV6RateLimitConfig();
   const clientIp = options?.clientIp ?? getTrustedClientIp(request);
   const deviceId = parsedBody?.deviceId ?? null;
-  const { ipHash, buckets: planned } = planAresV6RateLimitBuckets(clientIp, deviceId, config);
+  const { ipHash, buckets: planned } = planAresV6RateLimitBuckets(clientIp, deviceId, config, options?.keyNamespace);
   const scopesApplied = planned.map((bucket) => bucket.scope);
 
   const store = options && 'store' in options ? options.store : getDefaultRedisRateLimitStore();
