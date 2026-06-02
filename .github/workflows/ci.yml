@@ -58,6 +58,58 @@ jobs:
           path: coverage/
           if-no-files-found: ignore
 
+  ares-v6-real-infra-smoke:
+    name: ARES v6 Real-Infra Smoke
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sensipro_ares_v6_smoke
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sensipro_ares_v6_smoke?schema=public
+      REDIS_URL: redis://localhost:6379
+      ARES_V6_API_ENABLED: 'true'
+      ARES_V6_REAL_INFRA_SMOKE: 'true'
+      ARES_V6_LOG_SALT: ci-smoke-long-salt-ares-v6
+      ARES_V6_RATE_LIMIT_FAIL_MODE: closed
+      ARES_V6_PROXY_TRUST_MODE: lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-db-push.log npm run db:push:test
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-seed.log npm run ares:v6:seed:smoke
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-tests.log npx vitest run src/lib/ares-v6/__tests__/real-infra.smoke.test.ts --coverage=false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-ares-v6-real-infra-smoke
+          path: ci-logs/
+          if-no-files-found: ignore
+
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
