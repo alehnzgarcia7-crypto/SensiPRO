@@ -6,6 +6,9 @@
 // from trusted metrics by default. No PII is read or produced.
 // ═══════════════════════════════════════════════════════════════
 
+/** Lab v0 caps per-table row processing; SQL rollups come later. */
+export const ARES_V6_LAB_METRICS_MAX_ROWS = 10_000;
+
 export interface AresV6GenerationMetricRow {
   totalDurationMs: number | null;
   dbDurationMs: number | null;
@@ -182,6 +185,8 @@ async function defaultFetchGenerations(filter: AresV6LabMetricsFilter): Promise<
       ...(filter.deviceId ? { deviceId: filter.deviceId } : {}),
       ...(filter.presetId ? { presetId: filter.presetId } : {}),
     },
+    orderBy: { createdAt: 'desc' },
+    take: ARES_V6_LAB_METRICS_MAX_ROWS,
     select: {
       totalDurationMs: true,
       dbDurationMs: true,
@@ -207,6 +212,8 @@ async function defaultFetchFeedback(filter: AresV6LabMetricsFilter): Promise<Are
       ...(filter.deviceId ? { deviceId: filter.deviceId } : {}),
       ...(filter.presetId ? { presetId: filter.presetId } : {}),
     },
+    orderBy: { createdAt: 'desc' },
+    take: ARES_V6_LAB_METRICS_MAX_ROWS,
     select: { rating: true, outcome: true, problemResolved: true, qualityFlag: true },
   });
 }

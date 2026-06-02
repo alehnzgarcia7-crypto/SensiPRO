@@ -78,10 +78,18 @@ const DEFAULT_DEPS: AresV6FeedbackServiceDeps = {
   now: () => Date.now(),
 };
 
+/** Detect a Prisma P2002 (unique constraint) error without importing Prisma at runtime. */
+export function isPrismaUniqueConstraintError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false;
+  const code = (error as { code?: unknown }).code;
+  return code === 'P2002';
+}
+
 /**
  * Submit internal feedback for a generation. Throws {@link NotFoundError} if
  * the generation is unknown and {@link ConflictError} if feedback already
- * exists (v0 allows one feedback per generation).
+ * exists — both the pre-check AND a concurrent P2002 unique-constraint race
+ * map to 409 (never 500).
  */
 export async function submitAresV6Feedback(
   input: AresV6FeedbackRequest,
@@ -130,6 +138,15 @@ export async function submitAresV6Feedback(
     source: 'INTERNAL_LAB',
   };
 
-  const created = await deps.createFeedback(record);
+  let created: { id: string };
+  try {
+    created = await deps.createFeedback(record);
+  } catch (error) {
+    // Concurrent duplicate: the unique constraint fires past the pre-check.
+    if (isPrismaUniqueConstraintError(error)) {
+      throw new ConflictError('FEEDBACK_EXISTS', 'Ya existe feedback para esta generación.');
+    }
+    throw error;
+  }
   return { id: created.id, qualityFlag: quality.qualityFlag, qualityReasons: quality.reasons };
 }
