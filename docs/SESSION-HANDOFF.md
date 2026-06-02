@@ -3,7 +3,7 @@
 **Fecha:** 2026-06-02
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3C.1 — internal activation security patch P0)
+**HEAD:** (Fase 3D — Evidence Review & Human-Gated Calibration Governance)
 
 ---
 
@@ -11,8 +11,8 @@
 
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **258** = **246 unit** (28 archivos; smoke saltado en el gate) + **12 real-infra smoke** (Redis + Postgres reales, validado local).
-- CI 3C.1: run **26806471800** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`). PR #1 OPEN · DRAFT · **MERGEABLE** (CLEAN).
+- Tests: **310** = **297 unit** (34 archivos; smoke saltado en el gate) + **13 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
+- CI 3D: run **PENDIENTE** (se registra tras `gh run watch`). Base 3C.1: run **26806471800** → success. PR #1 OPEN · DRAFT · esperado **MERGEABLE**.
 
 ---
 
@@ -35,6 +35,12 @@
   - **Cualquier** superficie v6 activa en prod exige internal token (no sólo `API_ENABLED`); `off`/`lab` explícito se ignora (→ `header`, `unsafeModeIgnored`).
   - `enforceAresV6InternalAccess` (chokepoint único en los 3 endpoints). Métricas: rate-limit (bucket `metrics`) + ventana 7d / máx 90d + tope 10k filas. Feedback `P2002` ⇒ **409**.
   - Preflight `npm run ares:v6:verify-env` (`internal-env-preflight.ts` + `scripts/ares-v6-verify-internal-env.ts`) — **bloqueante** en el workflow manual; nunca imprime secretos.
+- **3D — Evidence Review & Calibration Governance** — `docs/phase-3D/`:
+  - **Comparador legacy-vs-v6** (`legacy-vs-v6-comparator.ts`): deltas/severidad/dirección/expectedness, fixtures-only, puro. **Adapter legacy** (`legacy-output-adapter.ts`): usa el motor legacy real congelado vía costura inyectable (import-debt evaluado y seguro).
+  - **Umbrales + GO/NO-GO** (`evidence-thresholds.ts`): versionados; INFRA → MORE_DATA → FIX_ENGINE. **Evidence snapshot** (`evidence-snapshot.ts`): métricas + comparación + feedback TRUSTED + decisión; LEGACY-FREE en runtime; SUSPICIOUS excluido por defecto.
+  - **Propuestas human-gated** (`calibration-proposals.ts`): `autoApplyAllowed:false` SIEMPRE; gates infra/muestra/suspicious/fallback; artefacto JSON (sin modelo Prisma). **El feedback NUNCA recalibra el motor.**
+  - **CLI** `npm run ares:v6:evidence` (`scripts/ares-v6-evidence-review.ts` + `evidence-review-cli.ts`): JSON/markdown, safe dry-run, sin tokens/PII.
+  - **Endpoint opcional** `GET /api/lab/v6/evidence` (READ-ONLY, OFF por defecto). **Workflow manual** ampliado + gate sube `ares-v6-evidence-summary.json`/`.md`.
 
 ---
 
@@ -43,14 +49,15 @@
 - `POST /api/generate/v6` — flag → internal access → config gate → 413 → 400 → rate limit → generate → (opcional) persist.
 - `POST /api/feedback/v6` — flag `ARES_V6_WRITE_FEEDBACK` → internal access → rate limit (ns `fb`) → service (404/409) → 201.
 - `GET /api/lab/v6/metrics` — flag `ARES_V6_LAB_METRICS_ENABLED` → internal access → métricas agregadas.
+- `GET /api/lab/v6/evidence` — flag `ARES_V6_LAB_EVIDENCE_ENABLED` → internal access → rate limit (ns `evidence`) → snapshot agregado (sin filas crudas).
 
-Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256`, `ARES_V6_PERSIST_GENERATIONS(_REQUIRED)`, `ARES_V6_WRITE_FEEDBACK`, `ARES_V6_LAB_METRICS_ENABLED`. Runbook: `docs/phase-3C/INTERNAL-CONTROLLED-ACTIVATION-RUNBOOK.md`.
+Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256`, `ARES_V6_PERSIST_GENERATIONS(_REQUIRED)`, `ARES_V6_WRITE_FEEDBACK`, `ARES_V6_LAB_METRICS_ENABLED`. Flag 3D: `ARES_V6_LAB_EVIDENCE_ENABLED` (surface flag 3C.1 → exige token en prod). Runbook: `docs/phase-3C/INTERNAL-CONTROLLED-ACTIVATION-RUNBOOK.md §8`.
 
 ---
 
-## SIGUIENTE: Fase 3D (propuesta)
+## SIGUIENTE: Fase 3E (propuesta)
 
-Comparativa controlada **legacy vs v6** sobre evidencia TRUSTED + decisión de calibración **asistida por humano** (nunca automática), usando los umbrales go/no-go del runbook. Sólo entonces evaluar UI experimental tras `NEXT_PUBLIC_ARES_V6_ENABLED`.
+Con GO/NO-GO en verde sobre evidencia interna real (activación interna del lab), evaluar **UI experimental oculta** tras `NEXT_PUBLIC_ARES_V6_ENABLED` (solo lectura, behind flag, sin reemplazar el generador legacy). La decisión de activación sigue siendo **humana**. Ver `docs/phase-3D/EVIDENCE-REVIEW-VALIDATION.md §7`.
 
 ---
 

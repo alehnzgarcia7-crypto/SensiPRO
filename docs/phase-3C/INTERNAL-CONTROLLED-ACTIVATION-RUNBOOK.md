@@ -110,3 +110,29 @@ Superficies que exigen internal access (cualquiera activa en prod): `ARES_V6_API
 - Antes de activar: `npm run ares:v6:verify-env -- --strict --target preview` (o `--target local` para dry-run con motor).
 - El workflow manual corre el preflight como **paso bloqueante**: si el preflight falla, **no se activa nada**.
 - El preflight nunca imprime valores de secretos (sólo estados booleanos / nombres de modo).
+
+---
+
+## 8. Fase 3D — Evidence workflow (legacy-vs-v6 + GO/NO-GO)
+
+Tras una corrida interna (sección 4), generar el **tribunal de evidencia**. Nada se aplica al motor automáticamente; ver `docs/phase-3D/`.
+
+### Flujo
+1. Correr el lab (workflow manual) con `persistGenerations=true` para poblar `AresV6Generation`/`AresV6Feedback`.
+2. El workflow corre la evidencia automáticamente cuando `runEvidenceReview=true` (default). Inputs:
+   - `includeLegacyCompare` (default true) — incluye la comparación legacy-vs-v6 (fixtures-only).
+   - `includeProposals` (default false) — incluye propuestas de calibración **DRAFT/PENDING_HUMAN_REVIEW** (nunca aplicadas).
+3. Artefactos subidos: `ares-v6-evidence-summary.json` + `ares-v6-evidence-report.md` (además del `ares-v6-internal-lab-report.json`).
+4. Local / dry-run sin DB: `npm run ares:v6:evidence -- --fixtures-only --legacy-compare --markdown --output ares-v6-evidence-report.md`.
+5. Desde DB del lab: `npm run ares:v6:evidence -- --from-db --legacy-compare --proposals --json --output ares-v6-evidence-summary.json`.
+
+### GO/NO-GO (umbrales versionados, `evidence-thresholds.ts`)
+`GO_INTERNAL_UI_EXPERIMENT` solo si: p95 < 700ms, error/persistencia OK, fallbackPpiRate < 5%, HIGH/LAB_VERIFIED ≥ 80%, averageRating ≥ 4.3, worseRate ≤ 15%, suspiciousRate ≤ 20%, fixtureCoverage ≥ 80%, feedbackCoverage ≥ 30%, muestra suficiente por device×preset, 0 filas DANGEROUS. Precedencia: INFRA → MORE_DATA → FIX_ENGINE.
+
+### Endpoint opcional (READ-ONLY)
+`GET /api/lab/v6/evidence` tras `ARES_V6_LAB_EVIDENCE_ENABLED=true` (es **surface flag** 3C.1 ⇒ exige internal token en prod). Kill switch: ponerlo en `false` ⇒ 404 total.
+
+### Reglas duras
+- Ninguna propuesta se aplica automáticamente (`autoApplyAllowed:false` siempre).
+- Muestra insuficiente / SUSPICIOUS dominante / PPI fallback dominante / infra no sana ⇒ `NO_CHANGE_RECOMMENDED` (bloqueada).
+- El motor, los presets y la research-matrix NO se modifican.
