@@ -56,4 +56,13 @@ describe('submitAresV6Feedback', () => {
     expect(result.qualityFlag).toBe('SUSPICIOUS');
     expect(result.qualityReasons).toContain('LOW_RATING_VOLUME');
   });
+
+  it('maps a concurrent P2002 unique-constraint race to ConflictError (409)', async () => {
+    // Pre-check passes (findExistingFeedback → null), but the create races a
+    // concurrent insert and the unique constraint fires.
+    const p2002 = Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
+    await expect(
+      submitAresV6Feedback(input(), deps({ createFeedback: vi.fn().mockRejectedValue(p2002) })),
+    ).rejects.toThrow(ConflictError);
+  });
 });

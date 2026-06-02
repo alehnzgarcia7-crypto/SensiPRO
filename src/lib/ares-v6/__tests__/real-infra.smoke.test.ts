@@ -219,5 +219,21 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
       expect(result.generations).toBeGreaterThanOrEqual(0);
       expect(result.feedback).toBeGreaterThanOrEqual(0);
     });
+
+    it('requires an internal token when header mode is enforced (real route, no token => 404)', async () => {
+      const previous = process.env.ARES_V6_INTERNAL_ACCESS_MODE;
+      process.env.ARES_V6_INTERNAL_ACCESS_MODE = 'header';
+      try {
+        const res = await metricsGet(
+          new NextRequest('http://localhost/api/lab/v6/metrics', {
+            method: 'GET',
+            headers: { 'x-forwarded-for': uniqueIp(30) },
+          }),
+        );
+        expect(res.status).toBe(404);
+      } finally {
+        process.env.ARES_V6_INTERNAL_ACCESS_MODE = previous;
+      }
+    });
   });
 });
