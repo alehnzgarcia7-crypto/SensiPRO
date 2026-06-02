@@ -3,60 +3,54 @@
 **Fecha:** 2026-06-01
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** `8eaf95e` (+ commit de este handoff)
+**HEAD:** `6c99302` (+ commit de este handoff)
 
 ---
 
 ## Estado
 
 - Working tree limpio, al día con `origin`.
-- Salud verde: `npx eslint … v6` → 0, `npx tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **158 passed (15 files)** — `npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 --coverage=false` (91 motor + 67 backend).
-- CI: GitHub Actions run **26784031211** → conclusión **success**
-  ([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26784031211)).
-  `Phase 0.1B ARES v6 Gate` = success (bloqueante); `legacy-audit` = success (no bloqueante); `E2E Tests` = skipped.
+- Salud verde: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
+- Tests: **190** = 181 unit (18 archivos; smoke saltado en el gate) + **9 real-infra smoke** (Redis + Postgres reales).
+- CI: run **26795777050** → **success** ([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26795777050)).
+  `Phase 0.1B ARES v6 Gate` = success (bloqueante); **`ARES v6 Real-Infra Smoke` = success** (Postgres 16 + Redis 7 service containers); `legacy-audit` = success (no bloqueante); `E2E` = skipped.
 
 ---
 
 ## Fases completas
 
-- **Fase 0** — Refundación nuclear: docs + contratos del motor v6.
-- **Fase 0.1 / 0.1B** — Infra CI (`scripts/ci-runner.mjs`) + gate v6 bloqueante.
-- **Fase 1 / 1.5** — Motor modular (orquestador + 10 módulos) + quality gate (`tsconfig.ares-v6.json`, LAB_VERIFIED con tolerancia PPI, fix S24 Ultra).
-- **Fase 2 Foundation** — Backend aislado: `src/lib/ares-v6/` + endpoint `POST /api/generate/v6` (OFF por defecto, adapter que nunca pierde `screenDpi`).
-- **Fase 3A — Lab Hardening** — `docs/phase-3/*`. Endurece el endpoint (sigue OFF):
-  - **Strict Zod** (root/player/overrides `.strict()`) + dedupe de síntomas.
-  - **Rate limit** `src/lib/ares-v6/rate-limit.ts` por IP+deviceId sobre **Redis** (reusa el ioredis de `src/lib/cache/redis.ts` vía `getRedisClient()`), 60s, 20/8, 429 + `Retry-After`, **fail-open** en lab, corre **antes** de Prisma.
-  - **Payload guard** (`Content-Length > 20KB ⇒ 413`).
-  - **Observabilidad** `observability.ts` (requestId + hashes, eventos, métricas, redacción) — **cero PII**.
-  - **Access policy** `access-policy.ts` (device activo=público; inactivo⇒NotFound; `user` reservado).
-  - **api-errors.ts** (envelopes + headers). **lab mode** en `meta`. **dpi.source** expuesto en el motor.
-  - **Harness** `scripts/ares-v6-compare-fixtures.ts` con flags (`--json/--preset/--all-presets/--fixture/--output`).
+- **Fase 0 / 0.1 / 0.1B** — Refundación, contratos, CI gate.
+- **Fase 1 / 1.5** — Motor modular + quality gate.
+- **Fase 2 Foundation** — Backend aislado + endpoint OFF por defecto.
+- **Fase 3A — Lab Hardening** — strict Zod, rate limit (single bucket), payload guard, observabilidad sin PII, access policy, lab mode (`docs/phase-3/`).
+- **Fase 3B — Real-Infra Validation** — `docs/phase-3B/`:
+  - **Dual bucket** (cierra bypass por rotación de deviceId): IP_GLOBAL + IP_DEVICE / UNKNOWN_GLOBAL + UNKNOWN_DEVICE.
+  - **Redis atómico** (Lua EVAL, TTL garantizado; reusa ioredis de `src/lib/cache/redis.ts`).
+  - **Proxy trust** (`proxy-trust.ts`): vercel/strict/lab; XFF no se confía a ciegas.
+  - **Fail mode** (`rate-limit-policy.ts`): open (lab) / closed (beta-prod → 503).
+  - **Log salt policy** (`observability-policy.ts`): salt ≥16 requerido en prod con API on, o 503.
+  - **Real-infra smoke** (`__tests__/real-infra.smoke.test.ts`, gated por `ARES_V6_REAL_INFRA_SMOKE`) + job CI con service containers + seed (`testing/seed-real-infra.ts`, `scripts/ares-v6-seed-smoke.ts`, `npm run db:push:test`).
 
 ---
 
-## Endpoint v6
+## Endpoint v6 (OFF por defecto)
 
-- `POST /api/generate/v6` — **apagado por defecto** (`ARES_V6_API_ENABLED !== 'true'` ⇒ 404).
-- Pipeline: flag → 413 (payload) → 400 (JSON) → 400 (strict Zod) → 429 (rate limit, pre-Prisma) → generate.
-- No toca legacy ni pagos/auth/middleware/UI/schema. No escribe feedback.
+- `POST /api/generate/v6` — 404 si `ARES_V6_API_ENABLED !== 'true'`.
+- Pipeline: flag → config gate (503 si falta salt en prod) → 413 → 400 (JSON) → 400 (strict Zod) → rate limit (429 / fail-closed 503, **antes** de Prisma) → generate.
+- Flags: `ARES_V6_API_ENABLED`, `ARES_V6_LAB_MODE`, `ARES_V6_PROXY_TRUST_MODE` (vercel/strict/lab), `ARES_V6_RATE_LIMIT_FAIL_MODE` (open/closed), `ARES_V6_RATE_LIMIT_*` (límites), `ARES_V6_LOG_SALT`, `ARES_V6_REAL_INFRA_SMOKE`.
 
 ---
 
-## SIGUIENTE: Fase 3B (propuesta)
+## SIGUIENTE: Fase 3C (propuesta) — Internal Controlled Activation
 
-- Smoke test contra **DB real + Redis real** (validar el path no-mockeado del limiter).
-- Feedback loop `/api/feedback/v6` detrás de `ARES_V6_WRITE_FEEDBACK`.
-- UI experimental detrás de `NEXT_PUBLIC_ARES_V6_ENABLED`.
-- Throttle por IP a nivel edge/middleware + decisión fail-open vs fail-closed.
-- Comparativa legacy vs v6 + rollout gradual.
+Activar `ARES_V6_API_ENABLED=true` SÓLO en interno/preview (no prod pública) con `FAIL_MODE=closed`, `PROXY_TRUST_MODE=strict`, `LOG_SALT` fuerte; dashboards sobre los eventos/métricas existentes; feedback loop `/api/feedback/v6` tras `ARES_V6_WRITE_FEEDBACK`; primeras muestras por fixture antes de exposición pública.
 
 ---
 
 ## Riesgos abiertos
 
-- **(a) Rate limit post-validación** (no pre-parse): un flood fuerza parse+Zod (barato, ≤20KB) pero nunca DB/engine. Throttle edge → 3B.
-- **(b) `x-forwarded-for` spoofeable:** en exposición real confiar sólo en el header del proxy/CDN.
-- **(c) Fail-open si Redis cae:** decisión de lab; revisar fail-closed en producción.
-- **(d) Sólo mock-tested:** falta smoke contra DB/Redis reales (3B).
-- **(e) Hook Semgrep local** falla por falta de `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).
+- **UNKNOWN_GLOBAL** es un cap compartido para todo el tráfico no confiable (posible ruido bajo carga real).
+- **Proxy trust** en prod (Cloudflare→Vercel): usar `strict` o header confiable configurado.
+- **Fail-closed** hace de Redis una dependencia dura (503 si cae) → health-checks/alertas.
+- Smoke usa `prisma db push` contra DB efímera (no migraciones productivas).
+- Hook Semgrep local falla por falta de `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).

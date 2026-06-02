@@ -63,7 +63,14 @@ dropdb sensipro_ares_v6_smoke (cleanup)
 
 ## 4. Resultado de CI
 
-> **Pendiente de registrar tras el push.** Se actualiza con los run ids/conclusión de `Phase 0.1B ARES v6 Gate` y `ARES v6 Real-Infra Smoke` una vez ejecutado el workflow sobre el HEAD de Fase 3B.
+Commit `6c99302` · GitHub Actions run **26795777050** → conclusión **success**
+([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26795777050)).
+
+- `Phase 0.1B ARES v6 Gate`: **success** (npm ci → db:generate → eslint → tsc → vitest 181 passed | 9 skipped).
+- `ARES v6 Real-Infra Smoke`: **success** — Postgres 16 + Redis 7 service containers; db:push:test → seed → vitest **9 passed**. El log muestra un evento real `ares_v6.rate_limited` con `scopes:["IP_GLOBAL","IP_DEVICE"]`, `proxyTrusted:true` e `ipHash` hasheado (sin IP cruda).
+- `Legacy Audit non-blocking debt report`: **success** (no bloqueante).
+- `E2E Tests`: **skipped** (sólo en push a `main`).
+- PR #1: OPEN · DRAFT · **MERGEABLE**.
 
 ---
 
