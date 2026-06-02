@@ -1013,3 +1013,103 @@ model CommandCenterLog {
   @@index([email])
   @@index([createdAt(sort: Desc)])
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ARES v6 — Lab models (Fase 3C). Aditivos y aislados: sin relaciones
+// (sólo ids + índices) para no bloquear cleanup ni acoplar a modelos legacy.
+// NO guardan PII (ni IP cruda, ni user-agent, ni cookies, ni body completo).
+// ═══════════════════════════════════════════════════════════════
+
+// ──────────────────────────────────
+// 35. ARES V6 GENERATION — Evidencia interna de una generación v6
+// ──────────────────────────────────
+model AresV6Generation {
+  id                  String    @id @default(cuid())
+  requestId           String    @unique @map("request_id")
+  deviceId            String    @map("device_id")
+  deviceBrand         String    @map("device_brand")
+  deviceModel         String    @map("device_model")
+  deviceSlug          String?   @map("device_slug")
+  presetId            String    @map("preset_id")
+  playstyle           String
+  mode                String
+  fingers             Int       @db.SmallInt
+  primaryWeaponCategory String? @map("primary_weapon_category")
+  ppiSource           String    @map("ppi_source")
+  detectedPpi         Int?      @map("detected_ppi")
+  confidenceScore     Int       @map("confidence_score") @db.SmallInt
+  confidenceGrade     String    @map("confidence_grade")
+  sensitivity         Json
+  gyroscope           Json?
+  dpi                 Json
+  fireButton          Json      @map("fire_button")
+  hud                 Json
+  tuningSteps         Json      @map("tuning_steps")
+  warnings            Json
+  rateLimitScopes     Json?     @map("rate_limit_scopes")
+  rateLimitDegraded   Boolean   @default(false) @map("rate_limit_degraded")
+  proxyTrusted        Boolean?  @map("proxy_trusted")
+  proxyIpSource       String?   @map("proxy_ip_source")
+  dbDurationMs        Int?      @map("db_duration_ms")
+  engineDurationMs    Int?      @map("engine_duration_ms")
+  totalDurationMs     Int?      @map("total_duration_ms")
+  labMode             Boolean   @default(false) @map("lab_mode")
+  source              String    @default("INTERNAL_LAB")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@map("ares_v6_generations")
+  @@index([deviceId])
+  @@index([presetId])
+  @@index([mode])
+  @@index([confidenceGrade])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 36. ARES V6 FEEDBACK — Feedback interno (evidencia, NO verdad automática)
+// ──────────────────────────────────
+model AresV6Feedback {
+  id                  String    @id @default(cuid())
+  generationId        String    @map("generation_id")
+  requestId           String?   @map("request_id")
+  deviceId            String    @map("device_id")
+  presetId            String    @map("preset_id")
+  rating              Int       @db.SmallInt
+  outcome             String
+  problemResolved     Boolean?  @map("problem_resolved")
+  symptoms            Json?
+  adjustmentsApplied  Json?     @map("adjustments_applied")
+  comment             String?   @db.VarChar(280)
+  qualityFlag         String    @default("TRUSTED") @map("quality_flag")
+  qualityReasons      Json?     @map("quality_reasons")
+  source              String    @default("INTERNAL_LAB")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@map("ares_v6_feedback")
+  @@unique([generationId])
+  @@index([deviceId])
+  @@index([presetId])
+  @@index([rating])
+  @@index([qualityFlag])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────
+// 37. ARES V6 LAB RUN — Resumen de una corrida de laboratorio interna
+// ──────────────────────────────────
+model AresV6LabRun {
+  id            String    @id @default(cuid())
+  label         String
+  commitSha     String?   @map("commit_sha")
+  environment   String
+  status        String
+  startedAt     DateTime  @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  summary       Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("ares_v6_lab_runs")
+  @@index([environment])
+  @@index([status])
+  @@index([createdAt])
+}
