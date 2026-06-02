@@ -10,7 +10,7 @@ import {
   persistAresV6Generation,
   shouldPersistAresV6Generations,
 } from '@/lib/ares-v6/generation-persistence';
-import { checkAresV6InternalAccess } from '@/lib/ares-v6/internal-access';
+import { enforceAresV6InternalAccess } from '@/lib/ares-v6/internal-access-route';
 import {
   buildAresV6GenerationMetrics,
   createAresV6RequestContext,
@@ -47,17 +47,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return aresV6ErrorResponse('NOT_FOUND', 'Recurso no encontrado.', 404, { ctx });
   }
 
-  // 2. Internal access guard — prevents accidental public exposure.
-  const access = checkAresV6InternalAccess(request);
-  if (!access.ok) {
-    logAresV6Event({ type: 'ares_v6.internal_access_denied', ctx, data: { reason: access.reason } });
-    return aresV6ErrorResponse(
-      access.code ?? 'NOT_FOUND',
-      access.status === 403 ? 'Acceso no autorizado.' : 'Recurso no encontrado.',
-      access.status ?? 404,
-      { ctx },
-    );
-  }
+  // 2. Internal access guard — prevents accidental public exposure (any surface).
+  const access = enforceAresV6InternalAccess(request, ctx);
+  if (!access.ok) return access.response;
 
   // 3. Runtime config gate (e.g. log salt required in production).
   const configError = checkAresV6RuntimeConfig();

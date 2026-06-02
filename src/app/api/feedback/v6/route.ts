@@ -5,7 +5,7 @@ import { aresV6ErrorResponse } from '@/lib/ares-v6/api-errors';
 import { isAresV6FeedbackWriteEnabled } from '@/lib/ares-v6/feature-flags';
 import { aresV6FeedbackRequestSchema } from '@/lib/ares-v6/feedback-schema';
 import { submitAresV6Feedback } from '@/lib/ares-v6/feedback-service';
-import { checkAresV6InternalAccess } from '@/lib/ares-v6/internal-access';
+import { enforceAresV6InternalAccess } from '@/lib/ares-v6/internal-access-route';
 import { createAresV6RequestContext, logAresV6Event } from '@/lib/ares-v6/observability';
 import { checkAresV6RuntimeConfig } from '@/lib/ares-v6/observability-policy';
 import { getTrustedClientIp } from '@/lib/ares-v6/proxy-trust';
@@ -33,16 +33,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return aresV6ErrorResponse('NOT_FOUND', 'Recurso no encontrado.', 404, { ctx });
   }
 
-  const access = checkAresV6InternalAccess(request);
-  if (!access.ok) {
-    logAresV6Event({ type: 'ares_v6.internal_access_denied', ctx, data: { reason: access.reason } });
-    return aresV6ErrorResponse(
-      access.code ?? 'NOT_FOUND',
-      access.status === 403 ? 'Acceso no autorizado.' : 'Recurso no encontrado.',
-      access.status ?? 404,
-      { ctx },
-    );
-  }
+  const access = enforceAresV6InternalAccess(request, ctx);
+  if (!access.ok) return access.response;
 
   const configError = checkAresV6RuntimeConfig();
   if (configError) {
