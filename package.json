@@ -33,6 +33,7 @@
     "ares:v6:seed:smoke": "npx tsx scripts/ares-v6-seed-smoke.ts",
     "ares:v6:lab:run": "npx tsx scripts/ares-v6-internal-lab-runner.ts",
     "ares:v6:lab:cleanup": "npx tsx scripts/ares-v6-lab-cleanup.ts",
+    "ares:v6:verify-env": "npx tsx scripts/ares-v6-verify-internal-env.ts",
     "db:push:test": "cd packages/database && npx prisma db push --skip-generate",
     "db:reset:safe": "bash scripts/db-reset.sh",
     "clean": "rm -rf .next node_modules packages/*/node_modules packages/*/dist"
