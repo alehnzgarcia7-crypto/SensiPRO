@@ -18,8 +18,18 @@ on:
         type: boolean
         required: false
         default: true
-      dryRun:
-        description: 'Dry run (no DB persistence)'
+      enableFeedback:
+        description: 'Enable feedback writes (default off)'
+        type: boolean
+        required: false
+        default: false
+      enableMetrics:
+        description: 'Enable lab metrics endpoint'
+        type: boolean
+        required: false
+        default: true
+      persistGenerations:
+        description: 'Persist generations'
         type: boolean
         required: false
         default: true
@@ -65,7 +75,13 @@ jobs:
       ARES_V6_LAB_ENVIRONMENT: ares-v6-internal-lab
       ARES_V6_LOG_SALT: ${{ secrets.ARES_V6_LOG_SALT }}
       ARES_V6_INTERNAL_ACCESS_TOKEN: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN }}
-      ARES_V6_PERSIST_GENERATIONS: ${{ inputs.dryRun && 'false' || 'true' }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256 }}
+      ARES_V6_INTERNAL_ACCESS_MODE: header
+      ARES_V6_RATE_LIMIT_FAIL_MODE: closed
+      ARES_V6_PROXY_TRUST_MODE: strict
+      ARES_V6_PERSIST_GENERATIONS: ${{ inputs.persistGenerations && 'true' || 'false' }}
+      ARES_V6_WRITE_FEEDBACK: ${{ inputs.enableFeedback && 'true' || 'false' }}
+      ARES_V6_LAB_METRICS_ENABLED: ${{ inputs.enableMetrics && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,6 +91,13 @@ jobs:
       - run: node scripts/ci-runner.mjs ci-logs/lab-npm-ci.log npm ci
       - run: node scripts/ci-runner.mjs ci-logs/lab-prisma-generate.log npm run db:generate
       - run: node scripts/ci-runner.mjs ci-logs/lab-db-push.log npm run db:push:test
+      - name: Preflight internal env (must pass before activation)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        run: |
+          TARGET=local
+          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; fi
+          node scripts/ci-runner.mjs ci-logs/preflight.log npm run ares:v6:verify-env -- --strict --for-workflow --target "$TARGET"
       - name: Run internal lab
         env:
           INPUT_PRESET: ${{ inputs.preset }}

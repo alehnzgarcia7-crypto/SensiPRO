@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
       - run: node scripts/ci-runner.mjs ci-logs/v6-npm-ci.log npm ci
       - run: node scripts/ci-runner.mjs ci-logs/v6-prisma-generate.log npm run db:generate
-      - run: node scripts/ci-runner.mjs ci-logs/v6-lint.log npx eslint packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 --ext .ts,.tsx
+      - run: node scripts/ci-runner.mjs ci-logs/v6-lint.log npx eslint packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 scripts/ares-v6-*.ts --ext .ts,.tsx
       - run: node scripts/ci-runner.mjs ci-logs/v6-typecheck.log npx tsc -p tsconfig.ares-v6.json
       - run: node scripts/ci-runner.mjs ci-logs/v6-tests.log npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 --coverage=false
       - uses: actions/upload-artifact@v4
