@@ -6,8 +6,12 @@ import { POST as feedbackPost } from '@/app/api/feedback/v6/route';
 import { POST } from '@/app/api/generate/v6/route';
 import { GET as metricsGet } from '@/app/api/lab/v6/metrics/route';
 
+import { generateAresV6CalibrationProposals } from '../calibration-proposals';
+import { buildAresV6EvidenceSnapshot } from '../evidence-snapshot';
 import { generateAresV6ForDeviceId } from '../generate-service';
 import { runAresV6LabCleanup } from '../lab-cleanup';
+import { getAresV6LabMetrics } from '../lab-metrics';
+import { buildAresV6ComparisonMatrix, summarizeAresV6Comparison } from '../legacy-vs-v6-comparator';
 import { checkAresV6RateLimit } from '../rate-limit';
 import type { AresV6RateLimitConfig } from '../rate-limit-policy';
 import {
@@ -233,6 +237,72 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
         expect(res.status).toBe(404);
       } finally {
         process.env.ARES_V6_INTERNAL_ACCESS_MODE = previous;
+      }
+    });
+  });
+
+  describe('Evidence tribunal (Fase 3D)', () => {
+    function genRequest(ip: string, presetId: string): NextRequest {
+      return new Request('http://localhost/api/generate/v6', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+        body: JSON.stringify({
+          deviceId: activeId,
+          presetId,
+          player: { fingers: 3, playstyle: 'STANDARD', mode: 'BATTLE_ROYALE', usesGyroscope: false },
+        }),
+      }) as unknown as NextRequest;
+    }
+    function fbRequest(generationId: string, ip: string, body: Record<string, unknown>): NextRequest {
+      return new Request('http://localhost/api/feedback/v6', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+        body: JSON.stringify({ generationId, ...body }),
+      }) as unknown as NextRequest;
+    }
+    async function createGeneration(ip: string, presetId: string): Promise<string> {
+      const res = await POST(genRequest(ip, presetId));
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { meta: { generationId?: string } };
+      expect(body.meta.generationId).toBeTruthy();
+      return body.meta.generationId as string;
+    }
+
+    it('builds an evidence snapshot from real generations + TRUSTED/SUSPICIOUS feedback, with no auto-apply', async () => {
+      const g1 = await createGeneration(uniqueIp(40), 'STANDARD_PRO');
+      const g2 = await createGeneration(uniqueIp(41), 'TODO_ROJO');
+
+      // TRUSTED feedback.
+      const trusted = await feedbackPost(fbRequest(g1, uniqueIp(42), { rating: 5, outcome: 'BETTER' }));
+      expect(trusted.status).toBe(201);
+      // SUSPICIOUS feedback: WORSE + problemResolved=true → OUTCOME_RESOLVED_CONFLICT.
+      const suspicious = await feedbackPost(
+        fbRequest(g2, uniqueIp(43), { rating: 2, outcome: 'WORSE', problemResolved: true }),
+      );
+      expect(suspicious.status).toBe(201);
+
+      // Lab metrics over the real DB exclude SUSPICIOUS from trusted metrics.
+      const metrics = await getAresV6LabMetrics({});
+      expect(metrics.totalGenerations).toBeGreaterThanOrEqual(2);
+      expect(metrics.totalFeedback).toBeGreaterThanOrEqual(1);
+      expect(metrics.suspiciousFeedbackExcluded).toBeGreaterThanOrEqual(1);
+
+      // Legacy-vs-v6 comparator runs fixtures-only (pure, no DB) with no false danger.
+      const comparison = buildAresV6ComparisonMatrix({ standardOnly: true });
+      expect(comparison.length).toBeGreaterThan(0);
+      expect(summarizeAresV6Comparison(comparison).dangerous).toBe(0);
+
+      // Evidence snapshot assembled from the real DB + the comparison.
+      const snapshot = await buildAresV6EvidenceSnapshot({ comparisonRows: comparison });
+      expect(snapshot.metrics.totalGenerations).toBeGreaterThanOrEqual(2);
+      expect(snapshot.trustedFeedbackSummary.suspiciousExcluded).toBeGreaterThanOrEqual(1);
+
+      // Proposals NEVER auto-apply; every proposal requires human review.
+      const proposals = generateAresV6CalibrationProposals(snapshot);
+      expect(proposals.proposals.length).toBeGreaterThan(0);
+      for (const proposal of proposals.proposals) {
+        expect(proposal.autoApplyAllowed).toBe(false);
+        expect(proposal.humanReviewRequired).toBe(true);
       }
     });
   });
