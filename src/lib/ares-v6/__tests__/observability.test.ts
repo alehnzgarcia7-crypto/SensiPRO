@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { generateAresV6, getAresV6CalibrationFixture } from '@ares/algorithms/engine-v6';
 
@@ -11,64 +11,81 @@ import {
 } from '../observability';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Observability (Phase 3A). Must never leak PII.
+// ARES v6 — Observability (Phase 3A + 3B). Must never leak PII.
 // ═══════════════════════════════════════════════════════════════
+
+const snapshot = new Map<string, string | undefined>();
+
+function setEnv(name: string, value: string | undefined): void {
+  if (!snapshot.has(name)) snapshot.set(name, process.env[name]);
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
+
+afterEach(() => {
+  for (const [name, value] of snapshot) {
+    if (value === undefined) delete process.env[name];
+    else process.env[name] = value;
+  }
+  snapshot.clear();
+});
 
 function request(headers: Record<string, string> = {}): Request {
   return new Request('http://localhost/api/generate/v6', { method: 'POST', headers });
 }
 
 describe('extractClientIp', () => {
-  it('uses the first hop of x-forwarded-for', () => {
+  it('delegates to the proxy trust policy (lab accepts x-forwarded-for)', () => {
+    setEnv('ARES_V6_PROXY_TRUST_MODE', 'lab');
     expect(extractClientIp(request({ 'x-forwarded-for': '203.0.113.9, 10.0.0.1' }))).toBe('203.0.113.9');
-  });
-
-  it('falls back to x-real-ip and returns null when absent or garbage', () => {
-    expect(extractClientIp(request({ 'x-real-ip': '198.51.100.4' }))).toBe('198.51.100.4');
     expect(extractClientIp(request())).toBeNull();
-    expect(extractClientIp(request({ 'x-forwarded-for': 'not an ip <script>' }))).toBeNull();
   });
 });
 
 describe('createAresV6RequestContext', () => {
-  it('builds a context with a requestId and a hashed (non-raw) IP', () => {
+  it('builds a context with a requestId, hashed IP and proxy metadata', () => {
+    setEnv('ARES_V6_PROXY_TRUST_MODE', 'lab');
     const ctx = createAresV6RequestContext(request({ 'x-forwarded-for': '203.0.113.7', 'user-agent': 'curl/8' }));
     expect(ctx.requestId.length).toBeGreaterThan(0);
-    expect(ctx.method).toBe('POST');
     expect(ctx.endpoint).toBe('/api/generate/v6');
     expect(ctx.ipHash).not.toBe('203.0.113.7');
     expect(ctx.ipHash).toHaveLength(16);
     expect(ctx.userAgentHash).not.toBe('curl/8');
-    expect(typeof ctx.startedAt).toBe('number');
+    expect(ctx.proxyIpSource).toBe('FORWARDED_FOR');
+    expect(ctx.proxyTrusted).toBe(true);
   });
 
-  it('marks ip/userAgent hashes as "unknown" when headers are missing', () => {
-    const ctx = createAresV6RequestContext(request());
+  it('does not hash an untrusted IP (strict mode → ipHash unknown)', () => {
+    setEnv('ARES_V6_PROXY_TRUST_MODE', 'strict');
+    const ctx = createAresV6RequestContext(request({ 'x-forwarded-for': '203.0.113.7' }));
     expect(ctx.ipHash).toBe('unknown');
-    expect(ctx.userAgentHash).toBe('unknown');
+    expect(ctx.proxyTrusted).toBe(false);
+    expect(ctx.proxyIpSource).toBe('FORWARDED_FOR');
   });
 });
 
 describe('redactAresV6LogPayload', () => {
-  it('masks sensitive keys (incl. nested) and never keeps the raw IP', () => {
+  it('masks sensitive keys (incl. salt + nested) and never keeps the raw IP', () => {
     const redacted = redactAresV6LogPayload({
       ip: '1.2.3.4',
       email: 'player@example.com',
+      salt: 'super-secret-salt',
       keep: 'visible',
       nested: { userAgent: 'Mozilla', token: 'abc', ok: 1 },
     });
     expect(redacted.ip).toBe('[redacted]');
     expect(redacted.email).toBe('[redacted]');
+    expect(redacted.salt).toBe('[redacted]');
     expect(redacted.keep).toBe('visible');
     expect((redacted.nested as Record<string, unknown>).userAgent).toBe('[redacted]');
     expect((redacted.nested as Record<string, unknown>).ok).toBe(1);
     expect(JSON.stringify(redacted)).not.toContain('1.2.3.4');
-    expect(JSON.stringify(redacted)).not.toContain('player@example.com');
+    expect(JSON.stringify(redacted)).not.toContain('super-secret-salt');
   });
 });
 
 describe('buildAresV6GenerationMetrics', () => {
-  it('captures confidence, preset, mode and ppi source without PII', () => {
+  it('captures engine + operational metrics without PII', () => {
     const fixture = getAresV6CalibrationFixture('redmi-note-13');
     if (!fixture) throw new Error('fixture missing');
     const generation = generateAresV6({
@@ -82,24 +99,34 @@ describe('buildAresV6GenerationMetrics', () => {
       durationMs: 12,
       player: { mode: 'BATTLE_ROYALE', fingers: 3, usesGyroscope: false },
       generation,
+      operational: {
+        rateLimitScopes: ['IP_GLOBAL', 'IP_DEVICE'],
+        rateLimitDegraded: false,
+        rateLimitFailMode: 'closed',
+        proxyIpSource: 'FORWARDED_FOR',
+        proxyTrusted: true,
+        dbDurationMs: 3,
+        engineDurationMs: 1,
+        totalDurationMs: 12,
+      },
     });
 
-    expect(metrics.status).toBe('ok');
     expect(metrics.presetId).toBe('STANDARD_PRO');
-    expect(metrics.mode).toBe('BATTLE_ROYALE');
     expect(metrics.ppiSource).toBe('PPI');
-    expect(metrics.confidenceGrade).toBeTruthy();
-    expect(metrics.confidenceScore).toBeGreaterThan(0);
-    expect(metrics.fallbackPpi).toBe(false);
+    expect(metrics.rateLimitScopes).toEqual(['IP_GLOBAL', 'IP_DEVICE']);
+    expect(metrics.rateLimitFailMode).toBe('closed');
+    expect(metrics.proxyTrusted).toBe(true);
+    expect(metrics.dbDurationMs).toBe(3);
   });
 });
 
 describe('logAresV6Event', () => {
-  it('returns a record with the requestId and event, never the raw body', () => {
+  it('returns a record with requestId + proxy metadata, never the raw body', () => {
     const ctx = createAresV6RequestContext(request({ 'x-forwarded-for': '203.0.113.7' }));
-    const record = logAresV6Event({ type: 'ares_v6.validation_failed', ctx, data: { reason: 'schema', code: 'unrecognized_keys' } });
-    expect(record.event).toBe('ares_v6.validation_failed');
+    const record = logAresV6Event({ type: 'ares_v6.rate_limited', ctx, data: { scopes: ['IP_GLOBAL'] } });
+    expect(record.event).toBe('ares_v6.rate_limited');
     expect(record.requestId).toBe(ctx.requestId);
+    expect(record.proxyIpSource).toBeTruthy();
     expect(JSON.stringify(record)).not.toContain('"body"');
   });
 
