@@ -37,6 +37,21 @@ on:
         description: 'Deployed endpoint URL for http mode (optional)'
         required: false
         default: ''
+      runEvidenceReview:
+        description: 'Run the Fase 3D evidence review after the lab'
+        type: boolean
+        required: false
+        default: true
+      includeLegacyCompare:
+        description: 'Include legacy-vs-v6 comparison in the evidence report'
+        type: boolean
+        required: false
+        default: true
+      includeProposals:
+        description: 'Include human-gated calibration proposals (DRAFT only, never auto-applied)'
+        type: boolean
+        required: false
+        default: false
 
 env:
   NODE_VERSION: '20'
@@ -110,11 +125,24 @@ jobs:
           if [ -n "$INPUT_FIXTURE" ]; then ARGS="$ARGS --fixture $INPUT_FIXTURE"; fi
           if [ -n "$INPUT_TARGET_URL" ]; then ARGS="$ARGS --url $INPUT_TARGET_URL"; fi
           node scripts/ci-runner.mjs ci-logs/internal-lab.log npm run ares:v6:lab:run -- $ARGS
+      - name: Run evidence review (Fase 3D — legacy-vs-v6 + go/no-go)
+        if: ${{ inputs.runEvidenceReview }}
+        env:
+          INPUT_LEGACY_COMPARE: ${{ inputs.includeLegacyCompare }}
+          INPUT_PROPOSALS: ${{ inputs.includeProposals }}
+        run: |
+          ARGS="--from-db"
+          if [ "$INPUT_LEGACY_COMPARE" = "true" ]; then ARGS="$ARGS --legacy-compare"; fi
+          if [ "$INPUT_PROPOSALS" = "true" ]; then ARGS="$ARGS --proposals"; fi
+          node scripts/ci-runner.mjs ci-logs/evidence-json.log npm run ares:v6:evidence -- $ARGS --json --output ares-v6-evidence-summary.json
+          node scripts/ci-runner.mjs ci-logs/evidence-md.log npm run ares:v6:evidence -- $ARGS --markdown --output ares-v6-evidence-report.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ares-v6-internal-lab-report
           path: |
             ares-v6-internal-lab-report.json
+            ares-v6-evidence-summary.json
+            ares-v6-evidence-report.md
             ci-logs/
           if-no-files-found: ignore
