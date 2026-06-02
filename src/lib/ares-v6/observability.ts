@@ -4,12 +4,17 @@ import { logger } from '@ares/logger';
 
 import type { AresV6GenerationOutput } from '@ares/algorithms/engine-v6';
 
+import { getAresV6LogSalt } from './observability-policy';
+import { getTrustedClientIp, type AresV6ClientIpResult } from './proxy-trust';
+
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Observability (structured, NO PII)
 //
 // Lab-grade telemetry for the isolated v6 endpoint. We never log raw IPs,
-// user agents, request bodies, tokens, cookies or stack traces. IP/UA are
-// reduced to short salted hashes purely for correlation across log lines.
+// user agents, request bodies, tokens, cookies, salt values or stack traces.
+// IP/UA are reduced to short salted hashes (salt from observability-policy)
+// purely for correlation. The raw IP is hashed ONLY when the proxy trust
+// policy trusts it; untrusted clients log ipHash 'unknown'.
 // ═══════════════════════════════════════════════════════════════
 
 const ENDPOINT = '/api/generate/v6';
@@ -17,16 +22,8 @@ const HASH_LENGTH = 16;
 const MAX_REDACT_DEPTH = 5;
 const MAX_STRING_LENGTH = 256;
 
-/**
- * Salt for pseudonymising IP/UA in logs. This is correlation hygiene, not a
- * security boundary; set ARES_V6_LOG_SALT in lab to make hashes per-deploy.
- */
-function logSalt(): string {
-  return process.env.ARES_V6_LOG_SALT ?? 'ares-v6-lab-salt';
-}
-
 function shortHash(value: string): string {
-  return createHash('sha256').update(`${logSalt()}:${value}`).digest('hex').slice(0, HASH_LENGTH);
+  return createHash('sha256').update(`${getAresV6LogSalt()}:${value}`).digest('hex').slice(0, HASH_LENGTH);
 }
 
 /** Hash a client IP for logs/keys so the raw address never leaves the request. */
@@ -34,22 +31,9 @@ export function hashAresV6Ip(ip: string): string {
   return shortHash(ip);
 }
 
-const IP_PATTERN = /^[0-9a-fA-F:.]{3,45}$/;
-
-/**
- * Best-effort client IP from forwarding headers. Values are validated against a
- * conservative pattern so a hostile header can never become an unbounded key.
- * Returns null when no trustworthy IP is present (caller applies a stricter policy).
- */
+/** Backwards-compatible client IP getter; delegates to the proxy trust policy. */
 export function extractClientIp(request: Request): string | null {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const first = forwardedFor.split(',')[0]?.trim();
-    if (first && IP_PATTERN.test(first)) return first;
-  }
-  const realIp = request.headers.get('x-real-ip')?.trim();
-  if (realIp && IP_PATTERN.test(realIp)) return realIp;
-  return null;
+  return getTrustedClientIp(request).ip;
 }
 
 export interface AresV6RequestContext {
@@ -58,19 +42,28 @@ export interface AresV6RequestContext {
   endpoint: string;
   ipHash: string;
   userAgentHash: string;
+  proxyIpSource: AresV6ClientIpResult['source'];
+  proxyTrusted: boolean;
   startedAt: number;
 }
 
-/** Build a per-request context. requestId is a random UUID for log correlation. */
-export function createAresV6RequestContext(request: Request): AresV6RequestContext {
-  const ip = extractClientIp(request);
+/** Build a per-request context. Pass a pre-resolved clientIp to avoid re-parsing. */
+export function createAresV6RequestContext(
+  request: Request,
+  clientIp?: AresV6ClientIpResult,
+): AresV6RequestContext {
+  const resolved = clientIp ?? getTrustedClientIp(request);
   const userAgent = request.headers.get('user-agent');
+  const hasTrustedIp = resolved.trusted && resolved.ip !== null;
+
   return {
     requestId: randomUUID(),
     method: request.method,
     endpoint: ENDPOINT,
-    ipHash: ip ? shortHash(ip) : 'unknown',
+    ipHash: hasTrustedIp && resolved.ip ? shortHash(resolved.ip) : 'unknown',
     userAgentHash: userAgent ? shortHash(userAgent) : 'unknown',
+    proxyIpSource: resolved.source,
+    proxyTrusted: resolved.trusted,
     startedAt: Date.now(),
   };
 }
@@ -81,6 +74,7 @@ const REDACT_KEYS: ReadonlySet<string> = new Set([
   'ip_address',
   'x-forwarded-for',
   'x-real-ip',
+  'x-vercel-forwarded-for',
   'forwarded',
   'useragent',
   'user-agent',
@@ -94,6 +88,7 @@ const REDACT_KEYS: ReadonlySet<string> = new Set([
   'cookie',
   'set-cookie',
   'secret',
+  'salt',
   'apikey',
   'api-key',
   'body',
@@ -125,10 +120,13 @@ export function redactAresV6LogPayload(payload: Record<string, unknown>): Record
 
 export type AresV6EventType =
   | 'ares_v6.request_blocked_flag_off'
+  | 'ares_v6.config_error'
   | 'ares_v6.validation_failed'
   | 'ares_v6.rate_limited'
+  | 'ares_v6.rate_limit_store_unavailable'
   | 'ares_v6.device_not_found'
   | 'ares_v6.generated'
+  | 'ares_v6.real_infra_smoke_generated'
   | 'ares_v6.failed';
 
 export interface AresV6Event {
@@ -144,15 +142,18 @@ export interface AresV6LogRecord {
   method: string;
   ipHash: string;
   userAgentHash: string;
+  proxyIpSource: string;
+  proxyTrusted: boolean;
   data?: Record<string, unknown>;
 }
 
 const WARN_EVENTS: ReadonlySet<AresV6EventType> = new Set([
   'ares_v6.validation_failed',
   'ares_v6.rate_limited',
+  'ares_v6.rate_limit_store_unavailable',
   'ares_v6.device_not_found',
 ]);
-const ERROR_EVENTS: ReadonlySet<AresV6EventType> = new Set(['ares_v6.failed']);
+const ERROR_EVENTS: ReadonlySet<AresV6EventType> = new Set(['ares_v6.failed', 'ares_v6.config_error']);
 
 /** Emit a structured, redacted event. Returns the exact record that was logged. */
 export function logAresV6Event(event: AresV6Event): AresV6LogRecord {
@@ -164,6 +165,8 @@ export function logAresV6Event(event: AresV6Event): AresV6LogRecord {
     method: event.ctx.method,
     ipHash: event.ctx.ipHash,
     userAgentHash: event.ctx.userAgentHash,
+    proxyIpSource: event.ctx.proxyIpSource,
+    proxyTrusted: event.ctx.proxyTrusted,
     ...(data ? { data } : {}),
   };
 
@@ -174,6 +177,8 @@ export function logAresV6Event(event: AresV6Event): AresV6LogRecord {
     method: record.method,
     ipHash: record.ipHash,
     userAgentHash: record.userAgentHash,
+    proxyIpSource: record.proxyIpSource,
+    proxyTrusted: record.proxyTrusted,
     ...(record.data ? { data: record.data } : {}),
   };
 
@@ -184,7 +189,20 @@ export function logAresV6Event(event: AresV6Event): AresV6LogRecord {
   return record;
 }
 
-export interface AresV6GenerationMetrics {
+/** Operational (non-engine) metrics added in Phase 3B. */
+export interface AresV6GenerationOperational {
+  rateLimitScopes?: readonly string[];
+  rateLimitDegraded?: boolean;
+  rateLimitFailMode?: string;
+  proxyIpSource?: string;
+  proxyTrusted?: boolean;
+  dbDurationMs?: number;
+  engineDurationMs?: number;
+  totalDurationMs?: number;
+  realInfraSmoke?: boolean;
+}
+
+export interface AresV6GenerationMetrics extends AresV6GenerationOperational {
   status: 'ok';
   durationMs: number;
   deviceId: string;
@@ -207,8 +225,9 @@ export function buildAresV6GenerationMetrics(params: {
   durationMs: number;
   player: { mode: string; fingers: number; symptoms?: readonly string[]; usesGyroscope?: boolean };
   generation: AresV6GenerationOutput;
+  operational?: AresV6GenerationOperational;
 }): AresV6GenerationMetrics {
-  const { deviceId, durationMs, player, generation } = params;
+  const { deviceId, durationMs, player, generation, operational } = params;
   return {
     status: 'ok',
     durationMs,
@@ -224,5 +243,6 @@ export function buildAresV6GenerationMetrics(params: {
     usedGyro: generation.gyroscope !== null,
     symptomsCount: player.symptoms?.length ?? 0,
     tuningStepsCount: generation.firstTuningSteps.length,
+    ...(operational ?? {}),
   };
 }

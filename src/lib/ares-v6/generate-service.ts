@@ -17,10 +17,11 @@ import {
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Generation service
 //
-// Pure orchestration: find device → adapt (preserving screenDpi) → run the
-// engine. The device finder is injected so the service is fully testable
-// without a database; the default lazily loads Prisma so unit tests that
-// inject their own finder never touch @ares/database.
+// Pure orchestration: find device → access policy → adapt (preserving
+// screenDpi) → run the engine. The device finder is injected so the service is
+// fully testable without a database; the default lazily loads Prisma so unit
+// tests that inject their own finder never touch @ares/database. Phase 3B adds
+// DB/engine timings for observability.
 // ═══════════════════════════════════════════════════════════════
 
 export interface AresV6GenerateServiceInput {
@@ -38,9 +39,15 @@ export interface AresV6ServiceDevice extends AresV6AdaptableDevice {
   isActive?: boolean | null;
 }
 
+export interface AresV6GenerateServiceTimings {
+  dbDurationMs: number;
+  engineDurationMs: number;
+}
+
 export interface AresV6GenerateServiceResult {
   device: AresV6ServiceDevice;
   generation: AresV6GenerationOutput;
+  timings: AresV6GenerateServiceTimings;
 }
 
 export interface AresV6GenerateServiceDeps {
@@ -73,13 +80,16 @@ const DEFAULT_DEPS: AresV6GenerateServiceDeps = { findDevice: defaultFindDevice 
 
 /**
  * Resolve a device by id and generate a full ARES v6 package for it.
- * Throws {@link NotFoundError} when the device does not exist.
+ * Throws {@link NotFoundError} when the device does not exist or is inactive.
  */
 export async function generateAresV6ForDeviceId(
   input: AresV6GenerateServiceInput,
   deps: AresV6GenerateServiceDeps = DEFAULT_DEPS,
 ): Promise<AresV6GenerateServiceResult> {
+  const dbStart = Date.now();
   const device = await deps.findDevice(input.deviceId);
+  const dbDurationMs = Date.now() - dbStart;
+
   if (!device) {
     throw new NotFoundError('Device', input.deviceId);
   }
@@ -89,11 +99,14 @@ export async function generateAresV6ForDeviceId(
   assertCanGenerateForDevice({ device });
 
   const signal = toAresV6DeviceSignalWithOverrides(device, input.overrides);
+
+  const engineStart = Date.now();
   const generation = generateAresV6({
     device: signal,
     presetId: input.presetId,
     player: input.player,
   });
+  const engineDurationMs = Date.now() - engineStart;
 
-  return { device, generation };
+  return { device, generation, timings: { dbDurationMs, engineDurationMs } };
 }

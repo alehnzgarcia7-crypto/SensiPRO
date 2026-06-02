@@ -1,49 +1,47 @@
 import { logger } from '@ares/logger';
 
-import { getRedisClient } from '@/lib/cache/redis';
-
-import { extractClientIp, hashAresV6Ip } from './observability';
+import { hashAresV6Ip } from './observability';
+import { getTrustedClientIp, type AresV6ClientIpResult } from './proxy-trust';
+import { getAresV6RateLimitConfig, type AresV6RateLimitConfig } from './rate-limit-policy';
+import { getDefaultRedisRateLimitStore } from './redis-rate-limit-store';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Abuse guard / rate limiter
+// ARES v6 — Dual-bucket abuse guard
 //
-// The existing src/lib/security/rate-limiter.ts is keyed by userId+tier over a
-// 24h window — useless for this anonymous lab endpoint. This limiter keys by
-// (hashed IP + deviceId) over a 60s window.
+// Phase 3A keyed only by IP+deviceId, so an attacker could rotate deviceId to
+// get a fresh budget per request. Phase 3B evaluates MULTIPLE buckets and
+// blocks if ANY is exceeded:
+//   trusted IP   → IP_GLOBAL (per IP, all devices) + IP_DEVICE (per IP+device)
+//   untrusted IP → UNKNOWN_GLOBAL (all untrusted) + UNKNOWN_DEVICE (per device)
+// The per-IP/global buckets close the deviceId-rotation bypass.
 //
-// PRODUCTION STORE = Redis (reusing the shared ioredis client from
-// src/lib/cache/redis.ts — no third connection). If Redis is unavailable the
-// limiter FAILS OPEN with a warning: the in-process path is not a real
-// multi-instance guard, so we never pretend a Map protects production.
-// Tests inject a deterministic in-memory store via `options.store`.
+// The store is Redis (atomic Lua, shared ioredis). On store failure the result
+// honours the configured fail mode (open = degraded-allow; closed = block 503).
+// Keys embed the HASHED IP, never the raw address.
 // ═══════════════════════════════════════════════════════════════
 
-export const ARES_V6_RATE_WINDOW_SECONDS = 60;
-/** Per (IP + deviceId) budget when a trustworthy client IP is present. */
-export const ARES_V6_RATE_LIMIT_PER_IP_DEVICE = 20;
-/** Stricter budget when no trustworthy IP can be determined. */
-export const ARES_V6_RATE_LIMIT_UNKNOWN_IP = 8;
+export type AresV6RateLimitScope = 'IP_GLOBAL' | 'IP_DEVICE' | 'UNKNOWN_GLOBAL' | 'UNKNOWN_DEVICE';
 
-const KEY_PREFIX = 'ares:v6:rl';
-
-/** Minimal counter store. Returns the post-increment count and the key's TTL. */
+/** Atomic counter store. Returns the post-increment count and the key TTL. */
 export interface AresV6RateLimitStore {
-  hit(key: string, windowSeconds: number, now: number): Promise<{ count: number; ttlSeconds: number }>;
+  hit(key: string, windowSeconds: number): Promise<{ count: number; ttlSeconds: number }>;
 }
 
-/** Only the field the limiter reads from a validated body. */
+/** The only field the limiter reads from a validated body. */
 export interface AresV6RateLimitBody {
   deviceId?: string;
 }
 
-export interface AresV6RateLimitDescriptor {
+export interface AresV6RateLimitBucketResult {
+  scope: AresV6RateLimitScope;
+  /** Key contains the hashed IP, never the raw address. Safe to log. */
   key: string;
-  scope: 'IP_DEVICE' | 'UNKNOWN_IP';
   limit: number;
-  windowSeconds: number;
-  ipHash: string;
-  hasTrustedIp: boolean;
-  deviceId: string | null;
+  count: number;
+  remaining: number;
+  allowed: boolean;
+  resetAt: Date;
+  retryAfterSeconds: number;
 }
 
 export interface AresV6RateLimitResult {
@@ -52,85 +50,93 @@ export interface AresV6RateLimitResult {
   remaining: number;
   resetAt: Date;
   retryAfterSeconds?: number;
-  scope: AresV6RateLimitDescriptor['scope'];
-  /** Redis key — contains the hashed IP, never the raw address. Safe to log. */
-  key: string;
-  ipHash: string;
-  /** True when the limiter failed open (store unavailable/errored). */
+  buckets: readonly AresV6RateLimitBucketResult[];
+  scopesApplied: readonly AresV6RateLimitScope[];
   degraded: boolean;
+  storeUnavailable: boolean;
+  ipHash: string;
+  proxyIpSource: AresV6ClientIpResult['source'];
+  proxyTrusted: boolean;
 }
 
 export interface AresV6RateLimitOptions {
-  /** Inject a store (tests). `null` forces the fail-open path deterministically. */
+  /** Inject a store (tests). `null` forces the store-unavailable path. */
   store?: AresV6RateLimitStore | null;
   now?: number;
+  clientIp?: AresV6ClientIpResult;
+  config?: AresV6RateLimitConfig;
 }
 
-/**
- * Compute the rate-limit bucket for a request. The key embeds the hashed IP and
- * the deviceId, so different devices from the same IP get independent buckets,
- * and a missing/untrusted IP gets a stricter shared budget.
- */
-export function getAresV6RateLimitKey(
-  request: Request,
-  parsedBody?: AresV6RateLimitBody,
-): AresV6RateLimitDescriptor {
-  const ip = extractClientIp(request);
-  const hasTrustedIp = ip !== null;
-  const ipHash = ip ? hashAresV6Ip(ip) : 'unknown';
-  const deviceId = parsedBody?.deviceId ?? null;
-  const limit = hasTrustedIp ? ARES_V6_RATE_LIMIT_PER_IP_DEVICE : ARES_V6_RATE_LIMIT_UNKNOWN_IP;
-  const scope: AresV6RateLimitDescriptor['scope'] = hasTrustedIp ? 'IP_DEVICE' : 'UNKNOWN_IP';
+const KEY_PREFIX = 'ares:v6:rl';
+const STORE_UNAVAILABLE_RETRY_SECONDS = 5;
 
+interface PlannedBucket {
+  scope: AresV6RateLimitScope;
+  key: string;
+  limit: number;
+}
+
+/** Decide which buckets apply for a client + device, and the hashed IP. */
+export function planAresV6RateLimitBuckets(
+  clientIp: AresV6ClientIpResult,
+  deviceId: string | null,
+  config: AresV6RateLimitConfig,
+): { ipHash: string; buckets: PlannedBucket[] } {
+  const hasTrustedIp = clientIp.trusted && clientIp.ip !== null;
+  const ipHash = hasTrustedIp && clientIp.ip ? hashAresV6Ip(clientIp.ip) : 'unknown';
+  const buckets: PlannedBucket[] = [];
+
+  if (hasTrustedIp) {
+    buckets.push({ scope: 'IP_GLOBAL', key: `${KEY_PREFIX}:ip:${ipHash}`, limit: config.ipGlobalLimit });
+    if (deviceId) {
+      buckets.push({
+        scope: 'IP_DEVICE',
+        key: `${KEY_PREFIX}:ip-device:${ipHash}:${deviceId}`,
+        limit: config.ipDeviceLimit,
+      });
+    }
+  } else {
+    buckets.push({ scope: 'UNKNOWN_GLOBAL', key: `${KEY_PREFIX}:unknown`, limit: config.unknownGlobalLimit });
+    if (deviceId) {
+      buckets.push({
+        scope: 'UNKNOWN_DEVICE',
+        key: `${KEY_PREFIX}:unknown-device:${deviceId}`,
+        limit: config.unknownDeviceLimit,
+      });
+    }
+  }
+
+  return { ipHash, buckets };
+}
+
+function storeUnavailableResult(
+  config: AresV6RateLimitConfig,
+  clientIp: AresV6ClientIpResult,
+  ipHash: string,
+  scopesApplied: readonly AresV6RateLimitScope[],
+  now: number,
+): AresV6RateLimitResult {
+  const allowed = config.failMode === 'open';
   return {
-    key: `${KEY_PREFIX}:${ipHash}:${deviceId ?? '_'}`,
-    scope,
-    limit,
-    windowSeconds: ARES_V6_RATE_WINDOW_SECONDS,
+    allowed,
+    limit: 0,
+    remaining: 0,
+    resetAt: new Date(now + STORE_UNAVAILABLE_RETRY_SECONDS * 1000),
+    ...(allowed ? {} : { retryAfterSeconds: STORE_UNAVAILABLE_RETRY_SECONDS }),
+    buckets: [],
+    scopesApplied,
+    degraded: allowed, // fail-open is a degraded allow
+    storeUnavailable: true,
     ipHash,
-    hasTrustedIp,
-    deviceId,
-  };
-}
-
-/** Redis-backed store reusing the shared ioredis client. INCR + EXPIRE + TTL. */
-function redisStore(): AresV6RateLimitStore | null {
-  const client = getRedisClient();
-  if (!client) return null;
-
-  return {
-    async hit(key, windowSeconds) {
-      const count = await client.incr(key);
-      if (count === 1) {
-        await client.expire(key, windowSeconds);
-      }
-      let ttlSeconds = await client.ttl(key);
-      if (ttlSeconds < 0) {
-        // Key exists without a TTL (e.g. expire raced/failed): re-arm the window.
-        await client.expire(key, windowSeconds);
-        ttlSeconds = windowSeconds;
-      }
-      return { count, ttlSeconds };
-    },
-  };
-}
-
-function failOpen(descriptor: AresV6RateLimitDescriptor, now: number): AresV6RateLimitResult {
-  return {
-    allowed: true,
-    limit: descriptor.limit,
-    remaining: descriptor.limit,
-    resetAt: new Date(now + descriptor.windowSeconds * 1000),
-    scope: descriptor.scope,
-    key: descriptor.key,
-    ipHash: descriptor.ipHash,
-    degraded: true,
+    proxyIpSource: clientIp.source,
+    proxyTrusted: clientIp.trusted,
   };
 }
 
 /**
- * Check (and consume) the rate limit for a request. Never throws: on a missing
- * or failing store it fails open (lab posture) and flags `degraded`.
+ * Evaluate every applicable bucket and combine. allowed = all buckets allowed;
+ * remaining = min across buckets; the binding (most restrictive) bucket drives
+ * the headers. Never throws: store failures map to the fail-mode policy.
  */
 export async function checkAresV6RateLimit(
   request: Request,
@@ -138,36 +144,68 @@ export async function checkAresV6RateLimit(
   options?: AresV6RateLimitOptions,
 ): Promise<AresV6RateLimitResult> {
   const now = options?.now ?? Date.now();
-  const descriptor = getAresV6RateLimitKey(request, parsedBody);
-  const store = options && 'store' in options ? options.store : redisStore();
+  const config = options?.config ?? getAresV6RateLimitConfig();
+  const clientIp = options?.clientIp ?? getTrustedClientIp(request);
+  const deviceId = parsedBody?.deviceId ?? null;
+  const { ipHash, buckets: planned } = planAresV6RateLimitBuckets(clientIp, deviceId, config);
+  const scopesApplied = planned.map((bucket) => bucket.scope);
+
+  const store = options && 'store' in options ? options.store : getDefaultRedisRateLimitStore();
 
   if (!store) {
-    logger.warn('ares_v6.rate_limit_store_unavailable', {
-      scope: descriptor.scope,
-      ipHash: descriptor.ipHash,
-    });
-    return failOpen(descriptor, now);
+    logger.warn('ares_v6.rate_limit_store_unavailable', { failMode: config.failMode, scopes: scopesApplied });
+    return storeUnavailableResult(config, clientIp, ipHash, scopesApplied, now);
   }
 
+  let buckets: AresV6RateLimitBucketResult[];
   try {
-    const { count, ttlSeconds } = await store.hit(descriptor.key, descriptor.windowSeconds, now);
-    const allowed = count <= descriptor.limit;
-    return {
-      allowed,
-      limit: descriptor.limit,
-      remaining: Math.max(0, descriptor.limit - count),
-      resetAt: new Date(now + ttlSeconds * 1000),
-      ...(allowed ? {} : { retryAfterSeconds: Math.max(1, ttlSeconds) }),
-      scope: descriptor.scope,
-      key: descriptor.key,
-      ipHash: descriptor.ipHash,
-      degraded: false,
-    };
+    buckets = await Promise.all(
+      planned.map(async (bucket): Promise<AresV6RateLimitBucketResult> => {
+        const { count, ttlSeconds } = await store.hit(bucket.key, config.windowSeconds);
+        return {
+          scope: bucket.scope,
+          key: bucket.key,
+          limit: bucket.limit,
+          count,
+          remaining: Math.max(0, bucket.limit - count),
+          allowed: count <= bucket.limit,
+          resetAt: new Date(now + ttlSeconds * 1000),
+          retryAfterSeconds: Math.max(1, ttlSeconds),
+        };
+      }),
+    );
   } catch (error) {
-    logger.warn('ares_v6.rate_limit_check_failed', {
-      scope: descriptor.scope,
-      error: String(error),
-    });
-    return failOpen(descriptor, now);
+    logger.warn('ares_v6.rate_limit_check_failed', { failMode: config.failMode, error: String(error) });
+    return storeUnavailableResult(config, clientIp, ipHash, scopesApplied, now);
   }
+
+  const allowed = buckets.every((bucket) => bucket.allowed);
+  const blocking = buckets.filter((bucket) => !bucket.allowed);
+  const remaining = buckets.reduce((min, bucket) => Math.min(min, bucket.remaining), Number.POSITIVE_INFINITY);
+
+  // Binding bucket: the blocking one with the longest retry, else the scarcest.
+  const binding =
+    blocking.length > 0
+      ? blocking.reduce((a, b) => (b.retryAfterSeconds > a.retryAfterSeconds ? b : a))
+      : buckets.reduce((a, b) => (b.remaining < a.remaining ? b : a));
+
+  const resetAt =
+    blocking.length > 0
+      ? new Date(Math.max(...blocking.map((bucket) => bucket.resetAt.getTime())))
+      : binding.resetAt;
+
+  return {
+    allowed,
+    limit: binding.limit,
+    remaining: Number.isFinite(remaining) ? remaining : 0,
+    resetAt,
+    ...(allowed ? {} : { retryAfterSeconds: Math.max(...blocking.map((bucket) => bucket.retryAfterSeconds), 1) }),
+    buckets,
+    scopesApplied,
+    degraded: false,
+    storeUnavailable: false,
+    ipHash,
+    proxyIpSource: clientIp.source,
+    proxyTrusted: clientIp.trusted,
+  };
 }

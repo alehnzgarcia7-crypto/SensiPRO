@@ -9,8 +9,9 @@ import type { AresV6RateLimitResult } from './rate-limit';
 // ARES v6 — Consistent API responses
 //
 // Centralises the success/error envelopes so every response carries the same
-// shape, the requestId in `meta`, and (when known) standard rate-limit headers.
-// Internal details (stack traces, raw Zod values, ipHash, key) never appear.
+// shape, the requestId in `meta`, and (when known) standard rate-limit headers
+// reflecting the most restrictive bucket. Internal details (stack traces, raw
+// Zod values, ipHash, redis keys) never appear.
 // ═══════════════════════════════════════════════════════════════
 
 export interface AresV6ResponseDevice {
@@ -28,24 +29,40 @@ function rateLimitHeaders(rate?: AresV6RateLimitResult): Record<string, string> 
     'X-RateLimit-Remaining': String(rate.remaining),
     'X-RateLimit-Reset': String(Math.floor(rate.resetAt.getTime() / 1000)),
   };
-  if (!rate.allowed && rate.retryAfterSeconds !== undefined) {
+  if (rate.retryAfterSeconds !== undefined) {
     headers['Retry-After'] = String(rate.retryAfterSeconds);
   }
   return headers;
 }
 
-/** Standard error envelope: `{ success:false, error, meta:{ requestId } }`. */
+/** A safe (no key/ipHash) rate-limit summary for response meta. */
+function rateLimitMeta(rate?: AresV6RateLimitResult): Record<string, unknown> | undefined {
+  if (!rate) return undefined;
+  return {
+    limit: rate.limit,
+    remaining: rate.remaining,
+    resetAt: rate.resetAt.toISOString(),
+    scopes: rate.scopesApplied,
+    degraded: rate.degraded,
+  };
+}
+
+/** Standard error envelope: `{ success:false, error, meta:{ requestId, rateLimit? } }`. */
 export function aresV6ErrorResponse(
   code: string,
   message: string,
   statusCode: number,
   opts?: { ctx?: AresV6RequestContext; rate?: AresV6RateLimitResult },
 ): NextResponse {
+  const rateMeta = rateLimitMeta(opts?.rate);
   return NextResponse.json(
     {
       success: false as const,
       error: { code, message, statusCode },
-      meta: { requestId: opts?.ctx?.requestId ?? null },
+      meta: {
+        requestId: opts?.ctx?.requestId ?? null,
+        ...(rateMeta ? { rateLimit: rateMeta } : {}),
+      },
     },
     { status: statusCode, headers: rateLimitHeaders(opts?.rate) },
   );
