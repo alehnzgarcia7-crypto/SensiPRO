@@ -1,10 +1,13 @@
 import { NotFoundError } from '@ares/errors';
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { POST as feedbackPost } from '@/app/api/feedback/v6/route';
 import { POST } from '@/app/api/generate/v6/route';
+import { GET as metricsGet } from '@/app/api/lab/v6/metrics/route';
 
 import { generateAresV6ForDeviceId } from '../generate-service';
+import { runAresV6LabCleanup } from '../lab-cleanup';
 import { checkAresV6RateLimit } from '../rate-limit';
 import type { AresV6RateLimitConfig } from '../rate-limit-policy';
 import {
@@ -62,8 +65,13 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
     // for a fast 429, then seed the two smoke devices into the real DB.
     process.env.ARES_V6_API_ENABLED = 'true';
     process.env.ARES_V6_PROXY_TRUST_MODE = 'lab';
+    process.env.ARES_V6_INTERNAL_ACCESS_MODE = 'lab';
     process.env.ARES_V6_RATE_LIMIT_IP_DEVICE_LIMIT = '3';
     process.env.ARES_V6_RATE_LIMIT_IP_GLOBAL_LIMIT = '50';
+    process.env.ARES_V6_PERSIST_GENERATIONS = 'true';
+    process.env.ARES_V6_PERSIST_GENERATIONS_REQUIRED = 'true';
+    process.env.ARES_V6_WRITE_FEEDBACK = 'true';
+    process.env.ARES_V6_LAB_METRICS_ENABLED = 'true';
 
     const { prisma } = await import('@ares/database');
     const seeded = await seedAresV6SmokeDevices(prisma);
@@ -166,6 +174,50 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
       }
       expect(statuses).toContain(200);
       expect(statuses).toContain(429);
+    });
+  });
+
+  describe('Persistence + feedback + metrics + cleanup', () => {
+    function feedbackRequest(generationId: string, ip: string): NextRequest {
+      return new Request('http://localhost/api/feedback/v6', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+        body: JSON.stringify({ generationId, rating: 5, outcome: 'BETTER' }),
+      }) as unknown as NextRequest;
+    }
+
+    it('persists a generation, accepts feedback once (409 on duplicate), and metrics see them', async () => {
+      const genRes = await POST(makeRequest(activeId, uniqueIp(20)));
+      expect(genRes.status).toBe(200);
+      const genBody = (await genRes.json()) as { meta: { generationId?: string } };
+      const generationId = genBody.meta.generationId;
+      expect(generationId).toBeTruthy();
+
+      const fbRes = await feedbackPost(feedbackRequest(generationId as string, uniqueIp(21)));
+      expect(fbRes.status).toBe(201);
+
+      const dupRes = await feedbackPost(feedbackRequest(generationId as string, uniqueIp(22)));
+      expect(dupRes.status).toBe(409);
+
+      const metricsRes = await metricsGet(
+        new NextRequest('http://localhost/api/lab/v6/metrics', {
+          method: 'GET',
+          headers: { 'x-forwarded-for': uniqueIp(23) },
+        }),
+      );
+      expect(metricsRes.status).toBe(200);
+      const metricsBody = (await metricsRes.json()) as {
+        data: { totalGenerations: number; totalFeedback: number };
+      };
+      expect(metricsBody.data.totalGenerations).toBeGreaterThanOrEqual(1);
+      expect(metricsBody.data.totalFeedback).toBeGreaterThanOrEqual(1);
+    });
+
+    it('cleanup dry-run counts rows without deleting', async () => {
+      const result = await runAresV6LabCleanup({ dryRun: true, nowMs: Date.now() });
+      expect(result.dryRun).toBe(true);
+      expect(result.generations).toBeGreaterThanOrEqual(0);
+      expect(result.feedback).toBeGreaterThanOrEqual(0);
     });
   });
 });

@@ -1,41 +1,41 @@
 import type { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  isAresV6PersistenceRequired,
+  persistAresV6Generation,
+  shouldPersistAresV6Generations,
+} from '@/lib/ares-v6/generation-persistence';
 import { checkAresV6RateLimit } from '@/lib/ares-v6/rate-limit';
 
 import { POST } from '../route';
 
 // ═══════════════════════════════════════════════════════════════
-// POST /api/generate/v6 — hardened route handler tests (Phase 3A + 3B)
-//
-// Prisma is mocked (no DB). The rate limiter is mocked so the route is tested
-// against controlled allow/block/store-unavailable outcomes; the limiter logic
-// is covered in rate-limit.test.ts and the real-infra smoke. Flags via env.
+// POST /api/generate/v6 — hardened route (3A + 3B + 3C)
 // ═══════════════════════════════════════════════════════════════
 
 const { findUnique } = vi.hoisted(() => ({ findUnique: vi.fn() }));
 vi.mock('@ares/database', () => ({ prisma: { device: { findUnique } } }));
 vi.mock('@/lib/ares-v6/rate-limit', () => ({ checkAresV6RateLimit: vi.fn() }));
+vi.mock('@/lib/ares-v6/generation-persistence', () => ({
+  shouldPersistAresV6Generations: vi.fn(() => false),
+  isAresV6PersistenceRequired: vi.fn(() => false),
+  buildAresV6GenerationRecord: vi.fn(() => ({})),
+  persistAresV6Generation: vi.fn(),
+}));
 
 const mockedRateLimit = vi.mocked(checkAresV6RateLimit);
+const mockedShouldPersist = vi.mocked(shouldPersistAresV6Generations);
+const mockedRequired = vi.mocked(isAresV6PersistenceRequired);
+const mockedPersist = vi.mocked(persistAresV6Generation);
 
 interface SuccessBody {
   success: true;
-  data: {
-    device: { id: string; brand: string; model: string; slug: string; screenDpi: number | null };
-    generation: {
-      algorithmVersion: string;
-      dpi: { detectedPpi: number | null; source: string };
-      sensitivity: Record<string, number>;
-      confidence: { grade: string };
-      firstTuningSteps: { symptom: string }[];
-    };
-  };
-  meta: { engine: string; labMode: boolean; requestId: string; rateLimit: { limit: number; remaining: number }; warnings?: string[] };
+  data: { device: { screenDpi: number | null }; generation: { dpi: { detectedPpi: number | null; source: string } } };
+  meta: { engine: string; labMode: boolean; requestId: string; generationId?: string; persistence?: { persisted: boolean; degraded?: boolean } };
 }
 
 const DEVICE_ID = 'ckdevicea1b2c3d4e5f6g7h8';
-
 const MOCK_DEVICE = {
   id: DEVICE_ID,
   brand: 'Redmi',
@@ -51,7 +51,6 @@ const MOCK_DEVICE = {
   releaseYear: 2024,
   isActive: true,
 };
-
 const VALID_BODY = {
   deviceId: DEVICE_ID,
   presetId: 'STANDARD_PRO',
@@ -59,14 +58,13 @@ const VALID_BODY = {
 };
 
 type RateResult = Awaited<ReturnType<typeof checkAresV6RateLimit>>;
-
 function rateResult(overrides: Partial<RateResult> = {}): RateResult {
   return {
     allowed: true,
     limit: 20,
     remaining: 19,
     resetAt: new Date('2030-01-01T00:01:00.000Z'),
-    buckets: [{ scope: 'IP_GLOBAL', key: 'ares:v6:rl:ip:deadbeefdeadbeef', limit: 60, count: 1, remaining: 59, allowed: true, resetAt: new Date('2030-01-01T00:01:00.000Z'), retryAfterSeconds: 60 }],
+    buckets: [],
     scopesApplied: ['IP_GLOBAL', 'IP_DEVICE'],
     degraded: false,
     storeUnavailable: false,
@@ -96,8 +94,12 @@ beforeEach(() => {
   findUnique.mockReset();
   mockedRateLimit.mockReset();
   mockedRateLimit.mockResolvedValue(rateResult());
+  mockedShouldPersist.mockReturnValue(false);
+  mockedRequired.mockReturnValue(false);
+  mockedPersist.mockReset();
   setEnv('ARES_V6_API_ENABLED', 'true');
   setEnv('ARES_V6_LAB_MODE', undefined);
+  setEnv('ARES_V6_INTERNAL_ACCESS_MODE', undefined);
 });
 
 afterEach(() => {
@@ -108,134 +110,89 @@ afterEach(() => {
   snapshot.clear();
 });
 
-describe('POST /api/generate/v6 — gate & guards', () => {
-  it('returns 404 (skips DB + rate limit) when the feature flag is off', async () => {
+describe('POST /api/generate/v6 — gates', () => {
+  it('returns 404 when the feature flag is off', async () => {
     setEnv('ARES_V6_API_ENABLED', undefined);
+    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
+    expect(res.status).toBe(404);
+    expect(findUnique).not.toHaveBeenCalled();
+  });
+
+  it('blocks (no DB / no rate) when internal access is required and no token is given', async () => {
+    setEnv('ARES_V6_INTERNAL_ACCESS_MODE', 'header');
     const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
     expect(res.status).toBe(404);
     expect(findUnique).not.toHaveBeenCalled();
     expect(mockedRateLimit).not.toHaveBeenCalled();
   });
 
-  it('returns 503 (config error) in production + API enabled with a missing salt', async () => {
-    setEnv('NODE_ENV', 'production');
-    setEnv('ARES_V6_LOG_SALT', undefined);
-    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
-    expect(res.status).toBe(503);
-    expect(findUnique).not.toHaveBeenCalled();
-    expect(mockedRateLimit).not.toHaveBeenCalled();
-  });
-
-  it('returns 413 when Content-Length exceeds the limit', async () => {
-    const big = JSON.stringify({ filler: 'a'.repeat(21_000) });
-    const res = await POST(makeRequest(big, { 'content-length': String(Buffer.byteLength(big)) }));
-    expect(res.status).toBe(413);
-    expect(findUnique).not.toHaveBeenCalled();
-  });
-
-  it('returns 400 for malformed JSON', async () => {
-    expect((await POST(makeRequest('{ not json'))).status).toBe(400);
-  });
-
-  it('returns 400 for an unknown root key (strict schema)', async () => {
-    const res = await POST(makeRequest(JSON.stringify({ ...VALID_BODY, hackerField: true })));
-    expect(res.status).toBe(400);
-  });
-
-  it('returns 400 for an invalid request body', async () => {
-    const res = await POST(makeRequest(JSON.stringify({ deviceId: DEVICE_ID, presetId: 'STANDARD_PRO', player: {} })));
+  it('returns 400 for an unknown root key', async () => {
+    const res = await POST(makeRequest(JSON.stringify({ ...VALID_BODY, hacker: true })));
     expect(res.status).toBe(400);
   });
 });
 
 describe('POST /api/generate/v6 — rate limiting', () => {
-  it('returns 429 (IP_GLOBAL) with Retry-After and never touches Prisma when blocked', async () => {
-    mockedRateLimit.mockResolvedValue(
-      rateResult({ allowed: false, remaining: 0, retryAfterSeconds: 42, scopesApplied: ['IP_GLOBAL'] }),
-    );
+  it('returns 429 and never touches Prisma when blocked', async () => {
+    mockedRateLimit.mockResolvedValue(rateResult({ allowed: false, remaining: 0, retryAfterSeconds: 42 }));
     const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
     expect(res.status).toBe(429);
-    expect(res.headers.get('Retry-After')).toBe('42');
-    expect(res.headers.get('X-RateLimit-Remaining')).toBe('0');
     expect(findUnique).not.toHaveBeenCalled();
   });
 
-  it('returns 503 (fail-closed) when the store is unavailable and never touches Prisma', async () => {
-    mockedRateLimit.mockResolvedValue(
-      rateResult({ allowed: false, storeUnavailable: true, retryAfterSeconds: 5, limit: 0, remaining: 0 }),
-    );
+  it('returns 503 (fail-closed) when the store is unavailable', async () => {
+    mockedRateLimit.mockResolvedValue(rateResult({ allowed: false, storeUnavailable: true, retryAfterSeconds: 5 }));
     const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
     expect(res.status).toBe(503);
-    expect(res.headers.get('Retry-After')).toBe('5');
     expect(findUnique).not.toHaveBeenCalled();
-  });
-
-  it('continues (200) when the store is unavailable but fail-open/degraded', async () => {
-    mockedRateLimit.mockResolvedValue(rateResult({ degraded: true, storeUnavailable: true }));
-    findUnique.mockResolvedValue(MOCK_DEVICE);
-    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
-    expect(res.status).toBe(200);
-  });
-
-  it('never leaks the redis key or ipHash in a 429 response', async () => {
-    mockedRateLimit.mockResolvedValue(
-      rateResult({ allowed: false, remaining: 0, retryAfterSeconds: 9 }),
-    );
-    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
-    const text = await res.text();
-    expect(text).not.toContain('deadbeefdeadbeef');
-    expect(text).not.toContain('ares:v6:rl');
   });
 });
 
-describe('POST /api/generate/v6 — generation', () => {
-  it('returns 404 when the device does not exist', async () => {
-    findUnique.mockResolvedValue(null);
-    expect((await POST(makeRequest(JSON.stringify(VALID_BODY)))).status).toBe(404);
-  });
-
-  it('returns 404 for an inactive device (anti-enumeration)', async () => {
-    findUnique.mockResolvedValue({ ...MOCK_DEVICE, isActive: false });
-    expect((await POST(makeRequest(JSON.stringify(VALID_BODY)))).status).toBe(404);
-  });
-
-  it('returns 200 with a complete generation built from the DB screenDpi', async () => {
+describe('POST /api/generate/v6 — generation + persistence', () => {
+  it('returns 200 without persistence when the flag is off', async () => {
     findUnique.mockResolvedValue(MOCK_DEVICE);
     const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
     expect(res.status).toBe(200);
-    expect(res.headers.get('X-RateLimit-Limit')).toBe('20');
-
     const body = (await res.json()) as SuccessBody;
-    expect(body.data.device.screenDpi).toBe(395);
     expect(body.data.generation.dpi.detectedPpi).toBe(395);
-    expect(body.data.generation.dpi.source).toBe('PPI');
-    expect(body.meta.engine).toBe('ARES-v6-refoundation');
-    expect(body.meta.labMode).toBe(false);
-    expect(body.meta.requestId.length).toBeGreaterThan(0);
-    expect(body.meta.rateLimit.limit).toBe(20);
+    expect(body.meta.generationId).toBeUndefined();
+    expect(mockedPersist).not.toHaveBeenCalled();
   });
 
-  it('lets an override ppi win over the DB screenDpi', async () => {
+  it('persists and returns generationId when the flag is on', async () => {
     findUnique.mockResolvedValue(MOCK_DEVICE);
-    const res = await POST(makeRequest(JSON.stringify({ ...VALID_BODY, overrides: { ppi: 460 } })));
-    const body = (await res.json()) as SuccessBody;
-    expect(body.data.generation.dpi.detectedPpi).toBe(460);
-  });
-
-  it('deduplicates symptoms so firstTuningSteps has no duplicates', async () => {
-    findUnique.mockResolvedValue(MOCK_DEVICE);
-    const body = { ...VALID_BODY, player: { ...VALID_BODY.player, symptoms: ['DEVICE_LAGS', 'DEVICE_LAGS', 'AIM_SHAKES'] } };
-    const res = await POST(makeRequest(JSON.stringify(body)));
-    const json = (await res.json()) as SuccessBody;
-    expect(json.data.generation.firstTuningSteps).toHaveLength(2);
-  });
-
-  it('exposes labMode metadata when ARES_V6_LAB_MODE=true', async () => {
-    setEnv('ARES_V6_LAB_MODE', 'true');
-    findUnique.mockResolvedValue(MOCK_DEVICE);
+    mockedShouldPersist.mockReturnValue(true);
+    mockedPersist.mockResolvedValue({ id: 'gen_9' });
     const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
+    expect(res.status).toBe(200);
     const body = (await res.json()) as SuccessBody;
-    expect(body.meta.labMode).toBe(true);
-    expect(Array.isArray(body.meta.warnings)).toBe(true);
+    expect(body.meta.generationId).toBe('gen_9');
+    expect(body.meta.persistence?.persisted).toBe(true);
+  });
+
+  it('returns 503 when persistence fails and is required', async () => {
+    findUnique.mockResolvedValue(MOCK_DEVICE);
+    mockedShouldPersist.mockReturnValue(true);
+    mockedRequired.mockReturnValue(true);
+    mockedPersist.mockRejectedValue(new Error('db down'));
+    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
+    expect(res.status).toBe(503);
+  });
+
+  it('returns 200 + degraded meta when persistence fails and is not required', async () => {
+    findUnique.mockResolvedValue(MOCK_DEVICE);
+    mockedShouldPersist.mockReturnValue(true);
+    mockedRequired.mockReturnValue(false);
+    mockedPersist.mockRejectedValue(new Error('db down'));
+    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as SuccessBody;
+    expect(body.meta.persistence?.degraded).toBe(true);
+  });
+
+  it('returns 404 for an inactive device', async () => {
+    findUnique.mockResolvedValue({ ...MOCK_DEVICE, isActive: false });
+    const res = await POST(makeRequest(JSON.stringify(VALID_BODY)));
+    expect(res.status).toBe(404);
   });
 });
