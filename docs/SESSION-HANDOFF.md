@@ -12,7 +12,7 @@
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
 - Tests: **239** = **228 unit** (28 archivos; smoke saltado en el gate) + **11 real-infra smoke** (Redis + Postgres reales, validado local).
-- CI: ver run id en `docs/phase-3C/INTERNAL-CONTROLLED-ACTIVATION-VALIDATION.md` (§4).
+- CI: run **26803272532** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke` ambos success). PR #1 OPEN · DRAFT · **MERGEABLE**.
 
 ---
 

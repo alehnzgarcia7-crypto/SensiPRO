@@ -63,7 +63,15 @@ Cubre: limiter atómico Redis (count/TTL/IP_DEVICE/IP_GLOBAL), Prisma activo/ina
 
 ## 4. Resultado de CI
 
-> **Pendiente de registrar tras el push.** Se actualiza con los run ids/conclusión de `Phase 0.1B ARES v6 Gate` y `ARES v6 Real-Infra Smoke` (+ validez sintáctica del workflow manual `ares-v6-internal-lab.yml`).
+Commit `7f2ecff` · GitHub Actions run **26803272532** → conclusión **success**
+([link](https://github.com/alehnzgarcia7-crypto/SensiPRO/actions/runs/26803272532)).
+
+- `Phase 0.1B ARES v6 Gate`: **success** (lint + tsc + vitest sobre engine-v6 + lib + generate/v6 + feedback/v6 + lab/v6).
+- `ARES v6 Real-Infra Smoke`: **success** — Postgres 16 + Redis 7 service containers; db:push:test (incl. `ares_v6_*`) → seed → vitest **11 passed** (limiter atómico, Prisma activo/inactivo/inexistente, ruta 200/404/429, persistencia, feedback 201/409, métricas, cleanup dry-run).
+- `Legacy Audit non-blocking debt report`: **success** (no bloqueante).
+- `E2E Tests`: **skipped**.
+- PR #1: OPEN · DRAFT · **MERGEABLE**.
+- Workflow manual `ares-v6-internal-lab.yml`: YAML válido (parse OK), `workflow_dispatch` únicamente (no corre en push/PR).
 
 ---
 
