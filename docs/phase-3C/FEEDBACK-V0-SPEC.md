@@ -8,6 +8,8 @@
 
 `POST /api/feedback/v6` — OFF por defecto (`ARES_V6_WRITE_FEEDBACK !== 'true'` ⇒ 404). Internal-access obligatorio. Rate-limit propio (namespace `fb`) **antes** de cualquier escritura. Sin UI pública.
 
+> **Fase 3C.1:** un duplicado por carrera (Prisma `P2002` en el `@@unique`) se mapea a **409** (no 500) vía `isPrismaUniqueConstraintError(error: unknown)` — idempotente ante doble submit concurrente, sin filtrar detalle interno.
+
 ---
 
 ## 2. Contrato (Zod strict)

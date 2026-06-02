@@ -103,3 +103,42 @@ Ver §13 del reporte / el prompt sugerido: **Comparativa controlada legacy vs v6
 ## 8. Lo que NO se tocó (confirmado)
 
 Pagos, Stripe, MercadoPago, webhooks, auth, NextAuth, middleware, command-center, admin APIs, pricing, landing, academy, UI del generador, rutas legacy (`/api/generate`, `/all`, `/headshot`, `/export`). El schema sólo recibió modelos nuevos `ares_v6_*` (aditivos); ningún modelo existente fue modificado.
+
+---
+
+## 9. Fase 3C.1 — Security patch addendum
+
+**P0 corregido:** el internal access ya no dependía sólo de `ARES_V6_API_ENABLED`. Ahora **cualquier** superficie activa (`ARES_V6_WRITE_FEEDBACK`, `ARES_V6_LAB_METRICS_ENABLED`, `ARES_V6_PERSIST_GENERATIONS`, `ARES_V6_INTERNAL_ACCESS_ENABLED`, además de `API_ENABLED`) en producción exige token, y un modo `off`/`lab` explícito se **ignora** (forzado a `header`, marcado `unsafeModeIgnored`) en producción con superficie activa. Un flag mal puesto ya no puede exponer una superficie públicamente.
+
+### Cambios
+- `internal-access.ts`: `getAresV6EnabledSurfaces` / `isAresV6SurfaceEnabled` / `shouldRequireAresV6InternalAccess` / `getAresV6InternalAccessMode` + override de modo inseguro.
+- `internal-access-route.ts` (nuevo): `enforceAresV6InternalAccess` — chokepoint único en los 3 endpoints (log de denegación sin secretos + respuesta stealth).
+- `lab/v6/metrics`: rate-limit (bucket `metrics`) **antes** de la query; ventana por defecto 7d, máx 90d (`until<since` / rango>90d ⇒ 400); tope `ARES_V6_LAB_METRICS_MAX_ROWS = 10 000` con `orderBy createdAt desc`.
+- `feedback-service.ts`: `isPrismaUniqueConstraintError(error: unknown)`; `P2002` (carrera de duplicado) ⇒ **409** (antes 500).
+- `internal-env-preflight.ts` + `scripts/ares-v6-verify-internal-env.ts` (`npm run ares:v6:verify-env`): verificador de entorno (`--json` / `--strict` / `--for-workflow` / `--target local|preview`); seguridad = error en `preview`, warning en `local`; nunca imprime secretos.
+- Workflow manual: corre el preflight como paso **bloqueante**; inputs `enableFeedback` / `enableMetrics` / `persistGenerations`; env `INTERNAL_ACCESS_MODE=header`, `FAIL_MODE=closed`, `PROXY_TRUST_MODE=strict`; token nunca ecoado.
+- CI gate: eslint incluye `scripts/ares-v6-*.ts` (la deuda lint de scripts legacy queda fuera del gate bloqueante).
+
+### Tests (delta 3C.1)
+| Suite | Casos | Nota |
+|---|---:|---|
+| `internal-access.test.ts` (reescrito) | 12 | detección de superficies, require en prod, override off/lab, sin leak |
+| `internal-env-preflight.test.ts` (nuevo) | 7 | preview falla sin secrets; local degrada a warning; sin secretos impresos |
+| `feedback-service.test.ts` | 5 | +P2002 ⇒ `ConflictError` (409) |
+| `lab/v6/metrics/route.test.ts` (reescrito) | 9 | +429/503 sin DB, ventana 7d, rango>90d, until<since, key desconocida |
+| `real-infra.smoke.test.ts` (ampliado) | 12 | +token interno requerido (modo header) contra infra real |
+
+**Total v6: 258** — **246 unit** (28 archivos; smoke saltado en el gate) + **12 real-infra smoke**.
+
+### Comandos 3C.1 (local) y resultados
+```
+npx eslint <5 dirs v6> scripts/ares-v6-*.ts --ext .ts,.tsx → exit 0 (0 findings)
+npx tsc -p tsconfig.ares-v6.json                            → exit 0
+npx vitest run <5 dirs v6> --coverage=false                 → 246 passed | 12 skipped (29 files)
+real-infra.smoke (Postgres 16 + Redis 7 locales, DB efímera) → 12 passed
+npm run ares:v6:verify-env -- --json (local)               → passed:true, errors:0, warnings:6
+npm run ares:v6:verify-env -- --strict --target preview    → exit 1 (correcto: sin secrets no se activa)
+```
+
+### CI
+Run **<pendiente>** — actualizar con el id de GitHub Actions cuando cierre verde tras el push.

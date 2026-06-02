@@ -3,7 +3,7 @@
 **Fecha:** 2026-06-02
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3C + commit de este handoff)
+**HEAD:** (Fase 3C.1 — internal activation security patch P0)
 
 ---
 
@@ -11,8 +11,8 @@
 
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **239** = **228 unit** (28 archivos; smoke saltado en el gate) + **11 real-infra smoke** (Redis + Postgres reales, validado local).
-- CI: run **26803272532** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke` ambos success). PR #1 OPEN · DRAFT · **MERGEABLE**.
+- Tests: **258** = **246 unit** (28 archivos; smoke saltado en el gate) + **12 real-infra smoke** (Redis + Postgres reales, validado local).
+- CI 3C: run **26803272532** → success. **3C.1: pendiente de push** (actualizar id al cerrar verde). PR #1 OPEN · DRAFT · **MERGEABLE**.
 
 ---
 
@@ -31,6 +31,10 @@
   - **Lab runner + cleanup** (`scripts/ares-v6-internal-lab-runner.ts`, `…-lab-cleanup.ts`; `lab-runner.ts`, `lab-cleanup.ts`).
   - **Workflow manual** `.github/workflows/ares-v6-internal-lab.yml` (workflow_dispatch + environment `ares-v6-internal-lab`).
   - **Prisma**: 3 modelos aditivos (`AresV6Generation`, `AresV6Feedback`, `AresV6LabRun`) + migración `20260602000000_ares_v6_lab` (sólo CREATE).
+- **3C.1 — Internal Activation Security Patch (P0)** — `docs/phase-3C/…VALIDATION.md §9`:
+  - **Cualquier** superficie v6 activa en prod exige internal token (no sólo `API_ENABLED`); `off`/`lab` explícito se ignora (→ `header`, `unsafeModeIgnored`).
+  - `enforceAresV6InternalAccess` (chokepoint único en los 3 endpoints). Métricas: rate-limit (bucket `metrics`) + ventana 7d / máx 90d + tope 10k filas. Feedback `P2002` ⇒ **409**.
+  - Preflight `npm run ares:v6:verify-env` (`internal-env-preflight.ts` + `scripts/ares-v6-verify-internal-env.ts`) — **bloqueante** en el workflow manual; nunca imprime secretos.
 
 ---
 
@@ -52,6 +56,6 @@ Comparativa controlada **legacy vs v6** sobre evidencia TRUSTED + decisión de c
 
 ## Riesgos abiertos
 
-- Activación real necesita secrets del environment `ares-v6-internal-lab` (token hash, salt, DB/Redis URLs) — código + workflow listos, secrets pendientes del operador.
+- Activación real necesita secrets del environment `ares-v6-internal-lab` (token hash, salt, DB/Redis URLs) — código + workflow listos, secrets pendientes del operador. El environment debe **crearse y protegerse a mano** (required reviewers + prevent self-review); el preflight bloquea la activación si falta config.
 - `UNKNOWN_GLOBAL` cap compartido (3B). Cleanup sin cron (manual). Runner http depende de devices en la DB del target.
 - Hook Semgrep local falla por falta de `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).

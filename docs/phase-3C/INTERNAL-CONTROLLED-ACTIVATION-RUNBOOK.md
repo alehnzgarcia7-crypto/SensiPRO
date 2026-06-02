@@ -91,3 +91,22 @@ Cualquiera apaga su superficie al instante. `ARES_V6_API_ENABLED=false` ⇒ 404 
 - Lista de incidencias.
 - Decisión: continuar a Fase 3D o ajustar.
 - Cleanup: `npm run ares:v6:lab:cleanup -- --dry-run` (revisar) → `--execute` si procede.
+
+---
+
+## 7. Fase 3C.1 — Security patch (P0)
+
+**P0 corregido:** el internal access ya NO depende sólo de `ARES_V6_API_ENABLED`. **Cualquier** superficie activa en producción exige token, y un `ARES_V6_INTERNAL_ACCESS_MODE=off/lab` explícito se **ignora** (se fuerza `header`) en producción con superficie activa.
+
+Superficies que exigen internal access (cualquiera activa en prod): `ARES_V6_API_ENABLED`, `ARES_V6_WRITE_FEEDBACK`, `ARES_V6_LAB_METRICS_ENABLED`, `ARES_V6_PERSIST_GENERATIONS`, `ARES_V6_INTERNAL_ACCESS_ENABLED`.
+
+### Environment (manual y obligatorio)
+- El environment `ares-v6-internal-lab` **debe crearse y protegerse a mano** en GitHub — referenciarlo en el workflow NO lo protege por sí solo.
+- **Required reviewers** ≥ 1 y activar **prevent self-review** (el autor no aprueba su propia activación).
+- Secrets: `ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256`, `ARES_V6_INTERNAL_ACCESS_TOKEN`, `ARES_V6_LOG_SALT`, `DATABASE_URL`, `REDIS_URL`.
+- Vars: `ARES_V6_INTERNAL_ACCESS_MODE=header`, `ARES_V6_RATE_LIMIT_FAIL_MODE=closed`, `ARES_V6_PROXY_TRUST_MODE=strict`, + flags de superficie deseados.
+
+### Preflight obligatorio
+- Antes de activar: `npm run ares:v6:verify-env -- --strict --target preview` (o `--target local` para dry-run con motor).
+- El workflow manual corre el preflight como **paso bloqueante**: si el preflight falla, **no se activa nada**.
+- El preflight nunca imprime valores de secretos (sólo estados booleanos / nombres de modo).

@@ -64,3 +64,12 @@ Nearest-rank: `idx = ceil(p/100 * n) - 1` sobre el array ordenado; 0 si vacío. 
 
 - Script: `scripts/ares-v6-lab-cleanup.ts` (`--dry-run` por defecto, `--execute` borra).
 - **Sin cron automático** todavía (invocación manual).
+
+---
+
+## 7. Fase 3C.1 — Safety
+
+- **Rate limit:** `GET /api/lab/v6/metrics` se limita por bucket `metrics` (IP) **antes** de cualquier query; 429 si excede, 503 si el store cae en fail-closed.
+- **Ventana temporal:** sin `since` ⇒ `until - 7 días`; `until` por defecto = ahora. Rango **máximo 90 días**; `until < since` ⇒ 400; rango > 90d ⇒ 400. La meta de la respuesta incluye la ventana efectiva.
+- **Límite de filas:** cada tabla procesa máximo `ARES_V6_LAB_METRICS_MAX_ROWS = 10 000` (`orderBy createdAt desc`). Lab v0; los rollups SQL vienen después.
+- **Sin filas por API:** la respuesta sólo expone agregados — nunca filas individuales ni PII.
