@@ -12,7 +12,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 /** Bumped whenever a threshold value or the decision logic changes (OB53-versionable). */
-export const ARES_V6_EVIDENCE_THRESHOLDS_VERSION = '3D.1';
+export const ARES_V6_EVIDENCE_THRESHOLDS_VERSION = '3D.2';
 
 export interface AresV6EvidenceThresholds {
   /** Minimum TRUSTED feedback rows required per device×preset cell to judge it. */
@@ -91,10 +91,15 @@ export interface AresV6GoNoGoMetrics {
   highOrLabVerifiedRate: number;
   averageRating: number;
   worseOutcomeRate: number;
-  /** Legacy-vs-v6 rows flagged DANGEROUS by the comparator. Any > 0 blocks a GO. */
-  dangerousComparisonRows: number;
+  /** Legacy-vs-v6 rows flagged DANGEROUS (structural). Any > 0 blocks a GO. */
+  dangerousStructuralRows: number;
+  /** Legacy-vs-v6 rows flagged NEEDS_REVIEW (structural). Advisory warning only. */
+  reviewStructuralRows: number;
 
-  fixtureCoverage: number;
+  /** Real DB evidence breadth (gates GO). NOT the fixtures-only comparison coverage. */
+  evidenceFixtureCoverage: number;
+  /** Fixtures-only reference matrix breadth (informational only, no criterion). */
+  comparisonFixtureCoverage: number;
   feedbackCoverageRate: number;
   suspiciousFeedbackRate: number;
 }
@@ -164,8 +169,10 @@ export function evaluateAresV6GoNoGo(
       fail('totalTrustedFeedback', 'MORE_DATA', metrics.totalTrustedFeedback, thresholds.minTrustedFeedbackPerDevicePreset, 'lt'),
     );
   }
-  if (metrics.fixtureCoverage < thresholds.minFixtureCoverage) {
-    failed.push(fail('fixtureCoverage', 'MORE_DATA', metrics.fixtureCoverage, thresholds.minFixtureCoverage, 'lt'));
+  if (metrics.evidenceFixtureCoverage < thresholds.minFixtureCoverage) {
+    failed.push(
+      fail('evidenceFixtureCoverage', 'MORE_DATA', metrics.evidenceFixtureCoverage, thresholds.minFixtureCoverage, 'lt'),
+    );
   }
   if (metrics.feedbackCoverageRate < thresholds.minFeedbackCoverageRate) {
     failed.push(fail('feedbackCoverageRate', 'MORE_DATA', metrics.feedbackCoverageRate, thresholds.minFeedbackCoverageRate, 'lt'));
@@ -191,11 +198,14 @@ export function evaluateAresV6GoNoGo(
   if (metrics.worseOutcomeRate > thresholds.maxWorseOutcomeRate) {
     failed.push(fail('worseOutcomeRate', 'FIX_ENGINE', metrics.worseOutcomeRate, thresholds.maxWorseOutcomeRate, 'gt'));
   }
-  if (metrics.dangerousComparisonRows > 0) {
-    failed.push(fail('dangerousComparisonRows', 'FIX_ENGINE', metrics.dangerousComparisonRows, 0, 'gt'));
+  if (metrics.dangerousStructuralRows > 0) {
+    failed.push(fail('dangerousStructuralRows', 'FIX_ENGINE', metrics.dangerousStructuralRows, 0, 'gt'));
   }
 
   // ── Near-miss warnings (advisory, never change the decision).
+  if (metrics.reviewStructuralRows > 0) {
+    warnings.push(`${metrics.reviewStructuralRows} fila(s) NEEDS_REVIEW estructural(es) — revisión humana recomendada.`);
+  }
   if (
     metrics.suspiciousFeedbackRate <= thresholds.maxSuspiciousFeedbackRate &&
     metrics.suspiciousFeedbackRate > thresholds.maxSuspiciousFeedbackRate * (1 - WARN_MARGIN)

@@ -1,6 +1,11 @@
 import { ARES_V6_LATAM_CALIBRATION_FIXTURES } from '@ares/algorithms/engine-v6';
 
 import {
+  calculateComparisonFixtureCoverage,
+  calculateEvidenceFixtureCoverage,
+} from './evidence-fixture-coverage';
+import { getAresV6DevicePresetCounts, type AresV6DevicePresetCount } from './evidence-repository';
+import {
   evaluateAresV6GoNoGo,
   getDefaultAresV6EvidenceThresholds,
   type AresV6EvidenceThresholds,
@@ -11,29 +16,27 @@ import { getAresV6LabMetrics, type AresV6LabMetrics, type AresV6LabMetricsFilter
 import type { AresV6ComparisonRow } from './legacy-vs-v6-comparator';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Evidence snapshot builder (Fase 3D)
+// ARES v6 — Evidence snapshot builder (Fase 3D / 3D.1)
 //
 // Assembles a single auditable snapshot from: lab metrics, per device×preset
 // sample counts, TRUSTED feedback stats, the suspicious count, the (injected)
 // legacy-vs-v6 comparison and the GO/NO-GO verdict.
 //
-// SUSPICIOUS feedback is EXCLUDED from trusted metrics by default; pass
-// includeSuspicious only when explicitly auditing it. This module is LEGACY-FREE
-// at runtime: comparison rows are computed by the caller (CLI/endpoint) and
-// passed in (type-only comparator import), so the snapshot never bundles the
-// legacy engine. It never mutates the engine, presets or the research matrix.
+// 3D.1 integrity fixes:
+//   • EVIDENCE coverage (real DB) ≠ COMPARISON coverage (fixtures-only reference).
+//     GO/NO-GO gates on evidence coverage; comparison coverage only informs.
+//   • STRUCTURAL RISK (dangerous cascades) is a SEPARATE field, visible even when
+//     the decision is NO_GO_MORE_DATA — sample size can never hide a broken row.
+//
+// SUSPICIOUS feedback is EXCLUDED from trusted metrics by default. LEGACY-FREE at
+// runtime (type-only comparator import). Never mutates the engine/presets/matrix.
 // ═══════════════════════════════════════════════════════════════
 
-export const ARES_V6_EVIDENCE_SNAPSHOT_SCHEMA_VERSION = '3D.1';
+export const ARES_V6_EVIDENCE_SNAPSHOT_SCHEMA_VERSION = '3D.2';
 
-const TRUSTED_FIXTURE_COUNT = ARES_V6_LATAM_CALIBRATION_FIXTURES.length;
+const TOTAL_FIXTURES = ARES_V6_LATAM_CALIBRATION_FIXTURES.length;
 
-export interface AresV6DevicePresetCount {
-  deviceId: string;
-  presetId: string;
-  generations: number;
-  trustedFeedback: number;
-}
+export type { AresV6DevicePresetCount } from './evidence-repository';
 
 export interface AresV6TrustedFeedbackSummary {
   count: number;
@@ -60,6 +63,32 @@ export interface AresV6EvidenceComparisonSummary {
   byPreset: Record<string, { total: number; dangerous: number; needsReview: number }>;
 }
 
+export type AresV6StructuralRiskDecision = 'CLEAR' | 'REVIEW_REQUIRED' | 'BLOCKING';
+
+export interface AresV6StructuralRisk {
+  decision: AresV6StructuralRiskDecision;
+  dangerousRows: number;
+  needsReviewRows: number;
+  fallbackPpiRows: number;
+  noLegacyEquivalentRows: number;
+  rationale: string[];
+}
+
+/** Lightweight high-risk row WITHOUT legacy/v6 vectors or deltas (safe for endpoints). */
+export interface AresV6HighRiskSummaryRow {
+  fixtureId: string;
+  brand: string;
+  model: string;
+  presetId: AresV6ComparisonRow['presetId'];
+  ppi: number;
+  ppiSource: string;
+  expectedness: AresV6ComparisonRow['expectedness'];
+  requiresHumanReview: boolean;
+  rationale: string[];
+  legacyEquivalent: boolean;
+  fallbackPpi: boolean;
+}
+
 export interface AresV6EvidenceSnapshot {
   id?: string;
   schemaVersion: string;
@@ -70,12 +99,27 @@ export interface AresV6EvidenceSnapshot {
   goNoGo: AresV6GoNoGoResult;
   goNoGoInput: AresV6GoNoGoMetrics;
   metrics: AresV6LabMetrics;
-  fixtureCoverage: number;
-  coveredFixtures: number;
+
+  // ── Coverage (3D.1: evidence ≠ comparison) ──
+  /** Real DB evidence breadth (gates GO/NO-GO). */
+  evidenceFixtureCoverage: number;
+  evidenceCoveredFixtures: number;
+  /** Fixtures-only reference matrix breadth (informational only). */
+  comparisonFixtureCoverage: number;
+  comparisonCoveredFixtures: number;
   totalFixtures: number;
+  /** @deprecated alias of evidenceFixtureCoverage (kept for back-compat). */
+  fixtureCoverage: number;
+  /** @deprecated alias of evidenceCoveredFixtures. */
+  coveredFixtures: number;
+
+  // ── Structural risk (3D.1: separate from sample-size verdict) ──
+  structuralRisk: AresV6StructuralRisk;
+
   trustedFeedbackSummary: AresV6TrustedFeedbackSummary;
   comparisonSummary: AresV6EvidenceComparisonSummary;
   highRiskRows: AresV6ComparisonRow[];
+  highRiskSummaryRows: AresV6HighRiskSummaryRow[];
   insufficientEvidenceRows: AresV6DevicePresetCount[];
   recommendedNextActions: string[];
 }
@@ -190,8 +234,57 @@ function summarizeComparisonRows(rows: readonly AresV6ComparisonRow[]): AresV6Ev
   };
 }
 
-function distinctFixtureCount(rows: readonly AresV6ComparisonRow[]): number {
-  return new Set(rows.map((row) => row.fixtureId)).size;
+/** Structural risk over comparison rows. INDEPENDENT of sample size / GO-NO-GO. */
+export function computeAresV6StructuralRisk(rows: readonly AresV6ComparisonRow[]): AresV6StructuralRisk {
+  let dangerous = 0;
+  let needsReview = 0;
+  let fallback = 0;
+  let noLegacy = 0;
+  for (const row of rows) {
+    if (row.expectedness === 'DANGEROUS') dangerous += 1;
+    else if (row.expectedness === 'NEEDS_REVIEW') needsReview += 1;
+    if (row.fallbackPpi) fallback += 1;
+    if (!row.legacyEquivalent) noLegacy += 1;
+  }
+
+  const rationale: string[] = [];
+  let decision: AresV6StructuralRiskDecision = 'CLEAR';
+  if (dangerous > 0) {
+    decision = 'BLOCKING';
+    rationale.push(`${dangerous} fila(s) DANGEROUS estructural(es): cascada/relación de sliders inválida.`);
+  } else if (needsReview + fallback + noLegacy > 0) {
+    decision = 'REVIEW_REQUIRED';
+    if (needsReview > 0) rationale.push(`${needsReview} fila(s) NEEDS_REVIEW.`);
+    if (fallback > 0) rationale.push(`${fallback} fila(s) con PPI fallback.`);
+    if (noLegacy > 0) rationale.push(`${noLegacy} fila(s) sin equivalente legacy.`);
+  } else {
+    rationale.push('Sin riesgo estructural: todas las filas comparables son EXPECTED.');
+  }
+
+  return {
+    decision,
+    dangerousRows: dangerous,
+    needsReviewRows: needsReview,
+    fallbackPpiRows: fallback,
+    noLegacyEquivalentRows: noLegacy,
+    rationale,
+  };
+}
+
+function toHighRiskSummaryRow(row: AresV6ComparisonRow): AresV6HighRiskSummaryRow {
+  return {
+    fixtureId: row.fixtureId,
+    brand: row.brand,
+    model: row.model,
+    presetId: row.presetId,
+    ppi: row.ppi,
+    ppiSource: row.ppiSource,
+    expectedness: row.expectedness,
+    requiresHumanReview: row.requiresHumanReview,
+    rationale: row.rationale,
+    legacyEquivalent: row.legacyEquivalent,
+    fallbackPpi: row.fallbackPpi,
+  };
 }
 
 function highOrLabVerifiedRate(metrics: AresV6LabMetrics): number {
@@ -200,17 +293,18 @@ function highOrLabVerifiedRate(metrics: AresV6LabMetrics): number {
   return rate(high, metrics.totalGenerations);
 }
 
-/** Derive the flat GO/NO-GO input from metrics, cells, feedback and fixture coverage. */
+/** Derive the flat GO/NO-GO input. fixtureCoverage gates on EVIDENCE coverage. */
 export function deriveGoNoGoMetrics(params: {
   metrics: AresV6LabMetrics;
   counts: readonly AresV6DevicePresetCount[];
   feedback: AresV6TrustedFeedbackSummary;
-  fixtureCoverage: number;
+  evidenceFixtureCoverage: number;
+  comparisonFixtureCoverage: number;
+  structuralRisk: AresV6StructuralRisk;
   thresholds: AresV6EvidenceThresholds;
-  dangerousComparisonRows: number;
   generationErrorRate?: number;
 }): AresV6GoNoGoMetrics {
-  const { metrics, counts, feedback, fixtureCoverage, thresholds } = params;
+  const { metrics, counts, feedback, structuralRisk, thresholds } = params;
   const cells = summarizeEvidenceByDevicePreset(counts, thresholds);
   const insufficient = cells.filter((cell) => !cell.sufficient).length;
   const totalFeedbackWithSuspicious = metrics.totalFeedback + metrics.suspiciousFeedbackExcluded;
@@ -227,8 +321,10 @@ export function deriveGoNoGoMetrics(params: {
     highOrLabVerifiedRate: highOrLabVerifiedRate(metrics),
     averageRating: feedback.averageRating,
     worseOutcomeRate: feedback.worseRate,
-    dangerousComparisonRows: params.dangerousComparisonRows,
-    fixtureCoverage,
+    dangerousStructuralRows: structuralRisk.dangerousRows,
+    reviewStructuralRows: structuralRisk.needsReviewRows,
+    evidenceFixtureCoverage: params.evidenceFixtureCoverage,
+    comparisonFixtureCoverage: params.comparisonFixtureCoverage,
     feedbackCoverageRate: metrics.feedbackCoverageRate,
     suspiciousFeedbackRate: rate(metrics.suspiciousFeedbackExcluded, totalFeedbackWithSuspicious),
   };
@@ -236,10 +332,16 @@ export function deriveGoNoGoMetrics(params: {
 
 function buildNextActions(
   goNoGo: AresV6GoNoGoResult,
-  comparison: AresV6EvidenceComparisonSummary,
+  structuralRisk: AresV6StructuralRisk,
   insufficient: readonly AresV6DevicePresetCount[],
 ): string[] {
   const actions: string[] = [];
+  // Structural BLOCKING is surfaced FIRST, even under NO_GO_MORE_DATA.
+  if (structuralRisk.decision === 'BLOCKING') {
+    actions.push(
+      `URGENTE: ${structuralRisk.dangerousRows} fila(s) DANGEROUS estructural(es) — revisión HUMANA obligatoria antes de cualquier activación.`,
+    );
+  }
   for (const failed of goNoGo.failedCriteria) {
     switch (failed.criterion) {
       case 'totalTrustedFeedback':
@@ -250,8 +352,8 @@ function buildNextActions(
       case 'totalGenerations':
         actions.push(`Cubrir ${insufficient.length} celda(s) device×preset con muestra suficiente.`);
         break;
-      case 'fixtureCoverage':
-        actions.push('Ampliar la cobertura de fixtures en la comparación legacy-vs-v6.');
+      case 'evidenceFixtureCoverage':
+        actions.push('Ampliar la cobertura de EVIDENCIA real (más fixtures con generaciones persistidas).');
         break;
       case 'fallbackPpiRate':
         actions.push('Completar specs de PPI de los devices que caen en TIER_FALLBACK.');
@@ -264,6 +366,7 @@ function buildNextActions(
       case 'averageRating':
       case 'worseOutcomeRate':
       case 'highOrLabVerifiedRate':
+      case 'dangerousStructuralRows':
         actions.push('Abrir propuesta de calibración para revisión HUMANA (sin auto-aplicar).');
         break;
       case 'suspiciousFeedbackRate':
@@ -273,11 +376,8 @@ function buildNextActions(
         break;
     }
   }
-  if (comparison.dangerous > 0) {
-    actions.push(`Revisar ${comparison.dangerous} fila(s) DANGEROUS de la comparación legacy-vs-v6.`);
-  }
-  if (comparison.needsReview > 0) {
-    actions.push(`Revisar ${comparison.needsReview} fila(s) NEEDS_REVIEW.`);
+  if (structuralRisk.decision === 'REVIEW_REQUIRED') {
+    actions.push(`Revisar ${structuralRisk.needsReviewRows + structuralRisk.fallbackPpiRows + structuralRisk.noLegacyEquivalentRows} fila(s) NEEDS_REVIEW/fallback/sin-legacy.`);
   }
   if (actions.length === 0) {
     actions.push('Mantener OFF. La activación de UI experimental requiere decisión HUMANA explícita.');
@@ -303,51 +403,9 @@ export interface AresV6EvidenceSnapshotDeps {
   now(): number;
 }
 
-async function defaultGetDevicePresetCounts(
-  filter: AresV6LabMetricsFilter,
-  includeSuspicious: boolean,
-): Promise<AresV6DevicePresetCount[]> {
-  const { prisma } = await import('@ares/database');
-  const createdAt: { gte?: Date; lte?: Date } = {};
-  if (filter.since) createdAt.gte = filter.since;
-  if (filter.until) createdAt.lte = filter.until;
-  const where = {
-    ...(filter.since || filter.until ? { createdAt } : {}),
-    ...(filter.deviceId ? { deviceId: filter.deviceId } : {}),
-    ...(filter.presetId ? { presetId: filter.presetId } : {}),
-  };
-
-  const [generations, feedback] = await Promise.all([
-    prisma.aresV6Generation.groupBy({ by: ['deviceId', 'presetId'], _count: { _all: true }, where }),
-    prisma.aresV6Feedback.groupBy({
-      by: ['deviceId', 'presetId'],
-      _count: { _all: true },
-      where: { ...where, ...(includeSuspicious ? {} : { qualityFlag: { not: 'SUSPICIOUS' } }) },
-    }),
-  ]);
-
-  const cells = new Map<string, AresV6DevicePresetCount>();
-  for (const row of generations) {
-    const key = `${row.deviceId}:${row.presetId}`;
-    cells.set(key, { deviceId: row.deviceId, presetId: row.presetId, generations: row._count._all, trustedFeedback: 0 });
-  }
-  for (const row of feedback) {
-    const key = `${row.deviceId}:${row.presetId}`;
-    const existing = cells.get(key) ?? {
-      deviceId: row.deviceId,
-      presetId: row.presetId,
-      generations: 0,
-      trustedFeedback: 0,
-    };
-    existing.trustedFeedback = row._count._all;
-    cells.set(key, existing);
-  }
-  return [...cells.values()];
-}
-
 const DEFAULT_DEPS: AresV6EvidenceSnapshotDeps = {
   getMetrics: getAresV6LabMetrics,
-  getDevicePresetCounts: defaultGetDevicePresetCounts,
+  getDevicePresetCounts: getAresV6DevicePresetCounts,
   now: () => Date.now(),
 };
 
@@ -373,23 +431,35 @@ export async function buildAresV6EvidenceSnapshot(
 
   const trustedFeedbackSummary = calculateTrustedFeedbackStats(metrics);
   const comparisonSummary = summarizeComparisonRows(comparisonRows);
-  const coveredFixtures = distinctFixtureCount(comparisonRows);
-  const fixtureCoverage = TRUSTED_FIXTURE_COUNT > 0 ? rate(coveredFixtures, TRUSTED_FIXTURE_COUNT) : 0;
+  const structuralRisk = computeAresV6StructuralRisk(comparisonRows);
+
+  // Two DIFFERENT coverages (the 3D.1 fix).
+  const evidenceCoverage = calculateEvidenceFixtureCoverage(counts);
+  const comparisonCoverage = calculateComparisonFixtureCoverage(comparisonRows);
 
   const goNoGoInput = deriveGoNoGoMetrics({
     metrics,
     counts,
     feedback: trustedFeedbackSummary,
-    fixtureCoverage,
+    evidenceFixtureCoverage: evidenceCoverage.coverage,
+    comparisonFixtureCoverage: comparisonCoverage.coverage,
+    structuralRisk,
     thresholds,
-    dangerousComparisonRows: comparisonSummary.dangerous,
     generationErrorRate: input.generationErrorRate,
   });
   const goNoGo = evaluateAresV6GoNoGo(goNoGoInput, thresholds);
 
   const insufficientEvidenceRows = summarizeEvidenceByDevicePreset(counts, thresholds)
     .filter((cell) => !cell.sufficient)
-    .map(({ deviceId, presetId, generations, trustedFeedback }) => ({ deviceId, presetId, generations, trustedFeedback }));
+    .map(({ deviceId, presetId, generations, trustedFeedback, deviceBrand, deviceModel, deviceSlug }) => ({
+      deviceId,
+      presetId,
+      generations,
+      trustedFeedback,
+      deviceBrand,
+      deviceModel,
+      deviceSlug,
+    }));
 
   const highRiskRows = comparisonRows.filter((row) => row.requiresHumanReview);
 
@@ -402,13 +472,19 @@ export async function buildAresV6EvidenceSnapshot(
     goNoGo,
     goNoGoInput,
     metrics,
-    fixtureCoverage,
-    coveredFixtures,
-    totalFixtures: TRUSTED_FIXTURE_COUNT,
+    evidenceFixtureCoverage: evidenceCoverage.coverage,
+    evidenceCoveredFixtures: evidenceCoverage.coveredFixtures,
+    comparisonFixtureCoverage: comparisonCoverage.coverage,
+    comparisonCoveredFixtures: comparisonCoverage.coveredFixtures,
+    totalFixtures: TOTAL_FIXTURES,
+    fixtureCoverage: evidenceCoverage.coverage,
+    coveredFixtures: evidenceCoverage.coveredFixtures,
+    structuralRisk,
     trustedFeedbackSummary,
     comparisonSummary,
     highRiskRows: [...highRiskRows],
+    highRiskSummaryRows: highRiskRows.map(toHighRiskSummaryRow),
     insufficientEvidenceRows,
-    recommendedNextActions: buildNextActions(goNoGo, comparisonSummary, insufficientEvidenceRows),
+    recommendedNextActions: buildNextActions(goNoGo, structuralRisk, insufficientEvidenceRows),
   };
 }
