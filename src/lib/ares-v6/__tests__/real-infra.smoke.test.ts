@@ -347,23 +347,59 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
       expect(Object.keys(body.data.comparisonSummary.byPreset)).toEqual(['STANDARD_PRO']);
     });
 
-    it('endpoint default response excludes legacy/v6 vectors and deltas (summary rows only)', async () => {
+    it('endpoint default response excludes vectors/deltas and exposes coverage + structuralRisk', async () => {
       const res = await evidenceGet(evidenceRequest('?includeLegacyCompare=true', uniqueIp(53)));
       expect(res.status).toBe(200);
-      const body = (await res.json()) as { data: { highRiskRows?: unknown; highRiskSummaryRows?: unknown[] } };
+      const body = (await res.json()) as {
+        data: {
+          highRiskRows?: unknown;
+          highRiskSummaryRows?: unknown[];
+          evidenceFixtureCoverage?: number;
+          comparisonFixtureCoverage?: number;
+          structuralRisk?: { decision?: string };
+          fixtureCoverage?: number;
+        };
+      };
       expect(body.data.highRiskRows).toBeUndefined();
       expect(Array.isArray(body.data.highRiskSummaryRows)).toBe(true);
       const serialized = JSON.stringify(body.data.highRiskSummaryRows ?? []);
       expect(serialized).not.toContain('"deltas"');
+      expect(serialized).not.toContain('"relativeDeltas"');
       expect(serialized).not.toContain('"source":"LEGACY"');
+      // 3D.1B: coverage split + structural risk exposed; alias mirrors evidence.
+      expect(typeof body.data.evidenceFixtureCoverage).toBe('number');
+      expect(body.data.comparisonFixtureCoverage).toBeGreaterThan(0);
+      expect(body.data.structuralRisk?.decision).toBeTruthy();
+      expect(body.data.fixtureCoverage).toBe(body.data.evidenceFixtureCoverage);
     });
 
-    it('endpoint includeRows=true returns full rows capped at 100', async () => {
+    it('endpoint includeRows=true returns full rows capped at 100 with rows meta', async () => {
       const res = await evidenceGet(evidenceRequest('?includeLegacyCompare=true&includeRows=true', uniqueIp(54)));
       expect(res.status).toBe(200);
-      const body = (await res.json()) as { data: { highRiskRows?: unknown[] } };
+      const body = (await res.json()) as {
+        data: { highRiskRows?: unknown[]; highRiskSummaryRows?: unknown };
+        meta: { rowsIncluded?: boolean; rowsLimit?: number };
+      };
       expect(Array.isArray(body.data.highRiskRows)).toBe(true);
       expect((body.data.highRiskRows ?? []).length).toBeLessThanOrEqual(100);
+      expect(body.data.highRiskSummaryRows).toBeUndefined();
+      expect(body.meta.rowsIncluded).toBe(true);
+      expect(body.meta.rowsLimit).toBe(100);
+    });
+
+    it('endpoint compareScope=all ignores preset and warns (machine code)', async () => {
+      const res = await evidenceGet(
+        evidenceRequest('?includeLegacyCompare=true&presetId=STANDARD_PRO&compareScope=all', uniqueIp(56)),
+      );
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        data: { comparisonSummary: { byPreset: Record<string, unknown> } };
+        meta: { warnings?: string[]; compareScope?: string };
+      };
+      expect(body.meta.compareScope).toBe('all');
+      expect(body.meta.warnings).toContain('comparison_not_filtered_by_preset');
+      // compareScope=all => the matrix is NOT filtered to a single preset.
+      expect(Object.keys(body.data.comparisonSummary.byPreset).length).toBeGreaterThan(1);
     });
 
     it('endpoint rejects an invalid presetId with 400', async () => {

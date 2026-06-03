@@ -131,11 +131,11 @@ describe('3D.1 — compare-scope, summary-only, include-rows', () => {
     expect(report.warnings).toHaveLength(0);
   });
 
-  it('compare-scope=all ignores the preset filter and warns', async () => {
+  it('compare-scope=all ignores the preset filter and warns (machine code)', async () => {
     const report = await runAresV6EvidenceReview(options({ presetId: 'STANDARD_PRO', compareScope: 'all' }), deps);
     const presets = new Set(report.comparisonRows.map((row) => row.presetId));
     expect(presets.size).toBeGreaterThan(1);
-    expect(report.warnings.join(' ')).toContain('NO está filtrada por preset');
+    expect(report.warnings).toContain('comparison_not_filtered_by_preset');
   });
 
   it('--summary-only JSON omits full comparison rows and full high-risk rows', async () => {

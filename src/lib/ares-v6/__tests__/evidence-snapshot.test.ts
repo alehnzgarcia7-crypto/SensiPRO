@@ -12,7 +12,7 @@ import {
 } from '../evidence-snapshot';
 import { getDefaultAresV6EvidenceThresholds } from '../evidence-thresholds';
 import type { AresV6LabMetrics } from '../lab-metrics';
-import type { AresV6ComparisonRow } from '../legacy-vs-v6-comparator';
+import { buildAresV6ComparisonMatrix, type AresV6ComparisonRow } from '../legacy-vs-v6-comparator';
 
 function makeMetrics(overrides: Partial<AresV6LabMetrics> = {}): AresV6LabMetrics {
   return {
@@ -131,6 +131,16 @@ describe('buildAresV6EvidenceSnapshot', () => {
     expect(snapshot.fixtureCoverage).toBe(snapshot.evidenceFixtureCoverage);
     expect(snapshot.coveredFixtures).toBe(snapshot.evidenceCoveredFixtures);
     expect(snapshot.generatedAt).toBe(new Date(0).toISOString());
+  });
+
+  it('full fixtures-only comparison gives comparisonFixtureCoverage=1 but evidenceFixtureCoverage=0', async () => {
+    const snapshot = await buildAresV6EvidenceSnapshot(
+      { comparisonRows: buildAresV6ComparisonMatrix({}) },
+      deps(makeMetrics(), sufficientCells()),
+    );
+    expect(snapshot.comparisonFixtureCoverage).toBe(1);
+    expect(snapshot.comparisonCoveredFixtures).toBe(snapshot.totalFixtures);
+    expect(snapshot.evidenceFixtureCoverage).toBe(0);
   });
 
   it('counts EVIDENCE coverage from fixture-known persisted cells', async () => {
