@@ -137,5 +137,5 @@ El route test es **infra-free** y CI-safe: verificado que pasa incluso sin Redis
 
 ### CI 3D.1
 
-- Run de Actions: **PENDIENTE** (se registra tras `gh run watch`).
-- `Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`: **PENDIENTE**.
+- Commit `f51e72a`. Run de Actions: **26855946578** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success**. `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, +5 tests de endpoint/cobertura). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
