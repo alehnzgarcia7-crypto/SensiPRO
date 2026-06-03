@@ -49,7 +49,10 @@ Tipos: `PPI_BAND_ADJUSTMENT`, `PRESET_BIAS_ADJUSTMENT`, `WEAPON_BIAS_ADJUSTMENT`
 | Infra no sana (`NO_GO_INFRA`) | `NO_CHANGE_RECOMMENDED` | `INFRA_UNHEALTHY` |
 | Feedback SUSPICIOUS dominante (> 0.2) | `NO_CHANGE_RECOMMENDED` | `SUSPICIOUS_FEEDBACK_DOMINANT` |
 | PPI fallback dominante (> 0.05) | `NO_CHANGE_RECOMMENDED` | `FALLBACK_PPI_DOMINANT` |
-| Muestra insuficiente (`NO_GO_MORE_DATA` / celdas bajas) | `NO_CHANGE_RECOMMENDED` | `INSUFFICIENT_SAMPLE` |
+| Muestra insuficiente (celdas device×preset bajo el piso) | `NO_CHANGE_RECOMMENDED` | `INSUFFICIENT_SAMPLE` |
+| Cobertura de EVIDENCIA real insuficiente (3D.1) | `NO_CHANGE_RECOMMENDED` | `EVIDENCE_COVERAGE_INSUFFICIENT` |
+| Riesgo estructural BLOCKING + datos insuficientes (3D.1) | `NO_CHANGE_RECOMMENDED` | `STRUCTURAL_RISK_REVIEW_REQUIRED` (+ sample/coverage) |
+| Riesgo estructural BLOCKING + evidencia suficiente (3D.1) | `PENDING_HUMAN_REVIEW` | — |
 | Evidencia buena (`GO`), deltas esperados | `NO_CHANGE_RECOMMENDED` | — |
 | `NO_GO_FIX_ENGINE` con muestra limpia | `PENDING_HUMAN_REVIEW` | — |
 

@@ -132,6 +132,8 @@ Tras una corrida interna (sección 4), generar el **tribunal de evidencia**. Nad
 ### Endpoint opcional (READ-ONLY)
 `GET /api/lab/v6/evidence` tras `ARES_V6_LAB_EVIDENCE_ENABLED=true` (es **surface flag** 3C.1 ⇒ exige internal token en prod). Kill switch: ponerlo en `false` ⇒ 404 total.
 
+Query (3D.1): `presetId` validado contra `ARES_V6_PRESETS` (400 si inválido); `compareScope=filtered` (default, filtra la comparación por preset) | `all` (ignora + warning); `includeLegacyCompare`; `includeRows=false` (default ⇒ `highRiskSummaryRows` sin vectores/deltas) | `true` (interno ⇒ filas completas cap 100); `includeSuspicious`. Respuesta separa `evidenceFixtureCoverage` (gatea GO) de `comparisonFixtureCoverage` (informativo) y expone `structuralRisk` (CLEAR/REVIEW_REQUIRED/BLOCKING). Detalle: `docs/phase-3D/EVIDENCE-INTEGRITY-PATCH.md`.
+
 ### Reglas duras
 - Ninguna propuesta se aplica automáticamente (`autoApplyAllowed:false` siempre).
 - Muestra insuficiente / SUSPICIOUS dominante / PPI fallback dominante / infra no sana ⇒ `NO_CHANGE_RECOMMENDED` (bloqueada).

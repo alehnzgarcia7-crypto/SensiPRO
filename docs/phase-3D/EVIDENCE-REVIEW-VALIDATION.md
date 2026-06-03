@@ -101,3 +101,41 @@ Con GO/NO-GO en verde sobre evidencia interna real, evaluar **UI experimental oc
 ## 8. Lo que NO se tocó (confirmado)
 
 pagos/Stripe/MercadoPago/webhooks, auth/NextAuth, middleware, command-center, admin, pricing, landing, academy, UI del generador, rutas legacy (`/api/generate`, `/all`, `/headshot`, `/export`), engine/presets/research-matrix de v6, y el motor legacy (solo lectura vía adapter). Schema sin cambios (sin modelo de propuestas). Sin deployment público.
+
+---
+
+## 9. Fase 3D.1 — Evidence integrity patch (addendum)
+
+Ver `EVIDENCE-INTEGRITY-PATCH.md`. Cambios: cobertura **evidencia** vs **comparación** separada (GO gatea en evidencia); `structuralRisk` (CLEAR/REVIEW_REQUIRED/BLOCKING) separado del GO/NO-GO y visible bajo MORE_DATA; endpoint con `presetId` validado contra `ARES_V6_PRESETS`, `compareScope=filtered|all`, `includeRows` (default `false` ⇒ summary rows sin vectores/deltas, `true` ⇒ cap 100); CLI con `--compare-scope` / `--include-rows` / `--summary-only`; versiones snapshot/thresholds/report/proposal **3D.2**; `evidence-repository.ts` + `evidence-fixture-coverage.ts`; nuevos bloqueos de propuesta `EVIDENCE_COVERAGE_INSUFFICIENT` / `STRUCTURAL_RISK_REVIEW_REQUIRED`.
+
+### Tests (delta 3D.1)
+
+| Suite | Casos | Tipo |
+|---|---|---|
+| `evidence-fixture-coverage.test.ts` | 6 | unit (nuevo) |
+| `evidence/__tests__/route.test.ts` | 4 | unit (nuevo, infra-free: 404 flag-off + 400 validación) |
+| `evidence-thresholds.test.ts` | +1 (coverage split) | unit |
+| `evidence-snapshot.test.ts` | reescrito (coverage split + structuralRisk + summary rows) | unit |
+| `calibration-proposals.test.ts` | +3 (structural/coverage gates) | unit |
+| `evidence-review-cli.test.ts` | +5 (compare-scope/summary-only) | unit |
+| `real-infra.smoke.test.ts` | +5 (coverage real + endpoint filtro/summary/includeRows/400) | smoke |
+
+Total v6: **338** = **320 unit** + **18 real-infra smoke** (antes 310 = 297 + 13).
+
+### Comandos 3D.1 (local) y resultados
+
+```bash
+npx tsc -p tsconfig.ares-v6.json                                                                  # 0 errores
+npx eslint <5 dirs v6> scripts/ares-v6-*.ts --ext .ts,.tsx                                         # 0 errores
+npx vitest run <engine-v6 + src/lib/ares-v6 + generate/v6 + feedback/v6 + lab/v6> --coverage=false # 320 passed, 18 skipped
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json                 # structuralRisk=REVIEW_REQUIRED, evCov=0, cmpCov=1, sin rows completas/deltas
+# real-infra smoke (DB efímera): 18 passed. Verificado: evidenceFixtureCoverage>0 con devices fixture-known;
+# endpoint filtra por preset; default sin vectores/deltas; includeRows=true cap 100; invalid preset => 400.
+```
+
+El route test es **infra-free** y CI-safe: verificado que pasa incluso sin Redis (fail-open). El resto del endpoint (200 path, filtro, summary, includeRows) se valida en el real-infra smoke.
+
+### CI 3D.1
+
+- Run de Actions: **PENDIENTE** (se registra tras `gh run watch`).
+- `Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`: **PENDIENTE**.

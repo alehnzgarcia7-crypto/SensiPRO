@@ -5,6 +5,8 @@
 
 > Fase 3D compara legacy vs ARES v6, cruza evidencia interna TRUSTED y produce propuestas de calibración que un humano debe aprobar. **Ninguna propuesta se aplica automáticamente.** El motor, los presets y la research-matrix NO se modifican.
 
+> **Fase 3D.1 (integrity patch):** cobertura de **evidencia** (DB) ≠ cobertura de **comparación** (fixtures-only); el riesgo **estructural** es un campo separado y nunca queda oculto bajo falta de muestra; el endpoint filtra por preset y no devuelve filas crudas por default. Detalle en `EVIDENCE-INTEGRITY-PATCH.md`.
+
 ---
 
 ## 1. Por qué existe Fase 3D

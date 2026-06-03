@@ -3,7 +3,7 @@
 **Fecha:** 2026-06-02
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3D — Evidence Review & Human-Gated Calibration Governance)
+**HEAD:** (Fase 3D.1 — Evidence Integrity Patch + Decision Semantics Hardening)
 
 ---
 
@@ -11,8 +11,8 @@
 
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **310** = **297 unit** (34 archivos; smoke saltado en el gate) + **13 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
-- CI 3D: run **26845969669** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`). PR #1 OPEN · DRAFT · **MERGEABLE** (CLEAN).
+- Tests: **338** = **320 unit** (37 archivos; smoke saltado en el gate) + **18 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
+- CI 3D.1: run **PENDIENTE** (se registra tras `gh run watch`). Base 3D: run **26845969669** → success. PR #1 OPEN · DRAFT · esperado **MERGEABLE**.
 
 ---
 
@@ -41,6 +41,11 @@
   - **Propuestas human-gated** (`calibration-proposals.ts`): `autoApplyAllowed:false` SIEMPRE; gates infra/muestra/suspicious/fallback; artefacto JSON (sin modelo Prisma). **El feedback NUNCA recalibra el motor.**
   - **CLI** `npm run ares:v6:evidence` (`scripts/ares-v6-evidence-review.ts` + `evidence-review-cli.ts`): JSON/markdown, safe dry-run, sin tokens/PII.
   - **Endpoint opcional** `GET /api/lab/v6/evidence` (READ-ONLY, OFF por defecto). **Workflow manual** ampliado + gate sube `ares-v6-evidence-summary.json`/`.md`.
+- **3D.1 — Evidence Integrity Patch** — `docs/phase-3D/EVIDENCE-INTEGRITY-PATCH.md`:
+  - **Cobertura separada:** `evidenceFixtureCoverage` (DB real, gatea GO) vs `comparisonFixtureCoverage` (fixtures-only, informativo). `fixtureCoverage`/`coveredFixtures` quedan como alias deprecated de evidencia. Nuevos `evidence-fixture-coverage.ts` + `evidence-repository.ts` (counts con brand/model/slug).
+  - **Riesgo estructural** (`structuralRisk`: CLEAR/REVIEW_REQUIRED/BLOCKING) separado del GO/NO-GO; **visible aunque la decisión sea MORE_DATA** y primero en next-actions.
+  - **Endpoint**: `presetId` validado contra `ARES_V6_PRESETS` (400); `compareScope=filtered|all`; `includeRows` (default false ⇒ `highRiskSummaryRows` sin vectores/deltas; true ⇒ cap 100). CLI: `--compare-scope`/`--include-rows`/`--summary-only`.
+  - **Propuestas**: nuevos bloqueos `EVIDENCE_COVERAGE_INSUFFICIENT` / `STRUCTURAL_RISK_REVIEW_REQUIRED`. Versiones snapshot/thresholds/report/proposal **3D.2**. `autoApplyAllowed:false` invariante.
 
 ---
 
