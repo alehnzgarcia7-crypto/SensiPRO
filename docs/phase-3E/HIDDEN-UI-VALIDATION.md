@@ -24,8 +24,8 @@
 | 13 | Propuestas: `humanReviewRequired` y `autoApplyAllowed=false` | ✅ (test) |
 | 14 | Sin JSON crudo como UI primaria | ✅ (cards/barras/badges) |
 | 15 | Tests de servicio/componentes/seguridad | ✅ (45 nuevos) |
-| 16 | CI verde | ⏳ (run id en §5 tras push) |
-| 17 | PR mergeable | ⏳ (confirmar tras CI) |
+| 16 | CI verde | ✅ (run **26919718496** → success) |
+| 17 | PR mergeable | ✅ (OPEN · DRAFT · **MERGEABLE** · CLEAN) |
 | 18 | No se tocó legacy/pagos/auth/middleware/engine | ✅ (diff 100% aditivo) |
 
 ---
@@ -104,11 +104,11 @@ Resultado evidencia (fixtures-only, consistente con la UI):
 
 ## 5. CI
 
-- Commits: ver `git log`.
-- Run de Actions: **<PENDIENTE — se sella tras push>**.
-- `Phase 0.1B ARES v6 Gate` (gate lint/tsc/test ahora cubre `src/app/internal/ares-v6` +
-  `src/components/ares-v6-lab`). `ARES v6 Real-Infra Smoke`. `Legacy Audit` (no bloqueante).
-- PR #1: OPEN · DRAFT · **MERGEABLE** (a confirmar tras CI).
+- Commits: `ddbb3e7` (backend), `cbab70e` (componentes), `c5a836b` (ruta), `4b8db90` (CI wiring), `d8c8c5f` (docs).
+- Run de Actions: **26919718496** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success** (gate lint/tsc/test ahora cubre `src/app/internal/ares-v6` +
+  `src/components/ares-v6-lab`). `ARES v6 Real-Infra Smoke`: **success**. `Legacy Audit`: success (no bloqueante). `E2E Tests`: skipped (main-only).
+- PR #1: OPEN · DRAFT · **MERGEABLE** (CLEAN).
 
 ---
 
