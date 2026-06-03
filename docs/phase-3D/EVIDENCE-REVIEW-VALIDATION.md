@@ -139,3 +139,40 @@ El route test es **infra-free** y CI-safe: verificado que pasa incluso sin Redis
 
 - Commit `f51e72a`. Run de Actions: **26855946578** → **success**.
 - `Phase 0.1B ARES v6 Gate`: **success**. `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, +5 tests de endpoint/cobertura). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
+
+---
+
+## 10. Fase 3D.1B — Endpoint contract patch (addendum)
+
+Ver `EVIDENCE-INTEGRITY-PATCH.md §8`. La 3D.1 implementó el contrato del endpoint y lo validó en smoke real, pero el route duplicaba el schema, usaba warning de string humano, no tenía `meta.rowsIncluded/rowsLimit/rowsTruncated`, y **sólo tenía tests 404/400** (el path 200 sólo en smoke). 3D.1B cierra esto:
+
+- `evidence-query-schema.ts`: contrato compartido (`parseAresV6EvidenceQuery`/`normalizeAresV6EvidenceQuery`), enum real de preset, ventana acotada, warning **máquina** `comparison_not_filtered_by_preset`.
+- `evidence-route-service.ts`: `selectAresV6ComparisonRows`/`sanitizeAresV6EvidenceResponse`/`buildAresV6EvidenceRoutePayload` con deps inyectables → el route es un shell delgado y el **path 200 se prueba sin DB/Redis**.
+- Route + CLI comparten el mismo código de warning y semántica.
+
+### Tests (delta 3D.1B)
+
+| Suite | Casos | Tipo | Mata el falso positivo porque |
+|---|---|---|---|
+| `evidence-query-schema.test.ts` | 9 | unit (nuevo) | `compareScope=sideways` → `field='compareScope'` (sólo si es enum reconocido, no unknown key). |
+| `evidence-route-service.test.ts` | 8 | unit (nuevo) | prueba que el comparador se llama con `{presetId}` vs `{}`, que el default no devuelve vectores/deltas, que `includeRows` cap 100 — **comportamiento 200, sin infra**. |
+| `evidence-snapshot.test.ts` | +1 | unit | full matrix → `comparisonFixtureCoverage=1`, `evidenceFixtureCoverage=0`. |
+| `evidence-review-cli.test.ts` | warning → código máquina | unit | — |
+| `real-infra.smoke.test.ts` | +1 (compareScope=all warning) + coverage/meta | smoke | endpoint 200 real con warning + `meta.rowsLimit`. |
+
+Total v6: **357** = **338 unit** + **19 real-infra smoke** (antes 338 = 320 + 18).
+
+### Comandos 3D.1B (local) y resultados
+
+```bash
+npx tsc -p tsconfig.ares-v6.json                                                                    # 0
+npx eslint <5 dirs v6> scripts/ares-v6-*.ts --ext .ts,.tsx                                           # 0
+npx vitest run <engine-v6 + src/lib/ares-v6 + generate/v6 + feedback/v6 + lab/v6> --coverage=false   # 338 passed, 19 skipped
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json                   # sin rows completas, sin secretos
+# CLI --preset STANDARD_PRO --compare-scope all => warnings ["comparison_not_filtered_by_preset"], 15 presets.
+# real-infra smoke (DB efímera): 19 passed (endpoint compareScope=all warning + coverage + meta rows).
+```
+
+### CI 3D.1B
+
+- Run de Actions: **PENDIENTE** (se registra tras `gh run watch`).

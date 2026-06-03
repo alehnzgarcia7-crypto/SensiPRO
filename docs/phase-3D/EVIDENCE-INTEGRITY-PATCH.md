@@ -89,3 +89,29 @@ El tribunal sólo **recomienda** (GO/NO-GO), **bloquea** (gates de propuesta) o 
 Antes, `cmpCov=1` (referencia) podía leerse como cobertura suficiente y abrir la puerta a un GO falso. Con 3D.1, **sólo evidencia real** (generaciones persistidas que mapean a fixtures) cuenta para `minFixtureCoverage`. Sin lab interno activado, `evidenceFixtureCoverage=0` ⇒ `NO_GO_MORE_DATA` por diseño. La UI experimental (Fase 3E) sólo se evalúa cuando hay evidencia real suficiente y la decisión sigue siendo humana.
 
 Versiones bumpeadas: snapshot/thresholds/report/proposal `3D.1 → 3D.2`. `fixtureCoverage`/`coveredFixtures` quedan como alias **deprecated** de los campos de evidencia (back-compat sin mantener la semántica vieja en silencio).
+
+---
+
+## 8. 3D.1B — Endpoint Contract Patch (honestidad)
+
+**Qué pasó:** la 3D.1 SÍ implementó en el route `presetId` (enum real), `compareScope=filtered|all` y `includeRows`, y el filtrado/summary se validó contra **infra real** (real-infra smoke). PERO el route tenía 4 debilidades que abrían superficie a falsos positivos, y se cierran en 3D.1B:
+
+| Debilidad 3D.1 | Fix 3D.1B |
+|---|---|
+| Query schema **duplicado** entre route y CLI. | Contrato compartido `evidence-query-schema.ts` (`parseAresV6EvidenceQuery`/`normalizeAresV6EvidenceQuery`) — única fuente de verdad. |
+| Warning como **string humano**. | Código **máquina** `comparison_not_filtered_by_preset` (cliente puede ramificar). |
+| Tests del route **sólo 404/400** (el path 200 sólo se probaba en smoke con DB/Redis). | `evidence-route-service.ts` (testeable con deps inyectables) + `evidence-route-service.test.ts` que **prueban el path 200 sin infra**: que `buildAresV6ComparisonMatrix` se llama con `{presetId}` vs `{}`, que el default devuelve summary rows sin vectores/deltas, que `includeRows=true` cap 100. |
+| Sin `meta.rowsIncluded/rowsLimit/rowsTruncated`. | Añadidos en el payload del service. |
+
+**Mata-falsos-positivos:** el test `compareScope=sideways` antes pasaba como 400 — pero un crítico no podía distinguir si era por enum inválido (compareScope implementado) o por unknown key (compareScope ausente). Ahora `evidence-query-schema.test.ts` afirma `result.field === 'compareScope'` (sólo posible si compareScope es un campo enum reconocido), y `evidence-route-service.test.ts` prueba que `compareScope=all` **cambia** el comportamiento del comparador (lo llama con `{}` + warning). El comportamiento, no sólo el rechazo.
+
+**Contrato del endpoint (verificado por tests):**
+
+| Query | Default | Comportamiento (probado) |
+|---|---|---|
+| `presetId` | — | enum `ARES_V6_PRESETS` → 400 si inválido (unit: field=`presetId`). |
+| `compareScope` | `filtered` | `filtered`+preset → comparador `{presetId}`; `all` → `{}` + `meta.warnings=[comparison_not_filtered_by_preset]` (unit + smoke). |
+| `includeLegacyCompare` | `false` | `false` → comparador NO se llama (unit). |
+| `includeRows` | `false` | `false` → `highRiskSummaryRows` sin vectores/deltas; `true` → `highRiskRows` cap 100 + `meta.rowsLimit/rowsTruncated` (unit + smoke). |
+
+Endpoint y CLI ahora comparten el mismo código de warning y la misma semántica. `evidenceFixtureCoverage` gatea el GO; `comparisonFixtureCoverage` informa; `structuralRisk` es independiente. Sin afirmar "listo para UI" hasta que estos tests + el smoke estén verdes.

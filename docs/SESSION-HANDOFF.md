@@ -3,7 +3,7 @@
 **Fecha:** 2026-06-02
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3D.1 — Evidence Integrity Patch + Decision Semantics Hardening)
+**HEAD:** (Fase 3D.1B — Evidence Endpoint Contract Patch + False-Positive Test Killer)
 
 ---
 
@@ -11,8 +11,8 @@
 
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **338** = **320 unit** (37 archivos; smoke saltado en el gate) + **18 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
-- CI 3D.1: run **26855946578** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`). PR #1 OPEN · DRAFT · **MERGEABLE** (CLEAN).
+- Tests: **357** = **338 unit** (39 archivos; smoke saltado en el gate) + **19 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
+- CI 3D.1B: run **PENDIENTE** (se registra tras `gh run watch`). Base 3D.1: run **26855946578** → success. PR #1 OPEN · DRAFT · esperado **MERGEABLE**.
 
 ---
 
@@ -46,6 +46,9 @@
   - **Riesgo estructural** (`structuralRisk`: CLEAR/REVIEW_REQUIRED/BLOCKING) separado del GO/NO-GO; **visible aunque la decisión sea MORE_DATA** y primero en next-actions.
   - **Endpoint**: `presetId` validado contra `ARES_V6_PRESETS` (400); `compareScope=filtered|all`; `includeRows` (default false ⇒ `highRiskSummaryRows` sin vectores/deltas; true ⇒ cap 100). CLI: `--compare-scope`/`--include-rows`/`--summary-only`.
   - **Propuestas**: nuevos bloqueos `EVIDENCE_COVERAGE_INSUFFICIENT` / `STRUCTURAL_RISK_REVIEW_REQUIRED`. Versiones snapshot/thresholds/report/proposal **3D.2**. `autoApplyAllowed:false` invariante.
+- **3D.1B — Evidence Endpoint Contract Patch** — `docs/phase-3D/EVIDENCE-INTEGRITY-PATCH.md §8`:
+  - **Contrato compartido** `evidence-query-schema.ts` (route + CLI misma semántica) + **service testeable** `evidence-route-service.ts` (route = shell delgado). Warning **máquina** `comparison_not_filtered_by_preset`. `meta.rowsIncluded/rowsLimit/rowsTruncated`.
+  - **Mata-falsos-positivos:** `evidence-route-service.test.ts` prueba el **path 200 sin DB/Redis** (comparador llamado con `{presetId}` vs `{}`; default sin vectores/deltas; includeRows cap 100); `evidence-query-schema.test.ts` afirma que `compareScope=sideways` falla con `field='compareScope'` (enum reconocido, no unknown key). Honestidad: la 3D.1 ya implementaba el contrato pero sólo lo probaba en smoke; 3D.1B lo prueba a nivel unit.
 
 ---
 

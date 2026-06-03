@@ -88,3 +88,5 @@ Las propuestas son **artefactos JSON** (`ares-v6-evidence-summary.json`), no fil
 ## 7. Sin mutación automática del motor
 
 No existe ruta de código que escriba en `engine-v6/`, `presets.ts` o `research-matrix.ts` a partir de evidencia o feedback. La aplicación de una propuesta APPROVED es un cambio de ingeniería manual, revisado y fuera del alcance de Fase 3D.
+
+> **Nota 3D.1B:** el patch de contrato del endpoint (`EVIDENCE-INTEGRITY-PATCH.md §8`) NO cambia la gobernanza de propuestas: los bloqueos, el `humanReviewRequired:true` y el `autoApplyAllowed:false` se mantienen idénticos. Sólo se endureció el contrato/serialización del endpoint de evidencia y su cobertura de tests.

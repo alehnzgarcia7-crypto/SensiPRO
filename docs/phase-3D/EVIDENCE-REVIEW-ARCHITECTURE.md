@@ -7,6 +7,8 @@
 
 > **Fase 3D.1 (integrity patch):** cobertura de **evidencia** (DB) ≠ cobertura de **comparación** (fixtures-only); el riesgo **estructural** es un campo separado y nunca queda oculto bajo falta de muestra; el endpoint filtra por preset y no devuelve filas crudas por default. Detalle en `EVIDENCE-INTEGRITY-PATCH.md`.
 
+> **Fase 3D.1B (endpoint contract patch):** contrato de query compartido (`evidence-query-schema.ts`) + service testeable (`evidence-route-service.ts`) que prueba el **path 200 sin DB/Redis**; warning **máquina** `comparison_not_filtered_by_preset`; `meta.rowsIncluded/rowsLimit/rowsTruncated`. Detalle en `EVIDENCE-INTEGRITY-PATCH.md §8`.
+
 ---
 
 ## 1. Por qué existe Fase 3D
