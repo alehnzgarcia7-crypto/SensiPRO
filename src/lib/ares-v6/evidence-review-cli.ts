@@ -13,18 +13,21 @@ import { computeAresV6LabMetrics, type AresV6LabMetricsFilter } from './lab-metr
 import { buildAresV6ComparisonMatrix, type AresV6ComparisonRow } from './legacy-vs-v6-comparator';
 
 // ═══════════════════════════════════════════════════════════════
-// ARES v6 — Evidence review CLI core (Fase 3D)
+// ARES v6 — Evidence review CLI core (Fase 3D / 3D.1)
 //
 // Pure, testable arg parsing + orchestration + renderers behind the evidence
-// CLI. Default is a SAFE dry-run: no DB writes, no engine mutation. The produced
-// artifacts (JSON / markdown) carry NO tokens, NO raw IP, NO request body — the
-// underlying evidence model has no such fields by construction.
+// CLI. Default is a SAFE dry-run: no DB writes, no engine mutation. Artifacts
+// carry NO tokens, NO raw IP, NO request body. 3D.1: --compare-scope (filtered|
+// all) keeps the comparison honest about preset filtering; --summary-only and
+// --include-rows mirror the endpoint's row-disclosure semantics.
 // ═══════════════════════════════════════════════════════════════
 
-export const ARES_V6_EVIDENCE_REPORT_SCHEMA_VERSION = '3D.1';
+export const ARES_V6_EVIDENCE_REPORT_SCHEMA_VERSION = '3D.2';
 
 const VALID_PRESET_IDS = new Set<string>(ARES_V6_PRESETS.map((preset) => preset.id));
 const ISO_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
+
+export type AresV6CompareScope = 'filtered' | 'all';
 
 export interface AresV6EvidenceReviewOptions {
   fromDb: boolean;
@@ -33,6 +36,9 @@ export interface AresV6EvidenceReviewOptions {
   proposals: boolean;
   json: boolean;
   markdown: boolean;
+  summaryOnly: boolean;
+  includeRows: boolean;
+  compareScope: AresV6CompareScope;
   output: string | null;
   since: string | null;
   until: string | null;
@@ -56,6 +62,9 @@ export function parseAresV6EvidenceReviewArgs(argv: readonly string[]): AresV6Ev
     proposals: false,
     json: false,
     markdown: false,
+    summaryOnly: false,
+    includeRows: false,
+    compareScope: 'filtered',
     output: null,
     since: null,
     until: null,
@@ -84,6 +93,21 @@ export function parseAresV6EvidenceReviewArgs(argv: readonly string[]): AresV6Ev
       case '--markdown':
         options.markdown = true;
         break;
+      case '--summary-only':
+        options.summaryOnly = true;
+        break;
+      case '--include-rows':
+        options.includeRows = true;
+        break;
+      case '--compare-scope': {
+        const value = need(argv[i + 1], arg);
+        if (value !== 'filtered' && value !== 'all') {
+          throw new AresV6EvidenceArgError(`--compare-scope debe ser filtered|all: ${value}`);
+        }
+        options.compareScope = value;
+        i += 1;
+        break;
+      }
       case '--output':
       case '--out':
         options.output = need(argv[i + 1], arg);
@@ -124,6 +148,8 @@ export function parseAresV6EvidenceReviewArgs(argv: readonly string[]): AresV6Ev
 export interface AresV6EvidenceReport {
   schemaVersion: string;
   mode: 'from-db' | 'fixtures-only';
+  compareScope: AresV6CompareScope;
+  warnings: string[];
   generatedAt: string;
   options: AresV6EvidenceReviewOptions;
   goNoGo: AresV6EvidenceSnapshot['goNoGo'];
@@ -163,12 +189,23 @@ export async function runAresV6EvidenceReview(
   options: AresV6EvidenceReviewOptions,
   deps: AresV6EvidenceReviewDeps = defaultAresV6EvidenceReviewDeps(),
 ): Promise<AresV6EvidenceReport> {
-  const comparisonRows = options.legacyCompare
-    ? deps.buildComparison({
+  const warnings: string[] = [];
+  let comparisonRows: AresV6ComparisonRow[] = [];
+
+  if (options.legacyCompare) {
+    if (options.compareScope === 'all') {
+      // Explicitly ignore the preset filter for the comparison and warn.
+      comparisonRows = deps.buildComparison({ fixtureId: options.fixtureId ?? undefined });
+      if (options.presetId) {
+        warnings.push('compare-scope=all: la comparación legacy-vs-v6 NO está filtrada por preset.');
+      }
+    } else {
+      comparisonRows = deps.buildComparison({
         fixtureId: options.fixtureId ?? undefined,
         presetId: options.presetId ?? undefined,
-      })
-    : [];
+      });
+    }
+  }
 
   const filter: AresV6LabMetricsFilter = {
     ...(options.since ? { since: new Date(options.since) } : {}),
@@ -185,6 +222,8 @@ export async function runAresV6EvidenceReview(
   return {
     schemaVersion: ARES_V6_EVIDENCE_REPORT_SCHEMA_VERSION,
     mode: options.fromDb ? 'from-db' : 'fixtures-only',
+    compareScope: options.compareScope,
+    warnings,
     generatedAt: snapshot.generatedAt,
     options,
     goNoGo: snapshot.goNoGo,
@@ -196,14 +235,25 @@ export async function runAresV6EvidenceReview(
 
 // ── Renderers ───────────────────────────────────────────────────
 
+const MARKDOWN_ROW_CAP = 50;
+
+/** JSON. --summary-only strips full comparison rows + full high-risk rows (keeps summaries). */
 export function renderAresV6EvidenceJson(report: AresV6EvidenceReport): string {
-  return JSON.stringify(report, null, 2);
+  if (!report.options.summaryOnly) return JSON.stringify(report, null, 2);
+
+  const snapshotSummary: Record<string, unknown> = { ...report.snapshot };
+  delete snapshotSummary.highRiskRows; // keep highRiskSummaryRows only
+  const reportSummary: Record<string, unknown> = { ...report, snapshot: snapshotSummary };
+  delete reportSummary.comparisonRows;
+  return JSON.stringify(reportSummary, null, 2);
 }
 
 export function renderAresV6EvidenceSummaryLine(report: AresV6EvidenceReport): string {
   const s = report.snapshot;
   return (
     `ARES v6 evidence (${report.mode}): ${s.goNoGo.decision} · ` +
+    `structuralRisk=${s.structuralRisk.decision} · ` +
+    `evCov=${s.evidenceFixtureCoverage} cmpCov=${s.comparisonFixtureCoverage} · ` +
     `gen=${s.metrics.totalGenerations} fb=${s.metrics.totalFeedback} ` +
     `cmp=${s.comparisonSummary.total}(dang=${s.comparisonSummary.dangerous},rev=${s.comparisonSummary.needsReview}) ` +
     `proposals=${report.proposals ? report.proposals.proposals.length : 'no-solicitado'}`
@@ -220,16 +270,29 @@ export function renderAresV6EvidenceMarkdown(report: AresV6EvidenceReport): stri
   const fb = s.trustedFeedbackSummary;
   const lines: string[] = [];
 
-  lines.push('# ARES v6 — Evidence Review (Fase 3D)');
+  lines.push('# ARES v6 — Evidence Review (Fase 3D.1)');
   lines.push('');
-  lines.push(`**Modo:** ${report.mode}  ·  **Generado:** ${report.generatedAt}  ·  **schema:** ${report.schemaVersion}`);
+  lines.push(
+    `**Modo:** ${report.mode}  ·  **compare-scope:** ${report.compareScope}  ·  ` +
+      `**Generado:** ${report.generatedAt}  ·  **schema:** ${report.schemaVersion}`,
+  );
   lines.push('');
+  if (report.warnings.length > 0) {
+    lines.push('> ⚠️ ' + report.warnings.join(' '));
+    lines.push('');
+  }
+
   lines.push(`## GO/NO-GO: ${s.goNoGo.decision}`);
   lines.push('');
   lines.push(mdList(s.goNoGo.rationale));
   lines.push('');
 
-  lines.push('## Métricas');
+  lines.push(`## Riesgo estructural: ${s.structuralRisk.decision}`);
+  lines.push('');
+  lines.push(mdList(s.structuralRisk.rationale));
+  lines.push('');
+
+  lines.push('## Métricas y cobertura');
   lines.push('');
   lines.push('| Métrica | Valor |');
   lines.push('|---|---|');
@@ -242,7 +305,8 @@ export function renderAresV6EvidenceMarkdown(report: AresV6EvidenceReport): stri
   lines.push(`| averageRating | ${fb.averageRating} |`);
   lines.push(`| worseOutcomeRate | ${fb.worseRate} |`);
   lines.push(`| suspiciousFeedbackExcluded | ${fb.suspiciousExcluded} |`);
-  lines.push(`| fixtureCoverage | ${s.fixtureCoverage} (${s.coveredFixtures}/${s.totalFixtures}) |`);
+  lines.push(`| **evidenceFixtureCoverage** (gates GO) | ${s.evidenceFixtureCoverage} (${s.evidenceCoveredFixtures}/${s.totalFixtures}) |`);
+  lines.push(`| comparisonFixtureCoverage (informativo) | ${s.comparisonFixtureCoverage} (${s.comparisonCoveredFixtures}/${s.totalFixtures}) |`);
   lines.push('');
 
   lines.push('## Comparación legacy-vs-v6');
@@ -252,13 +316,17 @@ export function renderAresV6EvidenceMarkdown(report: AresV6EvidenceReport): stri
       `DANGEROUS ${cmp.dangerous} · sin equivalente legacy ${cmp.noLegacyEquivalent} · fallbackPpi ${cmp.fallbackPpiRows}`,
   );
   lines.push('');
-  if (s.highRiskRows.length > 0) {
+  const summaryRows = s.highRiskSummaryRows;
+  if (summaryRows.length > 0) {
     lines.push('| fixture | preset | ppi | src | expectedness | rationale |');
     lines.push('|---|---|---|---|---|---|');
-    for (const row of s.highRiskRows) {
+    for (const row of summaryRows.slice(0, MARKDOWN_ROW_CAP)) {
       lines.push(
         `| ${row.fixtureId} | ${row.presetId} | ${row.ppi} | ${row.ppiSource} | ${row.expectedness} | ${row.rationale.join('; ')} |`,
       );
+    }
+    if (summaryRows.length > MARKDOWN_ROW_CAP) {
+      lines.push(`| … | (${summaryRows.length - MARKDOWN_ROW_CAP} filas más truncadas) | | | | |`);
     }
   } else {
     lines.push('Sin filas de alto riesgo.');

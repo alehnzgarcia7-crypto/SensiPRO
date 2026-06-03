@@ -16,7 +16,7 @@ import type { AresV6ComparisonRow, AresV6Slider } from './legacy-vs-v6-comparato
 // dominant. Feedback is EVIDENCE, never automatic truth.
 // ═══════════════════════════════════════════════════════════════
 
-export const ARES_V6_CALIBRATION_PROPOSAL_SCHEMA_VERSION = '3D.1';
+export const ARES_V6_CALIBRATION_PROPOSAL_SCHEMA_VERSION = '3D.2';
 
 export type AresV6ProposalStatus = 'DRAFT' | 'PENDING_HUMAN_REVIEW' | 'APPROVED' | 'REJECTED';
 
@@ -34,7 +34,9 @@ export type AresV6ProposalBlockedReason =
   | 'INFRA_UNHEALTHY'
   | 'INSUFFICIENT_SAMPLE'
   | 'SUSPICIOUS_FEEDBACK_DOMINANT'
-  | 'FALLBACK_PPI_DOMINANT';
+  | 'FALLBACK_PPI_DOMINANT'
+  | 'STRUCTURAL_RISK_REVIEW_REQUIRED'
+  | 'EVIDENCE_COVERAGE_INSUFFICIENT';
 
 export interface AresV6CalibrationProposalTarget {
   presetId?: AresV6PresetId;
@@ -185,8 +187,10 @@ function result(
 /**
  * Generate human-gated calibration proposals from an evidence snapshot.
  * Returns NO_CHANGE_RECOMMENDED (never an actionable proposal) whenever a gate
- * blocks: infra unhealthy, insufficient sample, suspicious-feedback dominant, or
- * PPI-fallback dominant. Never mutates the engine.
+ * blocks: infra unhealthy, suspicious-feedback dominant, PPI-fallback dominant,
+ * insufficient sample, insufficient EVIDENCE coverage, or structural-risk review
+ * required without enough data. Structural BLOCKING is surfaced even under low
+ * sample. Never mutates the engine.
  */
 export function generateAresV6CalibrationProposals(
   snapshot: AresV6EvidenceSnapshot,
@@ -242,21 +246,32 @@ export function generateAresV6CalibrationProposals(
     );
   }
 
-  if (
-    snapshot.goNoGo.decision === 'NO_GO_MORE_DATA' ||
+  const structuralRisk = snapshot.structuralRisk;
+  // Sample (depth) and coverage (breadth) are ORTHOGONAL — neither implies the other.
+  const sampleInsufficient =
     input.totalTrustedFeedback < thresholds.minTrustedFeedbackPerDevicePreset ||
-    input.insufficientSampleCells > 0
-  ) {
+    input.insufficientSampleCells > 0;
+  const coverageInsufficient = input.evidenceFixtureCoverage < thresholds.minFixtureCoverage;
+
+  // Structural BLOCKING is handled EXPLICITLY so it is never masked by sample size.
+  // When the data is too thin/narrow to propose a fix, we still surface the risk.
+  if (structuralRisk.decision === 'BLOCKING' && (sampleInsufficient || coverageInsufficient)) {
+    const reasons: AresV6ProposalBlockedReason[] = ['STRUCTURAL_RISK_REVIEW_REQUIRED'];
+    if (coverageInsufficient) reasons.push('EVIDENCE_COVERAGE_INSUFFICIENT');
+    if (sampleInsufficient) reasons.push('INSUFFICIENT_SAMPLE');
     return result(
       snapshot,
       [
         noChange(
           snapshot,
-          ['Muestra insuficiente: una muestra pequeña produce hipótesis, no cambios de motor.'],
-          ['INSUFFICIENT_SAMPLE'],
           [
-            `≥ ${thresholds.minTrustedFeedbackPerDevicePreset} feedback TRUSTED por device×preset`,
-            `≥ ${thresholds.minGenerationsPerDevicePreset} generaciones por device×preset`,
+            `Riesgo estructural BLOCKING (${structuralRisk.dangerousRows} fila[s] DANGEROUS) visible, pero la evidencia no alcanza para proponer un cambio.`,
+            'Revisión HUMANA obligatoria; sin auto-aplicar.',
+          ],
+          reasons,
+          [
+            'Confirmar/corregir las filas DANGEROUS con revisión humana.',
+            `Cobertura de EVIDENCIA ≥ ${thresholds.minFixtureCoverage} y ≥ ${thresholds.minTrustedFeedbackPerDevicePreset} feedback TRUSTED por celda.`,
           ],
         ),
       ],
@@ -264,26 +279,76 @@ export function generateAresV6CalibrationProposals(
     );
   }
 
-  // ── Evidence is sufficient + clean. ─────────────────────────────
-  if (snapshot.goNoGo.decision === 'GO_INTERNAL_UI_EXPERIMENT') {
-    return result(
-      snapshot,
-      [
-        noChange(
-          snapshot,
-          [
-            'Evidencia buena y diferencias legacy-vs-v6 esperadas: NO se recomienda cambio de calibración.',
-            'Decisión de UI experimental sigue siendo HUMANA.',
-          ],
-          [],
-          [],
-        ),
-      ],
-      0,
-    );
+  // Not structurally blocking → coverage / sample / GO gates (blocking + sufficient falls through).
+  if (structuralRisk.decision !== 'BLOCKING') {
+    if (coverageInsufficient) {
+      const reasons: AresV6ProposalBlockedReason[] = ['EVIDENCE_COVERAGE_INSUFFICIENT'];
+      if (sampleInsufficient) reasons.push('INSUFFICIENT_SAMPLE');
+      return result(
+        snapshot,
+        [
+          noChange(
+            snapshot,
+            ['Cobertura de EVIDENCIA real insuficiente: la comparación fixtures-only NO es evidencia. No se proponen cambios.'],
+            reasons,
+            [`Cobertura de EVIDENCIA ≥ ${thresholds.minFixtureCoverage} (más fixtures con generaciones persistidas).`],
+          ),
+        ],
+        0,
+      );
+    }
+    if (sampleInsufficient) {
+      return result(
+        snapshot,
+        [
+          noChange(
+            snapshot,
+            ['Muestra insuficiente: una muestra pequeña produce hipótesis, no cambios de motor.'],
+            ['INSUFFICIENT_SAMPLE'],
+            [
+              `≥ ${thresholds.minTrustedFeedbackPerDevicePreset} feedback TRUSTED por device×preset`,
+              `≥ ${thresholds.minGenerationsPerDevicePreset} generaciones por device×preset`,
+            ],
+          ),
+        ],
+        0,
+      );
+    }
+    if (snapshot.goNoGo.decision === 'GO_INTERNAL_UI_EXPERIMENT') {
+      return result(
+        snapshot,
+        [
+          noChange(
+            snapshot,
+            [
+              'Evidencia buena y diferencias legacy-vs-v6 esperadas: NO se recomienda cambio de calibración.',
+              'Decisión de UI experimental sigue siendo HUMANA.',
+            ],
+            [],
+            [],
+          ),
+        ],
+        0,
+      );
+    }
+    // Any other NO_GO_MORE_DATA cause (e.g. low feedback coverage) → need more data.
+    if (snapshot.goNoGo.decision !== 'NO_GO_FIX_ENGINE') {
+      return result(
+        snapshot,
+        [
+          noChange(
+            snapshot,
+            ['Evidencia insuficiente para una propuesta accionable; recolectar más datos.'],
+            ['INSUFFICIENT_SAMPLE'],
+            ['Aumentar muestra y cobertura de evidencia hasta cumplir los umbrales.'],
+          ),
+        ],
+        0,
+      );
+    }
   }
 
-  // ── NO_GO_FIX_ENGINE with sufficient, clean data → human-review proposals. ──
+  // ── Actionable: NO_GO_FIX_ENGINE OR structural BLOCKING with sufficient evidence. ──
   const proposals: AresV6CalibrationProposal[] = [];
 
   // Concrete, located proposals from high-risk comparison rows (skip fallback-only rows).

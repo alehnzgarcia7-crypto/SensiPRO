@@ -10,17 +10,22 @@ import { createAresV6RequestContext, logAresV6Event } from '@/lib/ares-v6/observ
 import { checkAresV6RuntimeConfig } from '@/lib/ares-v6/observability-policy';
 import { getTrustedClientIp } from '@/lib/ares-v6/proxy-trust';
 import { checkAresV6RateLimit } from '@/lib/ares-v6/rate-limit';
+import { ARES_V6_PRESETS, type AresV6PresetId } from '@ares/algorithms/engine-v6';
 
 // ═══════════════════════════════════════════════════════════════
-// GET /api/lab/v6/evidence — INTERNAL evidence snapshot (Fase 3D)
+// GET /api/lab/v6/evidence — INTERNAL evidence snapshot (Fase 3D / 3D.1)
 //
 // OFF by default (404 when ARES_V6_LAB_EVIDENCE_ENABLED !== 'true'). Internal-
 // access gated (3C.1 surface flag), rate-limited (own 'evidence' bucket BEFORE
-// any DB query), bounded window (default 7d, max 90d). Returns an AGGREGATED
-// snapshot only — GO/NO-GO + metrics + trusted-feedback summary + comparison
-// summary. No raw generation/feedback rows, no PII. legacy-vs-v6 comparison is
-// OPTIONAL (?includeLegacyCompare=true) and lazy-loaded so the legacy engine is
-// never bundled unless explicitly requested. NEVER mutates the engine.
+// any DB query), bounded window (default 7d, max 90d).
+//
+// 3D.1 filter integrity:
+//   • presetId is validated against the real ARES_V6_PRESETS (400 otherwise).
+//   • compareScope=filtered (default) filters the comparison by presetId;
+//     compareScope=all ignores it and adds a meta warning.
+//   • includeRows=false (default) returns AGGREGATED summary rows only — NO
+//     legacy/v6 vectors, NO deltas. includeRows=true returns full rows capped
+//     at 100 (internal-only). No PII either way.
 // ═══════════════════════════════════════════════════════════════
 
 export const runtime = 'nodejs';
@@ -28,15 +33,23 @@ export const runtime = 'nodejs';
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_WINDOW_MS = 7 * DAY_MS;
 const MAX_RANGE_MS = 90 * DAY_MS;
+const MAX_FULL_ROWS = 100;
+
+const VALID_PRESET_IDS = new Set<string>(ARES_V6_PRESETS.map((preset) => preset.id));
+function isAresV6PresetId(value: string): value is AresV6PresetId {
+  return VALID_PRESET_IDS.has(value);
+}
 
 const querySchema = z
   .object({
     since: z.string().datetime({ message: 'since debe ser ISO 8601' }).optional(),
     until: z.string().datetime({ message: 'until debe ser ISO 8601' }).optional(),
     deviceId: z.string().max(64).optional(),
-    presetId: z.string().max(64).optional(),
+    presetId: z.string().refine(isAresV6PresetId, 'presetId no es un preset válido de ARES v6').optional(),
     includeSuspicious: z.enum(['true', 'false']).optional(),
     includeLegacyCompare: z.enum(['true', 'false']).optional(),
+    includeRows: z.enum(['true', 'false']).optional(),
+    compareScope: z.enum(['filtered', 'all']).optional(),
   })
   .strict();
 
@@ -95,23 +108,29 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return aresV6ErrorResponse('VALIDATION_ERROR', 'El rango máximo permitido es de 90 días.', 400, { ctx });
   }
 
+  const presetId = parsed.data.presetId;
+  const compareScope = parsed.data.compareScope ?? 'filtered';
+  const includeRows = parsed.data.includeRows === 'true';
+  const includeLegacyCompare = parsed.data.includeLegacyCompare === 'true';
+  const warnings: string[] = [];
+
   try {
     // Lazy-load the comparator (and thus the frozen legacy engine) ONLY when asked.
-    // Fixtures-only reference matrix (each fixture's primaryPresets); the preset
-    // filter applies to the DB metrics, not to this pure reference comparison.
     let comparisonRows: AresV6ComparisonRow[] = [];
-    if (parsed.data.includeLegacyCompare === 'true') {
+    if (includeLegacyCompare) {
       const { buildAresV6ComparisonMatrix } = await import('@/lib/ares-v6/legacy-vs-v6-comparator');
-      comparisonRows = buildAresV6ComparisonMatrix({});
+      if (compareScope === 'all') {
+        comparisonRows = buildAresV6ComparisonMatrix({});
+        if (presetId) warnings.push('comparison not filtered by presetId (compareScope=all)');
+      } else if (presetId && isAresV6PresetId(presetId)) {
+        comparisonRows = buildAresV6ComparisonMatrix({ presetId });
+      } else {
+        comparisonRows = buildAresV6ComparisonMatrix({});
+      }
     }
 
     const snapshot = await buildAresV6EvidenceSnapshot({
-      filter: {
-        since,
-        until,
-        deviceId: parsed.data.deviceId,
-        presetId: parsed.data.presetId,
-      },
+      filter: { since, until, deviceId: parsed.data.deviceId, presetId },
       includeSuspicious: parsed.data.includeSuspicious === 'true',
       comparisonRows,
     });
@@ -122,7 +141,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       data: { decision: snapshot.goNoGo.decision, totalGenerations: snapshot.metrics.totalGenerations },
     });
 
-    // Aggregated only: omit per-row comparison detail (return summary + risk findings).
+    // Aggregated by default: summary rows only (NO legacy/v6 vectors, NO deltas).
+    const rowsField = includeRows
+      ? { highRiskRows: snapshot.highRiskRows.slice(0, MAX_FULL_ROWS) }
+      : { highRiskSummaryRows: snapshot.highRiskSummaryRows };
+
     return JsonResponse.json({
       success: true as const,
       data: {
@@ -130,17 +153,25 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         goNoGo: snapshot.goNoGo,
         goNoGoInput: snapshot.goNoGoInput,
         metrics: snapshot.metrics,
-        fixtureCoverage: snapshot.fixtureCoverage,
+        evidenceFixtureCoverage: snapshot.evidenceFixtureCoverage,
+        evidenceCoveredFixtures: snapshot.evidenceCoveredFixtures,
+        comparisonFixtureCoverage: snapshot.comparisonFixtureCoverage,
+        comparisonCoveredFixtures: snapshot.comparisonCoveredFixtures,
+        totalFixtures: snapshot.totalFixtures,
+        structuralRisk: snapshot.structuralRisk,
         trustedFeedbackSummary: snapshot.trustedFeedbackSummary,
         comparisonSummary: snapshot.comparisonSummary,
-        highRiskRows: snapshot.highRiskRows,
+        ...rowsField,
         insufficientEvidenceRows: snapshot.insufficientEvidenceRows,
         recommendedNextActions: snapshot.recommendedNextActions,
       },
       meta: {
         requestId: ctx.requestId,
         window: { since: since.toISOString(), until: until.toISOString() },
-        includeLegacyCompare: parsed.data.includeLegacyCompare === 'true',
+        compareScope,
+        includeLegacyCompare,
+        includeRows,
+        ...(warnings.length > 0 ? { warnings } : {}),
       },
     });
   } catch {
