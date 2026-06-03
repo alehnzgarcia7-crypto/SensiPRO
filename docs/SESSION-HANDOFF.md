@@ -1,6 +1,6 @@
 # SensiPRO ARES v6 — Session Handoff
 
-**Fecha:** 2026-06-02
+**Fecha:** 2026-06-03
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
 **HEAD:** (Fase 3D.1B — Evidence Endpoint Contract Patch + False-Positive Test Killer)
@@ -9,6 +9,7 @@
 
 ## Estado
 
+- **Fase 3D.1B SELLADA** ✅ — contrato del endpoint `GET /api/lab/v6/evidence` **cerrado** vía `evidence-query-schema.ts` (contrato de query compartido) + `evidence-route-service.ts` (service testeable). **Falso positivo eliminado:** el path 200 se prueba a nivel **unit** (no sólo en smoke). Próxima fase activa: **3E**.
 - Working tree limpio, al día con `origin`.
 - Salud verde local: `eslint` v6 → 0, `tsc -p tsconfig.ares-v6.json` → 0.
 - Tests: **357** = **338 unit** (39 archivos; smoke saltado en el gate) + **19 real-infra smoke** (Redis + Postgres reales, validado local con DB efímera).
@@ -63,9 +64,9 @@ Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACC
 
 ---
 
-## SIGUIENTE: Fase 3E (propuesta)
+## SIGUIENTE: Fase 3E — UI interna oculta (read-only)
 
-Con GO/NO-GO en verde sobre evidencia interna real (activación interna del lab), evaluar **UI experimental oculta** tras `NEXT_PUBLIC_ARES_V6_ENABLED` (solo lectura, behind flag, sin reemplazar el generador legacy). La decisión de activación sigue siendo **humana**. Ver `docs/phase-3D/EVIDENCE-REVIEW-VALIDATION.md §7`.
+3D.1B sellada ⇒ fase activa siguiente: **3E**. UI **interna, oculta y de solo lectura** tras `NEXT_PUBLIC_ARES_V6_ENABLED` (behind flag, sin reemplazar el generador legacy, sin tocar producción). Pre-requisito: GO/NO-GO en verde sobre **evidencia interna real** (activación del lab) — `evidenceFixtureCoverage` real ≥ umbral y `structuralRisk=CLEAR`. La decisión de activación sigue siendo **humana**. Ver `docs/phase-3D/EVIDENCE-REVIEW-VALIDATION.md §7`.
 
 ---
 
