@@ -175,4 +175,5 @@ npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --js
 
 ### CI 3D.1B
 
-- Run de Actions: **PENDIENTE** (se registra tras `gh run watch`).
+- Commit `851fa55`. Run de Actions: **26858197075** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success** (+18 unit + artifact summary-only). `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, endpoint contract). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
