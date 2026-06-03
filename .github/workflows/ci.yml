@@ -27,6 +27,7 @@ jobs:
       # Fase 3D evidence review (fixtures-only is pure: no DB, no engine mutation).
       - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-json.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --json --output ares-v6-evidence-summary.json
       - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-md.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --markdown --output ares-v6-evidence-report.md
+      - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-summary-only.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json --output ares-v6-evidence-summary-only.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -35,6 +36,7 @@ jobs:
             ci-logs/
             ares-v6-evidence-summary.json
             ares-v6-evidence-report.md
+            ares-v6-evidence-summary-only.json
           if-no-files-found: ignore
 
   legacy-audit:
