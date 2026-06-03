@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/admin/',
+          '/internal/',
           '/profile/',
           '/payment/',
           '/_next/',
@@ -17,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/payment/'],
+        disallow: ['/api/', '/admin/', '/internal/', '/payment/'],
       },
     ],
     sitemap: 'https://sensibilidadespro.com/sitemap.xml',

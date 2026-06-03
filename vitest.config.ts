@@ -3,6 +3,9 @@ import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // React 18 automatic JSX runtime so .tsx component render tests (Fase 3E) work
+  // under environment: 'node' via react-dom/server, with no new test dependency.
+  esbuild: { jsx: 'automatic' },
   test: {
     globals: true,
     environment: 'node',
@@ -12,7 +15,7 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules', 'dist', '.next', '**/*.test.ts', '**/types/**'],
     },
-    include: ['**/*.test.ts', '**/*.spec.ts'],
+    include: ['**/*.test.ts', '**/*.spec.ts', '**/*.test.tsx', '**/*.spec.tsx'],
     exclude: ['node_modules', 'dist', '.next', 'tests/e2e'],
     testTimeout: 10000,
   },
