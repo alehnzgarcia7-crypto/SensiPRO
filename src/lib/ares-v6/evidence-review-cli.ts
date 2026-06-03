@@ -5,6 +5,10 @@ import {
   type AresV6CalibrationProposalResult,
 } from './calibration-proposals';
 import {
+  ARES_V6_EVIDENCE_WARNING_COMPARISON_NOT_FILTERED,
+  type AresV6CompareScope,
+} from './evidence-query-schema';
+import {
   buildAresV6EvidenceSnapshot,
   type AresV6EvidenceSnapshot,
   type AresV6EvidenceSnapshotDeps,
@@ -27,7 +31,7 @@ export const ARES_V6_EVIDENCE_REPORT_SCHEMA_VERSION = '3D.2';
 const VALID_PRESET_IDS = new Set<string>(ARES_V6_PRESETS.map((preset) => preset.id));
 const ISO_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
 
-export type AresV6CompareScope = 'filtered' | 'all';
+export type { AresV6CompareScope } from './evidence-query-schema';
 
 export interface AresV6EvidenceReviewOptions {
   fromDb: boolean;
@@ -197,7 +201,7 @@ export async function runAresV6EvidenceReview(
       // Explicitly ignore the preset filter for the comparison and warn.
       comparisonRows = deps.buildComparison({ fixtureId: options.fixtureId ?? undefined });
       if (options.presetId) {
-        warnings.push('compare-scope=all: la comparación legacy-vs-v6 NO está filtrada por preset.');
+        warnings.push(ARES_V6_EVIDENCE_WARNING_COMPARISON_NOT_FILTERED);
       }
     } else {
       comparisonRows = deps.buildComparison({
