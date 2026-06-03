@@ -60,3 +60,61 @@ export async function seedAresV6SmokeDevices(prisma: PrismaClient): Promise<Ares
 
   return { activeId: active.id, inactiveId: inactive.id };
 }
+
+// Devices whose slug equals a known calibration fixture id, so persisted
+// generations map to fixtures and exercise EVIDENCE coverage (Fase 3D.1).
+const ARES_V6_FIXTURE_KNOWN_DEVICES = [
+  {
+    fixtureId: 'redmi-note-13',
+    brand: 'Redmi',
+    model: 'Note 13',
+    screenHz: 120,
+    screenSize: 6.67,
+    ramGb: 6,
+    screenDpi: 395,
+    panelType: 'AMOLED' as const,
+    tier: 'MID' as const,
+  },
+  {
+    fixtureId: 'samsung-galaxy-a14',
+    brand: 'Samsung',
+    model: 'Galaxy A14',
+    screenHz: 90,
+    screenSize: 6.6,
+    ramGb: 4,
+    screenDpi: 400,
+    panelType: 'LCD' as const,
+    tier: 'LOW' as const,
+  },
+];
+
+export interface AresV6FixtureKnownSeedResult {
+  deviceId: string;
+  fixtureId: string;
+}
+
+/** Upsert fixture-known devices (slug === fixtureId). Returns their ids + fixture ids. */
+export async function seedAresV6FixtureKnownDevices(prisma: PrismaClient): Promise<AresV6FixtureKnownSeedResult[]> {
+  const results: AresV6FixtureKnownSeedResult[] = [];
+  for (const device of ARES_V6_FIXTURE_KNOWN_DEVICES) {
+    const row = await prisma.device.upsert({
+      where: { slug: device.fixtureId },
+      update: { isActive: true, screenDpi: device.screenDpi },
+      create: {
+        brand: device.brand,
+        model: device.model,
+        slug: device.fixtureId,
+        screenHz: device.screenHz,
+        screenSize: device.screenSize,
+        ramGb: device.ramGb,
+        screenDpi: device.screenDpi,
+        panelType: device.panelType,
+        tier: device.tier,
+        isActive: true,
+      },
+      select: { id: true },
+    });
+    results.push({ deviceId: row.id, fixtureId: device.fixtureId });
+  }
+  return results;
+}

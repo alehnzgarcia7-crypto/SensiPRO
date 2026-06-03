@@ -22,8 +22,10 @@ function goMetrics(overrides: Partial<AresV6GoNoGoMetrics> = {}): AresV6GoNoGoMe
     highOrLabVerifiedRate: 0.92,
     averageRating: 4.6,
     worseOutcomeRate: 0.05,
-    dangerousComparisonRows: 0,
-    fixtureCoverage: 0.92,
+    dangerousStructuralRows: 0,
+    reviewStructuralRows: 0,
+    evidenceFixtureCoverage: 0.92,
+    comparisonFixtureCoverage: 0.92,
     feedbackCoverageRate: 0.4,
     suspiciousFeedbackRate: 0.05,
     ...overrides,
@@ -97,10 +99,17 @@ describe('evaluateAresV6GoNoGo', () => {
     expect(result.decision).toBe('NO_GO_FIX_ENGINE');
   });
 
-  it('returns NO_GO_FIX_ENGINE when a comparison row is DANGEROUS', () => {
-    const result = evaluateAresV6GoNoGo(goMetrics({ dangerousComparisonRows: 1 }));
+  it('returns NO_GO_FIX_ENGINE when a structural row is DANGEROUS', () => {
+    const result = evaluateAresV6GoNoGo(goMetrics({ dangerousStructuralRows: 1 }));
     expect(result.decision).toBe('NO_GO_FIX_ENGINE');
-    expect(result.failedCriteria.some((c) => c.criterion === 'dangerousComparisonRows')).toBe(true);
+    expect(result.failedCriteria.some((c) => c.criterion === 'dangerousStructuralRows')).toBe(true);
+  });
+
+  it('gates fixture coverage on EVIDENCE, not COMPARISON coverage', () => {
+    // High comparison coverage must NOT rescue low real-evidence coverage.
+    const result = evaluateAresV6GoNoGo(goMetrics({ evidenceFixtureCoverage: 0.1, comparisonFixtureCoverage: 1 }));
+    expect(result.decision).toBe('NO_GO_MORE_DATA');
+    expect(result.failedCriteria.some((c) => c.criterion === 'evidenceFixtureCoverage')).toBe(true);
   });
 
   it('is deterministic for the same input', () => {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { ARES_V6_LATAM_CALIBRATION_FIXTURES } from '@ares/algorithms/engine-v6';
+
 import {
   averageRatingFromDistribution,
   buildAresV6EvidenceSnapshot,
@@ -42,6 +44,19 @@ function sufficientCells(): AresV6DevicePresetCount[] {
     { deviceId: 'dev1', presetId: 'STANDARD_PRO', generations: 30, trustedFeedback: 12 },
     { deviceId: 'dev2', presetId: 'STANDARD_PRO', generations: 30, trustedFeedback: 10 },
   ];
+}
+
+/** Sufficient cells mapped to the first `count` real fixtures (slug === fixtureId). */
+function fixtureCells(count: number): AresV6DevicePresetCount[] {
+  return ARES_V6_LATAM_CALIBRATION_FIXTURES.slice(0, count).map((fixture, index) => ({
+    deviceId: `dev-${index}`,
+    presetId: 'STANDARD_PRO',
+    generations: 30,
+    trustedFeedback: 12,
+    deviceBrand: fixture.device.brand,
+    deviceModel: fixture.device.model,
+    deviceSlug: fixture.id,
+  }));
 }
 
 function deps(metrics: AresV6LabMetrics, counts: AresV6DevicePresetCount[]): AresV6EvidenceSnapshotDeps {
@@ -102,22 +117,48 @@ describe('summarizeEvidenceByDevicePreset', () => {
 });
 
 describe('buildAresV6EvidenceSnapshot', () => {
-  it('builds a trusted-only snapshot and covers fixtures from comparison rows', async () => {
+  it('separates EVIDENCE coverage (DB) from COMPARISON coverage (fixtures-only)', async () => {
     const snapshot = await buildAresV6EvidenceSnapshot(
       { comparisonRows: [comparisonRow({})] },
       deps(makeMetrics(), sufficientCells()),
     );
-    expect(snapshot.metrics.totalGenerations).toBe(120);
-    expect(snapshot.trustedFeedbackSummary.count).toBe(40);
-    expect(snapshot.coveredFixtures).toBe(1);
+    // sufficientCells have no brand/model/slug → no fixture match → evidence coverage 0.
+    expect(snapshot.evidenceCoveredFixtures).toBe(0);
+    expect(snapshot.evidenceFixtureCoverage).toBe(0);
+    // The comparison row covers exactly 1 fixture.
+    expect(snapshot.comparisonCoveredFixtures).toBe(1);
+    // fixtureCoverage alias mirrors EVIDENCE coverage, NOT comparison.
+    expect(snapshot.fixtureCoverage).toBe(snapshot.evidenceFixtureCoverage);
+    expect(snapshot.coveredFixtures).toBe(snapshot.evidenceCoveredFixtures);
     expect(snapshot.generatedAt).toBe(new Date(0).toISOString());
+  });
+
+  it('counts EVIDENCE coverage from fixture-known persisted cells', async () => {
+    const snapshot = await buildAresV6EvidenceSnapshot({}, deps(makeMetrics(), fixtureCells(3)));
+    expect(snapshot.evidenceCoveredFixtures).toBe(3);
+    expect(snapshot.evidenceFixtureCoverage).toBeGreaterThan(0);
+  });
+
+  it('excludes unknown devices from EVIDENCE coverage', async () => {
+    const counts: AresV6DevicePresetCount[] = [
+      {
+        deviceId: 'x',
+        presetId: 'STANDARD_PRO',
+        generations: 30,
+        trustedFeedback: 12,
+        deviceBrand: 'Nokia',
+        deviceModel: 'XYZ-9000',
+        deviceSlug: 'nokia-xyz-9000',
+      },
+    ];
+    const snapshot = await buildAresV6EvidenceSnapshot({}, deps(makeMetrics(), counts));
+    expect(snapshot.evidenceCoveredFixtures).toBe(0);
   });
 
   it('includes the suspicious count but excludes it from trusted metrics', async () => {
     const metrics = makeMetrics({ suspiciousFeedbackExcluded: 8 });
     const snapshot = await buildAresV6EvidenceSnapshot({}, deps(metrics, sufficientCells()));
     expect(snapshot.trustedFeedbackSummary.suspiciousExcluded).toBe(8);
-    // 8 suspicious out of (40 trusted + 8) → rate ~0.1667, still trusted-driven metrics.
     expect(snapshot.goNoGoInput.suspiciousFeedbackRate).toBeCloseTo(8 / 48, 3);
     expect(snapshot.goNoGoInput.totalTrustedFeedback).toBe(40);
   });
@@ -131,10 +172,32 @@ describe('buildAresV6EvidenceSnapshot', () => {
     expect(snapshot.goNoGo.decision).toBe('NO_GO_MORE_DATA');
   });
 
-  it('surfaces high-risk comparison rows', async () => {
+  it('keeps a DANGEROUS structural row visible even under NO_GO_MORE_DATA', async () => {
+    const danger = comparisonRow({ expectedness: 'DANGEROUS', requiresHumanReview: true });
+    // sufficientCells map to no fixture → evidence coverage 0 → decision MORE_DATA.
+    const snapshot = await buildAresV6EvidenceSnapshot({ comparisonRows: [danger] }, deps(makeMetrics(), sufficientCells()));
+    expect(snapshot.goNoGo.decision).toBe('NO_GO_MORE_DATA');
+    expect(snapshot.structuralRisk.decision).toBe('BLOCKING');
+    expect(snapshot.structuralRisk.dangerousRows).toBe(1);
+    expect(snapshot.recommendedNextActions[0]).toContain('DANGEROUS');
+  });
+
+  it('high-risk summary rows carry no legacy/v6 vectors or deltas', async () => {
     const danger = comparisonRow({ expectedness: 'DANGEROUS', requiresHumanReview: true });
     const snapshot = await buildAresV6EvidenceSnapshot({ comparisonRows: [danger] }, deps(makeMetrics(), sufficientCells()));
-    expect(snapshot.highRiskRows).toHaveLength(1);
-    expect(snapshot.comparisonSummary.dangerous).toBe(1);
+    expect(snapshot.highRiskSummaryRows).toHaveLength(1);
+    const row = snapshot.highRiskSummaryRows[0] as unknown as Record<string, unknown>;
+    expect(row.v6).toBeUndefined();
+    expect(row.legacy).toBeUndefined();
+    expect(row.deltas).toBeUndefined();
+    expect(row.expectedness).toBe('DANGEROUS');
+  });
+
+  it('structural risk is CLEAR when all comparison rows are EXPECTED', async () => {
+    const snapshot = await buildAresV6EvidenceSnapshot(
+      { comparisonRows: [comparisonRow({})] },
+      deps(makeMetrics(), sufficientCells()),
+    );
+    expect(snapshot.structuralRisk.decision).toBe('CLEAR');
   });
 });

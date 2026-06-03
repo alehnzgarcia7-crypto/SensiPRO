@@ -19,6 +19,9 @@ function options(overrides: Partial<AresV6EvidenceReviewOptions> = {}): AresV6Ev
     proposals: false,
     json: false,
     markdown: false,
+    summaryOnly: false,
+    includeRows: false,
+    compareScope: 'filtered',
     output: null,
     since: null,
     until: null,
@@ -96,8 +99,9 @@ describe('renderers', () => {
   it('markdown output has the report sections', async () => {
     const report = await runAresV6EvidenceReview(options({ markdown: true, proposals: true }), deps);
     const md = renderAresV6EvidenceMarkdown(report);
-    expect(md).toContain('# ARES v6 — Evidence Review (Fase 3D)');
+    expect(md).toContain('# ARES v6 — Evidence Review (Fase 3D.1)');
     expect(md).toContain('## GO/NO-GO');
+    expect(md).toContain('## Riesgo estructural');
     expect(md).toContain('## Comparación legacy-vs-v6');
     expect(md).toContain('## Propuestas de calibración');
   });
@@ -105,5 +109,48 @@ describe('renderers', () => {
   it('summary line reflects the mode and decision', async () => {
     const report = await runAresV6EvidenceReview(options(), deps);
     expect(renderAresV6EvidenceSummaryLine(report)).toContain('fixtures-only');
+  });
+});
+
+describe('3D.1 — compare-scope, summary-only, include-rows', () => {
+  it('parses the new flags with safe defaults', () => {
+    const parsed = parseAresV6EvidenceReviewArgs(['--compare-scope', 'all', '--summary-only', '--include-rows']);
+    expect(parsed.compareScope).toBe('all');
+    expect(parsed.summaryOnly).toBe(true);
+    expect(parsed.includeRows).toBe(true);
+    expect(parseAresV6EvidenceReviewArgs([]).compareScope).toBe('filtered');
+    expect(() => parseAresV6EvidenceReviewArgs(['--compare-scope', 'bogus'])).toThrow(AresV6EvidenceArgError);
+  });
+
+  it('compare-scope=filtered limits the comparison to the chosen preset', async () => {
+    const report = await runAresV6EvidenceReview(
+      options({ presetId: 'STANDARD_PRO', compareScope: 'filtered' }),
+      deps,
+    );
+    expect(report.comparisonRows.every((row) => row.presetId === 'STANDARD_PRO')).toBe(true);
+    expect(report.warnings).toHaveLength(0);
+  });
+
+  it('compare-scope=all ignores the preset filter and warns', async () => {
+    const report = await runAresV6EvidenceReview(options({ presetId: 'STANDARD_PRO', compareScope: 'all' }), deps);
+    const presets = new Set(report.comparisonRows.map((row) => row.presetId));
+    expect(presets.size).toBeGreaterThan(1);
+    expect(report.warnings.join(' ')).toContain('NO está filtrada por preset');
+  });
+
+  it('--summary-only JSON omits full comparison rows and full high-risk rows', async () => {
+    const report = await runAresV6EvidenceReview(options({ summaryOnly: true, proposals: true }), deps);
+    const json = JSON.parse(renderAresV6EvidenceJson(report)) as Record<string, unknown> & {
+      snapshot: Record<string, unknown>;
+    };
+    expect(json.comparisonRows).toBeUndefined();
+    expect(json.snapshot.highRiskRows).toBeUndefined();
+    expect(json.snapshot.highRiskSummaryRows).toBeDefined();
+  });
+
+  it('default (no summary-only) JSON keeps full comparison rows', async () => {
+    const report = await runAresV6EvidenceReview(options(), deps);
+    const json = JSON.parse(renderAresV6EvidenceJson(report)) as { comparisonRows: unknown[] };
+    expect(Array.isArray(json.comparisonRows)).toBe(true);
   });
 });

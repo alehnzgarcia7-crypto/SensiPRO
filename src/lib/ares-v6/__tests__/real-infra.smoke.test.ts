@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { POST as feedbackPost } from '@/app/api/feedback/v6/route';
 import { POST } from '@/app/api/generate/v6/route';
+import { GET as evidenceGet } from '@/app/api/lab/v6/evidence/route';
 import { GET as metricsGet } from '@/app/api/lab/v6/metrics/route';
 
 import { generateAresV6CalibrationProposals } from '../calibration-proposals';
@@ -16,7 +17,9 @@ import { checkAresV6RateLimit } from '../rate-limit';
 import type { AresV6RateLimitConfig } from '../rate-limit-policy';
 import {
   ARES_V6_SMOKE_SCREEN_DPI,
+  seedAresV6FixtureKnownDevices,
   seedAresV6SmokeDevices,
+  type AresV6FixtureKnownSeedResult,
 } from '../testing/seed-real-infra';
 
 // ═══════════════════════════════════════════════════════════════
@@ -63,10 +66,11 @@ function makeRequest(deviceId: string, ip: string): NextRequest {
 describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () => {
   let activeId = '';
   let inactiveId = '';
+  let fixtureDevices: AresV6FixtureKnownSeedResult[] = [];
 
   beforeAll(async () => {
     // Self-sufficient: ensure the endpoint + lab proxy mode + low device limit
-    // for a fast 429, then seed the two smoke devices into the real DB.
+    // for a fast 429, then seed the smoke + fixture-known devices into the real DB.
     process.env.ARES_V6_API_ENABLED = 'true';
     process.env.ARES_V6_PROXY_TRUST_MODE = 'lab';
     process.env.ARES_V6_INTERNAL_ACCESS_MODE = 'lab';
@@ -76,11 +80,13 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
     process.env.ARES_V6_PERSIST_GENERATIONS_REQUIRED = 'true';
     process.env.ARES_V6_WRITE_FEEDBACK = 'true';
     process.env.ARES_V6_LAB_METRICS_ENABLED = 'true';
+    process.env.ARES_V6_LAB_EVIDENCE_ENABLED = 'true';
 
     const { prisma } = await import('@ares/database');
     const seeded = await seedAresV6SmokeDevices(prisma);
     activeId = seeded.activeId;
     inactiveId = seeded.inactiveId;
+    fixtureDevices = await seedAresV6FixtureKnownDevices(prisma);
   });
 
   afterAll(async () => {
@@ -304,6 +310,65 @@ describe.skipIf(!SMOKE)('ARES v6 — real infra smoke (Redis + Postgres)', () =>
         expect(proposal.autoApplyAllowed).toBe(false);
         expect(proposal.humanReviewRequired).toBe(true);
       }
+    });
+  });
+
+  describe('Evidence integrity (Fase 3D.1)', () => {
+    function evidenceRequest(query: string, ip: string): NextRequest {
+      return new NextRequest(`http://localhost/api/lab/v6/evidence${query}`, {
+        method: 'GET',
+        headers: { 'x-forwarded-for': ip },
+      });
+    }
+    async function generateFixture(deviceId: string, ip: string): Promise<void> {
+      const res = await POST(makeRequest(deviceId, ip));
+      expect(res.status).toBe(200);
+    }
+
+    it('EVIDENCE coverage > 0 from fixture-known devices; alias mirrors evidence (not comparison)', async () => {
+      expect(fixtureDevices.length).toBeGreaterThanOrEqual(2);
+      await generateFixture(fixtureDevices[0]!.deviceId, uniqueIp(50));
+      await generateFixture(fixtureDevices[1]!.deviceId, uniqueIp(51));
+
+      const comparison = buildAresV6ComparisonMatrix({ standardOnly: true });
+      const snapshot = await buildAresV6EvidenceSnapshot({ comparisonRows: comparison });
+
+      expect(snapshot.evidenceCoveredFixtures).toBeGreaterThanOrEqual(2);
+      expect(snapshot.evidenceFixtureCoverage).toBeGreaterThan(0);
+      expect(snapshot.comparisonCoveredFixtures).toBe(snapshot.totalFixtures); // standardOnly covers all
+      expect(snapshot.fixtureCoverage).toBe(snapshot.evidenceFixtureCoverage);
+      expect(snapshot.coveredFixtures).toBe(snapshot.evidenceCoveredFixtures);
+    });
+
+    it('endpoint filters the comparison by presetId (compareScope=filtered default)', async () => {
+      const res = await evidenceGet(evidenceRequest('?includeLegacyCompare=true&presetId=STANDARD_PRO', uniqueIp(52)));
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { data: { comparisonSummary: { byPreset: Record<string, unknown> } } };
+      expect(Object.keys(body.data.comparisonSummary.byPreset)).toEqual(['STANDARD_PRO']);
+    });
+
+    it('endpoint default response excludes legacy/v6 vectors and deltas (summary rows only)', async () => {
+      const res = await evidenceGet(evidenceRequest('?includeLegacyCompare=true', uniqueIp(53)));
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { data: { highRiskRows?: unknown; highRiskSummaryRows?: unknown[] } };
+      expect(body.data.highRiskRows).toBeUndefined();
+      expect(Array.isArray(body.data.highRiskSummaryRows)).toBe(true);
+      const serialized = JSON.stringify(body.data.highRiskSummaryRows ?? []);
+      expect(serialized).not.toContain('"deltas"');
+      expect(serialized).not.toContain('"source":"LEGACY"');
+    });
+
+    it('endpoint includeRows=true returns full rows capped at 100', async () => {
+      const res = await evidenceGet(evidenceRequest('?includeLegacyCompare=true&includeRows=true', uniqueIp(54)));
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { data: { highRiskRows?: unknown[] } };
+      expect(Array.isArray(body.data.highRiskRows)).toBe(true);
+      expect((body.data.highRiskRows ?? []).length).toBeLessThanOrEqual(100);
+    });
+
+    it('endpoint rejects an invalid presetId with 400', async () => {
+      const res = await evidenceGet(evidenceRequest('?presetId=NOT_A_PRESET', uniqueIp(55)));
+      expect(res.status).toBe(400);
     });
   });
 });
