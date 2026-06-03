@@ -177,3 +177,26 @@ npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --js
 
 - Commit `851fa55`. Run de Actions: **26858197075** → **success**.
 - `Phase 0.1B ARES v6 Gate`: **success** (+18 unit + artifact summary-only). `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, endpoint contract). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
+
+---
+
+## 11. Fase 3E — Hidden internal read-only UI (siguiente capa)
+
+La evidencia 3D ahora tiene **superficie de operador**: una UI interna oculta y de
+solo lectura (`/internal/ares-v6`) que **consume** los mismos contratos del tribunal
+(`buildAresV6EvidenceSnapshot`, `buildAresV6ComparisonMatrix`,
+`generateAresV6CalibrationProposals`) sin reimplementarlos y sin tocar el motor.
+
+- **Read-only / human-gated:** muestra GO/NO-GO, riesgo estructural, cobertura
+  EVIDENCIA vs COMPARACIÓN (separadas) y propuestas con `autoApplyAllowed=false` /
+  `humanReviewRequired=true`. **Sin** botón de aplicar/aprobar/publicar; **sin** feedback público.
+- **Seguridad server-side:** gate `ARES_V6_INTERNAL_UI_ENABLED` (404 stealth si off);
+  en prod exige `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION` (acuse de deployment protection).
+  `NEXT_PUBLIC_ARES_V6_ENABLED` es solo hint de cliente, jamás seguridad. noindex, sin nav, sin sitemap.
+- **Evidencia summary-only:** la UI lee únicamente `highRiskSummaryRows` (sin vectores legacy/v6
+  ni deltas) — el mismo default seguro del endpoint.
+- **GO/NO-GO de 3E:** GO para UI interna oculta read-only; **NO-GO** para UI pública (requiere
+  lab interno activado, `evidenceFixtureCoverage ≥ 0.8`, `structuralRisk=CLEAR`, decisión humana).
+
+Detalle completo: `docs/phase-3E/HIDDEN-UI-ARCHITECTURE.md`, `OPERATOR-GUIDE.md`,
+`HIDDEN-UI-VALIDATION.md`. Tests v6: **402 = 383 unit + 19 smoke** (+45 unit).
