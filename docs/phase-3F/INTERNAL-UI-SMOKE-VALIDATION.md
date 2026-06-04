@@ -74,3 +74,10 @@ ares:v6:human-review --dry-run (sobre la evidencia) # recommended=NO_GO_MORE_EVI
 Browser Playwright: validado a nivel de config + spec (compila/lint). La ejecución
 del browser (chromium + next dev) corre en el workflow manual / 3F.1; no se ejecutó
 en el gate de PR a propósito.
+
+### CI 3F
+
+- Run de Actions: **26923217585** → **success** (`Phase 0.1B ARES v6 Gate` +
+  `ARES v6 Real-Infra Smoke`; `Legacy Audit` no bloqueante; `E2E Tests` skipped main-only).
+- PR #1: OPEN · DRAFT · **MERGEABLE** (CLEAN). El workflow manual de sesión
+  `ares-v6-internal-review-session.yml` NO se dispara en push (workflow_dispatch only).
