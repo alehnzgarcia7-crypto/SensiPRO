@@ -112,29 +112,32 @@ jobs:
         run: |
           TARGET=local
           if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; fi
-          node scripts/ci-runner.mjs ci-logs/review-preflight.log npm run ares:v6:verify-env -- --strict --for-workflow --target "$TARGET"
+          npm run ares:v6:verify-env -- --strict --for-workflow --target "$TARGET" 2>&1 | tee ci-logs/review-preflight.log
 
       - name: UI execution readiness (must pass)
         env:
           INPUT_TARGET_URL: ${{ inputs.targetUrl }}
           INPUT_PERSIST: ${{ inputs.persistGenerations }}
           INPUT_FEEDBACK: ${{ inputs.enableFeedback }}
+        # Args as a quoted bash array — no string word-splitting, no re-parsing shell.
         run: |
           TARGET=local
-          UI_ARGS="--strict --for-workflow"
-          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; else UI_ARGS="$UI_ARGS --ui-only"; fi
-          if [ "$INPUT_PERSIST" = "true" ]; then UI_ARGS="$UI_ARGS --with-persistence"; fi
-          if [ "$INPUT_FEEDBACK" = "true" ]; then UI_ARGS="$UI_ARGS --with-feedback"; fi
-          node scripts/ci-runner.mjs ci-logs/review-ui-readiness.log npm run ares:v6:ui-readiness -- $UI_ARGS --target "$TARGET"
+          UI_ARGS=(--strict --for-workflow)
+          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; else UI_ARGS+=(--ui-only); fi
+          if [ "$INPUT_PERSIST" = "true" ]; then UI_ARGS+=(--with-persistence); fi
+          if [ "$INPUT_FEEDBACK" = "true" ]; then UI_ARGS+=(--with-feedback); fi
+          UI_ARGS+=(--target "$TARGET")
+          npm run ares:v6:ui-readiness -- "${UI_ARGS[@]}" 2>&1 | tee ci-logs/review-ui-readiness.log
 
       - name: Run internal lab
         env:
           INPUT_PRESET: ${{ inputs.preset }}
           INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        # Operator inputs (preset, targetUrl) as quoted argv only — no injection.
         run: |
-          ARGS="--preset $INPUT_PRESET --all-fixtures --json --output ares-v6-internal-lab-report.json --label ci-internal-review"
-          if [ -n "$INPUT_TARGET_URL" ]; then ARGS="$ARGS --url $INPUT_TARGET_URL"; fi
-          node scripts/ci-runner.mjs ci-logs/review-internal-lab.log npm run ares:v6:lab:run -- $ARGS
+          LAB_ARGS=(--preset "$INPUT_PRESET" --all-fixtures --json --output ares-v6-internal-lab-report.json --label ci-internal-review)
+          if [ -n "$INPUT_TARGET_URL" ]; then LAB_ARGS+=(--url "$INPUT_TARGET_URL"); fi
+          npm run ares:v6:lab:run -- "${LAB_ARGS[@]}" 2>&1 | tee ci-logs/review-internal-lab.log
 
       - name: Hidden-UI browser smoke (Playwright)
         id: uismoke
@@ -156,10 +159,10 @@ jobs:
         env:
           INPUT_PROPOSALS: ${{ inputs.includeProposals }}
         run: |
-          ARGS="--from-db --legacy-compare"
-          if [ "$INPUT_PROPOSALS" = "true" ]; then ARGS="$ARGS --proposals"; fi
-          node scripts/ci-runner.mjs ci-logs/review-evidence-json.log npm run ares:v6:evidence -- $ARGS --summary-only --json --output ares-v6-evidence-summary.json
-          node scripts/ci-runner.mjs ci-logs/review-evidence-md.log npm run ares:v6:evidence -- $ARGS --markdown --output ares-v6-evidence-report.md
+          EV_ARGS=(--from-db --legacy-compare)
+          if [ "$INPUT_PROPOSALS" = "true" ]; then EV_ARGS+=(--proposals); fi
+          npm run ares:v6:evidence -- "${EV_ARGS[@]}" --summary-only --json --output ares-v6-evidence-summary.json 2>&1 | tee ci-logs/review-evidence-json.log
+          npm run ares:v6:evidence -- "${EV_ARGS[@]}" --markdown --output ares-v6-evidence-report.md 2>&1 | tee ci-logs/review-evidence-md.log
 
       - name: Build Human Review Packet (DRAFT — human must decide)
         if: ${{ inputs.runEvidence }}
