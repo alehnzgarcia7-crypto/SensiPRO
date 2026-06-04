@@ -17,7 +17,7 @@ Esta fase **NO** ejecuta la activación, **NO** corre el workflow con `targetUrl
 | 2 | **Token hash hex real** | El readiness ya no acepta cualquier string de 64 chars; exige SHA-256 hex. |
 | 3 | **Workflow argv safety** | Inputs del operador sólo como argv citado (arrays bash); sin word-splitting/inyección. |
 | 4 | **Checklist operativo** | `OPERATOR-PRE-3G-CHECKLIST.md` (21 ítems) obligatorio antes de 3G. |
-| 5 | **CI verde sostenido** | 457 tests v6 (438 unit + 19 smoke); gate y smoke success. |
+| 5 | **CI verde sostenido** | 457 tests v6 (438 unit + 19 smoke); gate y smoke success (run **26974739905**). |
 
 ---
 
