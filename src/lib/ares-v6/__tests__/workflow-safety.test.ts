@@ -37,4 +37,27 @@ describe('review-session workflow safety', () => {
     // The safe form `"${SOME_ARGS[@]}"` must be present.
     expect(source).toMatch(/\$\{[A-Z_]+\[@\]\}"/);
   });
+
+  // ── Fase 3G additions ──
+  it('runs the target-url-check / execution-mode step', () => {
+    expect(source).toMatch(/ares:v6:target-check/);
+    expect(source).toMatch(/--emit-mode ares-v6-real-execution-mode\.json/);
+  });
+
+  it('runs the real-evidence validation gate', () => {
+    expect(source).toMatch(/ares:v6:validate-real-evidence/);
+  });
+
+  it('keeps feedback OFF by default', () => {
+    expect(source).toMatch(/enableFeedback:[\s\S]*?default: false/);
+  });
+
+  it('keeps persistGenerations ON by default', () => {
+    expect(source).toMatch(/persistGenerations:[\s\S]*?default: true/);
+  });
+
+  it('uploads the new 3G artifacts', () => {
+    expect(source).toMatch(/ares-v6-real-execution-mode\.json/);
+    expect(source).toMatch(/ares-v6-real-evidence-validation\.json/);
+  });
 });

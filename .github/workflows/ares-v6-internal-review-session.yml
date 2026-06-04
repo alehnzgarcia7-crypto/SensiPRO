@@ -106,6 +106,19 @@ jobs:
       - run: node scripts/ci-runner.mjs ci-logs/review-prisma-generate.log npm run db:generate
       - run: node scripts/ci-runner.mjs ci-logs/review-db-push.log npm run db:push:test
 
+      - name: Resolve execution mode + target URL check (gate)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        # A present targetUrl ⇒ REAL evidence mode: the check GATES on HTTPS / no
+        # localhost / no embedded creds / no secret query (exit 1 fails the run).
+        # Empty ⇒ dry-run-local (cannot claim real evidence). Persist/feedback for
+        # the emitted mode artifact come from the job env. Operator input passed
+        # ONLY as a quoted bash array — no re-parsing shell, no injection.
+        run: |
+          TC_ARGS=(--for-workflow --probe --emit-mode ares-v6-real-execution-mode.json --output ares-v6-target-url-check.json)
+          if [ -n "$INPUT_TARGET_URL" ]; then TC_ARGS+=(--target-url "$INPUT_TARGET_URL" --require); fi
+          npm run ares:v6:target-check -- "${TC_ARGS[@]}" 2>&1 | tee ci-logs/review-target-check.log
+
       - name: Preflight internal env (must pass)
         env:
           INPUT_TARGET_URL: ${{ inputs.targetUrl }}
@@ -183,15 +196,32 @@ jobs:
             --json --markdown --output human-review-packet.json \
             "${OPT_ARGS[@]}" 2>&1 | tee ci-logs/review-human-packet.log
 
+      - name: Validate real evidence (gate — real mode fails on no real evidence)
+        if: ${{ inputs.runEvidence }}
+        env:
+          INPUT_RUN_UI_SMOKE: ${{ inputs.runUiSmoke }}
+        # Skeptical auditor of the produced artifacts. real-http mode FAILS the run
+        # when the evidence is fixtures-only / evCov=0 / totalGenerations=0 / packet
+        # missing / a secret leaked / closed-beta gates unmet. dry-run-local must stay
+        # NO_GO_MORE_EVIDENCE. Mode comes from the emitted execution-mode artifact.
+        run: |
+          VR_ARGS=(--mode-json ares-v6-real-execution-mode.json --evidence-json ares-v6-evidence-summary.json --lab-report-json ares-v6-internal-lab-report.json --human-review-json human-review-packet.json --json --output ares-v6-real-evidence-validation.json)
+          if [ -f ares-v6-ui-smoke.json ]; then VR_ARGS+=(--ui-smoke-json ares-v6-ui-smoke.json); fi
+          if [ "$INPUT_RUN_UI_SMOKE" = "true" ]; then VR_ARGS+=(--require-ui-smoke); fi
+          npm run ares:v6:validate-real-evidence -- "${VR_ARGS[@]}" 2>&1 | tee ci-logs/review-validate-real-evidence.log
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ares-v6-internal-review-session
           path: |
+            ares-v6-real-execution-mode.json
+            ares-v6-target-url-check.json
             ares-v6-internal-lab-report.json
             ares-v6-evidence-summary.json
             ares-v6-evidence-report.md
             ares-v6-ui-smoke.json
+            ares-v6-real-evidence-validation.json
             human-review-packet.json
             human-review-packet.md
             ci-logs/
