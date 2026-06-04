@@ -3,6 +3,10 @@
 Obligatorio **antes** de ejecutar el workflow manual con un `targetUrl` real.
 Marca cada ítem. Si alguno falla, **no** ejecutes 3G.
 
+Procedimiento completo de 3G: `docs/phase-3G/REAL-EVIDENCE-ACTIVATION-RUNBOOK.md`,
+`docs/phase-3G/REAL-EVIDENCE_OPERATOR_GUIDE.md` y la plantilla
+`docs/phase-3G/REAL-EVIDENCE_GO_NO_GO.md`.
+
 > Recordatorio: **CI verde = tooling correcto. Human Review Packet FINAL = decisión
 > humana.** Ninguno de estos ítems se valida solo por tener el gate en verde.
 
@@ -42,13 +46,17 @@ Marca cada ítem. Si alguno falla, **no** ejecutes 3G.
 ## Ejecución y revisión
 
 - [ ] 17. Workflow manual **`ares-v6-internal-review-session`** ejecutado con `targetUrl`.
-- [ ] 18. Artifacts descargados (`ares-v6-internal-lab-report.json`,
+- [ ] 18. Artifacts descargados (`ares-v6-real-execution-mode.json`,
+  `ares-v6-target-url-check.json`, `ares-v6-internal-lab-report.json`,
   `ares-v6-evidence-summary.json` + `.md`, `ares-v6-ui-smoke.json`,
-  `human-review-packet.json` + `.md`).
+  `ares-v6-real-evidence-validation.json`, `human-review-packet.json` + `.md`).
 - [ ] 19. **Human Review Packet revisado** (evidencia, riesgo estructural, smoke, hallazgos).
+- [ ] 19b. `ares-v6-real-execution-mode.json` dice `mode=real-http` y
+  `ares-v6-real-evidence-validation.json` dice `passed=true`.
 - [ ] 20. La decisión sigue **DRAFT** si **no** hay humano (`decidedBy` + `rationale`).
-- [ ] 21. **No** se diseña closed-beta si `evidenceFixtureCoverage = 0`
-  (o `< umbral`) o `structuralRisk ≠ CLEAR`.
+- [ ] 21. **No** se diseña closed-beta si `evidenceFixtureCoverage = 0` (o `< umbral`),
+  `structuralRisk ≠ CLEAR`, deployment protection no verificada, UI smoke en fallo, o
+  `ares-v6-real-evidence-validation.json` con `passed=false`.
 
 ---
 
@@ -58,7 +66,13 @@ Marca cada ítem. Si alguno falla, **no** ejecutes 3G.
 # Preview readiness (debe PASS antes de activar):
 npm run ares:v6:verify-env -- --strict --for-workflow --target preview
 npm run ares:v6:ui-readiness -- --strict --target preview --with-persistence
+# Contrato del targetUrl (debe PASS; emite el modo de ejecución):
+npm run ares:v6:target-check -- --target-url "$TARGET_URL" --for-workflow --probe \
+  --emit-mode ares-v6-real-execution-mode.json
 ```
 
 Si cualquiera sale con exit 1 → corrige antes de 3G. La protección de deployment
-(ítems 6–7) **no** la detecta el preflight: es verificación **humana**.
+(ítems 6–7) **no** la detecta el preflight ni el target-check (el probe es sólo
+warning, un preview protegido responde 401/403): es verificación **humana**. Dentro
+del workflow, `ares:v6:validate-real-evidence` audita los artifacts y **falla el run**
+en modo real sin evidencia real (eso es un NO-GO honesto, no un error).

@@ -41,6 +41,10 @@ Todo lo anterior está orquestado por el workflow manual
 
 **Sin secretos** (sanitizer redacta tokens / 64-hex / Bearer). **Sin DB write.**
 
+> **3G:** el packet añade un bloque `execution` (`executionMode`,
+> `targetUrlRedacted`, `deploymentProtectionVerified`) y
+> `decision.finalizationBlockedReasons` (por qué una firma humana NO pudo ser FINAL).
+
 ---
 
 ## 3. Checklist humano
@@ -108,7 +112,10 @@ Todo lo anterior está orquestado por el workflow manual
 - Pasa a **FINAL** sólo cuando un humano registra `decidedBy` + `rationale`
   (+ `decision`). Sin eso, **no hay decisión final**.
 - `GO_PREPARE_CLOSED_BETA_DESIGN` jamás es público por sí mismo: habilita el
-  **diseño** de la closed-beta (Fase 3G), siempre detrás de decisión humana.
+  **diseño** de la closed-beta (Fase 3H), siempre detrás de decisión humana.
+- **3G:** aun CON firma humana, el packet **rechaza** ser FINAL (queda DRAFT) si la
+  decisión es un GO sobre un bloqueador, o un closed-beta sin cobertura / `CLEAR` /
+  deployment protection / smoke. El porqué queda en `decision.finalizationBlockedReasons`.
 
 > **No autocalibración:** ningún feedback ni propuesta modifica engine, presets,
 > research-matrix o fixtures. Las propuestas son `autoApplyAllowed=false`,
@@ -126,3 +133,22 @@ La closed-beta se **diseña** sólo si, sobre **evidencia real**, se cumplen TOD
 `evidenceFixtureCoverage ≥ umbral` · `structuralRisk = CLEAR` · `UI smoke passed` ·
 `deployment protection verified` · `decidedBy + rationale` (FINAL, no DRAFT). Antes
 de 3G: `OPERATOR-PRE-3G-CHECKLIST.md` y `PRE-ACTIVATION-SEAL.md`.
+
+---
+
+## 7. Fase 3G — activación de evidencia real
+
+3G ejecuta la sesión contra un **preview protegido** para mover
+`evidenceFixtureCoverage` de 0 a evidencia real:
+
+- El `targetUrl` se valida con `ares:v6:target-check` (HTTPS, no localhost, no
+  credenciales, no query sensible) y emite `ares-v6-real-execution-mode.json`
+  (`real-http` si hay un targetUrl válido; `dry-run-local` si no).
+- Tras producir los artifacts, `ares:v6:validate-real-evidence` los audita: en
+  `real-http` exige evidencia no-fixtures-only, `evidenceFixtureCoverage > 0`,
+  `totalGenerations > 0`, packet presente, recomendación basada en evidencia real y
+  cero secretos; en `dry-run-local` exige `NO_GO_MORE_EVIDENCE` y prohíbe closed-beta.
+- `dry-run-local` **nunca** alcanza una recomendación de closed-beta.
+
+Detalle: `docs/phase-3G/REAL-EVIDENCE-ACTIVATION-RUNBOOK.md` y
+`docs/phase-3G/REAL-EVIDENCE_OPERATOR_GUIDE.md`.
