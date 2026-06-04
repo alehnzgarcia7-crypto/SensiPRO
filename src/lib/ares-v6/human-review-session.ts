@@ -1,3 +1,5 @@
+import 'server-only';
+
 import {
   ARES_V6_LATAM_CALIBRATION_FIXTURES,
   type AresV6PresetId,

@@ -1,3 +1,5 @@
+import 'server-only';
+
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Internal UI execution readiness (Fase 3F)
 //
@@ -17,8 +19,12 @@
 // The report contains ONLY booleans / status / mode-names — never secret values.
 // ═══════════════════════════════════════════════════════════════
 
-const SHA256_HEX_LENGTH = 64;
 const MIN_LOG_SALT_LENGTH = 16;
+
+/** True only for a real 64-char lowercase/uppercase SHA-256 hex digest. */
+function isSha256Hex(value: unknown): value is string {
+  return typeof value === 'string' && /^[a-f0-9]{64}$/i.test(value);
+}
 
 export type AresV6UiReadinessTarget = 'local' | 'preview' | 'production';
 export type AresV6UiReadinessStatus = 'ok' | 'warning' | 'error';
@@ -192,12 +198,12 @@ export function evaluateAresV6UiReadiness(opts: AresV6UiReadinessOptions): AresV
 
   // 11. Internal access token hash — needed when an internal API is reachable.
   const tokenHash = env.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256;
-  const tokenOk = typeof tokenHash === 'string' && tokenHash.length === SHA256_HEX_LENGTH;
+  const tokenOk = isSha256Hex(tokenHash);
   const tokenNeeded = deployed && ((!uiOnly && apiEnabled) || withFeedback || withPersistence || evidenceEnabled);
   push(
     'internal_access_token_hash',
     tokenOk ? 'ok' : tokenNeeded ? 'error' : 'warning',
-    tokenOk ? 'configured (64 hex)' : 'missing or not 64 hex',
+    tokenOk ? 'configured (64 hex)' : 'missing or not valid 64-hex SHA-256',
   );
 
   // 12. Database — required when persistence/evidence/metrics are involved.

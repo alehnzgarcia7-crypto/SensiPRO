@@ -92,3 +92,28 @@ describe('no secret leak', () => {
     expect(serialized).not.toContain('secret@localhost');
   });
 });
+
+describe('token hash hex validation (3F.1)', () => {
+  // preview + an active surface ⇒ the token-hash check is required (error if invalid).
+  function tokenStatus(token: string | undefined): string {
+    const env: NodeJS.ProcessEnv = { ...SECURE, ARES_V6_LAB_EVIDENCE_ENABLED: 'true' };
+    if (token === undefined) delete env.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256;
+    else env.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256 = token;
+    const result = evaluateAresV6UiReadiness({ target: 'preview', env });
+    return result.checks.find((c) => c.name === 'internal_access_token_hash')?.status ?? 'absent';
+  }
+
+  it('accepts a real 64-hex SHA-256 (lowercase, uppercase, mixed)', () => {
+    expect(tokenStatus('a'.repeat(64))).toBe('ok');
+    expect(tokenStatus('A'.repeat(64))).toBe('ok');
+    expect(tokenStatus('0123456789abcdef'.repeat(4))).toBe('ok');
+  });
+
+  it('rejects non-hex 64, 63 hex, 65 hex, and missing', () => {
+    expect(tokenStatus('g'.repeat(64))).toBe('error'); // 64 chars but not hex
+    expect(tokenStatus('z'.repeat(64))).toBe('error');
+    expect(tokenStatus('a'.repeat(63))).toBe('error'); // too short
+    expect(tokenStatus('a'.repeat(65))).toBe('error'); // too long
+    expect(tokenStatus(undefined)).toBe('error'); // missing
+  });
+});

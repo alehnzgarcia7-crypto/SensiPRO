@@ -1,3 +1,5 @@
+import 'server-only';
+
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Lab metrics aggregator (Fase 3C)
 //
