@@ -24,8 +24,8 @@
 | 13 | Packet sigue DRAFT sin humano | ✅ |
 | 14 | Docs 3G creados | ✅ |
 | 15 | Tests verdes (local) | ✅ |
-| 16 | CI verde | ⏳ (se sella con el run id tras push) |
-| 17 | PR mergeable | ⏳ |
+| 16 | CI verde | ✅ run 26979353180 |
+| 17 | PR mergeable | ✅ |
 | 18 | Sin cambios al motor | ✅ |
 | 19 | Sin cambios a legacy | ✅ |
 | 20 | Nada público activado | ✅ |
@@ -68,9 +68,9 @@ ares:v6:validate-real-evidence --mode real-http (fixtures-only)  → passed=fals
 
 ## 4. Resultado de CI
 
-- `Phase 0.1B ARES v6 Gate`: ⏳ run ____ (se sella tras push).
-- `ARES v6 Real-Infra Smoke`: ⏳ run ____.
-- PR #1: ⏳ MERGEABLE.
+- `Phase 0.1B ARES v6 Gate`: ✅ success — run **26979353180**.
+- `ARES v6 Real-Infra Smoke`: ✅ success — run **26979353180**.
+- PR #1: OPEN · DRAFT · **MERGEABLE** (mergeStateStatus CLEAN).
 
 ## 5. Seguridad / privacidad (verificado)
 
