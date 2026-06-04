@@ -37,6 +37,8 @@
     "ares:v6:evidence": "npx tsx --conditions=react-server scripts/ares-v6-evidence-review.ts",
     "ares:v6:ui-readiness": "npx tsx --conditions=react-server scripts/ares-v6-ui-readiness.ts",
     "ares:v6:human-review": "npx tsx --conditions=react-server scripts/ares-v6-human-review-session.ts",
+    "ares:v6:target-check": "npx tsx --conditions=react-server scripts/ares-v6-target-url-check.ts",
+    "ares:v6:validate-real-evidence": "npx tsx --conditions=react-server scripts/ares-v6-validate-real-evidence.ts",
     "ares:v6:ui:smoke": "playwright test --config playwright.internal-ui.config.ts",
     "db:push:test": "cd packages/database && npx prisma db push --skip-generate",
     "db:reset:safe": "bash scripts/db-reset.sh",
