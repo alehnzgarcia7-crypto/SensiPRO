@@ -1,9 +1,9 @@
 # SensiPRO ARES v6 — Session Handoff
 
-**Fecha:** 2026-06-03
+**Fecha:** 2026-06-04
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3F.1 — Pre-Activation Seal antes de evidencia real)
+**HEAD:** (Fase 3F.1 — Pre-Activation Seal · sellada · CI run 26974739905)
 
 ---
 
@@ -75,9 +75,9 @@ Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACC
 
 ---
 
-## SIGUIENTE: Fase 3G — Activación real del lab + diseño de closed-beta (human-gated)
+## SIGUIENTE: Fase 3G — Activación real contra preview protegido (human-gated)
 
-3F entregada (tooling de sesión: server-only, readiness, human review packet, smoke, workflow manual) ⇒ siguiente: **3G**. Objetivo: el operador ejecuta el **workflow manual** `ares-v6-internal-review-session.yml` (con los secrets del environment `ares-v6-internal-lab`) contra un target que **persista generaciones** (modo http, `targetUrl`) para mover `evidenceFixtureCoverage` de 0 a evidencia real, recolectar feedback TRUSTED, y producir un Human Review Packet con datos reales. Sólo con `GO_PREPARE_CLOSED_BETA_DESIGN` sostenido (`structuralRisk=CLEAR`, cobertura/feedback ≥ umbral, smoke OK, protección de deployment verificada) **y decisión humana FINAL** se diseña la **closed-beta** (aún detrás de flag, NO pública). La UI sigue OFF/oculta. Ver `docs/phase-3F/*`.
+3F + 3F.1 entregadas (tooling de sesión + pre-activation seal: server-only 12/12 vía `--conditions=react-server`, token hash SHA-256 hex real, workflow argv seguro sin shell injection) ⇒ siguiente: **3G = ejecución real, no más preparación**. El operador, **tras pasar `docs/phase-3F/OPERATOR-PRE-3G-CHECKLIST.md`** (21 ítems: environment protegido + secrets + **Vercel Deployment Protection** activa), ejecuta el **workflow manual** `ares-v6-internal-review-session.yml` con `targetUrl` apuntando a un **preview protegido** que **persista generaciones** (modo http), para **mover `evidenceFixtureCoverage` de 0** a evidencia real, recolectar feedback TRUSTED, y producir un Human Review Packet con datos reales. Sólo con `GO_PREPARE_CLOSED_BETA_DESIGN` sostenido (`structuralRisk=CLEAR`, cobertura/feedback ≥ umbral, smoke OK, deployment protection verificada) **y decisión humana FINAL** (`decidedBy`+`rationale`) se diseña la **closed-beta** (detrás de flag, NO pública). **CI verde ≠ aprobación.** La UI sigue OFF/oculta. Ver `docs/phase-3F/*`.
 
 ---
 
