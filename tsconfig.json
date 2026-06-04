@@ -22,6 +22,7 @@
       "@/*": ["./src/*"],
       "@ares/database": ["./packages/database/src"],
       "@ares/algorithms": ["./packages/algorithms/src"],
+      "@ares/algorithms/engine-v6": ["./packages/algorithms/src/engine-v6"],
       "@ares/types": ["./packages/types/src"],
       "@ares/utils": ["./packages/utils/src"],
       "@ares/errors": ["./packages/errors/src"],

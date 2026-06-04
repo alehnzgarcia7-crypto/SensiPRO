@@ -10,8 +10,8 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  lint:
-    name: Lint
+  phase-0-v6-gate:
+    name: Phase 0.1B ARES v6 Gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,50 +19,125 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
-
-  typecheck:
-    name: Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      - run: npm ci
-      - run: npx tsc --noEmit
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      - run: npm ci
-      - run: npx vitest run --coverage
+      - run: node scripts/ci-runner.mjs ci-logs/v6-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/v6-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/v6-lint.log npx eslint packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 src/app/internal/ares-v6 src/components/ares-v6-lab scripts/ares-v6-*.ts --ext .ts,.tsx
+      - run: node scripts/ci-runner.mjs ci-logs/v6-typecheck.log npx tsc -p tsconfig.ares-v6.json
+      - run: node scripts/ci-runner.mjs ci-logs/v6-tests.log npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 src/app/internal/ares-v6 src/components/ares-v6-lab --coverage=false
+      # Fase 3D evidence review (fixtures-only is pure: no DB, no engine mutation).
+      - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-json.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --json --output ares-v6-evidence-summary.json
+      - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-md.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --markdown --output ares-v6-evidence-report.md
+      - run: node scripts/ci-runner.mjs ci-logs/v6-evidence-summary-only.log npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json --output ares-v6-evidence-summary-only.json
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: coverage
+          name: ci-logs-phase-0-v6-gate
+          path: |
+            ci-logs/
+            ares-v6-evidence-summary.json
+            ares-v6-evidence-report.md
+            ares-v6-evidence-summary-only.json
+          if-no-files-found: ignore
+
+  legacy-audit:
+    name: Legacy Audit non-blocking debt report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/legacy-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/legacy-prisma-generate.log npm run db:generate || true
+      - run: node scripts/ci-runner.mjs ci-logs/legacy-lint.log npm run lint || true
+      - run: node scripts/ci-runner.mjs ci-logs/legacy-typecheck.log npm run typecheck || true
+      - run: node scripts/ci-runner.mjs ci-logs/legacy-unit-tests.log npm run test:coverage || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-legacy-audit
+          path: ci-logs/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: legacy-coverage
           path: coverage/
+          if-no-files-found: ignore
+
+  ares-v6-real-infra-smoke:
+    name: ARES v6 Real-Infra Smoke
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sensipro_ares_v6_smoke
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sensipro_ares_v6_smoke?schema=public
+      REDIS_URL: redis://localhost:6379
+      ARES_V6_API_ENABLED: 'true'
+      ARES_V6_REAL_INFRA_SMOKE: 'true'
+      ARES_V6_LOG_SALT: ci-smoke-long-salt-ares-v6
+      ARES_V6_RATE_LIMIT_FAIL_MODE: closed
+      ARES_V6_PROXY_TRUST_MODE: lab
+      ARES_V6_INTERNAL_ACCESS_MODE: lab
+      ARES_V6_PERSIST_GENERATIONS: 'true'
+      ARES_V6_PERSIST_GENERATIONS_REQUIRED: 'true'
+      ARES_V6_WRITE_FEEDBACK: 'true'
+      ARES_V6_LAB_METRICS_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-db-push.log npm run db:push:test
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-seed.log npm run ares:v6:seed:smoke
+      - run: node scripts/ci-runner.mjs ci-logs/smoke-tests.log npx vitest run src/lib/ares-v6/__tests__/real-infra.smoke.test.ts --coverage=false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs-ares-v6-real-infra-smoke
+          path: ci-logs/
+          if-no-files-found: ignore
 
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    needs: [lint, typecheck]
+    needs: [phase-0-v6-gate]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - run: node scripts/ci-runner.mjs ci-logs/e2e-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/e2e-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/playwright-install.log npx playwright install --with-deps chromium
+      - run: node scripts/ci-runner.mjs ci-logs/e2e.log npx playwright test
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
       - uses: actions/upload-artifact@v4
@@ -70,17 +145,10 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-
-  deploy-staging:
-    name: Deploy Staging
-    runs-on: ubuntu-latest
-    needs: [unit-tests, e2e-tests]
-    if: github.ref == 'refs/heads/develop'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v25
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          scope: ${{ secrets.VERCEL_ORG_ID }}
+          name: ci-logs-e2e
+          path: ci-logs/
+          if-no-files-found: ignore

@@ -1,0 +1,154 @@
+# Fase 3F — Protocolo de Revisión Humana
+
+Cómo se conduce una sesión interna real de ARES v6 y cómo se decide.
+**El sistema recomienda; un humano decide.** Ninguna propuesta se auto-aplica;
+el motor no se modifica.
+
+---
+
+## 1. Flujo de la sesión
+
+```
+1. Operador prepara entorno protegido (secrets del environment ares-v6-internal-lab).
+2. Preflight env        → npm run ares:v6:verify-env -- --strict --target <t>
+3. UI readiness         → npm run ares:v6:ui-readiness -- --strict --target <t>
+4. Lab runner           → npm run ares:v6:lab:run -- ... --json --output lab.json
+5. (http target) persiste generaciones reales vía la ruta.
+6. Evidence report      → npm run ares:v6:evidence -- --from-db --legacy-compare --summary-only --json --output ev.json
+7. UI smoke (browser)   → npm run ares:v6:ui:smoke      (opcional, manual)
+8. Human review packet  → npm run ares:v6:human-review -- --evidence-json ev.json ...
+9. Un humano llena la decisión (decidedBy + rationale) → FINAL.
+```
+
+Todo lo anterior está orquestado por el workflow manual
+`.github/workflows/ares-v6-internal-review-session.yml` (workflow_dispatch only).
+
+---
+
+## 2. El Human Review Packet
+
+`human-review-packet.json` + `.md`. Secciones:
+
+1. Metadata de sesión (label, operador, entorno, commit, target).
+2. Evidencia · GO/NO-GO.
+3. Cobertura **EVIDENCIA** vs **COMPARACIÓN** (separadas).
+4. Filas de alto riesgo (resumen, sin vectores).
+5. Prueba de humo de la UI.
+6. Checklist humano (auto + manual).
+7. Hallazgos (findings derivados + los que agregue el humano).
+8. Próximas acciones (de la evidencia).
+9. **Bloque de decisión** (DRAFT por defecto).
+
+**Sin secretos** (sanitizer redacta tokens / 64-hex / Bearer). **Sin DB write.**
+
+> **3G:** el packet añade un bloque `execution` (`executionMode`,
+> `targetUrlRedacted`, `deploymentProtectionVerified`) y
+> `decision.finalizationBlockedReasons` (por qué una firma humana NO pudo ser FINAL).
+
+---
+
+## 3. Checklist humano
+
+| Ítem | Tipo |
+|---|---|
+| Protección de deployment verificada (Vercel auth/password/trusted IPs) | humano |
+| /internal/ares-v6 oculta: sin nav/sitemap/SEO | humano |
+| Sin link público | humano |
+| Sin botón aplicar/aprobar/publicar | humano |
+| Preview cambia al seleccionar fixture/preset (sin persistencia) | humano |
+| `evidenceFixtureCoverage ≥ umbral` | auto |
+| `structuralRisk = CLEAR` | auto |
+| `feedbackCoverage ≥ umbral` | auto |
+| Prueba de humo de la UI aprobada | auto |
+
+---
+
+## 4. Estados de decisión
+
+| Decisión | Cuándo |
+|---|---|
+| **NO_GO_FIX_BLOCKERS** | Smoke falló · readiness falló · `structuralRisk=BLOCKING` · `NO_GO_INFRA` · `NO_GO_FIX_ENGINE`. |
+| **NO_GO_MORE_EVIDENCE** | `evidenceCoverage < umbral` · `feedbackCoverage < umbral` · `NO_GO_MORE_DATA` · `structuralRisk=REVIEW_REQUIRED`. |
+| **GO_HIDDEN_UI_CONTINUE** | UI sana, sin bloqueadores, pero aún sin alcanzar el bar de closed-beta (seguir iterando interno). |
+| **GO_PREPARE_CLOSED_BETA_DESIGN** | `GO_INTERNAL_UI_EXPERIMENT` + `structuralRisk=CLEAR` + cobertura/feedback ≥ umbral + smoke OK + protección de deployment verificada. |
+
+**Precedencia:** blockers → more-evidence → closed-beta-ready → continue.
+**Default (sin métricas reales / fixtures-only):** `NO_GO_MORE_EVIDENCE`.
+
+### Matriz de decisión
+
+```
+                          ┌─────────────────────────────────────────────┐
+                          │ ¿smoke fail / readiness fail / BLOCKING /    │
+                          │  NO_GO_INFRA / NO_GO_FIX_ENGINE?             │
+                          └───────────────┬─────────────────────────────┘
+                            sí            │ no
+                  ┌─────────▼─────────┐   │
+                  │ NO_GO_FIX_BLOCKERS│   │
+                  └───────────────────┘   ▼
+                          ┌─────────────────────────────────────────────┐
+                          │ ¿evCov<u / fbCov<u / NO_GO_MORE_DATA /       │
+                          │  REVIEW_REQUIRED?                           │
+                          └───────────────┬─────────────────────────────┘
+                            sí            │ no
+                  ┌─────────▼─────────┐   │
+                  │ NO_GO_MORE_EVIDENCE│  │
+                  └───────────────────┘   ▼
+                          ┌─────────────────────────────────────────────┐
+                          │ ¿GO + CLEAR + cobertura + feedback + smoke + │
+                          │  deployment-protection-verified?            │
+                          └───────────┬───────────────┬─────────────────┘
+                          sí          │            no │
+              ┌───────────▼─────────┐ │  ┌────────────▼──────────┐
+              │GO_PREPARE_CLOSED_BETA│ │  │ GO_HIDDEN_UI_CONTINUE  │
+              └─────────────────────┘ │  └───────────────────────┘
+```
+
+---
+
+## 5. Regla de decisión final
+
+- El packet nace **DRAFT** con una **recomendación** del sistema.
+- Pasa a **FINAL** sólo cuando un humano registra `decidedBy` + `rationale`
+  (+ `decision`). Sin eso, **no hay decisión final**.
+- `GO_PREPARE_CLOSED_BETA_DESIGN` jamás es público por sí mismo: habilita el
+  **diseño** de la closed-beta (Fase 3H), siempre detrás de decisión humana.
+- **3G:** aun CON firma humana, el packet **rechaza** ser FINAL (queda DRAFT) si la
+  decisión es un GO sobre un bloqueador, o un closed-beta sin cobertura / `CLEAR` /
+  deployment protection / smoke. El porqué queda en `decision.finalizationBlockedReasons`.
+
+> **No autocalibración:** ningún feedback ni propuesta modifica engine, presets,
+> research-matrix o fixtures. Las propuestas son `autoApplyAllowed=false`,
+> `humanReviewRequired=true`.
+
+Plantilla de decisión: `GO-NO-GO-DECISION-TEMPLATE.md`.
+
+---
+
+## 6. CI verde ≠ aprobación (Fase 3F.1)
+
+> **CI success = el tooling es correcto. Human Review Packet FINAL = la decisión humana.**
+
+La closed-beta se **diseña** sólo si, sobre **evidencia real**, se cumplen TODOS:
+`evidenceFixtureCoverage ≥ umbral` · `structuralRisk = CLEAR` · `UI smoke passed` ·
+`deployment protection verified` · `decidedBy + rationale` (FINAL, no DRAFT). Antes
+de 3G: `OPERATOR-PRE-3G-CHECKLIST.md` y `PRE-ACTIVATION-SEAL.md`.
+
+---
+
+## 7. Fase 3G — activación de evidencia real
+
+3G ejecuta la sesión contra un **preview protegido** para mover
+`evidenceFixtureCoverage` de 0 a evidencia real:
+
+- El `targetUrl` se valida con `ares:v6:target-check` (HTTPS, no localhost, no
+  credenciales, no query sensible) y emite `ares-v6-real-execution-mode.json`
+  (`real-http` si hay un targetUrl válido; `dry-run-local` si no).
+- Tras producir los artifacts, `ares:v6:validate-real-evidence` los audita: en
+  `real-http` exige evidencia no-fixtures-only, `evidenceFixtureCoverage > 0`,
+  `totalGenerations > 0`, packet presente, recomendación basada en evidencia real y
+  cero secretos; en `dry-run-local` exige `NO_GO_MORE_EVIDENCE` y prohíbe closed-beta.
+- `dry-run-local` **nunca** alcanza una recomendación de closed-beta.
+
+Detalle: `docs/phase-3G/REAL-EVIDENCE-ACTIVATION-RUNBOOK.md` y
+`docs/phase-3G/REAL-EVIDENCE_OPERATOR_GUIDE.md`.

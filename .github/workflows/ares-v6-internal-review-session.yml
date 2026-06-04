@@ -1,0 +1,228 @@
+name: ARES v6 Internal Review Session
+
+# Manual, controlled internal review session ONLY (Fase 3F). Never runs on push/PR.
+# Uses the protected `ares-v6-internal-lab` environment for secrets/vars.
+# Produces: lab report + evidence report + UI smoke + a DRAFT Human Review Packet.
+# The system RECOMMENDS; a human must record the final decision. No engine change.
+on:
+  workflow_dispatch:
+    inputs:
+      operator:
+        description: 'Operator name (required — recorded in the packet)'
+        required: true
+      label:
+        description: 'Session label'
+        required: false
+        default: 'ares-v6-3f-review'
+      targetUrl:
+        description: 'Deployed endpoint URL for http mode (optional; enables real persistence)'
+        required: false
+        default: ''
+      preset:
+        description: 'Preset id'
+        required: false
+        default: 'STANDARD_PRO'
+      runUiSmoke:
+        description: 'Run the hidden-UI Playwright browser smoke'
+        type: boolean
+        required: false
+        default: true
+      runEvidence:
+        description: 'Run the Fase 3D evidence review'
+        type: boolean
+        required: false
+        default: true
+      includeProposals:
+        description: 'Include human-gated calibration proposals (DRAFT only, never auto-applied)'
+        type: boolean
+        required: false
+        default: true
+      enableFeedback:
+        description: 'Enable feedback writes (default off — open only after the first batch)'
+        type: boolean
+        required: false
+        default: false
+      persistGenerations:
+        description: 'Persist generations (http mode)'
+        type: boolean
+        required: false
+        default: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  internal-review-session:
+    name: ARES v6 Internal Review Session (manual)
+    runs-on: ubuntu-latest
+    environment: ares-v6-internal-lab
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sensipro_ares_v6_review
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sensipro_ares_v6_review?schema=public
+      REDIS_URL: redis://localhost:6379
+      ARES_V6_LAB_ENVIRONMENT: ares-v6-internal-lab
+      ARES_V6_INTERNAL_UI_ENABLED: 'true'
+      ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION: 'false'
+      ARES_V6_LAB_EVIDENCE_ENABLED: 'true'
+      ARES_V6_LAB_METRICS_ENABLED: 'true'
+      ARES_V6_API_ENABLED: ${{ inputs.targetUrl != '' && 'true' || 'false' }}
+      ARES_V6_PERSIST_GENERATIONS: ${{ inputs.persistGenerations && 'true' || 'false' }}
+      ARES_V6_WRITE_FEEDBACK: ${{ inputs.enableFeedback && 'true' || 'false' }}
+      ARES_V6_RATE_LIMIT_FAIL_MODE: closed
+      ARES_V6_PROXY_TRUST_MODE: strict
+      ARES_V6_INTERNAL_ACCESS_MODE: header
+      ARES_V6_LOG_SALT: ${{ secrets.ARES_V6_LOG_SALT }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/review-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/review-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/review-db-push.log npm run db:push:test
+
+      - name: Resolve execution mode + target URL check (gate)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        # A present targetUrl ⇒ REAL evidence mode: the check GATES on HTTPS / no
+        # localhost / no embedded creds / no secret query (exit 1 fails the run).
+        # Empty ⇒ dry-run-local (cannot claim real evidence). Persist/feedback for
+        # the emitted mode artifact come from the job env. Operator input passed
+        # ONLY as a quoted bash array — no re-parsing shell, no injection.
+        run: |
+          TC_ARGS=(--for-workflow --probe --emit-mode ares-v6-real-execution-mode.json --output ares-v6-target-url-check.json)
+          if [ -n "$INPUT_TARGET_URL" ]; then TC_ARGS+=(--target-url "$INPUT_TARGET_URL" --require); fi
+          npm run ares:v6:target-check -- "${TC_ARGS[@]}" 2>&1 | tee ci-logs/review-target-check.log
+
+      - name: Preflight internal env (must pass)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        run: |
+          TARGET=local
+          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; fi
+          npm run ares:v6:verify-env -- --strict --for-workflow --target "$TARGET" 2>&1 | tee ci-logs/review-preflight.log
+
+      - name: UI execution readiness (must pass)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+          INPUT_PERSIST: ${{ inputs.persistGenerations }}
+          INPUT_FEEDBACK: ${{ inputs.enableFeedback }}
+        # Args as a quoted bash array — no string word-splitting, no re-parsing shell.
+        run: |
+          TARGET=local
+          UI_ARGS=(--strict --for-workflow)
+          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; else UI_ARGS+=(--ui-only); fi
+          if [ "$INPUT_PERSIST" = "true" ]; then UI_ARGS+=(--with-persistence); fi
+          if [ "$INPUT_FEEDBACK" = "true" ]; then UI_ARGS+=(--with-feedback); fi
+          UI_ARGS+=(--target "$TARGET")
+          npm run ares:v6:ui-readiness -- "${UI_ARGS[@]}" 2>&1 | tee ci-logs/review-ui-readiness.log
+
+      - name: Run internal lab
+        env:
+          INPUT_PRESET: ${{ inputs.preset }}
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        # Operator inputs (preset, targetUrl) as quoted argv only — no injection.
+        run: |
+          LAB_ARGS=(--preset "$INPUT_PRESET" --all-fixtures --json --output ares-v6-internal-lab-report.json --label ci-internal-review)
+          if [ -n "$INPUT_TARGET_URL" ]; then LAB_ARGS+=(--url "$INPUT_TARGET_URL"); fi
+          npm run ares:v6:lab:run -- "${LAB_ARGS[@]}" 2>&1 | tee ci-logs/review-internal-lab.log
+
+      - name: Hidden-UI browser smoke (Playwright)
+        id: uismoke
+        if: ${{ inputs.runUiSmoke }}
+        continue-on-error: true
+        run: |
+          npx playwright install --with-deps chromium
+          node scripts/ci-runner.mjs ci-logs/review-ui-smoke.log npm run ares:v6:ui:smoke
+
+      - name: Record UI smoke result (simple shape for the packet)
+        if: ${{ inputs.runUiSmoke }}
+        env:
+          UISMOKE_OUTCOME: ${{ steps.uismoke.outcome }}
+        run: |
+          node -e "require('fs').writeFileSync('ares-v6-ui-smoke.json', JSON.stringify({ ran: true, passed: process.env.UISMOKE_OUTCOME === 'success' }))"
+
+      - name: Run evidence review (Fase 3D — legacy-vs-v6 + go/no-go)
+        if: ${{ inputs.runEvidence }}
+        env:
+          INPUT_PROPOSALS: ${{ inputs.includeProposals }}
+        run: |
+          EV_ARGS=(--from-db --legacy-compare)
+          if [ "$INPUT_PROPOSALS" = "true" ]; then EV_ARGS+=(--proposals); fi
+          npm run ares:v6:evidence -- "${EV_ARGS[@]}" --summary-only --json --output ares-v6-evidence-summary.json 2>&1 | tee ci-logs/review-evidence-json.log
+          npm run ares:v6:evidence -- "${EV_ARGS[@]}" --markdown --output ares-v6-evidence-report.md 2>&1 | tee ci-logs/review-evidence-md.log
+
+      - name: Build Human Review Packet (DRAFT — human must decide)
+        if: ${{ inputs.runEvidence }}
+        env:
+          OPERATOR: ${{ inputs.operator }}
+          LABEL: ${{ inputs.label }}
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        # Operator-controlled inputs are passed ONLY as quoted argv (bash arrays),
+        # never through a re-parsing shell — no command injection surface.
+        run: |
+          OPT_ARGS=()
+          if [ -f ares-v6-ui-smoke.json ]; then OPT_ARGS+=(--ui-smoke-json ares-v6-ui-smoke.json); fi
+          if [ -n "$INPUT_TARGET_URL" ]; then OPT_ARGS+=(--target-url "$INPUT_TARGET_URL"); fi
+          npm run ares:v6:human-review -- \
+            --evidence-json ares-v6-evidence-summary.json \
+            --lab-report-json ares-v6-internal-lab-report.json \
+            --operator "$OPERATOR" --label "$LABEL" \
+            --json --markdown --output human-review-packet.json \
+            "${OPT_ARGS[@]}" 2>&1 | tee ci-logs/review-human-packet.log
+
+      - name: Validate real evidence (gate — real mode fails on no real evidence)
+        if: ${{ inputs.runEvidence }}
+        env:
+          INPUT_RUN_UI_SMOKE: ${{ inputs.runUiSmoke }}
+        # Skeptical auditor of the produced artifacts. real-http mode FAILS the run
+        # when the evidence is fixtures-only / evCov=0 / totalGenerations=0 / packet
+        # missing / a secret leaked / closed-beta gates unmet. dry-run-local must stay
+        # NO_GO_MORE_EVIDENCE. Mode comes from the emitted execution-mode artifact.
+        run: |
+          VR_ARGS=(--mode-json ares-v6-real-execution-mode.json --evidence-json ares-v6-evidence-summary.json --lab-report-json ares-v6-internal-lab-report.json --human-review-json human-review-packet.json --json --output ares-v6-real-evidence-validation.json)
+          if [ -f ares-v6-ui-smoke.json ]; then VR_ARGS+=(--ui-smoke-json ares-v6-ui-smoke.json); fi
+          if [ "$INPUT_RUN_UI_SMOKE" = "true" ]; then VR_ARGS+=(--require-ui-smoke); fi
+          npm run ares:v6:validate-real-evidence -- "${VR_ARGS[@]}" 2>&1 | tee ci-logs/review-validate-real-evidence.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ares-v6-internal-review-session
+          path: |
+            ares-v6-real-execution-mode.json
+            ares-v6-target-url-check.json
+            ares-v6-internal-lab-report.json
+            ares-v6-evidence-summary.json
+            ares-v6-evidence-report.md
+            ares-v6-ui-smoke.json
+            ares-v6-real-evidence-validation.json
+            human-review-packet.json
+            human-review-packet.md
+            ci-logs/
+          if-no-files-found: ignore

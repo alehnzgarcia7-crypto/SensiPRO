@@ -1,0 +1,148 @@
+name: ARES v6 Internal Lab
+
+# Manual, controlled internal activation ONLY. Never runs on push/PR.
+# Uses the protected `ares-v6-internal-lab` environment for secrets/vars.
+on:
+  workflow_dispatch:
+    inputs:
+      preset:
+        description: 'Preset id (e.g. STANDARD_PRO)'
+        required: false
+        default: 'STANDARD_PRO'
+      fixture:
+        description: 'Single fixture id (optional)'
+        required: false
+        default: ''
+      allFixtures:
+        description: 'Run all fixtures (local-service mode)'
+        type: boolean
+        required: false
+        default: true
+      enableFeedback:
+        description: 'Enable feedback writes (default off)'
+        type: boolean
+        required: false
+        default: false
+      enableMetrics:
+        description: 'Enable lab metrics endpoint'
+        type: boolean
+        required: false
+        default: true
+      persistGenerations:
+        description: 'Persist generations'
+        type: boolean
+        required: false
+        default: true
+      targetUrl:
+        description: 'Deployed endpoint URL for http mode (optional)'
+        required: false
+        default: ''
+      runEvidenceReview:
+        description: 'Run the Fase 3D evidence review after the lab'
+        type: boolean
+        required: false
+        default: true
+      includeLegacyCompare:
+        description: 'Include legacy-vs-v6 comparison in the evidence report'
+        type: boolean
+        required: false
+        default: true
+      includeProposals:
+        description: 'Include human-gated calibration proposals (DRAFT only, never auto-applied)'
+        type: boolean
+        required: false
+        default: false
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  internal-lab:
+    name: ARES v6 Internal Lab (manual)
+    runs-on: ubuntu-latest
+    environment: ares-v6-internal-lab
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sensipro_ares_v6_lab
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sensipro_ares_v6_lab?schema=public
+      REDIS_URL: redis://localhost:6379
+      ARES_V6_LAB_ENVIRONMENT: ares-v6-internal-lab
+      ARES_V6_LOG_SALT: ${{ secrets.ARES_V6_LOG_SALT }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN }}
+      ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256: ${{ secrets.ARES_V6_INTERNAL_ACCESS_TOKEN_SHA256 }}
+      ARES_V6_INTERNAL_ACCESS_MODE: header
+      ARES_V6_RATE_LIMIT_FAIL_MODE: closed
+      ARES_V6_PROXY_TRUST_MODE: strict
+      ARES_V6_PERSIST_GENERATIONS: ${{ inputs.persistGenerations && 'true' || 'false' }}
+      ARES_V6_WRITE_FEEDBACK: ${{ inputs.enableFeedback && 'true' || 'false' }}
+      ARES_V6_LAB_METRICS_ENABLED: ${{ inputs.enableMetrics && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: node scripts/ci-runner.mjs ci-logs/lab-npm-ci.log npm ci
+      - run: node scripts/ci-runner.mjs ci-logs/lab-prisma-generate.log npm run db:generate
+      - run: node scripts/ci-runner.mjs ci-logs/lab-db-push.log npm run db:push:test
+      - name: Preflight internal env (must pass before activation)
+        env:
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        run: |
+          TARGET=local
+          if [ -n "$INPUT_TARGET_URL" ]; then TARGET=preview; fi
+          node scripts/ci-runner.mjs ci-logs/preflight.log npm run ares:v6:verify-env -- --strict --for-workflow --target "$TARGET"
+      - name: Run internal lab
+        env:
+          INPUT_PRESET: ${{ inputs.preset }}
+          INPUT_FIXTURE: ${{ inputs.fixture }}
+          INPUT_ALL_FIXTURES: ${{ inputs.allFixtures }}
+          INPUT_TARGET_URL: ${{ inputs.targetUrl }}
+        run: |
+          ARGS="--preset $INPUT_PRESET --json --output ares-v6-internal-lab-report.json --label ci-internal-lab"
+          if [ "$INPUT_ALL_FIXTURES" = "true" ]; then ARGS="$ARGS --all-fixtures"; fi
+          if [ -n "$INPUT_FIXTURE" ]; then ARGS="$ARGS --fixture $INPUT_FIXTURE"; fi
+          if [ -n "$INPUT_TARGET_URL" ]; then ARGS="$ARGS --url $INPUT_TARGET_URL"; fi
+          node scripts/ci-runner.mjs ci-logs/internal-lab.log npm run ares:v6:lab:run -- $ARGS
+      - name: Run evidence review (Fase 3D — legacy-vs-v6 + go/no-go)
+        if: ${{ inputs.runEvidenceReview }}
+        env:
+          INPUT_LEGACY_COMPARE: ${{ inputs.includeLegacyCompare }}
+          INPUT_PROPOSALS: ${{ inputs.includeProposals }}
+        run: |
+          ARGS="--from-db"
+          if [ "$INPUT_LEGACY_COMPARE" = "true" ]; then ARGS="$ARGS --legacy-compare"; fi
+          if [ "$INPUT_PROPOSALS" = "true" ]; then ARGS="$ARGS --proposals"; fi
+          node scripts/ci-runner.mjs ci-logs/evidence-json.log npm run ares:v6:evidence -- $ARGS --json --output ares-v6-evidence-summary.json
+          node scripts/ci-runner.mjs ci-logs/evidence-md.log npm run ares:v6:evidence -- $ARGS --markdown --output ares-v6-evidence-report.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ares-v6-internal-lab-report
+          path: |
+            ares-v6-internal-lab-report.json
+            ares-v6-evidence-summary.json
+            ares-v6-evidence-report.md
+            ci-logs/
+          if-no-files-found: ignore

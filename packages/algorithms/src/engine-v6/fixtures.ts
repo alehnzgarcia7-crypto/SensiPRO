@@ -1,0 +1,349 @@
+import type { AresV6DeviceSignal, AresV6PresetId } from './types';
+
+// ═══════════════════════════════════════════════════════════════
+// ARES ENGINE V6 — LATAM Calibration Fixtures
+//
+// These fixtures define the first devices that must feel correct
+// before the v6 engine is allowed to replace legacy generation.
+// ═══════════════════════════════════════════════════════════════
+
+export interface AresV6CalibrationFixture {
+  id: string;
+  device: AresV6DeviceSignal;
+  priority: 'P0' | 'P1' | 'P2';
+  marketReason: string;
+  expectedPpiBand: string;
+  expectedStandardGeneralRange: readonly [number, number];
+  primaryPresets: readonly AresV6PresetId[];
+  validationNotes: readonly string[];
+}
+
+export const ARES_V6_LATAM_CALIBRATION_FIXTURES = [
+  {
+    id: 'samsung-galaxy-a14',
+    priority: 'P0',
+    marketReason: 'Mass-market LATAM budget Samsung. Critical because legacy often treats A-series incorrectly.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'TODO_ROJO', 'LOW_END_STABLE', 'ANDROID_BUDGET'],
+    device: {
+      brand: 'Samsung',
+      model: 'Galaxy A14',
+      screenSize: 6.6,
+      ramGb: 4,
+      screenHz: 90,
+      panelType: 'LCD',
+      tier: 'LOW',
+      ppi: 400,
+      screenDpi: 400,
+      chipset: 'Helio G80 / Exynos variant',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['Must not fall back to LOW=330 PPI.', 'Red Dot must feel alive for drag without making 4x chaotic.'],
+  },
+  {
+    id: 'samsung-galaxy-a15',
+    priority: 'P0',
+    marketReason: 'Very common 2024 budget-mid Samsung with AMOLED/90Hz. Needs correct PPI and panel handling.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'TODO_ROJO', 'CLASH_SQUAD', 'ANDROID_BUDGET'],
+    device: {
+      brand: 'Samsung',
+      model: 'Galaxy A15',
+      screenSize: 6.5,
+      ramGb: 4,
+      screenHz: 90,
+      panelType: 'AMOLED',
+      tier: 'MID',
+      ppi: 396,
+      screenDpi: 396,
+      chipset: 'Helio G99',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['AMOLED should slightly reduce jitter vs LCD A14.', 'Do not classify as 270 PPI.'],
+  },
+  {
+    id: 'samsung-galaxy-a24',
+    priority: 'P0',
+    marketReason: 'Popular LATAM Samsung mid-range with AMOLED and 90Hz.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'TODO_ROJO', 'SMG_TRACKING'],
+    device: {
+      brand: 'Samsung',
+      model: 'Galaxy A24',
+      screenSize: 6.5,
+      ramGb: 4,
+      screenHz: 90,
+      panelType: 'AMOLED',
+      tier: 'MID',
+      ppi: 396,
+      screenDpi: 396,
+      chipset: 'Helio G99',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['Should be close to A15 but with slightly more stable profile if RAM override is higher.'],
+  },
+  {
+    id: 'samsung-galaxy-a54',
+    priority: 'P0',
+    marketReason: 'Reference FHD+ Samsung. Must be a flagship fixture for mainstream calibration.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'BATTLE_ROYALE', 'AR_RECOIL_CONTROL', 'GYRO_LIGHT'],
+    device: {
+      brand: 'Samsung',
+      model: 'Galaxy A54',
+      screenSize: 6.4,
+      ramGb: 8,
+      screenHz: 120,
+      panelType: 'AMOLED',
+      tier: 'HIGH',
+      ppi: 401,
+      screenDpi: 401,
+      chipset: 'Exynos 1380',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+      highFpsMode: true,
+    },
+    validationNotes: ['120Hz/AMOLED should slightly reduce raw sensi from budget devices.', 'Should not output legacy v5 General around 100.'],
+  },
+  {
+    id: 'redmi-note-12',
+    priority: 'P0',
+    marketReason: 'One of the core Xiaomi/Redmi devices for LATAM Free Fire searches.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'TODO_ROJO', 'CLASH_SQUAD', 'SMG_TRACKING'],
+    device: {
+      brand: 'Redmi',
+      model: 'Note 12',
+      screenSize: 6.67,
+      ramGb: 4,
+      screenHz: 120,
+      panelType: 'AMOLED',
+      tier: 'MID',
+      ppi: 395,
+      screenDpi: 395,
+      chipset: 'Snapdragon 685',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+      highFpsMode: true,
+    },
+    validationNotes: ['Large 6.67 screen should protect against overshoot.', 'Needs a strong Todo Rojo preset for search intent.'],
+  },
+  {
+    id: 'redmi-note-13',
+    priority: 'P0',
+    marketReason: 'Current Redmi mass-market device; must be excellent for SEO and conversion.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'X_METHOD', 'TODO_ROJO', 'CLASH_SQUAD'],
+    device: {
+      brand: 'Redmi',
+      model: 'Note 13',
+      screenSize: 6.67,
+      ramGb: 6,
+      screenHz: 120,
+      panelType: 'AMOLED',
+      tier: 'MID',
+      ppi: 395,
+      screenDpi: 395,
+      chipset: 'Snapdragon 685 / Dimensity variant',
+      releaseYear: 2024,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+      highFpsMode: true,
+    },
+    validationNotes: ['Should be slightly smoother than Note 12 when user RAM override is 6GB+.'],
+  },
+  {
+    id: 'poco-x5-pro',
+    priority: 'P1',
+    marketReason: 'Performance-oriented Xiaomi/POCO device popular with competitive mobile players.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'FOUR_FINGER_PRO', 'GYRO_LIGHT', 'AR_RECOIL_CONTROL'],
+    device: {
+      brand: 'POCO',
+      model: 'X5 Pro',
+      screenSize: 6.67,
+      ramGb: 8,
+      screenHz: 120,
+      panelType: 'AMOLED',
+      tier: 'HIGH',
+      ppi: 395,
+      screenDpi: 395,
+      chipset: 'Snapdragon 778G',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+      highFpsMode: true,
+    },
+    validationNotes: ['Should support lower jitter and gyro presets better than budget Android.'],
+  },
+  {
+    id: 'moto-g54',
+    priority: 'P0',
+    marketReason: 'Motorola mass-market LATAM device, essential for SEO and trust.',
+    expectedPpiBand: '390-449',
+    expectedStandardGeneralRange: [168, 182],
+    primaryPresets: ['STANDARD_PRO', 'LOW_END_STABLE', 'SMG_TRACKING'],
+    device: {
+      brand: 'Motorola',
+      model: 'Moto G54',
+      screenSize: 6.5,
+      ramGb: 8,
+      screenHz: 120,
+      panelType: 'IPS',
+      tier: 'MID',
+      ppi: 405,
+      screenDpi: 405,
+      chipset: 'Dimensity 7020',
+      releaseYear: 2023,
+      os: 'ANDROID',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['IPS should feel slightly less crisp than AMOLED devices in same PPI band.'],
+  },
+  {
+    id: 'iphone-11',
+    priority: 'P0',
+    marketReason: 'Popular older iPhone with lower PPI; common second-hand competitive device.',
+    expectedPpiBand: '320-359',
+    expectedStandardGeneralRange: [185, 200],
+    primaryPresets: ['STANDARD_PRO', 'IPHONE_SMOOTH', 'ONE_TAP'],
+    device: {
+      brand: 'Apple',
+      model: 'iPhone 11',
+      screenSize: 6.1,
+      ramGb: 4,
+      screenHz: 60,
+      panelType: 'IPS',
+      tier: 'HIGH',
+      ppi: 326,
+      screenDpi: 326,
+      chipset: 'A13 Bionic',
+      releaseYear: 2019,
+      os: 'IOS',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['Low PPI iPhone should not be treated like modern 460 PPI OLED iPhones.'],
+  },
+  {
+    id: 'iphone-14',
+    priority: 'P0',
+    marketReason: 'High-PPI iPhone reference for premium calibration.',
+    expectedPpiBand: '450-519',
+    expectedStandardGeneralRange: [155, 172],
+    primaryPresets: ['STANDARD_PRO', 'IPHONE_SMOOTH', 'SNIPER_AWM', 'GYRO_LIGHT'],
+    device: {
+      brand: 'Apple',
+      model: 'iPhone 14',
+      screenSize: 6.1,
+      ramGb: 6,
+      screenHz: 60,
+      panelType: 'OLED',
+      tier: 'ULTRA',
+      ppi: 460,
+      screenDpi: 460,
+      chipset: 'A15 Bionic',
+      releaseYear: 2022,
+      os: 'IOS',
+      client: 'FREE_FIRE',
+    },
+    validationNotes: ['Must output lower raw sensitivity than FHD+ Android mid-range.'],
+  },
+  {
+    id: 'iphone-16-pro-max',
+    priority: 'P1',
+    marketReason: 'Premium iPhone flagship fixture; validates large OLED/high-end tuning.',
+    expectedPpiBand: '450-519',
+    expectedStandardGeneralRange: [155, 172],
+    primaryPresets: ['STANDARD_PRO', 'IPHONE_SMOOTH', 'FOUR_FINGER_PRO', 'GYRO_PRO'],
+    device: {
+      brand: 'Apple',
+      model: 'iPhone 16 Pro Max',
+      screenSize: 6.9,
+      ramGb: 8,
+      screenHz: 120,
+      panelType: 'LTPO',
+      tier: 'GAMING',
+      ppi: 460,
+      screenDpi: 460,
+      chipset: 'A18 Pro',
+      releaseYear: 2024,
+      os: 'IOS',
+      client: 'FREE_FIRE',
+      highFpsMode: true,
+      frameBoostEnabled: true,
+    },
+    validationNotes: ['Large screen should lower overshoot while allowing high freeView awareness.'],
+  },
+  {
+    id: 'galaxy-s24-ultra',
+    priority: 'P1',
+    marketReason: 'Ultra high-end Android/QHD fixture; protects against high-PPI overshoot.',
+    // Fixture ppi 505 falls in the 450-519 band; device signals (QHD large
+    // screen, 120Hz, LTPO, FF MAX, frame boost) pull Standard down to a
+    // controlled flagship output (~149), inside the expected range below.
+    expectedPpiBand: '450-519',
+    expectedStandardGeneralRange: [140, 152],
+    primaryPresets: ['STANDARD_PRO', 'GYRO_PRO', 'SNIPER_AWM', 'AR_RECOIL_CONTROL'],
+    device: {
+      brand: 'Samsung',
+      model: 'Galaxy S24 Ultra',
+      screenSize: 6.8,
+      ramGb: 12,
+      screenHz: 120,
+      panelType: 'LTPO',
+      tier: 'GAMING',
+      ppi: 505,
+      screenDpi: 505,
+      chipset: 'Snapdragon 8 Gen 3',
+      releaseYear: 2024,
+      os: 'ANDROID',
+      client: 'FREE_FIRE_MAX',
+      highFpsMode: true,
+      frameBoostEnabled: true,
+    },
+    validationNotes: ['If using QHD-ish density, Standard should not be in budget Android ranges.', 'Gyro Pro should be viable here.'],
+  },
+] as const satisfies readonly AresV6CalibrationFixture[];
+
+export function getAresV6CalibrationFixture(id: string): AresV6CalibrationFixture | undefined {
+  return ARES_V6_LATAM_CALIBRATION_FIXTURES.find((fixture) => fixture.id === id);
+}
+
+/**
+ * Find the calibration fixture that matches a device by brand + model
+ * (case-insensitive). Used to gate LAB_VERIFIED confidence to devices the
+ * engine has actually been calibrated against.
+ */
+export function findAresV6FixtureForDevice(
+  brand: string,
+  model: string,
+): AresV6CalibrationFixture | undefined {
+  const normalizedBrand = brand.trim().toLowerCase();
+  const normalizedModel = model.trim().toLowerCase();
+
+  return ARES_V6_LATAM_CALIBRATION_FIXTURES.find(
+    (fixture) =>
+      fixture.device.brand.toLowerCase() === normalizedBrand &&
+      fixture.device.model.toLowerCase() === normalizedModel,
+  );
+}
+
+/** Convenience predicate over {@link findAresV6FixtureForDevice}. */
+export function isAresV6FixtureDevice(brand: string, model: string): boolean {
+  return findAresV6FixtureForDevice(brand, model) !== undefined;
+}

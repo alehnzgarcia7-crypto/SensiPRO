@@ -5,6 +5,7 @@ export {
   ForbiddenError,
   BusinessError,
   RateLimitError,
+  ConflictError,
   ValidationError,
 } from './errors';
 export { handleApiError, formatErrorResponse } from './error-handler';

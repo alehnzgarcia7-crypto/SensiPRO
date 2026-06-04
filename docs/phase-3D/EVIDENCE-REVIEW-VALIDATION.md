@@ -1,0 +1,202 @@
+# ARES v6 — Evidence Review Validation (Fase 3D)
+
+**Rama:** `refactor/phase-0-nuclear-refoundation`
+**Gates:** `Phase 0.1B ARES v6 Gate` (bloqueante) + `ARES v6 Real-Infra Smoke` (Postgres 16 + Redis 7). `legacy-audit` no bloqueante.
+
+---
+
+## 1. Resumen
+
+- Comparador legacy-vs-v6 (`legacy-vs-v6-comparator.ts`): deltas + severidad + dirección + expectedness; fixtures-only, puro.
+- Adapter legacy (`legacy-output-adapter.ts`): usa el motor legacy real congelado vía costura inyectable; import-debt evaluado y seguro.
+- Umbrales + GO/NO-GO (`evidence-thresholds.ts`): versionados, precedencia INFRA → MORE_DATA → FIX_ENGINE.
+- Evidence snapshot (`evidence-snapshot.ts`): ensambla métricas + comparación + feedback TRUSTED + GO/NO-GO; LEGACY-FREE en runtime; SUSPICIOUS excluido por defecto.
+- Propuestas (`calibration-proposals.ts`): human-gated, `autoApplyAllowed:false` siempre; gates de infra/muestra/suspicious/fallback; artefacto JSON (sin modelo Prisma).
+- CLI (`scripts/ares-v6-evidence-review.ts` + `evidence-review-cli.ts`): JSON + markdown; safe dry-run por defecto; sin tokens/PII.
+- Endpoint opcional `GET /api/lab/v6/evidence`: READ-ONLY, OFF por defecto, surface flag 3C.1, rate-limit ns `evidence`.
+
+---
+
+## 2. Tests
+
+| Suite | Casos | Tipo |
+|---|---|---|
+| `evidence-thresholds.test.ts` | 13 | unit |
+| `legacy-output-adapter.test.ts` | 8 | unit |
+| `legacy-vs-v6-comparator.test.ts` | 8 | unit |
+| `evidence-snapshot.test.ts` | 7 | unit |
+| `calibration-proposals.test.ts` | 7 | unit |
+| `evidence-review-cli.test.ts` | 8 | unit |
+| `real-infra.smoke.test.ts` (Evidence tribunal 3D) | +1 | smoke (real DB) |
+
+Total proyecto v6: **310** = **297 unit** + **13 real-infra smoke** (antes 258 = 246 + 12; +51 unit, +1 smoke).
+
+Casos cubiertos (mission): GO con todos los umbrales; muestra baja ⇒ MORE_DATA; infra falla ⇒ INFRA; rating/outcome malo ⇒ FIX_ENGINE; SUSPICIOUS excluido; fallbackPpi bloquea propuesta; fila DANGEROUS detectada (sniperScope>scope4x, scope4x>scope2x); TODO_ROJO redPoint bajo ⇒ review; fallbackPpi ⇒ review (no propuesta); CLI JSON sin token/body/IP; markdown generado; propuestas con `humanReviewRequired:true` y `autoApplyAllowed:false`; NO_LEGACY_EQUIVALENT marcado.
+
+---
+
+## 3. Comandos corridos (local) y resultados
+
+```bash
+npm run db:generate
+npx eslint packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 scripts/ares-v6-*.ts --ext .ts,.tsx   # 0 errores
+npx tsc -p tsconfig.ares-v6.json                                                                                                                                  # 0 errores
+npx vitest run packages/algorithms/src/engine-v6 src/lib/ares-v6 src/app/api/generate/v6 src/app/api/feedback/v6 src/app/api/lab/v6 --coverage=false               # 297 passed, 13 skipped
+
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --json --output ares-v6-evidence-summary.json
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --markdown --output ares-v6-evidence-report.md
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --proposals --json   # decision NO_GO_MORE_DATA (sin DB), 45 filas, 0 dangerous, propuesta NO_CHANGE bloqueada INSUFFICIENT_SAMPLE
+```
+
+### Real-infra smoke (local, DB efímera)
+
+```bash
+createdb sensipro_ares_v6_smoke
+DATABASE_URL=postgresql://…/sensipro_ares_v6_smoke REDIS_URL=redis://localhost:6379 ARES_V6_REAL_INFRA_SMOKE=true \
+  ARES_V6_API_ENABLED=true ARES_V6_PERSIST_GENERATIONS=true ARES_V6_WRITE_FEEDBACK=true ARES_V6_LAB_METRICS_ENABLED=true … \
+  npm run db:push:test && npm run ares:v6:seed:smoke
+npx vitest run src/lib/ares-v6/__tests__/real-infra.smoke.test.ts --coverage=false   # 13 passed
+dropdb sensipro_ares_v6_smoke
+```
+
+Verificado en los logs: generaciones persistidas con PPI real (no fallback), feedback TRUSTED (rating 5/BETTER) y SUSPICIOUS (rating 2/WORSE+resuelto ⇒ `OUTCOME_RESOLVED_CONFLICT`), métricas servidas, snapshot construido, propuestas human-gated; **cero IP/UA/token/body crudo** (solo `ipHash`/`userAgentHash`).
+
+---
+
+## 4. Resultado de CI
+
+- Commit: `2a206fb` (rama `refactor/phase-0-nuclear-refoundation`).
+- Run de Actions: **26845969669** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success**.
+- `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7).
+- `Legacy Audit`: success (no bloqueante). `E2E Tests`: skipped (solo en push a main).
+- PR #1: OPEN · DRAFT · **MERGEABLE**.
+
+---
+
+## 5. Seguridad / privacidad (verificado)
+
+- Artefactos y endpoint sin tokens, sin IP cruda, sin user-agent, sin body, sin cookies (el modelo de evidencia carece de esos campos; test de CLI lo afirma).
+- `ARES_V6_LAB_EVIDENCE_ENABLED` añadido a las surface flags 3C.1 ⇒ exige internal token en producción; un `off`/`lab` explícito se ignora.
+- Endpoint OFF por defecto (404), rate-limit antes de DB, ventana acotada (7d/90d).
+- Comparación legacy-vs-v6 es fixtures-only y puro; el motor legacy se importa en una sola costura y, en el endpoint, de forma perezosa solo bajo `includeLegacyCompare`.
+
+---
+
+## 6. Riesgos restantes
+
+- GO/NO-GO con muestra real requiere activación interna (secrets del environment `ares-v6-internal-lab`) — código + workflow listos; sin DB real, la evidencia es fixtures-only ⇒ MORE_DATA por diseño.
+- El mapeo preset→estilo legacy es una aproximación (3 estilos vs 20 presets); 4 presets v6-only se marcan `NO_LEGACY_EQUIVALENT`.
+- Las propuestas son hipótesis: requieren A/B y revisión humana antes de cualquier cambio de motor.
+- Hook Semgrep local falla sin `SEMGREP_APP_TOKEN` (cosmético; no afecta el gate).
+
+---
+
+## 7. Recomendación Fase 3E
+
+Con GO/NO-GO en verde sobre evidencia interna real, evaluar **UI experimental oculta** tras `NEXT_PUBLIC_ARES_V6_ENABLED` (solo lectura, behind flag, sin reemplazar el generador legacy), con la decisión de activación siempre HUMANA.
+
+---
+
+## 8. Lo que NO se tocó (confirmado)
+
+pagos/Stripe/MercadoPago/webhooks, auth/NextAuth, middleware, command-center, admin, pricing, landing, academy, UI del generador, rutas legacy (`/api/generate`, `/all`, `/headshot`, `/export`), engine/presets/research-matrix de v6, y el motor legacy (solo lectura vía adapter). Schema sin cambios (sin modelo de propuestas). Sin deployment público.
+
+---
+
+## 9. Fase 3D.1 — Evidence integrity patch (addendum)
+
+Ver `EVIDENCE-INTEGRITY-PATCH.md`. Cambios: cobertura **evidencia** vs **comparación** separada (GO gatea en evidencia); `structuralRisk` (CLEAR/REVIEW_REQUIRED/BLOCKING) separado del GO/NO-GO y visible bajo MORE_DATA; endpoint con `presetId` validado contra `ARES_V6_PRESETS`, `compareScope=filtered|all`, `includeRows` (default `false` ⇒ summary rows sin vectores/deltas, `true` ⇒ cap 100); CLI con `--compare-scope` / `--include-rows` / `--summary-only`; versiones snapshot/thresholds/report/proposal **3D.2**; `evidence-repository.ts` + `evidence-fixture-coverage.ts`; nuevos bloqueos de propuesta `EVIDENCE_COVERAGE_INSUFFICIENT` / `STRUCTURAL_RISK_REVIEW_REQUIRED`.
+
+### Tests (delta 3D.1)
+
+| Suite | Casos | Tipo |
+|---|---|---|
+| `evidence-fixture-coverage.test.ts` | 6 | unit (nuevo) |
+| `evidence/__tests__/route.test.ts` | 4 | unit (nuevo, infra-free: 404 flag-off + 400 validación) |
+| `evidence-thresholds.test.ts` | +1 (coverage split) | unit |
+| `evidence-snapshot.test.ts` | reescrito (coverage split + structuralRisk + summary rows) | unit |
+| `calibration-proposals.test.ts` | +3 (structural/coverage gates) | unit |
+| `evidence-review-cli.test.ts` | +5 (compare-scope/summary-only) | unit |
+| `real-infra.smoke.test.ts` | +5 (coverage real + endpoint filtro/summary/includeRows/400) | smoke |
+
+Total v6: **338** = **320 unit** + **18 real-infra smoke** (antes 310 = 297 + 13).
+
+### Comandos 3D.1 (local) y resultados
+
+```bash
+npx tsc -p tsconfig.ares-v6.json                                                                  # 0 errores
+npx eslint <5 dirs v6> scripts/ares-v6-*.ts --ext .ts,.tsx                                         # 0 errores
+npx vitest run <engine-v6 + src/lib/ares-v6 + generate/v6 + feedback/v6 + lab/v6> --coverage=false # 320 passed, 18 skipped
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json                 # structuralRisk=REVIEW_REQUIRED, evCov=0, cmpCov=1, sin rows completas/deltas
+# real-infra smoke (DB efímera): 18 passed. Verificado: evidenceFixtureCoverage>0 con devices fixture-known;
+# endpoint filtra por preset; default sin vectores/deltas; includeRows=true cap 100; invalid preset => 400.
+```
+
+El route test es **infra-free** y CI-safe: verificado que pasa incluso sin Redis (fail-open). El resto del endpoint (200 path, filtro, summary, includeRows) se valida en el real-infra smoke.
+
+### CI 3D.1
+
+- Commit `f51e72a`. Run de Actions: **26855946578** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success**. `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, +5 tests de endpoint/cobertura). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
+
+---
+
+## 10. Fase 3D.1B — Endpoint contract patch (addendum)
+
+Ver `EVIDENCE-INTEGRITY-PATCH.md §8`. La 3D.1 implementó el contrato del endpoint y lo validó en smoke real, pero el route duplicaba el schema, usaba warning de string humano, no tenía `meta.rowsIncluded/rowsLimit/rowsTruncated`, y **sólo tenía tests 404/400** (el path 200 sólo en smoke). 3D.1B cierra esto:
+
+- `evidence-query-schema.ts`: contrato compartido (`parseAresV6EvidenceQuery`/`normalizeAresV6EvidenceQuery`), enum real de preset, ventana acotada, warning **máquina** `comparison_not_filtered_by_preset`.
+- `evidence-route-service.ts`: `selectAresV6ComparisonRows`/`sanitizeAresV6EvidenceResponse`/`buildAresV6EvidenceRoutePayload` con deps inyectables → el route es un shell delgado y el **path 200 se prueba sin DB/Redis**.
+- Route + CLI comparten el mismo código de warning y semántica.
+
+### Tests (delta 3D.1B)
+
+| Suite | Casos | Tipo | Mata el falso positivo porque |
+|---|---|---|---|
+| `evidence-query-schema.test.ts` | 9 | unit (nuevo) | `compareScope=sideways` → `field='compareScope'` (sólo si es enum reconocido, no unknown key). |
+| `evidence-route-service.test.ts` | 8 | unit (nuevo) | prueba que el comparador se llama con `{presetId}` vs `{}`, que el default no devuelve vectores/deltas, que `includeRows` cap 100 — **comportamiento 200, sin infra**. |
+| `evidence-snapshot.test.ts` | +1 | unit | full matrix → `comparisonFixtureCoverage=1`, `evidenceFixtureCoverage=0`. |
+| `evidence-review-cli.test.ts` | warning → código máquina | unit | — |
+| `real-infra.smoke.test.ts` | +1 (compareScope=all warning) + coverage/meta | smoke | endpoint 200 real con warning + `meta.rowsLimit`. |
+
+Total v6: **357** = **338 unit** + **19 real-infra smoke** (antes 338 = 320 + 18).
+
+### Comandos 3D.1B (local) y resultados
+
+```bash
+npx tsc -p tsconfig.ares-v6.json                                                                    # 0
+npx eslint <5 dirs v6> scripts/ares-v6-*.ts --ext .ts,.tsx                                           # 0
+npx vitest run <engine-v6 + src/lib/ares-v6 + generate/v6 + feedback/v6 + lab/v6> --coverage=false   # 338 passed, 19 skipped
+npm run ares:v6:evidence -- --fixtures-only --legacy-compare --summary-only --json                   # sin rows completas, sin secretos
+# CLI --preset STANDARD_PRO --compare-scope all => warnings ["comparison_not_filtered_by_preset"], 15 presets.
+# real-infra smoke (DB efímera): 19 passed (endpoint compareScope=all warning + coverage + meta rows).
+```
+
+### CI 3D.1B
+
+- Commit `851fa55`. Run de Actions: **26858197075** → **success**.
+- `Phase 0.1B ARES v6 Gate`: **success** (+18 unit + artifact summary-only). `ARES v6 Real-Infra Smoke`: **success** (Postgres 16 + Redis 7, endpoint contract). `Legacy Audit`: success (no bloqueante). PR #1: OPEN · DRAFT · **MERGEABLE**.
+
+---
+
+## 11. Fase 3E — Hidden internal read-only UI (siguiente capa)
+
+La evidencia 3D ahora tiene **superficie de operador**: una UI interna oculta y de
+solo lectura (`/internal/ares-v6`) que **consume** los mismos contratos del tribunal
+(`buildAresV6EvidenceSnapshot`, `buildAresV6ComparisonMatrix`,
+`generateAresV6CalibrationProposals`) sin reimplementarlos y sin tocar el motor.
+
+- **Read-only / human-gated:** muestra GO/NO-GO, riesgo estructural, cobertura
+  EVIDENCIA vs COMPARACIÓN (separadas) y propuestas con `autoApplyAllowed=false` /
+  `humanReviewRequired=true`. **Sin** botón de aplicar/aprobar/publicar; **sin** feedback público.
+- **Seguridad server-side:** gate `ARES_V6_INTERNAL_UI_ENABLED` (404 stealth si off);
+  en prod exige `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION` (acuse de deployment protection).
+  `NEXT_PUBLIC_ARES_V6_ENABLED` es solo hint de cliente, jamás seguridad. noindex, sin nav, sin sitemap.
+- **Evidencia summary-only:** la UI lee únicamente `highRiskSummaryRows` (sin vectores legacy/v6
+  ni deltas) — el mismo default seguro del endpoint.
+- **GO/NO-GO de 3E:** GO para UI interna oculta read-only; **NO-GO** para UI pública (requiere
+  lab interno activado, `evidenceFixtureCoverage ≥ 0.8`, `structuralRisk=CLEAR`, decisión humana).
+
+Detalle completo: `docs/phase-3E/HIDDEN-UI-ARCHITECTURE.md`, `OPERATOR-GUIDE.md`,
+`HIDDEN-UI-VALIDATION.md`. Tests v6: **402 = 383 unit + 19 smoke** (+45 unit).

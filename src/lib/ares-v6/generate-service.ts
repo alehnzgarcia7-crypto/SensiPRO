@@ -1,0 +1,112 @@
+import { NotFoundError } from '@ares/errors';
+
+import {
+  generateAresV6,
+  type AresV6GenerationOutput,
+  type AresV6PlayerSignal,
+  type AresV6PresetId,
+} from '@ares/algorithms/engine-v6';
+
+import { assertCanGenerateForDevice } from './access-policy';
+import {
+  toAresV6DeviceSignalWithOverrides,
+  type AresV6AdaptableDevice,
+  type AresV6DeviceOverrides,
+} from './device-adapter';
+
+// ═══════════════════════════════════════════════════════════════
+// ARES v6 — Generation service
+//
+// Pure orchestration: find device → access policy → adapt (preserving
+// screenDpi) → run the engine. The device finder is injected so the service is
+// fully testable without a database; the default lazily loads Prisma so unit
+// tests that inject their own finder never touch @ares/database. Phase 3B adds
+// DB/engine timings for observability.
+// ═══════════════════════════════════════════════════════════════
+
+export interface AresV6GenerateServiceInput {
+  deviceId: string;
+  presetId: AresV6PresetId;
+  player: AresV6PlayerSignal;
+  overrides?: AresV6DeviceOverrides;
+}
+
+/** The device record the service needs: adapter fields plus id/slug for the response. */
+export interface AresV6ServiceDevice extends AresV6AdaptableDevice {
+  id: string;
+  slug: string;
+  /** Maps to Prisma `Device.isActive`; gates the access policy. */
+  isActive?: boolean | null;
+}
+
+export interface AresV6GenerateServiceTimings {
+  dbDurationMs: number;
+  engineDurationMs: number;
+}
+
+export interface AresV6GenerateServiceResult {
+  device: AresV6ServiceDevice;
+  generation: AresV6GenerationOutput;
+  timings: AresV6GenerateServiceTimings;
+}
+
+export interface AresV6GenerateServiceDeps {
+  findDevice(id: string): Promise<AresV6ServiceDevice | null>;
+}
+
+async function defaultFindDevice(id: string): Promise<AresV6ServiceDevice | null> {
+  const { prisma } = await import('@ares/database');
+  return prisma.device.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      brand: true,
+      model: true,
+      slug: true,
+      screenSize: true,
+      ramGb: true,
+      screenHz: true,
+      panelType: true,
+      tier: true,
+      screenDpi: true,
+      chipset: true,
+      releaseYear: true,
+      isActive: true,
+    },
+  });
+}
+
+const DEFAULT_DEPS: AresV6GenerateServiceDeps = { findDevice: defaultFindDevice };
+
+/**
+ * Resolve a device by id and generate a full ARES v6 package for it.
+ * Throws {@link NotFoundError} when the device does not exist or is inactive.
+ */
+export async function generateAresV6ForDeviceId(
+  input: AresV6GenerateServiceInput,
+  deps: AresV6GenerateServiceDeps = DEFAULT_DEPS,
+): Promise<AresV6GenerateServiceResult> {
+  const dbStart = Date.now();
+  const device = await deps.findDevice(input.deviceId);
+  const dbDurationMs = Date.now() - dbStart;
+
+  if (!device) {
+    throw new NotFoundError('Device', input.deviceId);
+  }
+
+  // Authorization boundary: inactive/unpublished devices are denied as if they
+  // did not exist (anti-enumeration). Public/active devices pass through.
+  assertCanGenerateForDevice({ device });
+
+  const signal = toAresV6DeviceSignalWithOverrides(device, input.overrides);
+
+  const engineStart = Date.now();
+  const generation = generateAresV6({
+    device: signal,
+    presetId: input.presetId,
+    player: input.player,
+  });
+  const engineDurationMs = Date.now() - engineStart;
+
+  return { device, generation, timings: { dbDurationMs, engineDurationMs } };
+}

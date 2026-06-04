@@ -39,6 +39,13 @@ export class RateLimitError extends AresError {
   }
 }
 
+export class ConflictError extends AresError {
+  constructor(code: string, message: string) {
+    super(code, message, 409);
+    this.name = 'ConflictError';
+  }
+}
+
 export class ValidationError extends AresError {
   constructor(message: string) {
     super('VALIDATION_ERROR', message, 400);
