@@ -3,17 +3,17 @@
 **Fecha:** 2026-06-03
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3E — Hidden Internal Read-Only UI · ARES v6 Command Lab)
+**HEAD:** (Fase 3F — Internal UI Execution + Human Review Session + Evidence Readiness Packet)
 
 ---
 
 ## Estado
 
-- **Fase 3E ENTREGADA** ✅ — primera UI experimental de ARES v6: interna, oculta y **solo lectura** en `/internal/ares-v6`. Gate server-side `ARES_V6_INTERNAL_UI_ENABLED` (404 stealth si off; en prod exige `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION`); `NEXT_PUBLIC_ARES_V6_ENABLED` solo hint de cliente. noindex, sin nav/sitemap. Muestra generación v6, evidencia summary-only, cobertura EVIDENCIA vs COMPARACIÓN separada, riesgo estructural, GO/NO-GO y propuestas human-gated (`autoApplyAllowed=false`). **No** toca motor/legacy/pagos/auth/middleware; diff 100% aditivo. Consume los contratos 3D sin reimplementarlos. CI 3E: run **26919718496** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`). PR #1 OPEN · DRAFT · **MERGEABLE**.
-- **Fase 3D.1B SELLADA** ✅ — contrato del endpoint `GET /api/lab/v6/evidence` cerrado (`evidence-query-schema.ts` + `evidence-route-service.ts`); path 200 probado a nivel unit.
-- Salud verde local: `eslint` (7 dirs v6, incl. `internal/ares-v6` + `components/ares-v6-lab`) → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **402** = **383 unit** (45 archivos) + **19 real-infra smoke** (validado local con DB efímera, role `alex`). +45 unit en 3E.
-- CI 3D.1B: run **26858197075** → **success**. PR #1 OPEN · DRAFT · **MERGEABLE**.
+- **Fase 3F ENTREGADA** ✅ — de "UI construida" a "sesión interna controlada con evidencia + revisión humana + decisión documentada". (1) **server-only** en los 7 módulos route/page-only (`internal-ui-*`, `evidence-route-service`, `feedback-service`, `generation-persistence`); lab-metrics/evidence-snapshot/calibration-proposals **se omiten a propósito** (los importa el CLI de evidencia bajo tsx, donde `server-only` lanzaría) — alias a stub vacío en vitest, Next mantiene la protección real. (2) **UI readiness** (`internal-ui-readiness.ts` + `ares:v6:ui-readiness`): pura sobre env, deployment-protection como **checklist humano** (no protección real), sin secretos. (3) **Human review session** (`human-review-session.ts` + `human-review-cli.ts` + `ares:v6:human-review`): packet JSON/MD, recomendación → decisión **DRAFT hasta `decidedBy`+`rationale`**; evidenceCoverage=0 ⇒ NO_GO_MORE_EVIDENCE; sin DB nueva, sin secretos. (4) **SSR smoke** always-on + **Playwright browser smoke** (config dedicada `*.pw.ts`, manual). (5) **Workflow manual** `ares-v6-internal-review-session.yml` (workflow_dispatch, environment protegido, inputs como argv citado — sin inyección). **No** UI pública, **no** aplica propuestas, **no** toca motor/legacy/pagos/auth/middleware; diff aditivo (+1 dep `server-only`). CI 3F: run **<PENDIENTE — sello tras push>**.
+- **Fase 3E SELLADA** ✅ — UI interna oculta read-only `/internal/ares-v6` (run CI **26919718496**).
+- **Fase 3D.1B SELLADA** ✅ — contrato del endpoint `GET /api/lab/v6/evidence` cerrado; path 200 probado a nivel unit.
+- Salud verde local: `eslint` (7 dirs v6 + `scripts/ares-v6-*.ts`) → 0, `tsc -p tsconfig.ares-v6.json` → 0.
+- Tests: **426** = **407 unit** (53 archivos) + **19 real-infra smoke** (validado local con DB efímera, role `alex`). +24 unit en 3F.
 
 ---
 
@@ -54,6 +54,11 @@
   - **Ruta** `/internal/ares-v6` (Server Components; un solo island cliente). Gate server `internal-ui-access.ts::assertCanViewAresV6InternalUi` (404 stealth si off; prod exige `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION`). `internal-ui-flags.ts` (NEXT_PUBLIC solo hint). `internal-ui-service.ts` (view models server-only) + `internal-preview-service.ts` (preview Result-typed, sin persistencia). Server action read-only `actions.ts`.
   - **Componentes** `src/components/ares-v6-lab/` (`presenters.ts` puro + cards). Evidencia **summary-only** (sin vectores), cobertura EVIDENCIA vs COMPARACIÓN separada, riesgo estructural visible, propuestas `autoApplyAllowed=false`/`humanReviewRequired=true` sin botón de aplicar.
   - **Tests:** +45 unit (flags/access/service/preview/presenters + render `react-dom/server`). Sin jsdom/`@testing-library`. CI gate + tsconfig.ares-v6 + vitest amplían a `internal/ares-v6` + `components/ares-v6-lab`.
+- **3F — Internal UI Execution + Human Review** — `docs/phase-3F/`:
+  - **server-only** (cierra P1 3E) en `internal-ui-flags/access/service/preview` + `evidence-route-service`/`feedback-service`/`generation-persistence`; `lab-metrics`/`evidence-snapshot`/`calibration-proposals` **OMITIDOS** (los importa el CLI de evidencia bajo tsx → `server-only` lanzaría). Alias vitest a stub vacío; Next mantiene la protección real.
+  - **UI readiness** (`internal-ui-readiness.ts`, `ares:v6:ui-readiness`): pura sobre env, deployment-protection como checklist humano, sin secretos, exit 1 en `--strict` con errores. **Human review** (`human-review-session.ts` + `human-review-cli.ts`, `ares:v6:human-review`): packet JSON/MD, **DRAFT hasta `decidedBy`+`rationale`**, evidenceCoverage=0 ⇒ NO_GO_MORE_EVIDENCE, sin DB nueva, sanitizer de secretos.
+  - **SSR smoke** always-on (gate) + **Playwright** `*.pw.ts` (config dedicada, `ares:v6:ui:smoke`, manual). **Workflow** `ares-v6-internal-review-session.yml` (workflow_dispatch, env `ares-v6-internal-lab`, inputs como argv citado — sin inyección).
+  - **Tests:** +24 unit (readiness/human-review/cli + SSR smoke). +1 dep `server-only` (0.0.1).
 
 ---
 
@@ -69,9 +74,9 @@ Flags 3C: `ARES_V6_INTERNAL_ACCESS_MODE` (off/header/lab), `ARES_V6_INTERNAL_ACC
 
 ---
 
-## SIGUIENTE: Fase 3F — Activación del lab interno + evaluación para UI pública
+## SIGUIENTE: Fase 3G — Activación real del lab + diseño de closed-beta (human-gated)
 
-3E entregada (UI interna oculta read-only) ⇒ fase activa siguiente: **3F**. Objetivo: **activar el lab interno real** (3C runbook: secrets del environment `ares-v6-internal-lab`, persistencia de generaciones, feedback TRUSTED) para mover `evidenceFixtureCoverage` de 0 (fixtures-only) a evidencia real, re-evaluar GO/NO-GO, y — sólo si hay GO sostenido con `structuralRisk=CLEAR` y **decisión humana explícita** — diseñar la **UI experimental pública behind flag** reutilizando los componentes read-only de 3E como base. La UI de 3E NO es pública; sigue OFF por defecto. Ver `docs/phase-3E/HIDDEN-UI-VALIDATION.md §6`.
+3F entregada (tooling de sesión: server-only, readiness, human review packet, smoke, workflow manual) ⇒ siguiente: **3G**. Objetivo: el operador ejecuta el **workflow manual** `ares-v6-internal-review-session.yml` (con los secrets del environment `ares-v6-internal-lab`) contra un target que **persista generaciones** (modo http, `targetUrl`) para mover `evidenceFixtureCoverage` de 0 a evidencia real, recolectar feedback TRUSTED, y producir un Human Review Packet con datos reales. Sólo con `GO_PREPARE_CLOSED_BETA_DESIGN` sostenido (`structuralRisk=CLEAR`, cobertura/feedback ≥ umbral, smoke OK, protección de deployment verificada) **y decisión humana FINAL** se diseña la **closed-beta** (aún detrás de flag, NO pública). La UI sigue OFF/oculta. Ver `docs/phase-3F/*`.
 
 ---
 

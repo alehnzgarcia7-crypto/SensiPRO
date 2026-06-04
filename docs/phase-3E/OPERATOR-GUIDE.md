@@ -114,3 +114,21 @@ Sin infra de e2e nueva; verificación manual:
 - ⛔ **NO-GO** para **UI pública**. Requiere, como mínimo: lab interno activado con
   evidencia real, `evidenceFixtureCoverage ≥ 0.8`, `structuralRisk = CLEAR`,
   `decision = GO_INTERNAL_UI_EXPERIMENT`, y **decisión humana explícita**.
+
+---
+
+## 8. Fase 3F — Ejecución de sesión real (siguiente capa)
+
+Para correr una **sesión interna real** (readiness + lab + evidencia + smoke +
+human review packet + decisión), ver `docs/phase-3F/`:
+
+```bash
+npm run ares:v6:ui-readiness -- --strict --target preview        # ¿entorno listo?
+npm run ares:v6:ui:smoke                                          # browser smoke (manual)
+npm run ares:v6:human-review -- --evidence-json ev.json --operator <tú> --json --markdown
+```
+
+Flags nuevos 3F: `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION` (ack de protección, ya en 3E);
+el resto reutiliza los flags 3C/3D. La protección de deployment (Vercel
+auth/password/trusted IPs) es un **checklist humano**, no un flag. Workflow manual:
+`ares-v6-internal-review-session.yml`. Decisión: `docs/phase-3F/GO-NO-GO-DECISION-TEMPLATE.md`.

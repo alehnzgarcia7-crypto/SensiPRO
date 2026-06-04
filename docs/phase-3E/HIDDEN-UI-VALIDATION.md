@@ -125,3 +125,13 @@ Resultado evidencia (fixtures-only, consistente con la UI):
 - Re-evaluar GO/NO-GO con `evidenceCoverage` real.
 - Si GO sostenido + `structuralRisk=CLEAR`: diseñar **UI experimental pública behind flag**
   (aún detrás de decisión humana), reutilizando estos componentes read-only como base.
+
+### Addendum — Fase 3F ENTREGADA (siguiente capa)
+
+3F convirtió esta UI en una **sesión de revisión controlada**: cerró el P1 con
+`import 'server-only'` (7 módulos route/page-only; ver `docs/phase-3F/INTERNAL-UI-EXECUTION-ARCHITECTURE.md §2`),
+agregó **UI readiness** (`ares:v6:ui-readiness`), **Human Review Packet**
+(`ares:v6:human-review`, DRAFT hasta `decidedBy`+`rationale`), **SSR smoke** always-on
++ **Playwright** browser smoke (`ares:v6:ui:smoke`) y el **workflow manual**
+`ares-v6-internal-review-session.yml`. La UI sigue OFF/oculta/read-only. Detalle:
+`docs/phase-3F/`. Tests v6: **426 = 407 unit + 19 smoke**.
