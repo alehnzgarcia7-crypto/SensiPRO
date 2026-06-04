@@ -115,3 +115,14 @@ Todo lo anterior está orquestado por el workflow manual
 > `humanReviewRequired=true`.
 
 Plantilla de decisión: `GO-NO-GO-DECISION-TEMPLATE.md`.
+
+---
+
+## 6. CI verde ≠ aprobación (Fase 3F.1)
+
+> **CI success = el tooling es correcto. Human Review Packet FINAL = la decisión humana.**
+
+La closed-beta se **diseña** sólo si, sobre **evidencia real**, se cumplen TODOS:
+`evidenceFixtureCoverage ≥ umbral` · `structuralRisk = CLEAR` · `UI smoke passed` ·
+`deployment protection verified` · `decidedBy + rationale` (FINAL, no DRAFT). Antes
+de 3G: `OPERATOR-PRE-3G-CHECKLIST.md` y `PRE-ACTIVATION-SEAL.md`.

@@ -63,6 +63,8 @@
 
 **Invariantes (no negociables):**
 
+- **CI verde ≠ aprobación.** CI success = tooling correcto; Human Review Packet
+  FINAL = decisión humana (con `decidedBy` + `rationale`).
 - El sistema RECOMIENDA, no aprueba. Sin `decidedBy` + `rationale` ⇒ DRAFT.
 - `evidenceCoverage=0` o `structuralRisk≠CLEAR` ⇒ **no** se recomienda closed-beta.
 - Ningún feedback/propuesta modifica el motor (autoApply SIEMPRE false).

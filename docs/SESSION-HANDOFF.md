@@ -3,17 +3,18 @@
 **Fecha:** 2026-06-03
 **Rama:** `refactor/phase-0-nuclear-refoundation`
 **PR:** [#1](https://github.com/alehnzgarcia7-crypto/SensiPRO/pull/1) — DRAFT, **MERGEABLE**
-**HEAD:** (Fase 3F — Internal UI Execution + Human Review Session + Evidence Readiness Packet)
+**HEAD:** (Fase 3F.1 — Pre-Activation Seal antes de evidencia real)
 
 ---
 
 ## Estado
 
+- **Fase 3F.1 ENTREGADA** ✅ (Pre-Activation Seal) — blindaje antes de 3G. (1) **server-only seal COMPLETO**: los 12 módulos críticos ahora llevan `import 'server-only'` (se agregaron los 5 tsx-shared: `internal-ui-readiness`, `human-review-session`, `human-review-cli`, `lab-metrics`, `evidence-snapshot`). Los 4 scripts CLI que los importan corren con **`npx tsx --conditions=react-server`** → `server-only` no-op en el CLI, protección real en Next; salida de evidencia **byte-idéntica** (cero cambio de números). (2) **token hash hex real** en readiness (`/^[a-f0-9]{64}$/i`, no sólo length 64). (3) **workflow argv safety**: los steps con inputs ya NO pasan por `ci-runner` (que usa `shell:true`); corren `npm` directo con **arrays bash citados** + `| tee` (`if/fi`, no `&&`). (4) docs `PRE-ACTIVATION-SEAL.md` + `OPERATOR-PRE-3G-CHECKLIST.md` (21 ítems). (5) tests: `server-only-boundary` (12 módulos marcados + 0 runtime-imports de cliente), `workflow-safety` (no bash-c/eval/`-- $VAR`), token hash hex. **CI verde ≠ aprobación**; closed-beta sólo con evidencia real + decisión humana. CI 3F.1: run **<PENDIENTE — sello tras push>**.
 - **Fase 3F ENTREGADA** ✅ — de "UI construida" a "sesión interna controlada con evidencia + revisión humana + decisión documentada". (1) **server-only** en los 7 módulos route/page-only (`internal-ui-*`, `evidence-route-service`, `feedback-service`, `generation-persistence`); lab-metrics/evidence-snapshot/calibration-proposals **se omiten a propósito** (los importa el CLI de evidencia bajo tsx, donde `server-only` lanzaría) — alias a stub vacío en vitest, Next mantiene la protección real. (2) **UI readiness** (`internal-ui-readiness.ts` + `ares:v6:ui-readiness`): pura sobre env, deployment-protection como **checklist humano** (no protección real), sin secretos. (3) **Human review session** (`human-review-session.ts` + `human-review-cli.ts` + `ares:v6:human-review`): packet JSON/MD, recomendación → decisión **DRAFT hasta `decidedBy`+`rationale`**; evidenceCoverage=0 ⇒ NO_GO_MORE_EVIDENCE; sin DB nueva, sin secretos. (4) **SSR smoke** always-on + **Playwright browser smoke** (config dedicada `*.pw.ts`, manual). (5) **Workflow manual** `ares-v6-internal-review-session.yml` (workflow_dispatch, environment protegido, inputs como argv citado — sin inyección). **No** UI pública, **no** aplica propuestas, **no** toca motor/legacy/pagos/auth/middleware; diff aditivo (+1 dep `server-only`). CI 3F: run **26923217585** → **success** (`Phase 0.1B ARES v6 Gate` + `ARES v6 Real-Infra Smoke`). PR #1 OPEN · DRAFT · **MERGEABLE**.
 - **Fase 3E SELLADA** ✅ — UI interna oculta read-only `/internal/ares-v6` (run CI **26919718496**).
 - **Fase 3D.1B SELLADA** ✅ — contrato del endpoint `GET /api/lab/v6/evidence` cerrado; path 200 probado a nivel unit.
 - Salud verde local: `eslint` (7 dirs v6 + `scripts/ares-v6-*.ts`) → 0, `tsc -p tsconfig.ares-v6.json` → 0.
-- Tests: **426** = **407 unit** (53 archivos) + **19 real-infra smoke** (validado local con DB efímera, role `alex`). +24 unit en 3F.
+- Tests: **457** = **438 unit** (56 archivos) + **19 real-infra smoke** (validado local con DB efímera, role `alex`). +31 unit en 3F.1 (token hash hex, server-only boundary, workflow safety).
 
 ---
 

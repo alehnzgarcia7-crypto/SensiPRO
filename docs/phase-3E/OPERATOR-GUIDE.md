@@ -132,3 +132,7 @@ Flags nuevos 3F: `ARES_V6_INTERNAL_UI_ALLOW_PRODUCTION` (ack de protección, ya 
 el resto reutiliza los flags 3C/3D. La protección de deployment (Vercel
 auth/password/trusted IPs) es un **checklist humano**, no un flag. Workflow manual:
 `ares-v6-internal-review-session.yml`. Decisión: `docs/phase-3F/GO-NO-GO-DECISION-TEMPLATE.md`.
+
+**Antes de ejecutar 3G real:** `docs/phase-3F/PRE-ACTIVATION-SEAL.md` (seal técnico)
+y `docs/phase-3F/OPERATOR-PRE-3G-CHECKLIST.md` (21 ítems). Recuerda: **CI verde =
+tooling correcto; Human Review Packet FINAL = decisión humana.**
