@@ -18,7 +18,10 @@ import { getDefaultAresV6EvidenceThresholds, type AresV6GoNoGoDecision } from '.
 // No secrets ever enter a packet (sanitizer is belt-and-suspenders).
 // ═══════════════════════════════════════════════════════════════
 
-export const ARES_V6_HUMAN_REVIEW_SCHEMA_VERSION = '3F.1';
+export const ARES_V6_HUMAN_REVIEW_SCHEMA_VERSION = '3G';
+
+/** Execution mode of a review session: real-http (preview persists) vs local dry-run. */
+export type AresV6ReviewExecutionMode = 'real-http' | 'dry-run-local';
 
 // ── Plan ─────────────────────────────────────────────────────────
 
@@ -152,6 +155,8 @@ export interface AresV6HumanReviewReadinessInput {
   deploymentProtectionVerified?: boolean;
   uiReadinessPassed?: boolean;
   thresholds?: AresV6HumanReviewGoNoGoThresholds;
+  /** real-http vs dry-run-local. A dry-run can NEVER reach a closed-beta recommendation. */
+  executionMode?: AresV6ReviewExecutionMode;
 }
 
 // ── Decision ─────────────────────────────────────────────────────
@@ -218,6 +223,11 @@ export function evaluateAresV6HumanReviewReadiness(
   }
   if (ev.structuralRisk === 'REVIEW_REQUIRED') {
     reasons.push(`Riesgo estructural REVIEW_REQUIRED (${ev.needsReviewRows} fila[s] a revisar).`);
+  }
+  // A dry-run-local session has no real persisted evidence — it can never claim
+  // closed-beta readiness, regardless of how good the (fixtures-only) numbers look.
+  if (input.executionMode === 'dry-run-local') {
+    reasons.push('Modo dry-run-local: la evidencia no es real (requiere modo http contra un preview que persista). No se puede recomendar closed-beta.');
   }
   if (reasons.length > 0) {
     return { recommendedDecision: 'NO_GO_MORE_EVIDENCE', closedBetaReady: false, blockers: [], reasons, unmetClosedBetaGates: [] };
@@ -391,12 +401,23 @@ export interface AresV6HumanReviewDecisionBlock {
   requiredFollowUps: string[];
   acceptedRisks: string[];
   rejectedActions: string[];
+  /** Why a human-supplied decision could NOT be FINALIZED (empty when it can). */
+  finalizationBlockedReasons: string[];
+}
+
+export interface AresV6HumanReviewExecution {
+  executionMode: AresV6ReviewExecutionMode;
+  /** Redacted preview URL (scheme://host/path) — NEVER the raw value or a secret. */
+  targetUrlRedacted: string | null;
+  /** Human assertion that real deployment protection (Vercel auth/password/IPs) was verified. */
+  deploymentProtectionVerified: boolean;
 }
 
 export interface AresV6HumanReviewPacket {
   schemaVersion: string;
   generatedAt: string;
   session: AresV6HumanReviewSessionPlan;
+  execution: AresV6HumanReviewExecution;
   evidence: AresV6ReviewEvidenceInput;
   smoke: AresV6ReviewSmokeInput | null;
   feedback: AresV6ReviewFeedbackInput | null;
@@ -422,6 +443,45 @@ export interface AresV6HumanReviewPacketInput {
   generatedAt: string;
   extraFindings?: AresV6HumanReviewFinding[];
   human?: AresV6HumanReviewHumanDecisionInput;
+  /** Redacted preview URL for the execution block (overrides plan.targetUrl). */
+  targetUrlRedacted?: string | null;
+}
+
+/**
+ * Why a human-supplied decision cannot be FINALIZED. A NO_GO can always be
+ * recorded; a GO cannot be finalized over a hard blocker, and closed-beta needs
+ * the full gate set (coverage, structuralRisk CLEAR, deployment protection, smoke).
+ */
+export function evaluateAresV6FinalizationBlockers(
+  decisionValue: AresV6HumanReviewDecisionValue,
+  ev: AresV6ReviewEvidenceInput,
+  smoke: AresV6ReviewSmokeInput | null | undefined,
+  deploymentProtectionVerified: boolean,
+  thresholds: AresV6HumanReviewGoNoGoThresholds,
+): string[] {
+  const reasons: string[] = [];
+  const isGo = decisionValue.startsWith('GO');
+  const smokeFailed = Boolean(smoke?.ran && !smoke.passed);
+  const smokePassed = Boolean(smoke?.ran && smoke.passed);
+
+  if (isGo) {
+    if (smokeFailed) reasons.push('No se puede FINALIZAR un GO con la prueba de humo de la UI en fallo.');
+    if (ev.evidenceFixtureCoverage === 0) {
+      reasons.push('No se puede FINALIZAR un GO con evidenceFixtureCoverage=0 (sin evidencia real).');
+    }
+    if (ev.structuralRisk === 'BLOCKING') reasons.push('No se puede FINALIZAR un GO con riesgo estructural BLOCKING.');
+  }
+  if (decisionValue === 'GO_PREPARE_CLOSED_BETA_DESIGN') {
+    if (ev.evidenceFixtureCoverage < thresholds.minEvidenceFixtureCoverage) {
+      reasons.push(`closed-beta: evidenceFixtureCoverage ${ev.evidenceFixtureCoverage} < ${thresholds.minEvidenceFixtureCoverage}.`);
+    }
+    if (thresholds.requireStructuralRiskClear && ev.structuralRisk !== 'CLEAR') {
+      reasons.push('closed-beta: structuralRisk no es CLEAR.');
+    }
+    if (!deploymentProtectionVerified) reasons.push('closed-beta: protección de deployment no verificada por un humano.');
+    if (!smokePassed) reasons.push('closed-beta: prueba de humo de la UI no ejecutada o no aprobada.');
+  }
+  return [...new Set(reasons)];
 }
 
 /**
@@ -433,10 +493,27 @@ export function buildAresV6HumanReviewPacket(input: AresV6HumanReviewPacketInput
   const findings = [...deriveAresV6HumanReviewFindings(input.readinessInput), ...(input.extraFindings ?? [])];
   const checklist = buildAresV6HumanReviewChecklist(input.readinessInput);
 
+  const thresholds = input.readinessInput.thresholds ?? getDefaultAresV6ClosedBetaThresholds();
   const human = input.human ?? {};
   const decidedBy = (human.decidedBy ?? '').trim();
   const rationale = human.rationale ?? [];
-  const isFinal = decidedBy.length > 0 && rationale.length > 0 && human.decision != null;
+  const hasHumanDecision = decidedBy.length > 0 && rationale.length > 0 && human.decision != null;
+
+  // Even WITH a human signature, a decision cannot be FINAL if its gates aren't met
+  // (you can record a NO_GO, but you cannot finalize a GO over a hard blocker, nor
+  // closed-beta without coverage + CLEAR risk + deployment protection + smoke).
+  const finalizationBlockedReasons =
+    hasHumanDecision && human.decision
+      ? evaluateAresV6FinalizationBlockers(
+          human.decision,
+          input.readinessInput.evidence,
+          input.readinessInput.smoke,
+          input.readinessInput.deploymentProtectionVerified ?? false,
+          thresholds,
+        )
+      : [];
+
+  const isFinal = hasHumanDecision && finalizationBlockedReasons.length === 0;
 
   const decision: AresV6HumanReviewDecisionBlock = {
     status: isFinal ? 'FINAL' : 'DRAFT',
@@ -448,12 +525,20 @@ export function buildAresV6HumanReviewPacket(input: AresV6HumanReviewPacketInput
     requiredFollowUps: human.requiredFollowUps ?? [],
     acceptedRisks: human.acceptedRisks ?? [],
     rejectedActions: human.rejectedActions ?? [],
+    finalizationBlockedReasons,
+  };
+
+  const execution: AresV6HumanReviewExecution = {
+    executionMode: input.readinessInput.executionMode ?? 'dry-run-local',
+    targetUrlRedacted: input.targetUrlRedacted ?? input.plan.targetUrl ?? null,
+    deploymentProtectionVerified: input.readinessInput.deploymentProtectionVerified ?? false,
   };
 
   return {
     schemaVersion: ARES_V6_HUMAN_REVIEW_SCHEMA_VERSION,
     generatedAt: input.generatedAt,
     session: input.plan,
+    execution,
     evidence: input.readinessInput.evidence,
     smoke: input.readinessInput.smoke ?? null,
     feedback: input.readinessInput.feedback ?? null,

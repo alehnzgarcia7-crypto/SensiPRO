@@ -11,6 +11,7 @@ import {
   buildDefaultAresV6HumanReviewPlan,
   sanitizeAresV6HumanReviewPacket,
 } from '../src/lib/ares-v6/human-review-session';
+import { redactAresV6TargetUrl } from '../src/lib/ares-v6/target-url-check';
 
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Human review packet CLI (Fase 3F). INTERNAL ONLY.
@@ -60,13 +61,17 @@ function main(): void {
   const labCtx = labReportContext(options.labReportJson);
 
   const now = new Date().toISOString();
+  // Store ONLY the redacted preview URL (never the raw value) in the packet.
+  const targetUrlRedacted = options.targetUrl ? redactAresV6TargetUrl(options.targetUrl) : null;
+  const executionMode = options.executionMode ?? (options.targetUrl ? 'real-http' : 'dry-run-local');
+
   const plan = buildDefaultAresV6HumanReviewPlan({
     label: options.label,
     operator: options.operator,
     createdAt: now,
     environment: labCtx.environment ?? 'local',
     commitSha: process.env.GITHUB_SHA ?? labCtx.commitSha ?? null,
-    targetUrl: options.targetUrl,
+    targetUrl: targetUrlRedacted,
   });
 
   const packet = sanitizeAresV6HumanReviewPacket(
@@ -76,8 +81,10 @@ function main(): void {
         evidence,
         smoke,
         deploymentProtectionVerified: options.deploymentProtectionVerified,
+        executionMode,
       },
       generatedAt: now,
+      targetUrlRedacted,
     }),
   );
 

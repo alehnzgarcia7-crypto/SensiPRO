@@ -7,6 +7,7 @@ import type {
   AresV6HumanReviewFinding,
   AresV6HumanReviewPacket,
   AresV6ReviewEvidenceInput,
+  AresV6ReviewExecutionMode,
   AresV6ReviewSmokeInput,
 } from './human-review-session';
 
@@ -31,6 +32,8 @@ export interface AresV6HumanReviewCliOptions {
   dryRun: boolean;
   /** Operator assertion that deployment protection was verified (human checklist). */
   deploymentProtectionVerified: boolean;
+  /** Execution mode override; defaults to real-http when targetUrl is present. */
+  executionMode: AresV6ReviewExecutionMode | null;
 }
 
 export class AresV6HumanReviewArgError extends Error {}
@@ -53,6 +56,7 @@ export function parseAresV6HumanReviewArgs(argv: readonly string[]): AresV6Human
     markdown: false,
     dryRun: false,
     deploymentProtectionVerified: false,
+    executionMode: null,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -99,6 +103,15 @@ export function parseAresV6HumanReviewArgs(argv: readonly string[]): AresV6Human
       case '--deployment-protection-verified':
         options.deploymentProtectionVerified = true;
         break;
+      case '--execution-mode': {
+        const value = need(argv[i + 1], arg);
+        if (value !== 'real-http' && value !== 'dry-run-local') {
+          throw new AresV6HumanReviewArgError('--execution-mode debe ser real-http|dry-run-local');
+        }
+        options.executionMode = value;
+        i += 1;
+        break;
+      }
       default:
         throw new AresV6HumanReviewArgError(`Argumento desconocido: ${arg ?? '(vacío)'}`);
     }
@@ -246,7 +259,11 @@ export function buildAresV6HumanReviewMarkdown(packet: AresV6HumanReviewPacket):
       `**Entorno:** ${packet.session.environment}  ·  **Generado:** ${packet.generatedAt}  ·  **schema:** ${packet.schemaVersion}`,
   );
   if (packet.session.commitSha) lines.push(`**Commit:** ${packet.session.commitSha}`);
-  if (packet.session.targetUrl) lines.push(`**Target:** ${packet.session.targetUrl}`);
+  lines.push(
+    `**Modo de ejecución:** ${packet.execution.executionMode}  ·  ` +
+      `**Target (redacted):** ${packet.execution.targetUrlRedacted ?? '(none)'}  ·  ` +
+      `**Deployment protection:** ${packet.execution.deploymentProtectionVerified ? 'verificada (humano)' : 'NO verificada'}`,
+  );
   lines.push('');
 
   lines.push('## 1. Evidencia · GO/NO-GO');
@@ -323,6 +340,11 @@ export function buildAresV6HumanReviewMarkdown(packet: AresV6HumanReviewPacket):
     lines.push('');
     lines.push('**Gates de closed-beta no cumplidos:**');
     lines.push(mdList(packet.readiness.unmetClosedBetaGates));
+  }
+  if (d.finalizationBlockedReasons.length > 0) {
+    lines.push('');
+    lines.push('**Finalización bloqueada (no puede ser FINAL aún):**');
+    lines.push(mdList(d.finalizationBlockedReasons));
   }
   lines.push('');
   lines.push('**Rationale (humano):**');

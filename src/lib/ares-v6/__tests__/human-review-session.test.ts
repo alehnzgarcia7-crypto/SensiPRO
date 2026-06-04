@@ -109,3 +109,82 @@ describe('sanitizeAresV6HumanReviewPacket', () => {
     expect(clean.decision.rationale[0]).toBe('[redacted]');
   });
 });
+
+// ── Fase 3G additions ──
+describe('execution mode gating (3G)', () => {
+  it('real-http with enough evidence can recommend closed-beta design', () => {
+    const result = evaluateAresV6HumanReviewReadiness({
+      evidence: evidence(),
+      smoke: { ran: true, passed: true },
+      deploymentProtectionVerified: true,
+      executionMode: 'real-http',
+    });
+    expect(result.recommendedDecision).toBe('GO_PREPARE_CLOSED_BETA_DESIGN');
+  });
+
+  it('dry-run-local can NEVER recommend closed-beta (even with good numbers)', () => {
+    const result = evaluateAresV6HumanReviewReadiness({
+      evidence: evidence(),
+      smoke: { ran: true, passed: true },
+      deploymentProtectionVerified: true,
+      executionMode: 'dry-run-local',
+    });
+    expect(result.recommendedDecision).toBe('NO_GO_MORE_EVIDENCE');
+    expect(result.closedBetaReady).toBe(false);
+  });
+
+  it('a failed UI smoke is a hard blocker', () => {
+    const result = evaluateAresV6HumanReviewReadiness({
+      evidence: evidence(),
+      smoke: { ran: true, passed: false },
+      deploymentProtectionVerified: true,
+      executionMode: 'real-http',
+    });
+    expect(result.recommendedDecision).toBe('NO_GO_FIX_BLOCKERS');
+  });
+});
+
+describe('finalization hardening (3G)', () => {
+  const plan = buildDefaultAresV6HumanReviewPlan({ targetUrl: 'https://x.vercel.app/internal' });
+
+  it('refuses FINAL for closed-beta when gates are unmet (stays DRAFT)', () => {
+    const packet = buildAresV6HumanReviewPacket({
+      plan,
+      readinessInput: { evidence: evidence(), executionMode: 'real-http' }, // no smoke, no deployment protection
+      generatedAt: '1970-01-01T00:00:00.000Z',
+      human: { decision: 'GO_PREPARE_CLOSED_BETA_DESIGN', decidedBy: 'alex', rationale: ['ship it'] },
+    });
+    expect(packet.decision.status).toBe('DRAFT');
+    expect(packet.decision.decision).toBeNull();
+    expect(packet.decision.finalizationBlockedReasons.length).toBeGreaterThan(0);
+  });
+
+  it('allows FINAL for closed-beta only when every gate is met', () => {
+    const packet = buildAresV6HumanReviewPacket({
+      plan,
+      readinessInput: {
+        evidence: evidence(),
+        smoke: { ran: true, passed: true },
+        deploymentProtectionVerified: true,
+        executionMode: 'real-http',
+      },
+      generatedAt: '1970-01-01T00:00:00.000Z',
+      targetUrlRedacted: 'https://x.vercel.app/internal',
+      human: { decision: 'GO_PREPARE_CLOSED_BETA_DESIGN', decidedBy: 'alex', rationale: ['evidence reviewed'] },
+    });
+    expect(packet.decision.status).toBe('FINAL');
+    expect(packet.decision.finalizationBlockedReasons).toHaveLength(0);
+  });
+
+  it('records the execution block (mode + redacted target + deployment flag)', () => {
+    const packet = buildAresV6HumanReviewPacket({
+      plan,
+      readinessInput: { evidence: evidence(), executionMode: 'real-http', deploymentProtectionVerified: true },
+      generatedAt: '1970-01-01T00:00:00.000Z',
+      targetUrlRedacted: 'https://x.vercel.app/internal',
+    });
+    expect(packet.execution.executionMode).toBe('real-http');
+    expect(packet.execution.targetUrlRedacted).toBe('https://x.vercel.app/internal');
+    expect(packet.execution.deploymentProtectionVerified).toBe(true);
+  });
+});
