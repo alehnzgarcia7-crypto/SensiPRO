@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { ConflictError, NotFoundError } from '@ares/errors';
 import type { Prisma } from '@prisma/client';
 

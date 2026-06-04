@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { notFound } from 'next/navigation';
 
 import { getAresV6EnabledSurfaces } from './internal-access';

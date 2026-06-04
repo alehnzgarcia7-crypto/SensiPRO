@@ -1,3 +1,5 @@
+import 'server-only';
+
 import {
   ARES_V6_EVIDENCE_MAX_INCLUDED_ROWS,
   type AresV6NormalizedEvidenceQuery,

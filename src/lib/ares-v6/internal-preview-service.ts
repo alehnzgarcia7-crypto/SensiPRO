@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { AresV6PresetId } from '@ares/algorithms/engine-v6';
 
 import {

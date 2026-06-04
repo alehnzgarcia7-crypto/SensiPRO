@@ -35,6 +35,9 @@
     "ares:v6:lab:cleanup": "npx tsx scripts/ares-v6-lab-cleanup.ts",
     "ares:v6:verify-env": "npx tsx scripts/ares-v6-verify-internal-env.ts",
     "ares:v6:evidence": "npx tsx scripts/ares-v6-evidence-review.ts",
+    "ares:v6:ui-readiness": "npx tsx scripts/ares-v6-ui-readiness.ts",
+    "ares:v6:human-review": "npx tsx scripts/ares-v6-human-review-session.ts",
+    "ares:v6:ui:smoke": "playwright test --config playwright.internal-ui.config.ts",
     "db:push:test": "cd packages/database && npx prisma db push --skip-generate",
     "db:reset:safe": "bash scripts/db-reset.sh",
     "clean": "rm -rf .next node_modules packages/*/node_modules packages/*/dist"
@@ -59,6 +62,7 @@
     "recharts": "^2.12.0",
     "redis": "^4.6.0",
     "resend": "^6.9.2",
+    "server-only": "0.0.1",
     "stripe": "^13.0.0",
     "tailwind-merge": "^2.3.0",
     "uuid": "^13.0.0",

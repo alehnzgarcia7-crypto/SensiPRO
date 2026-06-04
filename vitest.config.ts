@@ -21,6 +21,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // server-only is a no-op in tests (Next keeps the real client-import guard).
+      'server-only': path.resolve(__dirname, 'tests/stubs/server-only.ts'),
       '@': path.resolve(__dirname, 'src'),
       '@ares/database': path.resolve(__dirname, 'packages/database/src'),
       '@ares/algorithms/engine-v6': path.resolve(__dirname, 'packages/algorithms/src/engine-v6'),

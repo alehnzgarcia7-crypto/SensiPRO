@@ -1,3 +1,5 @@
+import 'server-only';
+
 // ═══════════════════════════════════════════════════════════════
 // ARES v6 — Internal UI feature flags (Fase 3E)
 //
